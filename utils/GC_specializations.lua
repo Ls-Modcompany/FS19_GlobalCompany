@@ -47,12 +47,18 @@ function GC_specializations:registerSpecialization(xmlFile, key, modName)
 	local name = getXMLString(xmlFile, string.format("%s#name", key));
 	local className = getXMLString(xmlFile, string.format("%s#className", key));
 	local filename = Utils.getNoNil(getXMLString(xmlFile, string.format("%s#filename", key)), "");
+	local onlyLoad = Utils.getNoNil(getXMLString(xmlFile, string.format("%s#onlyLoad", key)), false);
 	filename = g_company.utils.createModPath(modName, filename)
 	
-	local specEnvName = string.format("%s.%s", "FS19_GlobalCompany", name);	
-	table.insert(GC_specializations.specs, {specEnvName=specEnvName, modName=modName, name=name, className=className, filename=filename});
-
-	g_specializationManager:addSpecialization(name, className, filename);	
+	if onlyLoad then
+		name = string.format("%s.%s", modName, name);	
+		className = string.format("%s.%s", modName, className);	
+		g_specializationManager:addSpecialization(name, className, filename, modName);	
+	else
+		local specEnvName = string.format("%s.%s", "FS19_GlobalCompany", name);
+		table.insert(GC_specializations.specs, {specEnvName=specEnvName, modName=modName, name=name, className=className, filename=filename});	
+		g_specializationManager:addSpecialization(name, className, filename);	
+	end;
 end;
 
 function GC_specializations:load()
