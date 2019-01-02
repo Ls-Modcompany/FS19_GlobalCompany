@@ -96,15 +96,15 @@ source(GlobalCompany.dir .. "GlobalCompanyGui.lua");
 
 --Objects
 --source(GlobalCompany.dir .. "objects/FarmShopPallet.lua");
-source(GlobalCompany.dir .. "objects/FeederSilo.lua");
-source(GlobalCompany.dir .. "objects/FeederRoboter.lua");
+--source(GlobalCompany.dir .. "objects/FeederSilo.lua");
+--source(GlobalCompany.dir .. "objects/FeederRoboter.lua");
 --source(GlobalCompany.dir .. "objects/NodeObjects.lua");
 --source(GlobalCompany.dir .. "objects/ObjectNodeSpawner.lua");
 
 -- Objects (onCreate)
 --source(GlobalCompany.dir .. "objects/AnimalShop.lua");
 --source(GlobalCompany.dir .. "objects/Construction.lua");
-source(GlobalCompany.dir .. "objects/Feeder.lua");
+--source(GlobalCompany.dir .. "objects/Feeder.lua");
 --source(GlobalCompany.dir .. "objects/Fermenter.lua");
 --source(GlobalCompany.dir .. "objects/ProductFactory.lua");
 --source(GlobalCompany.dir .. "objects/Scaffolding.lua");
@@ -116,17 +116,17 @@ source(GlobalCompany.dir .. "objects/Feeder.lua");
 source(GlobalCompany.dir .. "objects/GC_Animations.lua");
 --source(GlobalCompany.dir .. "objects/GC_AnimationClips.lua");
 source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
-source(GlobalCompany.dir .. "objects/GC_ExtendedHeap.lua");
-source(GlobalCompany.dir .. "objects/GC_FillVolume.lua");
+--source(GlobalCompany.dir .. "objects/GC_ExtendedHeap.lua");
+--source(GlobalCompany.dir .. "objects/GC_FillVolume.lua");
 source(GlobalCompany.dir .. "objects/GC_ParticleEffects.lua");
 --source(GlobalCompany.dir .. "objects/GC_Lighting.lua");
 --source(GlobalCompany.dir .. "objects/GC_Sounds.lua");
-source(GlobalCompany.dir .. "objects/GC_Shaders.lua");
+--source(GlobalCompany.dir .. "objects/GC_Shaders.lua");
 --source(GlobalCompany.dir .. "objects/GC_RotationNodes.lua");
 --source(GlobalCompany.dir .. "objects/GC_Displays.lua");
 
 --Triggers
-source(GlobalCompany.dir .. "triggers/GC_AnimalShopTrigger.lua");
+--source(GlobalCompany.dir .. "triggers/GC_AnimalShopTrigger.lua");
 --source(GlobalCompany.dir .. "triggers/GC_TipTrigger.lua");
 --source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
 --source(GlobalCompany.dir .. "triggers/GC_BaleTrigger.lua");

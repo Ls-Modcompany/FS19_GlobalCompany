@@ -26,7 +26,7 @@
 -- 	debug and debugIndex
 -- 
 
-source(g_company.dir.."events/SetGcAnimationsEvent.lua");
+--source(g_company.dir.."events/SetGcAnimationsEvent.lua");
 
 GC_Animations = {};
 getfenv(0)["GC_Animations"] = GC_Animations;

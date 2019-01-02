@@ -17,7 +17,7 @@
 -- 
 -- 
 -- ToDo:
--- 
+-- sortCategories: type not used in script
 -- 
 local debugIndex = g_debug.registerMod("GlobalCompany-GC_i3dLoader");
 
@@ -25,7 +25,6 @@ GC_shopManager = {};
 g_company.shopManager = GC_shopManager;
 
 function GC_shopManager:loadFromXML(modName, xmlPath)
-print(xmlPath);
 	local xmlFile = loadXMLFile("shopManager", xmlPath);	
 	
 	local i = 0;
@@ -39,7 +38,7 @@ print(xmlPath);
 		local title = g_company.languageManager:getText(getXMLString(xmlFile, key.."#title"));
 		
 		local image = getXMLString(xmlFile, key.."#image");		
-		g_storeManager:addCategory(name, title, image, type, modName);
+		g_storeManager:addCategory(name, title, image, type, g_company.shopManager:getFullImagePath(image, modName));
 		i = i + 1;
 	end;	
 	
@@ -91,12 +90,13 @@ print(xmlPath);
 			break;
 		end;
 		local xmlFilename = getXMLString(xmlFile, key.."#xmlFilename");
+		xmlFilename = g_company.shopManager:getFullXmlFilename(xmlFilename, modName);
 		
 		local item = g_storeManager:getItemByXMLFilename(xmlFilename);
 		g_storeManager:removeItemByIndex(item.id);
 		i = i + 1;
 	end;
-	
+		
 	i = 0;
 	while true do
 		local key = string.format("shopManager.changeCategory.item(%d)", i);
@@ -104,6 +104,7 @@ print(xmlPath);
 			break;
 		end;
 		local xmlFilename = getXMLString(xmlFile, key.."#xmlFilename");
+		xmlFilename = g_company.shopManager:getFullXmlFilename(xmlFilename, modName);
 		local name = getXMLString(xmlFile, key.."#category");
 				
 		local item = g_storeManager:getItemByXMLFilename(xmlFilename);
@@ -116,6 +117,22 @@ print(xmlPath);
 	return true;
 end;
 
+function GC_shopManager:getFullXmlFilename(xmlFilename, modName)
+	local lenght = xmlFilename:len();
+	if xmlFilename:sub(0, 1) == "$" then
+		return xmlFilename:sub(2, lenght);
+	else
+		return g_company.utils.createModPath(modName, xmlFilename);
+	end; 
+end;
+
+function GC_shopManager:getFullImagePath(imagePath, modName)
+	if imagePath:sub(0, 1) == "$" then
+		return "";
+	else
+		return g_company.utils.createDirPath(modName);
+	end; 
+end;
 
 
 
