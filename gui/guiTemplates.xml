@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<guiTemplates>
+	<colors>
+		<color name="white" value="1 1 1 1" />
+		<color name="black" value="0 0 0 1" />
+		<color name="orange" value="0.9910 0.3865 0.0100 1" />
+		
+		<color name="gray1" value="0.6 0.6 0.6 1" />
+		<color name="gray2" value="0.3 0.3 0.3 1" />
+		
+		<color name="glass1_60" value="0.3 0.3 0.3 0.6" />
+		<color name="glass2_45" value="0.2 0.2 0.2 0.45" />
+		<color name="glass3_40" value="0.018 0.016 0.015 0.4" />
+		<color name="glass4_10" value="0.5 0.5 0.5 0.1" />
+		
+		<color name="image" value="1 1 1 1" />
+		<color name="image_disabled" value="07098 07098 07098 1" />
+		<color name="image_selected" value="0.5 0.5 0.5 0.2" />
+		<color name="image_selected2" value="0.9910 0.3865 0.0100 1" />
+		
+		<color name="text" value="1 1 1 1" />		
+		<color name="text_disabled" value="0.498 0.498 0.498 1" />		
+		<color name="text_selected" value="0.9910 0.3865 0.0100 1" />
+	</colors>
+	
+	<uvs>
+		<uv name="colorBg" value="10px 1010px 4px 4px" />
+		<uv name="image" value="0 0 1 1" />
+		<uv name="icon_notification" value="0px 0px 80px 80px" />
+		<uv name="icon_notificationNumber" value="80px 0px 80px 80px" />
+		<uv name="icon_apps" value="240px 0px 80px 80px" />
+		<uv name="icon_settings" value="160px 0px 80px 80px" />
+	</uvs>
+	
+	<templates>
+		<template name="gcBase">
+			<value name="imageFilename" value="g_baseUIFilename" />
+			<value name="imageUVs" value="colorBg" />
+			<value name="imageUVs_selected" value="colorBg" />
+			<value name="imageUVs_disabled" value="colorBg" />
+			
+			<value name="imageColor" value="image" />
+			<value name="imageColor_disabled" value="image_disabled" />
+			<value name="imageColor_selected" value="image_selected" />
+			
+			<value name="textColor" value="text" />
+			<value name="textColor_disabled" value="text_disabled" />
+			<value name="textColor_selected" value="text_selected" />
+			<value name="imageSize" value="1024 1024" />
+		</template>
+		
+		<template name="gcBase_text" extends="gcBase">
+			<value name="size" value="0px 0px" />
+		</template>
+		
+		<template name="gcBase_border" extends="">
+			<value name="borderLeftSize" value="0px" />
+			<value name="borderRightSize" value="0px" />
+			<value name="borderTopSize" value="0px" />
+			<value name="borderBottomSize" value="0px" />
+			<value name="borderLeftColor" value="gray1" />
+			<value name="borderRightColor" value="gray1" />
+			<value name="borderTopColor" value="gray1" />
+			<value name="borderBottomColor" value="gray1" />
+			
+			<value name="borderLeftSize_selected" value="0px" />
+			<value name="borderRightSize_selected" value="0px" />
+			<value name="borderTopSize_selected" value="0px" />
+			<value name="borderBottomSize_selected" value="0px" />
+			<value name="borderLeftColor_selected" value="gray1" />
+			<value name="borderRightColor_selected" value="gray1" />
+			<value name="borderTopColor_selected" value="gray1" />
+			<value name="borderBottomColor_selected" value="orange" />
+			
+			<value name="borderLeftSize_disabled" value="2px" />
+			<value name="borderRightSize_disabled" value="2px" />
+			<value name="borderTopSize_disabled" value="2px" />
+			<value name="borderBottomSize_disabled" value="2px" />
+			<value name="borderLeftColor_disabled" value="gray1" />
+			<value name="borderRightColor_disabled" value="gray1" />
+			<value name="borderTopColor_disabled" value="gray1" />
+			<value name="borderBottomColor_disabled" value="gray1" />
+		</template>		
+		
+		<template name="gcBorder_button" extends="gcBase_border">
+			<value name="borderLeftSize" value="1px" />
+			<value name="borderRightSize" value="1px" />
+			<value name="borderBottomSize" value="1px" />
+			<value name="borderLeftSize_selected" value="1px" />
+			<value name="borderRightSize_selected" value="1px" />
+			<value name="borderBottomSize_selected" value="5px" />
+		</template>
+		<template name="gcBorder_Header" extends="gcBase_border">
+			<value name="borderBottomSize" value="2px" />
+			<value name="borderBottomColor" value="gray1" />
+		</template>
+		<template name="gcBorder_Header2" extends="gcBase_border">
+			<value name="borderBottomSize" value="4px" />
+			<value name="borderBottomColor" value="orange" />
+		</template>
+	</templates>	
+</guiTemplates>

@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<modDesc descVersion="40">
+	<author>Ls-Modcompany - kevink98</author>
+    <version>0.1.0.0</version>
+    <title>
+        <en>GlobalCompany</en>
+    </title>
+    <description>
+        <de><![CDATA[123]]></de>
+		<en><![CDATA[123]]></en>
+
+    </description>
+    <iconFilename>globalCompany.dds</iconFilename>
+    <multiplayer supported="true"/>
+	<extraSourceFiles>	
+		<sourceFile filename="GlobalCompany.lua" /> 
+	</extraSourceFiles>
+	
+	<l10n>		
+		<text name="input_SHOW_FARMSHOP"><en>Open farmshop</en><de>Farmshop öffnen</de></text>
+		<text name="input_FARMSHOPPALLET_CHANGESTATE"><en>Ls-Modcompany GC</en></text>
+		<text name="input_FARMSHOPPALLET_BUILDPALLET"><en>Ls-Modcompany GC</en></text>
+		<text name="input_FARMSHOPPALLET_BUILDPALLET2"><en>Ls-Modcompany GC</en></text>
+	</l10n>	
+	
+	<inputBindings>
+        <input name="SHOW_FARMSHOP" category="ONFOOT" key1="KEY_r" key2="" button="" device="" mouse=""/>
+        <input name="FARMSHOPPALLET_CHANGESTATE" category="ONFOOT" key1="KEY_t" key2="" button="" device="" mouse=""/>
+        <input name="FARMSHOPPALLET_BUILDPALLET" category="ONFOOT" key1="KEY_y" key2="" button="" device="" mouse=""/>
+        <input name="FARMSHOPPALLET_BUILDPALLET2" category="ONFOOT" key1="KEY_u" key2="" button="" device="" mouse=""/>
+    </inputBindings>
+</modDesc>
