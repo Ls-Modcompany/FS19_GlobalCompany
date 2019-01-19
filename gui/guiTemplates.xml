@@ -15,7 +15,7 @@
 		
 		<color name="image" value="1 1 1 1" />
 		<color name="image_disabled" value="07098 07098 07098 1" />
-		<color name="image_selected" value="0.5 0.5 0.5 0.2" />
+		<color name="image_selected" value="1 1 1 1" />
 		<color name="image_selected2" value="0.9910 0.3865 0.0100 1" />
 		
 		<color name="text" value="1 1 1 1" />		

@@ -39,7 +39,7 @@ source(g_currentModDirectory .. "gui/FakeGui.lua");
 
 function GlobalCompanyGui:init()	
 	for _,inAc in pairs(self.toInit_actionEvents) do
-		g_gui.inputManager:registerActionEvent(inAc.inputAction, GlobalCompanyGui, inAc.func, false, true, false, true);	
+		g_gui.inputManager:registerActionEvent(inAc.inputAction, GlobalCompanyGui, inAc.func, false, true, false, true);
 	end;
 end;
 
@@ -51,12 +51,12 @@ end;
 function GlobalCompanyGui:update(dt)
 	if self.DevelopementVersion then
 		if self.DevelopementVersionTimer == nil or self.DevelopementVersionTimer <= 0 then
+			for _, fileName in pairs(GlobalCompanyGui.DevelopementVersionTemplatesFilename) do				
+				self:loadGuiTemplates(fileName);
+			end;
 			for name,gui in pairs(self.guis) do				
 				gui.gui:deleteElements();
 				gui.gui:loadFromXML();
-			end;
-			for _, fileName in pairs(GlobalCompanyGui.DevelopementVersionTemplatesFilename) do				
-				self:loadGuiTemplates(fileName);
 			end;
 			if self.activeGui ~= nil then
 				self.guis[self.activeGui].gui:openGui();
@@ -622,19 +622,30 @@ end;
 
 -- http://alienryderflex.com/polygon/
 function GlobalCompanyGui:checkClickZone(x,y, clickZone, isRound)		
-	if isRound then
-		local r = (clickZone[3] - clickZone[1]) / 2;
-		local mx = clickZone[1] + r;
-		local my = clickZone[2] + r;
-		return math.sqrt(math.pow(x - mx, 2) + math.pow(y - my, 2)) <= r ;		
+	if isRound then	
+		local dx = math.abs(clickZone[1] - x);
+		local dy = math.abs(clickZone[2] - y);	
+		return math.sqrt(dx*dx + dy*dy) <= clickZone[3];		
 	else	
-		local polyX = {clickZone[1], clickZone[3], clickZone[5], clickZone[7]};
-		local polyY = {clickZone[2], clickZone[4], clickZone[6], clickZone[8]};	
+		local polyX = {}
+		local polyY = {};
 		
-		local j = 4;
+		local num = table.getn(clickZone);
+		
+		for i=1, num do
+			if i % 2 == 0 then
+				table.insert(polyY, clickZone[i]);
+			else
+				table.insert(polyX, clickZone[i]);
+			end;
+		end;
+		
+		num = num / 2;
+		
+		local j = num;
 		local insert = false;
 		
-		for i=1, 4 do
+		for i=1, num do
 			if polyY[i]< y and polyY[j]>=y or polyY[j]< y and polyY[i]>=y then
 				if polyX[i] + (y-polyY[i]) / (polyY[j]-polyY[i])*(polyX[j]-polyX[i]) < x then
 					insert = not insert;

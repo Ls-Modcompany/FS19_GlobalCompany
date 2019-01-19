@@ -28,12 +28,13 @@ function GC_Gui_element:new(gui, custom_mt, isOnlyElement)
 	self.drawPosition = {0,0}; 
 	self.size = {1,1};
 	self.margin = {0,0,0,0}; --left, top, right, bottom
-	self.outputSize = {1920, 1080};
+	self.outputSize = {g_screenWidth, g_screenHeight};
     self.imageSize = {1024, 1024};
 	self.visible = true;
 	self.disabled = false;
 	self.selected = false;
 	self.debugEnabled = false;
+	self.parameter = false;
 	
 	self.newLayer = false;	
 	
@@ -57,6 +58,8 @@ function GC_Gui_element:loadTemplate(templateName, xmlFile, key)
 	self.position = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValueXML(xmlFile, "position", key), self.outputSize, self.position);
 	self.size = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValueXML(xmlFile, "size", key), self.outputSize, self.size);
 	self.margin = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValueXML(xmlFile, "margin", key), self.outputSize, self.margin);
+	
+	self.parameter = g_company.gui:getTemplateValueXML(xmlFile, "parameter", key);
 	
 	self.callback_onCreate = g_company.gui:getTemplateValueXML(xmlFile, "onCreate", key);
 	if self.isOnlyElement then

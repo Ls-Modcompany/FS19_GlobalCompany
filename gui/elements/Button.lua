@@ -84,13 +84,18 @@ end;
 function GC_Gui_button:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
 	if not self:getDisabled() then
 		eventUsed = GC_Gui_button:superClass().mouseEvent(self, posX, posY, isDown, isUp, button, eventUsed)
-				
-		local clickZone = {
-			self.drawPosition[1] + self.clickZone[1] + self.margin[1], self.drawPosition[2] + self.clickZone[2] + self.margin[4],
-			self.drawPosition[1] + self.clickZone[3] + self.margin[1], self.drawPosition[2] + self.clickZone[4] + self.margin[4],
-			self.drawPosition[1] + self.clickZone[5] + self.margin[1], self.drawPosition[2] + self.clickZone[6] + self.margin[4], 
-			self.drawPosition[1] + self.clickZone[7] + self.margin[1], self.drawPosition[2] + self.clickZone[8] + self.margin[4]
-		}
+			
+		local clickZone = {};		
+		if self.isRoundButton then
+			clickZone[1] = self.drawPosition[1] + self.clickZone[1] + self.margin[1];
+			clickZone[2] = self.drawPosition[2] + self.clickZone[2] + self.margin[4];
+			clickZone[3] = self.clickZone[3]
+		else
+			for i=1, table.getn(self.clickZone), 2 do
+				clickZone[i] = self.drawPosition[1] + self.clickZone[i] + self.margin[1];
+				clickZone[i+1] = self.drawPosition[2] + self.clickZone[i+1] + self.margin[4];
+			end;			
+		end;
 		
 		if not eventUsed then
 			if g_company.gui:checkClickZone(posX, posY, clickZone, self.isRoundButton) then
@@ -98,7 +103,7 @@ function GC_Gui_button:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
 					self.mouseEntered = true;
 					self:setSelected(true);
 					if self.callback_onEnter ~= nil then
-						self.gui[self.callback_onEnter](self.gui, self);
+						self.gui[self.callback_onEnter](self.gui, self, self.parameter);
 					end;
 				end;
 				
@@ -115,13 +120,13 @@ function GC_Gui_button:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
 						self.doubleClickTime = self.doubleClickInterval;
 					else
 						if self.callback_onDoubleClick ~= nil then
-							self.gui[self.callback_onDoubleClick](self.gui, self);
+							self.gui[self.callback_onDoubleClick](self.gui, self, self.parameter);
 						end;
 						self.doubleClickTime = 0;
 					end;
 					
 					if self.callback_onClick ~= nil then
-						self.gui[self.callback_onClick](self.gui, self);
+						self.gui[self.callback_onClick](self.gui, self, self.parameter);
 					end;
 				end;
 			else
@@ -135,7 +140,7 @@ function GC_Gui_button:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
 						self:setSelected(false);
 					end;					
 					if self.callback_onLeave ~= nil then
-						self.gui[self.callback_onLeave](self.gui, self);
+						self.gui[self.callback_onLeave](self.gui, self, self.parameter);
 					end;
 				end;
 			
@@ -158,6 +163,31 @@ end;
 
 function GC_Gui_button:draw(index)
 	self.drawPosition[1], self.drawPosition[2] = g_company.gui:calcDrawPos(self, index);	
+	
+	
+	if self.debugEnabled then
+		local xPixel = 1 / g_screenWidth;
+		local yPixel = 1 / g_screenHeight;
+		setOverlayColor(GuiElement.debugOverlay, 1, 0,0,1)
+				
+		if self.isRoundButton then
+		
+			local y = self.clickZone[3] * (g_screenWidth / g_screenHeight);
+			renderOverlay(GuiElement.debugOverlay, self.drawPosition[1] + self.clickZone[1] + self.margin[1], self.drawPosition[2] + self.clickZone[2] + self.margin[4], self.clickZone[3],yPixel);
+			renderOverlay(GuiElement.debugOverlay, self.drawPosition[1] + self.clickZone[1] + self.margin[1], self.drawPosition[2] + self.clickZone[2] + self.margin[4], xPixel,y);
+		else
+			local clickZone = {};		
+			for i=1, table.getn(self.clickZone), 2 do
+				clickZone[i] = self.drawPosition[1] + self.clickZone[i] + self.margin[1];
+				clickZone[i+1] = self.drawPosition[2] + self.clickZone[i+1] + self.margin[4];
+			end;	
+			
+			for i=1, table.getn(clickZone), 2 do
+				renderOverlay(GuiElement.debugOverlay, clickZone[i], clickZone[i+1], xPixel*3,yPixel*3);
+			end;
+		end;
+	end
+	
 	GC_Gui_button:superClass().draw(self);
 end;
 

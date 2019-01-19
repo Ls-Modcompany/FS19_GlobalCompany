@@ -167,6 +167,10 @@ function GC_Gui_overlay:getImageColor()
     end;
 end;
 
+function GC_Gui_overlay:setRotation(rotation)
+	self.rotation = rotation;
+end;
+
 
 
 
