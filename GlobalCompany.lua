@@ -78,6 +78,7 @@ source(GlobalCompany.dir .. "utils/GC_i3dLoader.lua");
 source(GlobalCompany.dir .. "utils/GC_specializations.lua");
 source(GlobalCompany.dir .. "utils/GC_shopManager.lua");
 source(GlobalCompany.dir .. "utils/GC_languageManager.lua");
+source(GlobalCompany.dir .. "utils/GC_densityMapHeight.lua");
 
 
 
@@ -171,6 +172,8 @@ for _,v in pairs(mods.files) do
 		GlobalCompany.environments[modName].xmlFile = xmlFile;
 		GlobalCompany.environments[modName].specializations = getXMLString(xmlFile, "globalCompany.specializations#xmlFilename");
 		GlobalCompany.environments[modName].shopManager = getXMLString(xmlFile, "globalCompany.shopManager#xmlFilename");
+		GlobalCompany.environments[modName].densityMapHeight = getXMLString(xmlFile, "globalCompany.densityMapHeight#xmlFilename");
+		GlobalCompany.environments[modName].densityMapHeightOverwriteOrginalFunction = getXMLBool(xmlFile, "globalCompany.densityMapHeight#overwriteOrginalFunction");
 	end;
 end;
 
@@ -178,6 +181,9 @@ end;
 for modName, values in pairs(GlobalCompany.environments) do
 	if values.specializations ~= nil and values.specializations ~= "" then	
 		g_company.specializations:loadFromXML(modName, g_company.utils.createModPath(modName, values.specializations));
+	end;
+	if values.densityMapHeightOverwriteOrginalFunction then	
+		g_densityMapHeightManager.loadMapData = function() return true; end;		
 	end;
 end;
 
@@ -239,6 +245,9 @@ function GlobalCompany:loadMap()
 		
 		if e.shopManager ~= nil and e.shopManager ~= "" then	
 			g_company.shopManager:loadFromXML(modName, g_company.utils.createModPath(modName, e.shopManager));
+		end;
+		if e.densityMapHeight ~= nil and e.densityMapHeight ~= "" then	
+			g_company.densityMapHeight:loadFromXML(modName, g_company.utils.createModPath(modName, e.densityMapHeight));
 		end;
 		
 		delete(e.xmlFile);
