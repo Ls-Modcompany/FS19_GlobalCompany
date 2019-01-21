@@ -11,7 +11,7 @@
 -- Changelog:
 --		
 -- 	v1.0.0.0 (31.12.2018):
--- 		- initial fs19 (kevink98)
+-- 		- initial fs19 (kevink98, GtX)
 -- 
 -- Notes:
 -- 
@@ -167,4 +167,53 @@ function GlobalCompanyUtils.find(str, search)
 end; 
 
 
+-- Split the 'mod script' className and return only the script name.
+-- @param table object = object to get class name from.
+-- @param string backupString = backup string to display if there is a problem. (Optional)
+-- @return string splitClassName = script class name with mod name removed.
+function GlobalCompanyUtils.getSplitClassName(object, backupString)
+	local splitClassName = "";
+	
+	if backupString ~= nil then
+		splitClassName = tostring(backupString);
+	end;
+	
+	if object ~= nil and type(object) == "table" then
+		local fullClassName = object.className;
+		if fullClassName ~= nil then
+			local start, _ = string.find(fullClassName, ".", 1, true);
+			if start ~= nil then
+				splitClassName = string.sub(fullClassName, start + 1);
+			end;
+		end;
+	end;
+	
+	return splitClassName;
+end;
 
+
+
+-- This will allow placeable / onCreate to have different keys.
+-- Might be better in i3dLoader ?? Example of use in Factory Script soon.
+function GlobalCompanyUtils.getXmlKey(xmlFile, baseKey, key, indexName)
+	local xmlKey = string.format("%s.%s", baseKey, key);
+
+	if indexName ~= nil then
+		local i = 0;
+		while true do
+			local indexNameKey = string.format("%s.%s(%d)", baseKey, key, i);
+			if not hasXMLProperty(xmlFile, indexNameKey) then
+				break;
+			end;
+
+			local factoryIndex = getXMLString(xmlFile, indexNameKey .. "#indexName");
+			if factoryIndex == indexName then
+				xmlKey = indexNameKey;
+				break;
+			end;
+			i = i + 1;
+		end;
+	end;
+
+	return xmlKey;
+end;
