@@ -147,8 +147,8 @@ for _,v in pairs(mods.files) do
 	if v.isDirectory then
 		modName = v.filename;
 	else
-		local l = v.filename:len();
-		if l > 4 then
+		local len = v.filename:len();
+		if len > 4 then
 			local ext = v.filename:sub(len-3);
 			if ext == ".zip" or ext == ".gar" then
 				modName = v.filename:sub(1, len-4);
