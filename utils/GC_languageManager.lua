@@ -51,6 +51,8 @@ function GC_languageManager:getText(text)
 		end;
 		if text:sub(1,6) == "$l10n_" then
 			text = g_i18n:getText(text:sub(7));
+		elseif g_i18n:hasText(text) then
+			text = g_i18n:getText(text);
 		end;
 		if addColon and text ~= "" then
 			text = text .. ":";
