@@ -73,6 +73,8 @@ function GlobalCompany.removeUpdateableTick(target, update)
 end; ]]--
 
 
+
+-- Utils
 source(GlobalCompany.dir .. "utils/GC_utils.lua");
 source(GlobalCompany.dir .. "utils/GC_i3dLoader.lua");
 source(GlobalCompany.dir .. "utils/GC_specializations.lua");
@@ -80,8 +82,29 @@ source(GlobalCompany.dir .. "utils/GC_shopManager.lua");
 source(GlobalCompany.dir .. "utils/GC_languageManager.lua");
 source(GlobalCompany.dir .. "utils/GC_densityMapHeight.lua");
 
+source(GlobalCompany.dir .. "utils/GC_TriggerManager.lua");
+
+-- Objects
+source(GlobalCompany.dir .. "objects/GC_Animations.lua");
+source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
+source(GlobalCompany.dir .. "objects/GC_ParticleEffects.lua");
+source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
 
 
+-- Triggers
+source(GlobalCompany.dir .. "triggers/GC_DynamicHeap.lua");
+source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
+source(GlobalCompany.dir .. "triggers/GC_PlayerTrigger.lua");
+source(GlobalCompany.dir .. "triggers/GC_UnloadingTrigger.lua");
+
+
+-- GUI
+source(GlobalCompany.dir .. "GlobalCompanyGui.lua");
+
+
+
+
+-- OLD
 
 
 --source(GlobalCompany.dir .. "utils/TriggerUtil.lua");
@@ -89,7 +112,6 @@ source(GlobalCompany.dir .. "utils/GC_densityMapHeight.lua");
 --source(GlobalCompany.dir .. "utils/TextDisplayUtil.lua");
 --source(GlobalCompany.dir .. "utils/AlgorithUtils.lua");
 --source(GlobalCompany.dir .. "utils/GcUtils.lua");
-source(GlobalCompany.dir .. "GlobalCompanyGui.lua");
 
 --FarmShop
 --source(GlobalCompany.dir .. "shop/FarmShop.lua");
@@ -114,12 +136,12 @@ source(GlobalCompany.dir .. "GlobalCompanyGui.lua");
 -- Objects (Addon Scripts)
 --source(GlobalCompany.dir .. "objects/GC_Movers.lua");
 --source(GlobalCompany.dir .. "objects/GC_VisibilityNodes.lua");
-source(GlobalCompany.dir .. "objects/GC_Animations.lua");
+--source(GlobalCompany.dir .. "objects/GC_Animations.lua");
 --source(GlobalCompany.dir .. "objects/GC_AnimationClips.lua");
-source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
+--source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
 --source(GlobalCompany.dir .. "objects/GC_ExtendedHeap.lua");
 --source(GlobalCompany.dir .. "objects/GC_FillVolume.lua");
-source(GlobalCompany.dir .. "objects/GC_ParticleEffects.lua");
+--source(GlobalCompany.dir .. "objects/GC_ParticleEffects.lua");
 --source(GlobalCompany.dir .. "objects/GC_Lighting.lua");
 --source(GlobalCompany.dir .. "objects/GC_Sounds.lua");
 --source(GlobalCompany.dir .. "objects/GC_Shaders.lua");
