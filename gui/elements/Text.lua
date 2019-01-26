@@ -35,7 +35,7 @@ function GC_Gui_text:new(gui, custom_mt)
 	self.textUpperCase_selected = false;
 	
 	self.textSize = 0.025;
-	self.textLineHeightScale = 0.025;
+	self.textLineHeightScale = 1.1;
 	self.textMaxWidth = nil;
 	self.textWrapWidth = 1;
 	self.textMaxNumLines = 1;
@@ -65,7 +65,8 @@ function GC_Gui_text:loadTemplate(templateName, xmlFile, key)
 	self.textSize = unpack(GuiUtils.getNormalizedValues(g_company.gui:getTemplateValue(templateName, "textSize"), {self.outputSize[2]}, {self.textSize}));
 	self.textMaxWidth = unpack(GuiUtils.getNormalizedValues(g_company.gui:getTemplateValue(templateName, "textMaxWidth"), {self.outputSize[1]}, {self.textMaxWidth}));
 	self.textWrapWidth = unpack(GuiUtils.getNormalizedValues(g_company.gui:getTemplateValue(templateName, "textWrapWidth"), {self.outputSize[1]}, {self.textWrapWidth}));
-	self.textMaxNumLines = g_company.gui:getTemplateValue(templateName, "textMaxNumLines", self.textMaxNumLines);
+	self.textMaxNumLines = g_company.gui:getTemplateValueNumber(templateName, "textMaxNumLines", self.textMaxNumLines);
+	self.textLineHeightScale = g_company.gui:getTemplateValueNumber(templateName, "textLineHeightScale", self.textLineHeightScale);
 	
 	local textAlignment = g_company.gui:getTemplateValue(templateName, "textAlignment");
 	if textAlignment ~= nil then

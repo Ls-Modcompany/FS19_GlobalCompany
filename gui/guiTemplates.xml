@@ -1,14 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <guiTemplates>
 	<colors>
+		<color name="transparent" value="0 0 0 0" />
 		<color name="white" value="1 1 1 1" />
 		<color name="black" value="0 0 0 1" />
 		<color name="orange" value="0.9910 0.3865 0.0100 1" />
 		
 		<color name="gray1" value="0.6 0.6 0.6 1" />
 		<color name="gray2" value="0.3 0.3 0.3 1" />
+		<color name="gray3" value="0.1 0.1 0.1 1" />
 		
 		<color name="glass1_60" value="0.3 0.3 0.3 0.6" />
+		<color name="glass1_50" value="0.3 0.3 0.3 0.5" />
+		<color name="glass1_80" value="0.3 0.3 0.3 0.8" />
 		<color name="glass2_45" value="0.2 0.2 0.2 0.45" />
 		<color name="glass3_40" value="0.018 0.016 0.015 0.4" />
 		<color name="glass4_10" value="0.5 0.5 0.5 0.1" />
