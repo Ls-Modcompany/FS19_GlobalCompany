@@ -3,12 +3,15 @@
 --
 -- @Interface: --
 -- @Author: LS-Modcompany / kevink98 / GtX
--- @Date: 14.01.2019
--- @Version: 1.1.0.0
+-- @Date: 26.01.2019
+-- @Version: 1.1.1.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+-- 	v1.1.1.0 (26.01.2019):
+--		- add function for set triggernode when don't use xml for loading
+--
 -- 	v1.1.0.0 (14.01.2019):
 -- 		- convert to fs19,
 --		- add TriggerManager support,
@@ -72,13 +75,12 @@ end
 -- @param boolean removeAfterActivated = remove activatable after input is pressed. (Activatable Only)
 -- @return boolean true/false = load success or fail.
 function GC_PlayerTrigger:load(nodeId, target, xmlFile, xmlKey, triggerReference, isActivatable, activateText, removeAfterActivated)
-	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
+	if nodeId == nil or target == nil then
 		return false;
 	end;
 
 	self.rootNode = nodeId;
 	self.target = target;
-	print(target);
 	self.triggerReference = triggerReference;
 
 	self.playerInTrigger = false;
@@ -180,7 +182,6 @@ function GC_PlayerTrigger:drawActivate()
 end;
 
 function GC_PlayerTrigger:playerTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay)
-		print("trigger")
 	if (g_currentMission.controlPlayer and g_currentMission.player ~= nil and otherId == g_currentMission.player.rootNode) then
 		if onEnter or onLeave then
 			if onEnter then
