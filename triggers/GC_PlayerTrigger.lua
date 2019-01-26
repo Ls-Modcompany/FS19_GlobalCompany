@@ -78,6 +78,7 @@ function GC_PlayerTrigger:load(nodeId, target, xmlFile, xmlKey, triggerReference
 
 	self.rootNode = nodeId;
 	self.target = target;
+	print(target);
 	self.triggerReference = triggerReference;
 
 	self.playerInTrigger = false;
@@ -85,27 +86,36 @@ function GC_PlayerTrigger:load(nodeId, target, xmlFile, xmlKey, triggerReference
 	
 	self.targetScriptName = GlobalCompanyUtils.getSplitClassName(target); -- For clear debugging. What do you think @kevink98
 
-	local playerTriggerNode = getXMLString(xmlFile, xmlKey .. "#playerTriggerNode");
+	if xmlFile ~= nil and xmlKey ~= nil then
+		local playerTriggerNode = getXMLString(xmlFile, xmlKey .. "#playerTriggerNode");
+		if playerTriggerNode ~= nil then
+			self.playerTriggerNode = I3DUtil.indexToObject(nodeId, playerTriggerNode, target.i3dMappings);
+			if self.playerTriggerNode ~= nil then
+				addTrigger(self.playerTriggerNode, "playerTriggerCallback", self);
+			end;
+		end;
+	end;
+
+	if self.isActivatable then
+		if self.target.playerTriggerActivated ~= nil then
+			self.removeAfterActivated = Utils.getNoNil(removeAfterActivated, false);
+			self.activateText = Utils.getNoNil(activateText, g_i18n:getText("input_ACTIVATE_OBJECT"));
+		else
+			g_debug.write(debugIndex, g_debug.DEV, "function 'playerTriggerActivated' does not exist in [%s]. 'isActivatable' is not an option.", self.targetScriptName);
+			self.isActivatable = false;
+		end;
+	end;
+
+	return true;
+end;
+
+function GC_PlayerTrigger:setTriggerNode(playerTriggerNode)
 	if playerTriggerNode ~= nil then
-		self.playerTriggerNode = I3DUtil.indexToObject(nodeId, playerTriggerNode, target.i3dMappings);
+		self.playerTriggerNode = I3DUtil.indexToObject(self.rootNode, playerTriggerNode, self.target.i3dMappings);
 		if self.playerTriggerNode ~= nil then
 			addTrigger(self.playerTriggerNode, "playerTriggerCallback", self);
 		end;
-
-		if self.isActivatable then
-			if self.target.playerTriggerActivated ~= nil then
-				self.removeAfterActivated = Utils.getNoNil(removeAfterActivated, false);
-				self.activateText = Utils.getNoNil(activateText, g_i18n:getText("input_ACTIVATE_OBJECT"));
-			else
-				g_debug.write(debugIndex, g_debug.DEV, "function 'playerTriggerActivated' does not exist in [%s]. 'isActivatable' is not an option.", self.targetScriptName);
-				self.isActivatable = false;
-			end;
-		end;
-
-		return true;
 	end;
-
-	return false;
 end;
 
 function GC_PlayerTrigger:delete()
@@ -170,6 +180,7 @@ function GC_PlayerTrigger:drawActivate()
 end;
 
 function GC_PlayerTrigger:playerTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay)
+		print("trigger")
 	if (g_currentMission.controlPlayer and g_currentMission.player ~= nil and otherId == g_currentMission.player.rootNode) then
 		if onEnter or onLeave then
 			if onEnter then
