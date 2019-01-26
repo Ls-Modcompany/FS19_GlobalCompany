@@ -12,7 +12,7 @@ local debugIndex = g_debug.registerMod("GlobalCompany-Gui");
 
 GlobalCompanyGui = {};
 g_company.gui = GlobalCompanyGui;
-GlobalCompanyGui.DevelopementVersion = true;
+GlobalCompanyGui.DevelopementVersion = false;
 GlobalCompanyGui.DevelopementVersionTemplatesFilename = {};
 addModEventListener(GlobalCompanyGui);
 
