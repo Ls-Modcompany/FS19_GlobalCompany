@@ -130,6 +130,7 @@ function GC_Gui:openGui()
 	if self.classGui.onOpen ~= nil then
 		self.classGui:onOpen();
 	end;
+	self.rootElement:onOpen();
 end;
 
 function GC_Gui:closeGui()

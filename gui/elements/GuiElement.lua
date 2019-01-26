@@ -61,6 +61,7 @@ function GC_Gui_element:loadTemplate(templateName, xmlFile, key)
 	
 	self.parameter = g_company.gui:getTemplateValueXML(xmlFile, "parameter", key);
 	
+	self.callback_onOpen = g_company.gui:getTemplateValueXML(xmlFile, "onOpen", key);
 	self.callback_onCreate = g_company.gui:getTemplateValueXML(xmlFile, "onCreate", key);
 	if self.isOnlyElement then
 		self:loadOnCreate();
@@ -70,6 +71,15 @@ end;
 function GC_Gui_element:loadOnCreate()
 	if self.callback_onCreate ~= nil then
 		self.gui[self.callback_onCreate](self.gui, self, self.parameter);
+	end;
+end;
+
+function GC_Gui_element:onOpen()
+	if self.callback_onOpen ~= nil then
+		self.gui[self.callback_onOpen](self.gui, self, self.parameter);
+	end;
+	for _,v in ipairs(self.elements) do
+		v:onOpen();
 	end;
 end;
 	
