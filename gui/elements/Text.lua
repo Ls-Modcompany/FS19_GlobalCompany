@@ -82,20 +82,8 @@ function GC_Gui_text:loadTemplate(templateName, xmlFile, key)
 	end;
 	
 	local text = getXMLString(xmlFile, string.format("%s#text", key));	
-	if text ~= nil then
-        local addColon = false;
-        local lenght = text:len();
-        if text:sub(lenght, lenght+1) == ":" then
-            text = text:sub(1, lenght-1);
-            addColon = true;
-        end;
-        if text:sub(1,6) == "$l10n_" then
-            text = g_i18n:getText(text:sub(7));
-        end;
-        if addColon and text ~= "" then
-            text = text .. ":";
-        end;
-        self:setText(text, true);
+	if text ~= nil then       
+        self:setText(g_company.languageManager:getText(text), true);
     end;
 	self:loadOnCreate();
 end;
