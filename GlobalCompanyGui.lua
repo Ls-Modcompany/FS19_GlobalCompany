@@ -179,6 +179,26 @@ function GlobalCompanyGui:openGui(name)
 	self.guis[name].gui:openGui();
 end;
 
+function GlobalCompanyGui:getGuiForOpen(name)
+	if self.guis[name] == nil then
+		g_debug.write(debugIndex, Debug.ERROR, "Gui %s not exist.", name);
+		return;
+	end;
+	if self.guis[name].isFullGui then
+		g_gui:showGui("gc_fakeGui");
+		self.fakeGui:setExit(self.guis[name].canExit);
+		
+		for nameG,_ in pairs(self.smallGuis) do
+			self.guis[nameG].gui:closeGui();
+		end;
+		
+		self.activeGui = name;
+	else
+		self.smallGuis[name] = true;
+	end;
+	return self.guis[name].gui;
+end;
+
 function GlobalCompanyGui:closeGui(name)
 	if self.guis[name].isFullGui then
 		for nameG,open in pairs(self.smallGuis) do
