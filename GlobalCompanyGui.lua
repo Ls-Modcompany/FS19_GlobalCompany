@@ -526,7 +526,11 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 					if i == index then
 						break;
 					else
-						y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
+						if element.name == "text" then							
+							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4];
+						else
+							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
+						end;
 					end;
 				end;
 				
@@ -543,7 +547,11 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 					if i == index then
 						break;
 					else
-						y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
+						if element.name == "text" then							
+							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4];
+						else
+							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
+						end;
 					end;
 				end;
 				
@@ -560,7 +568,11 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 					if i == index then
 						break;
 					else
-						y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
+						if element.name == "text" then							
+							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4];
+						else
+							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
+						end;
 					end;
 				end;
 				

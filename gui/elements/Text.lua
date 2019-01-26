@@ -67,7 +67,8 @@ function GC_Gui_text:loadTemplate(templateName, xmlFile, key)
 	self.textWrapWidth = unpack(GuiUtils.getNormalizedValues(g_company.gui:getTemplateValue(templateName, "textWrapWidth"), {self.outputSize[1]}, {self.textWrapWidth}));
 	self.textMaxNumLines = g_company.gui:getTemplateValueNumber(templateName, "textMaxNumLines", self.textMaxNumLines);
 	self.textLineHeightScale = g_company.gui:getTemplateValueNumber(templateName, "textLineHeightScale", self.textLineHeightScale);
-	
+	self.margin = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValue(templateName, "textMargin"), self.outputSize, self.margin);
+
 	local textAlignment = g_company.gui:getTemplateValue(templateName, "textAlignment");
 	if textAlignment ~= nil then
 		textAlignment = textAlignment:lower();
@@ -144,6 +145,7 @@ function GC_Gui_text:update(dt)
 end;
 
 function GC_Gui_text:draw(index)
+	self.drawPosition[1], self.drawPosition[2] = g_company.gui:calcDrawPos(self, index);
 
 	if self.text ~= nil and self.text ~= "" then
 		
@@ -164,7 +166,6 @@ function GC_Gui_text:draw(index)
 			text = Utils.limitTextToWidth(text, self.textSize, self.textMaxWidth, false, "...");
 		end;
 		
-		self.drawPosition[1], self.drawPosition[2] = g_company.gui:calcDrawPos(self, index);
 		
 		local x,y = self.drawPosition[1], self.drawPosition[2];
 		
