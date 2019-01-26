@@ -103,7 +103,6 @@ source(GlobalCompany.dir .. "GlobalCompanyGui.lua");
 
 
 
-
 -- OLD
 
 
@@ -210,6 +209,7 @@ for modName, values in pairs(GlobalCompany.environments) do
 end;
 
 
+g_company.languageManager:load();
 
 --[[
 GlobalCompanyOnCreate = {};
@@ -251,9 +251,7 @@ function GlobalCompany:init()
 end;
 	
 
-function GlobalCompany:loadMap()
-	g_company.languageManager:load();
-	
+function GlobalCompany:loadMap()	
 	for modName, e in pairs(GlobalCompany.environments) do
 		for name, v in pairs(GlobalCompany.loadParameters) do
 			if v.typ == GlobalCompany.LOADTYP_XMLFILENAME then
