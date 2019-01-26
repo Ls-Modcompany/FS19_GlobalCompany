@@ -90,12 +90,7 @@ function GC_PlayerTrigger:load(nodeId, target, xmlFile, xmlKey, triggerReference
 
 	if xmlFile ~= nil and xmlKey ~= nil then
 		local playerTriggerNode = getXMLString(xmlFile, xmlKey .. "#playerTriggerNode");
-		if playerTriggerNode ~= nil then
-			self.playerTriggerNode = I3DUtil.indexToObject(nodeId, playerTriggerNode, target.i3dMappings);
-			if self.playerTriggerNode ~= nil then
-				addTrigger(self.playerTriggerNode, "playerTriggerCallback", self);
-			end;
-		end;
+		self:setTriggerNode(playerTriggerNode);
 	end;
 
 	if self.isActivatable then
