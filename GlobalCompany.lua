@@ -90,6 +90,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "utils/GC_specializations.lua");
 	source(GlobalCompany.dir .. "utils/GC_languageManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_densityMapHeight.lua");
+	source(GlobalCompany.dir .. "utils/GC_cameraUtil.lua");
 	
 	
 	--|| Gui ||--

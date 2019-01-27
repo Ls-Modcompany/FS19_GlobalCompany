@@ -652,7 +652,7 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 	return x,y;
 end;
 
-function GlobalCompany:get()
+function GlobalCompanyGui:getOutputSize()
 	if g_screenWidth == 640 and g_screenHeight == 480 then
 		return {g_screenWidth * 1.688, g_screenHeight * 1.688};
 	elseif g_screenWidth == 800 and g_screenHeight == 600 then                                                           
@@ -688,8 +688,6 @@ function GlobalCompany:get()
 	elseif g_screenWidth == 1920 and g_screenHeight == 1080 then                                                          
 		return {g_screenWidth * 0.75, g_screenHeight * 0.75};
 	end;
-
-	
 end
 
 -- http://alienryderflex.com/polygon/
