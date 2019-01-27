@@ -31,7 +31,6 @@ function GC_languageManager:load()
 		local fullPath = string.format("%sl10n%s.xml", currentPath, g_languageSuffix);
 		if not fileExists(fullPath) then
 			fullPath = string.format("%slanguages/l10n%s.xml", currentPath, g_languageSuffix);
-			print(fullPath)
 			if not fileExists(fullPath) then
 				fullPath = nil;
 			end;
@@ -41,7 +40,6 @@ function GC_languageManager:load()
 			local fullPath = string.format("%sl10n_en.xml", currentPath);
 			if not fileExists(fullPath) then
 				fullPath = string.format("%slanguages/l10n_en.xml", currentPath);
-				print(fullPath)
 				if not fileExists(fullPath) then
 					fullPath = nil;
 				end;
