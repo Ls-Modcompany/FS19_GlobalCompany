@@ -31,11 +31,8 @@
 --
 --
 -- ToDo:
---		- Fix warning / debug  texts.
 --
 --
-
-local debugIndex = g_debug.registerMod("GlobalCompany-GC_PlayerTrigger");
 
 GC_PlayerTrigger = {};
 
@@ -44,11 +41,6 @@ InitObjectClass(GC_PlayerTrigger, "GC_PlayerTrigger");
 
 g_company.playerTrigger = GC_PlayerTrigger;
 
--- Creating player trigger object.
--- @param boolean isServer = is server.
--- @param boolean isClient = is client.
--- @param table customMt = custom metatable. (optional)
--- @return table instance = instance of object.
 function GC_PlayerTrigger:new(isServer, isClient, customMt)
 	if customMt == nil then
 		customMt = GC_PlayerTrigger_mt;
@@ -79,18 +71,20 @@ function GC_PlayerTrigger:load(nodeId, target, xmlFile, xmlKey, triggerReference
 		return false;
 	end;
 
+	self.debugIndex = g_company.debug:registerMod("GC_PlayerTrigger", target); -- Create mod header and return index.
+
 	self.rootNode = nodeId;
 	self.target = target;
 	self.triggerReference = triggerReference;
 
 	self.playerInTrigger = false;
 	self.isActivatable = Utils.getNoNil(isActivatable, false);
-	
-	self.targetScriptName = GlobalCompanyUtils.getSplitClassName(target); -- For clear debugging. What do you think @kevink98
 
 	if xmlFile ~= nil and xmlKey ~= nil then
 		local playerTriggerNode = getXMLString(xmlFile, xmlKey .. "#playerTriggerNode");
-		self:setTriggerNode(playerTriggerNode);
+		if not self:setTriggerNode(playerTriggerNode) then
+			g_company.debug:logWrite(self.debugIndex, GC_DebugUtils.MODDING, "Error loading 'playerTriggerNode' %s!", playerTriggerNode);
+		end;
 	end;
 
 	if self.isActivatable then
@@ -98,7 +92,7 @@ function GC_PlayerTrigger:load(nodeId, target, xmlFile, xmlKey, triggerReference
 			self.removeAfterActivated = Utils.getNoNil(removeAfterActivated, false);
 			self.activateText = Utils.getNoNil(activateText, g_i18n:getText("input_ACTIVATE_OBJECT"));
 		else
-			g_debug.write(debugIndex, g_debug.DEV, "function 'playerTriggerActivated' does not exist in [%s]. 'isActivatable' is not an option.", self.targetScriptName);
+			g_company.debug:logWrite(self.debugIndex, GC_DebugUtils.DEV, "function 'playerTriggerActivated' does not exist. 'isActivatable' is not an option.");
 			self.isActivatable = false;
 		end;
 	end;
@@ -111,8 +105,11 @@ function GC_PlayerTrigger:setTriggerNode(playerTriggerNode)
 		self.playerTriggerNode = I3DUtil.indexToObject(self.rootNode, playerTriggerNode, self.target.i3dMappings);
 		if self.playerTriggerNode ~= nil then
 			addTrigger(self.playerTriggerNode, "playerTriggerCallback", self);
+			return true;
 		end;
 	end;
+
+	return false;
 end;
 
 function GC_PlayerTrigger:delete()
@@ -138,7 +135,7 @@ function GC_PlayerTrigger:update(dt)
 				local text = self.target:playerTriggerGetActivateText(self.triggerReference);
 				self:setActivateText(text);
 			end;
-			
+
 			self:raiseActive();
 		else
 			self.playerInTrigger = false;
