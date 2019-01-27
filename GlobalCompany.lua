@@ -26,9 +26,7 @@ function GlobalCompany.initialLoad()
 		return;
 	end;	
 
-	--| Appended / Prepended functions |--
 	Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, GlobalCompany.init);	
-	Mission00.load = Utils.prependedFunction(Mission00.load, GlobalCompany.preMapLoad);
 
 	--| Debug |--
 	source(GlobalCompany.dir .. "utils/GC_DebugUtils.lua");
@@ -43,6 +41,53 @@ function GlobalCompany.initialLoad()
 	GlobalCompany.loadParametersToEnvironment = {};
 	
 	GlobalCompany.loadSourceFiles();
+
+	local mods = Files:new(g_modsDirectory);
+	for _,v in pairs(mods.files) do
+		local modName = nil;
+		if v.isDirectory then
+			modName = v.filename;
+		else
+			local l = v.filename:len();
+			if l > 4 then
+				local ext = v.filename:sub(l-3);
+				if ext == ".zip" or ext == ".gar" then
+					modName = v.filename:sub(1, l-4);
+				end;
+			end;
+		end;
+		local currentPath = string.format("%s%s/",g_modsDirectory, modName);
+		local fullPath = currentPath .. "globalCompany.xml";
+		if not fileExists(fullPath) then
+			fullPath = currentPath .. "xml/globalCompany.xml";
+			if not fileExists(fullPath) then
+				fullPath = nil;
+			end;
+		end;
+		
+		if fullPath ~= nil then
+			local xmlFile = loadXMLFile("globalCompany", fullPath);
+			
+			GlobalCompany.environments[modName] = {};
+			GlobalCompany.environments[modName].fullPath = fullPath;
+			GlobalCompany.environments[modName].xmlFile = xmlFile;
+			GlobalCompany.environments[modName].specializations = getXMLString(xmlFile, "globalCompany.specializations#xmlFilename");
+			GlobalCompany.environments[modName].shopManager = getXMLString(xmlFile, "globalCompany.shopManager#xmlFilename");
+			GlobalCompany.environments[modName].densityMapHeight = getXMLString(xmlFile, "globalCompany.densityMapHeight#xmlFilename");
+			GlobalCompany.environments[modName].densityMapHeightOverwriteOrginalFunction = getXMLBool(xmlFile, "globalCompany.densityMapHeight#overwriteOrginalFunction");
+		end;
+	end;
+
+	for modName, values in pairs(GlobalCompany.environments) do
+		if values.specializations ~= nil and values.specializations ~= "" then	
+			g_company.specializations:loadFromXML(modName, g_company.utils.createModPath(modName, values.specializations));
+		end;
+		if values.densityMapHeightOverwriteOrginalFunction then	
+			g_densityMapHeightManager.loadMapData = function() return true; end;		
+		end;
+	end;
+	
+	g_company.languageManager:load(); -- Load language manager.
 
 	GlobalCompany.initialLoadComplete = true;
 	g_company.debug:singleWrite(debugIndex, GC_DebugUtils.BLANK, "Loaded Version: %s", version);	
@@ -111,82 +156,6 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "triggers/GC_UnloadingTrigger.lua");
 end;
 
---| Environments and Language |--
-function GlobalCompany.preMapLoad()
-	if GlobalCompany.preLoadComplete ~= nil then
-		return;
-	end;
-	
-	debugPrint("GlobalCompany.preMapLoad") -- TESTING
-
-	local activeMods = g_modManager:getActiveMods();
-	for _, mod in pairs(activeMods) do		
-		local modName = mod.modName;
-		local path = mod.modDir .. "globalCompany.xml";
-		if not fileExists(path) then
-			path = mod.modDir .. "xml/globalCompany.xml";
-			if not fileExists(path) then
-				path = nil;
-			end;
-		end;
-		
-		if path ~= nil then
-			local xmlFile = loadXMLFile("globalCompany", path);
-			
-			GlobalCompany.environments[modName] = {};
-			GlobalCompany.environments[modName].path = path;
-			GlobalCompany.environments[modName].xmlFile = xmlFile;
-			GlobalCompany.environments[modName].specializations = getXMLString(xmlFile, "globalCompany.specializations#xmlFilename");
-			GlobalCompany.environments[modName].shopManager = getXMLString(xmlFile, "globalCompany.shopManager#xmlFilename");
-		end;
-	end;
-
---[[This is the old method for reference if I missed something in the one above ;-)
-	local mods = Files:new(g_modsDirectory);
-	for _,v in pairs(mods.files) do
-		local modName = nil;
-		if v.isDirectory then
-			modName = v.filename;
-		else
-			local l = v.filename:len();
-			if l > 4 then
-				local ext = v.filename:sub(l-3);
-				if ext == ".zip" or ext == ".gar" then
-					modName = v.filename:sub(1, l-4);
-				end;
-			end;
-		end;
-		local currentPath = string.format("%s%s/",g_modsDirectory, modName);
-		local fullPath = currentPath .. "globalCompany.xml";
-		if not fileExists(fullPath) then
-			fullPath = currentPath .. "xml/globalCompany.xml";
-			if not fileExists(fullPath) then
-				fullPath = nil;
-			end;
-		end;
-		
-		if fullPath ~= nil then
-			local xmlFile = loadXMLFile("globalCompany", fullPath);
-			
-			GlobalCompany.environments[modName] = {};
-			GlobalCompany.environments[modName].fullPath = fullPath;
-			GlobalCompany.environments[modName].xmlFile = xmlFile;
-			GlobalCompany.environments[modName].specializations = getXMLString(xmlFile, "globalCompany.specializations#xmlFilename");
-			GlobalCompany.environments[modName].shopManager = getXMLString(xmlFile, "globalCompany.shopManager#xmlFilename");
-		end;
-	end;
-]]--
-
-	for modName, values in pairs(GlobalCompany.environments) do
-		if values.specializations ~= nil and values.specializations ~= "" then	
-			g_company.specializations:loadFromXML(modName, g_company.utils.createModPath(modName, values.specializations));
-		end;
-	end;
-	
-	g_company.languageManager:load(); -- Load language manager.
-	GlobalCompany.preLoadComplete = true;
-end;
-
 --| Main |--
 function GlobalCompany:init() 
 	for _, init in pairs(GlobalCompany.inits) do
@@ -211,6 +180,10 @@ function GlobalCompany:loadMap()
 		
 		if e.shopManager ~= nil and e.shopManager ~= "" then	
 			g_company.shopManager:loadFromXML(modName, g_company.utils.createModPath(modName, e.shopManager));
+		end;
+
+		if e.densityMapHeight ~= nil and e.densityMapHeight ~= "" then	
+			g_company.densityMapHeight:loadFromXML(modName, g_company.utils.createModPath(modName, e.densityMapHeight));
 		end;
 		
 		delete(e.xmlFile);
