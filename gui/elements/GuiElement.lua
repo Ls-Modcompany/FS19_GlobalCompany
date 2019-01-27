@@ -28,7 +28,7 @@ function GC_Gui_element:new(gui, custom_mt, isOnlyElement)
 	self.drawPosition = {0,0}; 
 	self.size = {1,1};
 	self.margin = {0,0,0,0}; --left, top, right, bottom
-	self.outputSize = {g_screenWidth, g_screenHeight};
+	self.outputSize = g_company.gui:getOutputSize();
     self.imageSize = {1024, 1024};
 	self.visible = true;
 	self.disabled = false;
@@ -75,7 +75,7 @@ function GC_Gui_element:loadOnCreate()
 end;
 
 function GC_Gui_element:onOpen()
-	if self.callback_onOpen ~= nil then
+	if self.isOnlyElement and self.callback_onOpen ~= nil then
 		self.gui[self.callback_onOpen](self.gui, self, self.parameter);
 	end;
 	for _,v in ipairs(self.elements) do

@@ -234,6 +234,13 @@ function GC_Gui_table:createItemRec(t, element, parent)
 	end;
 end;
 
+function GC_Gui_table:onOpen()
+	if self.callback_onOpen ~= nil then
+		self.gui[self.callback_onOpen](self.gui, self, self.parameter);
+	end;
+	GC_Gui_table:superClass().onOpen(self);
+end;
+
 
 
 

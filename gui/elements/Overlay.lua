@@ -62,6 +62,7 @@ function GC_Gui_overlay:loadTemplate(templateName, xmlFile, key, overlayName)
 	self.imageColor_disabled = g_company.gui:getTemplateValueColor(templateName, overlayName .. "Color_disabled", self.imageColor_disabled);
 	self.imageColor_selected = g_company.gui:getTemplateValueColor(templateName, overlayName .. "Color_selected", self.imageColor_selected);	
 	
+	self.isCamera = g_company.gui:getTemplateValueBool(templateName, "isCamera", false);	
 	self.hasBorders = g_company.gui:getTemplateValueBool(templateName, "hasBorders", false);	
 	if self.hasBorders then
 		self.borders = GC_Gui_borders:new(self.gui);
@@ -114,6 +115,10 @@ function GC_Gui_overlay:setImageFilename(filename)
 	self.imageOverlay = createImageOverlay(self.imageFilename);
 end;
 
+function GC_Gui_overlay:setImageOverlay(overlay)
+	self.imageOverlay = overlay;
+end;
+
 function GC_Gui_overlay:delete()
 	GC_Gui_overlay:superClass().delete(self);
 	if self.imageOverlay ~= nil then
@@ -136,10 +141,15 @@ end;
 
 function GC_Gui_overlay:draw(index)
 	self.drawPosition[1], self.drawPosition[2] = g_company.gui:calcDrawPos(self, index);
-	setOverlayRotation(self.imageOverlay, self.rotation, self.size[1] * 0.5, self.size[2] * 0.5);
-	setOverlayUVs(self.imageOverlay, unpack(self:getUVs()));
-	setOverlayColor(self.imageOverlay, unpack(self:getImageColor()));
-	renderOverlay(self.imageOverlay, self.drawPosition[1], self.drawPosition[2], self.size[1], self.size[2]);
+	if self.isCamera then
+		setOverlayRotation(self.imageOverlay, self.rotation, self.size[1] * 0.5, self.size[2] * 0.5);
+		renderOverlay(self.imageOverlay, self.drawPosition[1], self.drawPosition[2], self.size[1], self.size[2]);
+	else
+		setOverlayRotation(self.imageOverlay, self.rotation, self.size[1] * 0.5, self.size[2] * 0.5);
+		setOverlayUVs(self.imageOverlay, unpack(self:getUVs()));
+		setOverlayColor(self.imageOverlay, unpack(self:getImageColor()));
+		renderOverlay(self.imageOverlay, self.drawPosition[1], self.drawPosition[2], self.size[1], self.size[2]);
+	end;
 	GC_Gui_overlay:superClass().draw(self);
 end;
 
@@ -169,6 +179,13 @@ end;
 
 function GC_Gui_overlay:setRotation(rotation)
 	self.rotation = rotation;
+end;
+
+function GC_Gui_overlay:onOpen()
+	if self.callback_onOpen ~= nil then
+		self.gui[self.callback_onOpen](self.gui, self, self.parameter);
+	end;
+	GC_Gui_overlay:superClass().onOpen(self);
 end;
 
 

@@ -12,7 +12,7 @@ local debugIndex = g_debug.registerMod("GlobalCompany-Gui");
 
 GlobalCompanyGui = {};
 g_company.gui = GlobalCompanyGui;
-GlobalCompanyGui.DevelopementVersion = false;
+GlobalCompanyGui.DevelopementVersion = true;
 GlobalCompanyGui.DevelopementVersionTemplatesFilename = {};
 addModEventListener(GlobalCompanyGui);
 
@@ -651,6 +651,46 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 
 	return x,y;
 end;
+
+function GlobalCompany:get()
+	if g_screenWidth == 640 and g_screenHeight == 480 then
+		return {g_screenWidth * 1.688, g_screenHeight * 1.688};
+	elseif g_screenWidth == 800 and g_screenHeight == 600 then                                                           
+		return {g_screenWidth * 1.35, g_screenHeight * 1.35};
+	elseif g_screenWidth == 1024 and g_screenHeight == 768 then                                                            
+		return {g_screenWidth * 1.054, g_screenHeight * 1.054};
+	elseif g_screenWidth == 1152 and g_screenHeight == 864 then                                                          
+		return {g_screenWidth * 0.937, g_screenHeight * 0.937};
+	elseif g_screenWidth == 1280 and g_screenHeight == 600 then                                                          
+		return {g_screenWidth * 0.843, g_screenHeight * 0.843};
+	elseif g_screenWidth == 1280 and g_screenHeight == 720 then                                                          
+		return {g_screenWidth * 0.843, g_screenHeight * 0.843};
+	elseif g_screenWidth == 1280 and g_screenHeight == 768 then                                                          
+		return {g_screenWidth * 0.843, g_screenHeight * 0.843};
+	elseif g_screenWidth == 1280 and g_screenHeight == 800 then                                                          
+		return {g_screenWidth * 0.843, g_screenHeight * 0.843};
+	elseif g_screenWidth == 1280 and g_screenHeight == 960 then                                                          
+		return {g_screenWidth * 0.843, g_screenHeight * 0.843};
+	elseif g_screenWidth == 1280 and g_screenHeight == 1024 then                                                          
+		return {g_screenWidth * 0.843, g_screenHeight * 0.843};
+	elseif g_screenWidth == 1360 and g_screenHeight == 768 then                                                          
+		return {g_screenWidth * 0.794, g_screenHeight * 0.794};
+	elseif g_screenWidth == 1366 and g_screenHeight == 768 then                                                          
+		return {g_screenWidth * 0.79, g_screenHeight * 0.79};
+	elseif g_screenWidth == 1400 and g_screenHeight == 1050 then                                                          
+		return {g_screenWidth * 0.771, g_screenHeight * 0.771};
+	elseif g_screenWidth == 1440 and g_screenHeight == 900 then                                                          
+		return {g_screenWidth * 0.75, g_screenHeight * 0.75};
+	elseif g_screenWidth == 1600 and g_screenHeight == 900 then                                                          
+		return {g_screenWidth * 0.75, g_screenHeight * 0.75};
+	elseif g_screenWidth == 1680 and g_screenHeight == 1050 then                                                          
+		return {g_screenWidth * 0.75, g_screenHeight * 0.75};
+	elseif g_screenWidth == 1920 and g_screenHeight == 1080 then                                                          
+		return {g_screenWidth * 0.75, g_screenHeight * 0.75};
+	end;
+
+	
+end
 
 -- http://alienryderflex.com/polygon/
 function GlobalCompanyGui:checkClickZone(x,y, clickZone, isRound)		

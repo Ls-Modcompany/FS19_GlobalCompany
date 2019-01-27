@@ -56,20 +56,20 @@ function GC_Gui_button:loadTemplate(templateName, xmlFile, key)
 	self.hasText = g_company.gui:getTemplateValueBool(templateName, "hasText", false);
 	
 	if self.hasOverlay then
-		guiElement = GC_Gui_overlay:new(self.gui);
-		guiElement:loadTemplate(templateName, xmlFile, key);
-		self:addElement(guiElement);
+		self.overlayElement = GC_Gui_overlay:new(self.gui);
+		self.overlayElement:loadTemplate(templateName, xmlFile, key);
+		self:addElement(self.overlayElement);
 		if id ~= nil and id ~= "" then
-			self.gui[id] = guiElement;
+			self.gui[id] = self.overlayElement;
 		end;
 	end;
 
 	if self.hasText then
-		guiElement = GC_Gui_text:new(self.gui);
-		guiElement:loadTemplate(templateName, xmlFile, key);
-		self:addElement(guiElement);
+		self.textElement = GC_Gui_text:new(self.gui);
+		self.textElement:loadTemplate(templateName, xmlFile, key);
+		self:addElement(self.textElement);
 		if id ~= nil and id ~= "" then
-			self.gui[id] = guiElement;
+			self.gui[id] = self.textElement;
 		end;
 	end;
 	
@@ -244,7 +244,21 @@ function GC_Gui_button:setActive(state, checkNotParent)
 	self:setSelected(state, true);
 end;
 
+function GC_Gui_button:onOpen()
+	if self.callback_onOpen ~= nil then
+		self.gui[self.callback_onOpen](self.gui, self, self.parameter);
+	end;
+	GC_Gui_button:superClass().onOpen(self);
+end;
 
+
+function GC_Gui_button:setText(...)
+	for _,v in ipairs(self.elements) do
+		if v.setText ~= nil then
+			v:setText(...);
+		end;
+	end;
+end;
 
 
 

@@ -296,6 +296,13 @@ function GC_Gui_borders:getBorderBottomSize()
     end;
 end;
 
+function GC_Gui_borders:onOpen()
+	if self.callback_onOpen ~= nil then
+		self.gui[self.callback_onOpen](self.gui, self, self.parameter);
+	end;
+	GC_Gui_borders:superClass().onOpen(self);
+end;
+
 
 
 

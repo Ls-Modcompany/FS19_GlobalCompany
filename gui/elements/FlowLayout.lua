@@ -99,6 +99,13 @@ function GC_Gui_flowLayout:draw(index)
 	GC_Gui_flowLayout:superClass().draw(self);
 end;
 
+function GC_Gui_flowLayout:onOpen()
+	if self.callback_onOpen ~= nil then
+		self.gui[self.callback_onOpen](self.gui, self, self.parameter);
+	end;
+	GC_Gui_flowLayout:superClass().onOpen(self);
+end;
+
 
 
 
