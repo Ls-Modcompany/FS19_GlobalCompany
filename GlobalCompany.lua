@@ -41,35 +41,25 @@ function GlobalCompany.initialLoad()
 	GlobalCompany.loadParametersToEnvironment = {};
 	
 	GlobalCompany.loadSourceFiles();
-
-	local mods = Files:new(g_modsDirectory);
-	for _,v in pairs(mods.files) do
-		local modName = nil;
-		if v.isDirectory then
-			modName = v.filename;
-		else
-			local l = v.filename:len();
-			if l > 4 then
-				local ext = v.filename:sub(l-3);
-				if ext == ".zip" or ext == ".gar" then
-					modName = v.filename:sub(1, l-4);
+	
+	for _, mod in pairs(g_modManager.mods) do		
+		local path = nil;
+		local modName = mod.modName;
+		if mod.modDir ~= nil then	
+			path = mod.modDir .. "globalCompany.xml";
+			if not fileExists(path) then
+				path = mod.modDir .. "xml/globalCompany.xml";
+				if not fileExists(path) then
+					path = nil;
 				end;
 			end;
 		end;
-		local currentPath = string.format("%s%s/",g_modsDirectory, modName);
-		local fullPath = currentPath .. "globalCompany.xml";
-		if not fileExists(fullPath) then
-			fullPath = currentPath .. "xml/globalCompany.xml";
-			if not fileExists(fullPath) then
-				fullPath = nil;
-			end;
-		end;
-		
-		if fullPath ~= nil then
-			local xmlFile = loadXMLFile("globalCompany", fullPath);
+
+		if path ~= nil then
+			local xmlFile = loadXMLFile("globalCompany", path);
 			
 			GlobalCompany.environments[modName] = {};
-			GlobalCompany.environments[modName].fullPath = fullPath;
+			GlobalCompany.environments[modName].fullPath = path;
 			GlobalCompany.environments[modName].xmlFile = xmlFile;
 			GlobalCompany.environments[modName].specializations = getXMLString(xmlFile, "globalCompany.specializations#xmlFilename");
 			GlobalCompany.environments[modName].shopManager = getXMLString(xmlFile, "globalCompany.shopManager#xmlFilename");
