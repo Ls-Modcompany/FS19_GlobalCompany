@@ -46,13 +46,16 @@ function GC_cameraUtil:getRenderOverlayId(camera, x, y)
 end;
 
 function GC_cameraUtil:getCameraData(x,y)	
-    local cameraAspectRatio = getScreenAspectRatio() * ((g_screenWidth*x)/(g_screenHeight*y));
+    print(g_screenWidth /(g_screenHeight * (x/y)))
+    --local cameraAspectRatio = getScreenAspectRatio() * (g_screenWidth /(g_screenHeight * (x/y)));
     
 	--local cameraResolutionX = GC_cameraUtil:nextPow2(g_screenWidth*x);
     --local cameraResolutionY = GC_cameraUtil:nextPow2(g_screenHeight*y);
 
     local cameraResolutionX = math.ceil(g_screenWidth * x) * 2
     local cameraResolutionY = math.ceil(g_screenHeight * y) * 2
+
+    local cameraAspectRatio = cameraResolutionX / cameraResolutionY;
 
     return cameraAspectRatio, cameraResolutionX, cameraResolutionY;
 end;
