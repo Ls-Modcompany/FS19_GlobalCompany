@@ -82,7 +82,7 @@ function GlobalCompany.initialLoad()
 	g_company.languageManager:load(); -- Load language manager.
 
 	GlobalCompany.initialLoadComplete = true;
-	g_company.debug:singleWrite(GlobalCompany.debugIndex, GC_DebugUtils.BLANK, "Loaded Version: %s", version);	
+	g_company.debug:singleLogWrite(GlobalCompany.debugIndex, GC_DebugUtils.BLANK, "Loaded Version: %s", version);	
 end;
 
 --|| Init ||--
