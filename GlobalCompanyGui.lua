@@ -1,12 +1,23 @@
 -- 
--- GlobalCompanyGui
+-- GlobalCompany 
 -- 
--- @Interface: 1.4.4.0 1.4.4RC8
--- @Author: kevink98 
--- @Date: 22.06.2017
--- @Version: 1.0.0
+-- @Interface: --
+-- @Author: LS-Modcompany / kevink98, GtX
+-- @Date: 26.01.2019
+-- @Version: 1.0.0.0
 -- 
 -- @Support: LS-Modcompany
+-- 
+-- Changelog:
+--		
+-- 	v1.0.0.0 ():
+-- 		- initial fs19
+-- 
+-- Notes:
+-- 
+-- 
+-- ToDo:
+-- 		xmlIinformations at fakegui (kevin)
 -- 
 local debugIndex = g_debug.registerMod("GlobalCompany-Gui");
 
@@ -36,6 +47,7 @@ source(g_currentModDirectory .. "gui/elements/Borders.lua");
 source(g_currentModDirectory .. "gui/elements/Table.lua");
 
 source(g_currentModDirectory .. "gui/FakeGui.lua");
+source(g_currentModDirectory .. "gui/MultiDialog.lua");
 
 function GlobalCompanyGui:init()	
 	for _,inAc in pairs(self.toInit_actionEvents) do
@@ -46,6 +58,8 @@ end;
 function GlobalCompanyGui:loadMap()
 	self.fakeGui = GC_Gui_FakeGui:new();
 	g_gui:loadGui(g_company.dir .. self.fakeGui.guiInformations.guiXml, "gc_fakeGui", self.fakeGui);
+	
+	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
 end;
 
 function GlobalCompanyGui:update(dt)
@@ -199,6 +213,17 @@ function GlobalCompanyGui:getGuiForOpen(name)
 	end;
 	return self.guis[name].gui;
 end;
+function GlobalCompanyGui:openGuiWithData(guiName, ...)
+	local gui = self:getGuiForOpen(guiName);
+	gui.classGui:setData(...);
+	gui:openGui();
+end
+
+function GlobalCompanyGui:openMultiDialog(...)
+	local gui = self:getGuiForOpen("gc_multiDialog");
+	gui.classGui:setData(...);
+	gui:openGui();
+end
 
 function GlobalCompanyGui:closeGui(name)
 	if self.guis[name].isFullGui then
@@ -547,7 +572,7 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 					if i == index then
 						break;
 					else
-						if element.name == "text" then							
+						if elementF.name == "text" then							
 							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4];
 						else
 							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
@@ -568,7 +593,7 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 					if i == index then
 						break;
 					else
-						if element.name == "text" then							
+						if elementF.name == "text" then							
 							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4];
 						else
 							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
@@ -589,7 +614,7 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 					if i == index then
 						break;
 					else
-						if element.name == "text" then							
+						if elementF.name == "text" then							
 							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4];
 						else
 							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4];

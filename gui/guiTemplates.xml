@@ -103,5 +103,42 @@
 			<value name="borderBottomSize" value="4px" />
 			<value name="borderBottomColor" value="orange" />
 		</template>
+
+		<!-- MultiDialog -->
+		<template name="gcMdBackground" anchor="middleCenter" extends="gcBase gcBorder">
+			<value name="size" value="1000px 400px" />
+			<value name="imageColor" value="glass1_50" />
+			<value name="hasBorders" value="true" />
+			<value name="borderBottomSize" value="6px" />
+			<value name="borderBottomColor" value="orange" />
+		</template>
+		<template name="gcMdHeader" anchor="middleTop" extends="gcBase gcBorder">
+			<value name="size" value="1000px 50px" />
+			<value name="imageColor" value="transparent" />
+			<value name="hasBorders" value="true" />
+			<value name="borderBottomSize" value="4px" />
+			<value name="borderBottomColor" value="gray2" />
+		</template>
+		<template name="gcMdHeaderText" anchor="middleCenter" extends="gcBase_text">
+			<value name="textSize" value="25px" />
+			<value name="textAlignment" value="center" />	
+		</template>	
+		<template name="gcMdContentText" anchor="leftTop" extends="gcBase_text">
+			<value name="position" value="50px -80px" />
+			<value name="textSize" value="20px" />
+			<value name="textAlignment" value="left" />	
+			<value name="textWrapWidth" value="900px" />	
+			<value name="textMaxNumLines" value="3" />		
+		</template>	
+		<template name="gcMdContentButtons" anchor="leftTop" extends="gcHotelContentInteraction">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="top" />
+			<value name="position" value="0px 0px" />
+			<value name="size" value="800px 400px" />
+		</template>
+
+
+
+
 	</templates>	
 </guiTemplates>
