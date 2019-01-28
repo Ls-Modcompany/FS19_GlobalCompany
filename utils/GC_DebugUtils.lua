@@ -139,9 +139,16 @@ end;
 -- @param integer parentScriptId = registered parent script index. (OPTIONAL)
 -- @param string modName = name of the mod loading the scripts. (OPTIONAL) e.g customEnvironment
 -- @return table = scriptId, header, (all prefix levels).
-function GC_DebugUtils:getDebugData(scriptId, target)
+function GC_DebugUtils:getDebugData(scriptId, target, customEnvironment)
 	local parentScriptId = target.debugIndex;
-	local modName = target.customEnvironment;
+
+	local modName;
+	if customEnvironment ~= nil then
+		modName = customEnvironment;
+	else
+		modName = target.customEnvironment;
+	end;	
+	
 	if modName ~= nil then
 		modName = " - [" .. tostring(modName) .. "]";
 	else
