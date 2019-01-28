@@ -17,7 +17,7 @@
 --      - some functions from Stegei and Mixfeeder(Fs15)
 -- 
 -- ToDo:
--- 
+--      -- add possibility to add cameras with trans and rot values (no link to cameraobject)
 -- 
 local debugIndex = g_debug.registerMod("GlobalCompany-GC_cameraUtil");
 

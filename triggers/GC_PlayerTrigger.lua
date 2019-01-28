@@ -38,6 +38,7 @@ GC_PlayerTrigger = {};
 
 local GC_PlayerTrigger_mt = Class(GC_PlayerTrigger, Object);
 InitObjectClass(GC_PlayerTrigger, "GC_PlayerTrigger");
+GC_PlayerTrigger.debugIndex = g_company.debug:registerScriptName("GC_PlayerTrigger");
 
 g_company.playerTrigger = GC_PlayerTrigger;
 
@@ -71,7 +72,7 @@ function GC_PlayerTrigger:load(nodeId, target, xmlFile, xmlKey, triggerReference
 		return false;
 	end;
 
-	self.debugIndex = g_company.debug:registerMod("GC_PlayerTrigger", target); -- Create mod header and return index.
+	self.debugData = g_company.debug:getDebugData(GC_PlayerTrigger.debugIndex, target);
 
 	self.rootNode = nodeId;
 	self.target = target;
@@ -83,7 +84,7 @@ function GC_PlayerTrigger:load(nodeId, target, xmlFile, xmlKey, triggerReference
 	if xmlFile ~= nil and xmlKey ~= nil then
 		local playerTriggerNode = getXMLString(xmlFile, xmlKey .. "#playerTriggerNode");
 		if not self:setTriggerNode(playerTriggerNode) then
-			g_company.debug:logWrite(self.debugIndex, GC_DebugUtils.MODDING, "Error loading 'playerTriggerNode' %s!", playerTriggerNode);
+			g_company.debug:logWrite(self.debugData, GC_DebugUtils.MODDING, "Error loading 'playerTriggerNode' %s!", playerTriggerNode);
 		end;
 	end;
 
@@ -92,7 +93,7 @@ function GC_PlayerTrigger:load(nodeId, target, xmlFile, xmlKey, triggerReference
 			self.removeAfterActivated = Utils.getNoNil(removeAfterActivated, false);
 			self.activateText = Utils.getNoNil(activateText, g_i18n:getText("input_ACTIVATE_OBJECT"));
 		else
-			g_company.debug:logWrite(self.debugIndex, GC_DebugUtils.DEV, "function 'playerTriggerActivated' does not exist. 'isActivatable' is not an option.");
+			g_company.debug:logWrite(self.debugData, GC_DebugUtils.DEV, "function 'playerTriggerActivated' does not exist. 'isActivatable' is not an option.");
 			self.isActivatable = false;
 		end;
 	end;

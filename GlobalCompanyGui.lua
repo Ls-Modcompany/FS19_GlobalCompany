@@ -160,6 +160,7 @@ function GlobalCompanyGui:unregisterGui()
 end;
 
 function GlobalCompanyGui:openGui(name)
+	self:closeActiveGui();
 	if self.guis[name] == nil then
 		g_debug.write(debugIndex, Debug.ERROR, "Gui %s not exist.", name);
 		return;

@@ -58,6 +58,8 @@ function GC_DebugUtils:new(customMt)
 	self.isDev = GC_DebugUtils:getIsDev();
 	local setMax = self.isDev and GC_DebugUtils.setDevLevelMax;
 
+	self.registeredScriptNames = {};
+	
 	self.registeredScripts = {};
 	self.registeredScriptsCount = 0;
 
@@ -80,39 +82,16 @@ function GC_DebugUtils:new(customMt)
 
 	-- Set print levels prefix.
 	self.printLevelPrefix[GC_DebugUtils.BLANK] = "";
-	self.printLevelPrefix[GC_DebugUtils.ERROR] = "ERROR:  ";
-	self.printLevelPrefix[GC_DebugUtils.WARNING] = "WARNING:  ";
-	self.printLevelPrefix[GC_DebugUtils.INFORMATIONS] = "INFORMATIONS:  ";
-	self.printLevelPrefix[GC_DebugUtils.LOAD] = "LOAD:  ";
-	self.printLevelPrefix[GC_DebugUtils.ONCREATE] = "ONCREATE:  ";
-	self.printLevelPrefix[GC_DebugUtils.TABLET] = "TABLET:  ";
-	self.printLevelPrefix[GC_DebugUtils.MODDING] = "MODDING:  ";
-	self.printLevelPrefix[GC_DebugUtils.DEV] = "DEVELOPMENT:  ";
+	self.printLevelPrefix[GC_DebugUtils.ERROR] = "ERROR: ";
+	self.printLevelPrefix[GC_DebugUtils.WARNING] = "WARNING: ";
+	self.printLevelPrefix[GC_DebugUtils.INFORMATIONS] = "INFORMATIONS: ";
+	self.printLevelPrefix[GC_DebugUtils.LOAD] = "LOAD: ";
+	self.printLevelPrefix[GC_DebugUtils.ONCREATE] = "ONCREATE: ";
+	self.printLevelPrefix[GC_DebugUtils.TABLET] = "TABLET: ";
+	self.printLevelPrefix[GC_DebugUtils.MODDING] = "MODDING: ";
+	self.printLevelPrefix[GC_DebugUtils.DEV] = "DEVELOPMENT: ";
 
 	return self;
-end;
-
-function GC_DebugUtils:addNewLevel(key, prefix)
-	if type(key) == "string" then
-		if GC_DebugUtils.numLevels + 1 <= GC_DebugUtils.maxLevels then
-			local newLevelKey = string.upper(key);
-			if GC_DebugUtils[newLevelKey] == nil then
-				GC_DebugUtils.numLevels = GC_DebugUtils.numLevels + 1;
-				GC_DebugUtils[newLevelKey] = GC_DebugUtils.numLevels;
-	
-				if prefix == nil then
-					prefix = "";
-				end;
-				self.printLevelPrefix[GC_DebugUtils.numLevels] = tostring(prefix) .. ":  ";
-			end;
-	
-			if self.isDev and GC_DebugUtils.setDevLevelMax then
-				self:setLevel(GC_DebugUtils[newLevelKey], true);
-			end;
-	
-			return GC_DebugUtils[newLevelKey];
-		end;
-	end;
 end;
 
 function GC_DebugUtils:setLevel(level, value)
@@ -137,95 +116,160 @@ function GC_DebugUtils:setAllLevels(value)
 	end;
 end;
 
--- This is done in the 'new' or 'load' functions of the script.
--- EXAMPLE: self.debugIndex = g_company.debug:registerMod(scriptName, parentScript);
-function GC_DebugUtils:registerMod(scriptName, parentScript, modName)
-	local registeredMod = {};
-	registeredMod.scriptName = scriptName;
-	registeredMod.parentScriptName = self:getSplitClassName(parentScript);
+-- This is done when game loads.
+-- EXAMPLE: GC_PlayerTrigger.debugIndex = g_company.debug:registerScriptName("PlayerTrigger");
 
-	if modName == nil then
-		modName = self:getModNameTextFromObject(parentScript);
+-- @param string scriptName = name of the script to register.
+-- @return integer = index of the script.
+function GC_DebugUtils:registerScriptName(scriptName)
+	if self.registeredScriptNames[scriptName] == nil then	
+		self.registeredScriptsCount = self.registeredScriptsCount + 1;
+		
+		self.registeredScripts[self.registeredScriptsCount] = scriptName;
+		self.registeredScriptNames[scriptName] = self.registeredScriptsCount;
+	
+		return self.registeredScriptsCount;
 	end;
-	registeredMod.modName = modName;
-
-	local parentScriptName = registeredMod.parentScriptName;
-	if parentScriptName ~= "" then
-		parentScriptName = parentScriptName .. " > ";
-	end;
-
-	registeredMod.header = "    [LSMC - GlobalCompany] - [" .. parentScriptName .. scriptName .. "] -" .. modName;
-
-	self.registeredModsCount = self.registeredModsCount + 1;
-	self.registeredMods[self.registeredModsCount] = registeredMod;
-
-	return self.registeredModsCount;
 end;
 
--- EXAMPLE:
---     [LSMC - GlobalCompany] - [GC_ProductionFactory > GC_PlayerTrigger] - [Mod Name: FS19_SawMill];
---     DEV ERROR:  function 'playerTriggerActivated' does not exist! 'isActivatable' is not an option!
-function GC_DebugUtils:logWrite(modIndex, level, message, ...)
-	if self.printLevel[level] then
-		if modIndex ~= nil and self.registeredMods[modIndex] ~= nil then
-			local registeredMod = self.registeredMods[modIndex];
-			local debugText = "    " .. self.printLevelPrefix[level] .. string.format(message, ...);
-			print(registeredMod.header, debugText);
-		else
-			print("    [LSMC - GC_DebugUtils] illegal mod!");
+-- This is called when the script is loaded.
+-- EXAMPLE: self.debugData = g_company.debug:getDebugData(GC_PlayerTrigger.debugIndex, target.debugIndex, target.customEnvironment);
+
+-- @param integer scriptId = registered script index.
+-- @param integer parentScriptId = registered parent script index. (OPTIONAL)
+-- @param string modName = name of the mod loading the scripts. (OPTIONAL) e.g customEnvironment
+-- @return table = scriptId, header, (all prefix levels).
+function GC_DebugUtils:getDebugData(scriptId, target)
+	local parentScriptId = target.debugIndex;
+	local modName = target.customEnvironment;
+	if modName ~= nil then
+		modName = " - [" .. tostring(modName) .. "]";
+	else
+		modName = "";
+	end;
+	
+	local scriptName = self:getScriptNameFromIndex(scriptId);
+	if scriptName ~= "" then
+		local parentScriptName = self:getScriptNameFromIndex(parentScriptId);
+		if parentScriptName ~= "" then
+			scriptName =  parentScriptName .. " > " .. scriptName;
 		end;
-	end;
+	
+		local header = "  [LSMC - GlobalCompany] - [" .. scriptName .. "]" .. modName;
+
+		return {scriptId = scriptId,
+				header = header,
+				BLANK = -2,
+				ERROR = -1,
+				WARNING = 0,
+				INFORMATIONS = 1,
+				LOAD = 2,
+				ONCREATE = 3,
+				TABLET = 4,
+				MODDING = 5,
+				DEV = 6};
+	end;	
+
+	return nil;
 end;
 
--- EXAMPLE:
---     [LSMC - GlobalCompany > GC_ProductionFactory] - ERROR: function 'playerTriggerActivated' does not exist! 'isActivatable' is not an option!
-function GC_DebugUtils:singleWrite(modIndex, level, message, ...)
-	if self.printLevel[level] then
-		if modIndex ~= nil and self.registeredMods[modIndex] ~= nil then
-			local scriptName = self.registeredMods[modIndex].scriptName;
-			local scriptString = " > " .. scriptName;
-			if scriptName == nil or scriptName == "GlobalCompany" then
-				scriptString = "";
+-- Print only with a single line and no header.
+
+-- EXAMPLE: g_company.debug:logWrite(self.debugData, self.debugData.MODDING, "Error loading 'playerTriggerNode' %s!", playerTriggerNode);
+--
+-- [LSMC - GlobalCompany] - Loaded Version: 1.0.0.0 (04.05.2018)
+
+
+-- EXAMPLE: g_company.debug:logWrite(GC_PlayerTrigger.debugIndex, GC_DebugUtils.MODDING, "Error loading 'playerTriggerNode' %s!", playerTriggerNode);
+--
+-- [LSMC - GlobalCompany] - Loaded Version: 1.0.0.0 (04.05.2018)
+
+-- @param integer data = registered script index.
+-- or
+-- @param table data = self.debugData = GC_DebugUtils:getDebugData(scriptId, parentScriptId, modName)
+
+-- @param integer level = print level to be used. (-2 > 6)
+-- @param string message = text to be printed. Can contain string-format placeholders
+-- @param ... = values to add to given placeholders (OPTIONAL)
+function GC_DebugUtils:singleLogWrite(data, level, message, ...)
+	if self.printLevel[level] == true then
+		if data ~= nil then
+			local registeredScriptName, header;
+		
+			if type(data) == "table" then
+				registeredScriptName = self.registeredScripts[data.scriptId];
+			else
+				registeredScriptName = self.registeredScripts[data];
 			end;
-			print("    [LSMC - GlobalCompany" .. scriptString .. "] - " .. self.printLevelPrefix[level] .. string.format(message, ...));
-		else
-			print("    [LSMC - GC_DebugUtils] illegal mod!");
+		
+			if registeredScriptName ~= nil then
+				print("  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[level] .. string.format(message, ...));
+			else
+				print("  [LSMC - GlobalCompany > GC_DebugUtils] - Illegal mod!");
+			end;
 		end;
 	end;
 end;
 
-function GC_DebugUtils:getSplitClassName(object)
-	local splitClassName = "";
+-- Print header and given message.
 
-	if object ~= nil and type(object) == "table" then
-		local fullClassName = object.className;
-		if fullClassName ~= nil then
-			local start, _ = string.find(fullClassName, ".", 1, true);
-			if start ~= nil then
-				splitClassName = string.sub(fullClassName, start + 1);
+-- EXAMPLE: g_company.debug:logWrite(self.debugData, self.debugData.MODDING, "Error loading 'playerTriggerNode' %s!", playerTriggerNode);
+--
+-- [LSMC - GlobalCompany] - [ProductionFactory > GC_PlayerTrigger] - [FS19_TestMap]
+--   MODDING: Error loading 'playerTriggerNode' woodSellStartTrigger!
+
+
+-- EXAMPLE: g_company.debug:logWrite(GC_PlayerTrigger.debugIndex, GC_DebugUtils.MODDING, "Error loading 'playerTriggerNode' %s!", playerTriggerNode);
+--
+-- [LSMC - GlobalCompany] - [GC_PlayerTrigger]
+--   MODDING: Error loading 'playerTriggerNode' woodSellStartTrigger!
+
+
+-- @param integer data = registered script index.
+-- or
+-- @param table data = self.debugData = GC_DebugUtils:getDebugData(scriptId, parentScriptId, modName)
+
+-- @param integer level = print level to be used. (-2 > 6)
+-- @param string message = text to be printed. Can contain string-format placeholders
+-- @param ... = values to add to given placeholders (OPTIONAL)
+function GC_DebugUtils:logWrite(data, level, message, ...)
+	if self.printLevel[level] == true then
+		if data ~= nil then
+			local registeredScriptName, header;
+		
+			if type(data) == "table" then
+				registeredScriptName = self.registeredScripts[data.scriptId];
+				header = data.header;
+			else
+				registeredScriptName = self.registeredScripts[data];
+				header = "  [LSMC - GlobalCompany] - [" .. registeredScriptName .. "]";
+			end;
+		
+			if registeredScriptName ~= nil then
+				if header ~= nil then				
+					print(header, "    " .. self.printLevelPrefix[level] .. string.format(message, ...));
+				else
+					print("  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[level] .. string.format(message, ...));
+				end;
+			else
+				print("  [LSMC - GlobalCompany > GC_DebugUtils] - Illegal mod!");
 			end;
 		end;
 	end;
-
-	return splitClassName;
 end;
 
-function GC_DebugUtils:getModNameTextFromObject(object)
-	local text = "";
-
-	if object ~= nil and object.customEnvironment ~= nil then
-		local modName = object.customEnvironment;
-
-		text = string.format(" [Mod Name: %s  Type: Placeable]", modName);
-
-		if g_currentMission.loadingMapModName ~= nil then
-			if modName == g_currentMission.loadingMapModName then
-				text = string.format(" [Mod Name: %s  Type: OnCreate]", modName);
-			end;
-		end;
+function GC_DebugUtils:getScriptNameFromIndex(index)
+	local name = "";
+	
+	if index ~= nil and self.registeredScripts[index] ~= nil then
+		name = self.registeredScripts[index];
 	end;
+	
+	return name;
+end;
 
-	return text;
+function GC_DebugUtils:getScriptIndexFromName(name)
+	return self.registeredScriptNames[name];
 end;
 
 function GC_DebugUtils:getIsDev()
@@ -270,7 +314,7 @@ function GC_DebugUtils:consoleCommandSetDebugLevel(level, state)
 	local value = Utils.stringToBoolean(state);
 	self:setLevel(level, value);
 	
-	return "GC Debug print level " .. level .. " = " .. state;
+	return "GC Debug print level " .. level .. " = " .. value;
 end;
 
 ------------------------------------
@@ -310,4 +354,4 @@ function debugPrint(name, text, depth, referenceText)
 		print("    " .. refName .. " = " .. tostring(name));
 	end;
 end;
-
+getfenv(0)["gc_debugPrint"] = debugPrint; -- Maybe to make global?

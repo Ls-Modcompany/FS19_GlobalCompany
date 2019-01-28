@@ -8,6 +8,8 @@
 -- 
 -- @Support: LS-Modcompany
 --
+
+-- note: loadParameters only for one environment! this is not good
  
 local version = "1.0.0.0 (04.05.2018)";
 
@@ -31,7 +33,7 @@ function GlobalCompany.initialLoad()
 	--| Debug |--
 	source(GlobalCompany.dir .. "utils/GC_DebugUtils.lua");
 	g_company.debug = GC_DebugUtils:new();
-	local debugIndex = g_company.debug:registerMod("GlobalCompany");
+	GlobalCompany.debugIndex = g_company.debug:registerScriptName("GlobalCompany");
 		
 	GlobalCompany.inits = {};
 	GlobalCompany.loadables = {};
