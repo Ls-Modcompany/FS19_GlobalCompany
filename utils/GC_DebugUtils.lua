@@ -44,7 +44,7 @@ GC_DebugUtils.DEV = 6;
 
 function GC_DebugUtils:new(customMt)
 	if g_company.debug ~= nil then
-		print("[LSMC - GC_DebugUtils] Class already registered! Use 'g_company.debug' to access debug manager.")
+		print("  [LSMC - GlobalCompany > GC_DebugUtils] - Class already registered! Use 'g_company.debug' to access debug manager.");
 		return;
 	end;
 
@@ -99,9 +99,12 @@ function GC_DebugUtils:setLevel(level, value)
 		value = false;
 	end;
 
-	if level ~= nil and level > 0 then
+	if level ~= nil and level > 0 and level < GC_DebugUtils.maxLevels then
 		self.printLevel[level] = value;
+		return true;
 	end;
+	
+	return false;
 end;
 
 function GC_DebugUtils:setAllLevels(value)
@@ -109,19 +112,23 @@ function GC_DebugUtils:setAllLevels(value)
 		value = false;
 	end;
 
+	local count = 0
 	for i = -1, GC_DebugUtils.maxLevels do
 		if i > 0 then
 			self.printLevel[i] = value;
+			count = count + 1;
 		end;
 	end;
+	
+	return count;
 end;
 
--- This is done when game loads.
--- EXAMPLE: GC_PlayerTrigger.debugIndex = g_company.debug:registerScriptName("PlayerTrigger");
-
--- @param string scriptName = name of the script to register.
--- @return integer = index of the script.
 function GC_DebugUtils:registerScriptName(scriptName)
+	if type(scriptName) ~= "string" then
+		print("  [LSMC - GlobalCompany > GC_DebugUtils] - 'registerScriptName' failed! '" .. tostring(scriptName) .. "' is not a string value.");
+		return;
+	end;
+	
 	if self.registeredScriptNames[scriptName] == nil then	
 		self.registeredScriptsCount = self.registeredScriptsCount + 1;
 		
@@ -129,30 +136,28 @@ function GC_DebugUtils:registerScriptName(scriptName)
 		self.registeredScriptNames[scriptName] = self.registeredScriptsCount;
 	
 		return self.registeredScriptsCount;
+	else
+		print(string.format("  [LSMC - GlobalCompany > GC_DebugUtils] - Script name %s is already registered! Registered Script Id = %d", scriptName, self.registeredScriptNames[scriptName]));
 	end;
 end;
 
--- This is called when the script is loaded.
--- EXAMPLE: self.debugData = g_company.debug:getDebugData(GC_PlayerTrigger.debugIndex, target.debugIndex, target.customEnvironment);
-
--- @param integer scriptId = registered script index.
--- @param integer parentScriptId = registered parent script index. (OPTIONAL)
--- @param string modName = name of the mod loading the scripts. (OPTIONAL) e.g customEnvironment
--- @return table = scriptId, header, (all prefix levels).
 function GC_DebugUtils:getDebugData(scriptId, target, customEnvironment)
-	local parentScriptId = target.debugIndex;
-
-	local modName;
-	if customEnvironment ~= nil then
-		modName = customEnvironment;
-	else
-		modName = target.customEnvironment;
-	end;	
+	local parentScriptId, modName = nil, "";
 	
-	if modName ~= nil then
-		modName = " - [" .. tostring(modName) .. "]";
+	if target ~= nil then
+		parentScriptId = target.debugIndex;
+		
+		if customEnvironment ~= nil then
+			modName = " - [" .. tostring(customEnvironment) .. "]"; -- Optional to overwrite modName.
+		elseif target.debugModName ~= nil then
+			modName = " - [" .. tostring(target.debugModName) .. "]"; -- Optional value for any script to store 'loading mod name'.
+		elseif target.customEnvironment ~= nil then
+			modName = " - [" .. tostring(target.customEnvironment) .. "]"; -- As given by any 'Object' Class script.
+		end;
 	else
-		modName = "";
+		if customEnvironment ~= nil then
+			modName = " - [" .. tostring(customEnvironment) .. "]";  -- Optional to show modName in header if no target is given.
+		end;
 	end;
 	
 	local scriptName = self:getScriptNameFromIndex(scriptId);
@@ -166,6 +171,7 @@ function GC_DebugUtils:getDebugData(scriptId, target, customEnvironment)
 
 		return {scriptId = scriptId,
 				header = header,
+				modName = modName,
 				BLANK = -2,
 				ERROR = -1,
 				WARNING = 0,
@@ -180,24 +186,7 @@ function GC_DebugUtils:getDebugData(scriptId, target, customEnvironment)
 	return nil;
 end;
 
--- Print only with a single line and no header.
-
--- EXAMPLE: g_company.debug:logWrite(self.debugData, self.debugData.MODDING, "Error loading 'playerTriggerNode' %s!", playerTriggerNode);
---
--- [LSMC - GlobalCompany] - Loaded Version: 1.0.0.0 (04.05.2018)
-
-
--- EXAMPLE: g_company.debug:logWrite(GC_PlayerTrigger.debugIndex, GC_DebugUtils.MODDING, "Error loading 'playerTriggerNode' %s!", playerTriggerNode);
---
--- [LSMC - GlobalCompany] - Loaded Version: 1.0.0.0 (04.05.2018)
-
--- @param integer data = registered script index.
--- or
--- @param table data = self.debugData = GC_DebugUtils:getDebugData(scriptId, parentScriptId, modName)
-
--- @param integer level = print level to be used. (-2 > 6)
--- @param string message = text to be printed. Can contain string-format placeholders
--- @param ... = values to add to given placeholders (OPTIONAL)
+-- Print to log without header.
 function GC_DebugUtils:singleLogWrite(data, level, message, ...)
 	if self.printLevel[level] == true then
 		if data ~= nil then
@@ -218,27 +207,7 @@ function GC_DebugUtils:singleLogWrite(data, level, message, ...)
 	end;
 end;
 
--- Print header and given message.
-
--- EXAMPLE: g_company.debug:logWrite(self.debugData, self.debugData.MODDING, "Error loading 'playerTriggerNode' %s!", playerTriggerNode);
---
--- [LSMC - GlobalCompany] - [ProductionFactory > GC_PlayerTrigger] - [FS19_TestMap]
---   MODDING: Error loading 'playerTriggerNode' woodSellStartTrigger!
-
-
--- EXAMPLE: g_company.debug:logWrite(GC_PlayerTrigger.debugIndex, GC_DebugUtils.MODDING, "Error loading 'playerTriggerNode' %s!", playerTriggerNode);
---
--- [LSMC - GlobalCompany] - [GC_PlayerTrigger]
---   MODDING: Error loading 'playerTriggerNode' woodSellStartTrigger!
-
-
--- @param integer data = registered script index.
--- or
--- @param table data = self.debugData = GC_DebugUtils:getDebugData(scriptId, parentScriptId, modName)
-
--- @param integer level = print level to be used. (-2 > 6)
--- @param string message = text to be printed. Can contain string-format placeholders
--- @param ... = values to add to given placeholders (OPTIONAL)
+-- Print to log with header.
 function GC_DebugUtils:logWrite(data, level, message, ...)
 	if self.printLevel[level] == true then
 		if data ~= nil then
@@ -301,27 +270,56 @@ end;
 --| Debug Console Commands |--
 ------------------------------
 function GC_DebugUtils:loadConsoleCommands()
-	if self.isDev then
-	
+	if self.consoleCommandsLoaded == true then
+		return;
 	end;
 	
-	addConsoleCommand("gc_setDebugLevelState", "Set the state of the given debug level. [level] [state]", "consoleCommandSetDebugLevel", self);
+	if self.isDev then
+		-- Load dev only debug commands when added.
+	end;
+	
+	addConsoleCommand("gcSetDebugLevelState", "Set the state of the given debug level. [level] [state]", "consoleCommandSetDebugLevel", self);
+	addConsoleCommand("gcSetAllDebugLevelsState", "Set the state of all debug levels. [state]", "consoleCommandSetAllDebugLevels", self);
+	
+	self.consoleCommandsLoaded = true;
 end;
 
 function GC_DebugUtils:deleteConsoleCommands()
 	if self.isDev then
-	
+		-- Load dev only debug commands when added
 	end;
 	
-	removeConsoleCommand("gc_setDebugLevelState");
+	removeConsoleCommand("gcSetDebugLevelState");
+	removeConsoleCommand("gcSetAllDebugLevelsState");
 end;
 
 function GC_DebugUtils:consoleCommandSetDebugLevel(level, state)
-	local newLevel = Utils.stringToBoolean(level);
-	local value = Utils.stringToBoolean(state);
-	self:setLevel(level, value);
+	if level == nil then
+		return "'GlobalCompany' Debug printLevel failed to update!  gcSetDebugLevelState [level] [state]";
+	end;
 	
-	return "GC Debug print level " .. level .. " = " .. value;
+	local newLevel;	
+	if GC_DebugUtils[level:upper()] ~= nil then
+		newLevel = GC_DebugUtils[level:upper()];
+	else
+		newLevel = tonumber(level);
+	end;
+
+	local value = Utils.stringToBoolean(state);
+	local success = self:setLevel(newLevel, value);
+	
+	if success then
+		return "'GlobalCompany' Debug printLevel " .. tostring(newLevel) .. " = " .. tostring(value);
+	else
+		return "'GlobalCompany' Debug printLevel failed to update!";
+	end;
+end;
+
+function GC_DebugUtils:consoleCommandSetAllDebugLevels(state)
+	local value = Utils.stringToBoolean(state);
+	local updated = self:setAllLevels(value);
+
+	return "'GlobalCompany' Updated (" .. tostring(updated) .. ") Debug printLevels to '" .. tostring(value) .. "'.";
 end;
 
 ------------------------------------
@@ -362,3 +360,7 @@ function debugPrint(name, text, depth, referenceText)
 	end;
 end;
 getfenv(0)["gc_debugPrint"] = debugPrint; -- Maybe to make global?
+
+
+
+

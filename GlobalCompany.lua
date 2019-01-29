@@ -33,8 +33,10 @@ function GlobalCompany.initialLoad()
 	--| Debug |--
 	source(GlobalCompany.dir .. "utils/GC_DebugUtils.lua");
 	g_company.debug = GC_DebugUtils:new();
+	--getfenv(0)["gc_debug "] = g_company.debug; --[[ This is in case we need a superGlobal version ]]--
+
 	GlobalCompany.debugIndex = g_company.debug:registerScriptName("GlobalCompany");
-		
+
 	GlobalCompany.inits = {};
 	GlobalCompany.loadables = {};
 	GlobalCompany.updateables = {};
