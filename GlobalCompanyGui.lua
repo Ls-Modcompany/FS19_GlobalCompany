@@ -37,6 +37,11 @@ GlobalCompanyGui.template.uvs = {};
 GlobalCompanyGui.template.templates = {};
 GlobalCompanyGui.template.uiElements = {};
 
+GlobalCompanyGui.MULTIDIALOG_MODE_OK = 0;
+GlobalCompanyGui.MULTIDIALOG_MODE_YES_NO = 1;
+GlobalCompanyGui.MULTIDIALOG_SIGN_EXCLAMATION = 0;
+GlobalCompanyGui.MULTIDIALOG_SIGN_QUESTION = 1;
+
 source(g_currentModDirectory .. "gui/elements/Gui.lua");
 source(g_currentModDirectory .. "gui/elements/GuiElement.lua");
 source(g_currentModDirectory .. "gui/elements/Text.lua");
@@ -60,6 +65,8 @@ function GlobalCompanyGui:loadMap()
 	g_gui:loadGui(g_company.dir .. self.fakeGui.guiInformations.guiXml, "gc_fakeGui", self.fakeGui);
 	
 	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
+
+	self.activeGuiDialogs = {};
 end;
 
 function GlobalCompanyGui:update(dt)
@@ -90,10 +97,15 @@ function GlobalCompanyGui:update(dt)
 	else
 		self.guis[self.activeGui].gui:update(dt);
 	end;
+	for _, name in pairs(GlobalCompanyGui.activeGuiDialogs) do
+		GlobalCompanyGui.guis[name].gui:update(dt);
+	end;
 end;
 
 function GlobalCompanyGui:mouseEvent(posX, posY, isDown, isUp, button) 
-	if self.activeGui == nil then
+	if self.activeGuiDialog ~= nil then
+		GlobalCompanyGui.guis[self.activeGuiDialog].gui:mouseEvent(posX, posY, isDown, isUp, button);
+	elseif self.activeGui == nil then
 		for name, open in pairs(self.smallGuis) do
 			if open then
 				self.guis[name].mouseEvent(posX, posY, isDown, isUp, button);
@@ -105,7 +117,9 @@ function GlobalCompanyGui:mouseEvent(posX, posY, isDown, isUp, button)
 end;
 
 function GlobalCompanyGui:keyEvent(unicode, sym, modifier, isDown) 
-	if self.activeGui == nil then
+	if self.activeGuiDialog ~= nil then
+		GlobalCompanyGui.guis[self.activeGuiDialog].gui:keyEvent(unicode, sym, modifier, isDown);
+	elseif self.activeGui == nil then
 		for name, open in pairs(self.smallGuis) do
 			if open then
 				self.guis[name].gui:keyEvent(unicode, sym, modifier, isDown);
@@ -126,6 +140,9 @@ function GlobalCompanyGui:drawB()
 		end;
 	else
 		GlobalCompanyGui.guis[GlobalCompanyGui.activeGui].gui:draw();
+	end;
+	for _, name in pairs(GlobalCompanyGui.activeGuiDialogs) do
+		GlobalCompanyGui.guis[name].gui:draw();
 	end;
 end;
 
@@ -173,8 +190,11 @@ function GlobalCompanyGui:unregisterGui()
 	end;
 end;
 
-function GlobalCompanyGui:openGui(name)
-	self:closeActiveGui();
+function GlobalCompanyGui:openGui(name, asDialog)
+	if not asDialog then
+		self:closeActiveGui();
+	end;
+	
 	if self.guis[name] == nil then
 		g_debug.write(debugIndex, Debug.ERROR, "Gui %s not exist.", name);
 		return;
@@ -183,18 +203,20 @@ function GlobalCompanyGui:openGui(name)
 		g_gui:showGui("gc_fakeGui");
 		self.fakeGui:setExit(self.guis[name].canExit);
 		
-		for nameG,_ in pairs(self.smallGuis) do
-			self.guis[nameG].gui:closeGui();
+		if not asDialog then
+			for nameG,_ in pairs(self.smallGuis) do
+				self.guis[nameG].gui:closeGui();
+			end;
+			
+			self.activeGui = name;
 		end;
-		
-		self.activeGui = name;
 	else
 		self.smallGuis[name] = true;
 	end;
 	self.guis[name].gui:openGui();
 end;
 
-function GlobalCompanyGui:getGuiForOpen(name)
+function GlobalCompanyGui:getGuiForOpen(name, asDialog)
 	if self.guis[name] == nil then
 		g_debug.write(debugIndex, Debug.ERROR, "Gui %s not exist.", name);
 		return;
@@ -203,24 +225,30 @@ function GlobalCompanyGui:getGuiForOpen(name)
 		g_gui:showGui("gc_fakeGui");
 		self.fakeGui:setExit(self.guis[name].canExit);
 		
-		for nameG,_ in pairs(self.smallGuis) do
-			self.guis[nameG].gui:closeGui();
+		if asDialog then
+			table.insert(self.activeGuiDialogs, name);
+			self.activeGuiDialog = name;
+		else
+			for nameG,_ in pairs(self.smallGuis) do
+				self.guis[nameG].gui:closeGui();
+			end;
+			
+			self.activeGui = name;
 		end;
-		
-		self.activeGui = name;
 	else
 		self.smallGuis[name] = true;
 	end;
 	return self.guis[name].gui;
 end;
-function GlobalCompanyGui:openGuiWithData(guiName, ...)
-	local gui = self:getGuiForOpen(guiName);
+
+function GlobalCompanyGui:openGuiWithData(guiName, asDialog, ...)
+	local gui = self:getGuiForOpen(guiName, asDialog);
 	gui.classGui:setData(...);
 	gui:openGui();
 end
 
 function GlobalCompanyGui:openMultiDialog(...)
-	local gui = self:getGuiForOpen("gc_multiDialog");
+	local gui = self:getGuiForOpen("gc_multiDialog", true);
 	gui.classGui:setData(...);
 	gui:openGui();
 end
@@ -244,6 +272,17 @@ end;
 function GlobalCompanyGui:closeActiveGui()
 	if self.activeGui ~= nil then
 		self:closeGui(self.activeGui);
+	end;
+end;
+
+function GlobalCompanyGui:closeActiveDialog()
+	if self.activeGuiDialog ~= nil then
+		self.guis[self.activeGuiDialog].gui:closeGui();
+		table.remove(self.activeGuiDialogs, #self.activeGuiDialogs);
+		self.activeGuiDialog = nil;	
+		for _,dialogName in pairs(self.activeGuiDialogs) do
+			self.activeGuiDialog = dialogName;
+		end;
 	end;
 end;
 

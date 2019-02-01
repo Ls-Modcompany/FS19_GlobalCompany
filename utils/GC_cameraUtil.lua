@@ -32,7 +32,6 @@ function GC_cameraUtil:loadFromXml(xmlFile, key)
 end;
 
 function GC_cameraUtil:loadCameraNode(nodeId, camera)	
-    print(camera.camNode)
     camera.node = I3DUtil.indexToObject(nodeId, camera.camNode);
     return camera;
 end;
@@ -46,7 +45,6 @@ function GC_cameraUtil:getRenderOverlayId(camera, x, y)
 end;
 
 function GC_cameraUtil:getCameraData(x,y)	
-    print(g_screenWidth /(g_screenHeight * (x/y)))
     --local cameraAspectRatio = getScreenAspectRatio() * (g_screenWidth /(g_screenHeight * (x/y)));
     
 	--local cameraResolutionX = GC_cameraUtil:nextPow2(g_screenWidth*x);

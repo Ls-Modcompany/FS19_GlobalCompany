@@ -51,6 +51,7 @@ function GC_Gui_element:loadTemplate(templateName, xmlFile, key)
 	self.visible = g_company.gui:getTemplateValueBool(templateName, "visible", self.visible);
 	self.disabled = g_company.gui:getTemplateValueBool(templateName, "disabled", self.disabled);
 	self.debugEnabled = g_company.gui:getTemplateValueBool(templateName, "debugEnabled", self.debugEnabled);
+	self.newLayer = g_company.gui:getTemplateValueBool(templateName, "newLayer", self.newLayer);
 		
 	self.visible = g_company.gui:getTemplateValueNumberXML(xmlFile, "visible", key, self.visible);
 	self.disabled = g_company.gui:getTemplateValueNumberXML(xmlFile, "disabled", key, self.disabled);
@@ -151,6 +152,9 @@ function GC_Gui_element:draw(index)
 	if self.isOnlyElement then
 		self.drawPosition[1], self.drawPosition[2] = g_company.gui:calcDrawPos(self, index);
 	end;
+	if self.newLayer then
+		new2DLayer()
+	end
 	
 	if self.debugEnabled then
 		local xPixel = 1 / g_screenWidth;

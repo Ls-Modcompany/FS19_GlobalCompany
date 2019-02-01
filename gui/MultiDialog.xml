@@ -1,12 +1,29 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <GUI>
-  <GuiElement type="image" template="gcMdBackground">    
-    <GuiElement type="image" template="gcMdHeader">    
-      <GuiElement type="text" template="gcMdHeaderText" />   
+  <GuiElement type="image" template="gcMdMainLayerBackground">    
+    <GuiElement type="image" template="gcMdMainBackground">    
+      <GuiElement type="image" template="gcMdBackground">    
+        <GuiElement type="image" template="gcMdHeader">    
+          <GuiElement type="text" template="gcMdHeaderText" id="gui_header" />   
+        </GuiElement>
+
+        <GuiElement type="flowLayout" template="gcMdContentLayout">
+          <GuiElement type="image" template="gcMdContentIcon" >    
+            <GuiElement type="image" template="gcMdContentIconTyp" id="gui_icon" />  
+          </GuiElement>  
+          <GuiElement type="text" template="gcMdContentText" id="gui_text" />   
+        </GuiElement>
+        
+        <GuiElement type="flowLayout" template="gcMdContentButtonsLayout" id="gui_buttons_ok">
+          <GuiElement type="button" template="gcMdContentButtonsButton" size="1000px 50px" text="$l10n_gui_buttons_ok" onClick="onClick"/>
+        </GuiElement>
+
+        <GuiElement type="flowLayout" template="gcMdContentButtonsLayout" id="gui_buttons_yesNoExit">
+          <GuiElement type="button" template="gcMdContentButtonsButton" size="500px 50px" text="$l10n_gui_buttons_yes" onClick="onClick" parameter="1"/>
+          <GuiElement type="button" template="gcMdContentButtonsButton" size="500px 50px" text="$l10n_gui_buttons_no" onClick="onClick" />
+        </GuiElement>
+      </GuiElement>
     </GuiElement>
-    <GuiElement type="text" template="gcMdContentText" text="efieeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeimmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmeifjeifjeifjeifjaioefj ocnwe8oufneoifjiowrjfiorjfriofjirojfoirajfoirjfiorsjfirosfhriofhrifhrihfirhfirhfirhfirhfirhifhriefieeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeimmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmeifjeifjeifjeifjaioefj ocnwe8oufneoifjiowrjfiorjfriofjirojfoirajfoirjfiorsjfirosfhriofhrifhrihfirhfirhfirhfirhfirhifhriefieeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeimmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmeifjeifjeifjeifjaioefj ocnwe8oufneoifjiowrjfiorjfriofjirojfoirajfoirjfiorsjfirosfhriofhrifhrihfirhfirhfirhfirhfirhifhriefieeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeimmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmeifjeifjeifjeifjaioefj ocnwe8oufneoifjiowrjfiorjfriofjirojfoirajfoirjfiorsjfirosfhriofhrifhrihfirhfirhfirhfirhfirhifhri" />   
-
-
   </GuiElement>
 </GUI>
 

@@ -25,8 +25,9 @@ GC_languageManager = {};
 g_company.languageManager = GC_languageManager;
 
 function GC_languageManager:load()	
-	for modName, data in pairs(g_company.environments) do		
-		local currentPath = string.format("%s%s/", g_modsDirectory, modName);
+
+	for _, mod in pairs(g_modManager.mods) do	
+		local currentPath = string.format("%s%s/", g_modsDirectory, mod.modName);
 				
 		local fullPath = string.format("%sl10n%s.xml", currentPath, g_languageSuffix);
 		if not fileExists(fullPath) then
@@ -36,8 +37,8 @@ function GC_languageManager:load()
 			end;
 		end;		
 		
-		if fullPath ~= nil then
-			local fullPath = string.format("%sl10n_en.xml", currentPath);
+		if fullPath == nil then
+			fullPath = string.format("%sl10n_en.xml", currentPath);
 			if not fileExists(fullPath) then
 				fullPath = string.format("%slanguages/l10n_en.xml", currentPath);
 				if not fileExists(fullPath) then
@@ -45,7 +46,7 @@ function GC_languageManager:load()
 				end;
 			end;	
 		end;
-
+		
 		if fullPath ~= nil then
 			local langXml = loadXMLFile("TempConfig", fullPath);
 			g_i18n:loadEntriesFromXML(langXml, "l10n.elements.e(%d)", "Warning: Duplicate text in l10n %s",  g_i18n.texts);

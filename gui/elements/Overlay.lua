@@ -141,15 +141,18 @@ end;
 
 function GC_Gui_overlay:draw(index)
 	self.drawPosition[1], self.drawPosition[2] = g_company.gui:calcDrawPos(self, index);
-	if self.isCamera then
-		setOverlayRotation(self.imageOverlay, self.rotation, self.size[1] * 0.5, self.size[2] * 0.5);
-		renderOverlay(self.imageOverlay, self.drawPosition[1], self.drawPosition[2], self.size[1], self.size[2]);
-	else
-		setOverlayRotation(self.imageOverlay, self.rotation, self.size[1] * 0.5, self.size[2] * 0.5);
-		setOverlayUVs(self.imageOverlay, unpack(self:getUVs()));
-		setOverlayColor(self.imageOverlay, unpack(self:getImageColor()));
-		renderOverlay(self.imageOverlay, self.drawPosition[1], self.drawPosition[2], self.size[1], self.size[2]);
+	if self:getVisible() then
+		if self.isCamera then
+			setOverlayRotation(self.imageOverlay, self.rotation, self.size[1] * 0.5, self.size[2] * 0.5);
+			renderOverlay(self.imageOverlay, self.drawPosition[1], self.drawPosition[2], self.size[1], self.size[2]);
+		else
+			setOverlayRotation(self.imageOverlay, self.rotation, self.size[1] * 0.5, self.size[2] * 0.5);
+			setOverlayUVs(self.imageOverlay, unpack(self:getUVs()));
+			setOverlayColor(self.imageOverlay, unpack(self:getImageColor()));
+			renderOverlay(self.imageOverlay, self.drawPosition[1], self.drawPosition[2], self.size[1], self.size[2]);
+		end;
 	end;
+
 	GC_Gui_overlay:superClass().draw(self);
 end;
 
@@ -186,6 +189,12 @@ function GC_Gui_overlay:onOpen()
 		self.gui[self.callback_onOpen](self.gui, self, self.parameter);
 	end;
 	GC_Gui_overlay:superClass().onOpen(self);
+end;
+
+function GC_Gui_overlay:setImageUv(uv)
+	if g_company.gui.template.uvs[uv] ~= nil then
+		self.uvs = GuiUtils.getUVs(g_company.gui.template.uvs[uv], self.imageSize, self.default);
+	end;
 end;
 
 

@@ -1,0 +1,10 @@
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<l10n><elements>
+
+<e k="gui_buttons_ok" v="OK"/>
+<e k="gui_buttons_yes" v="Ja"/>
+<e k="gui_buttons_no" v="Nein"/>
+
+
+</elements></l10n>

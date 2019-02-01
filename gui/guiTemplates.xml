@@ -17,6 +17,7 @@
 		<color name="glass2_45" value="0.2 0.2 0.2 0.45" />
 		<color name="glass3_40" value="0.018 0.016 0.015 0.4" />
 		<color name="glass4_10" value="0.5 0.5 0.5 0.1" />
+		<color name="glass5_70" value="0.1 0.1 0.1 0.9" />
 		
 		<color name="image" value="1 1 1 1" />
 		<color name="image_disabled" value="07098 07098 07098 1" />
@@ -29,6 +30,11 @@
 	</colors>
 	
 	<uvs>
+        <uv name="icon_roundBig" value="290px 385px 110px 110px"/>
+        <uv name="icon_roundSmall" value="530px 385px 55px 55px"/>
+        <uv name="icon_info" value="190px 722px 30px 60px"/>
+        <uv name="icon_question" value="150px 722px 35px 60px"/>
+
 		<uv name="colorBg" value="10px 1010px 4px 4px" />
 		<uv name="image" value="0 0 1 1" />
 		<uv name="icon_notification" value="0px 0px 80px 80px" />
@@ -105,6 +111,15 @@
 		</template>
 
 		<!-- MultiDialog -->
+		<template name="gcMdMainLayerBackground" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="1920px 1080px" />
+			<value name="newLayer" value="true" />
+			<value name="imageColor" value="transparent" />
+		</template>
+		<template name="gcMdMainBackground" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="1920px 1080px" />
+			<value name="imageColor" value="glass5_70" />
+		</template>
 		<template name="gcMdBackground" anchor="middleCenter" extends="gcBase gcBorder">
 			<value name="size" value="1000px 400px" />
 			<value name="imageColor" value="glass1_50" />
@@ -123,20 +138,43 @@
 			<value name="textSize" value="25px" />
 			<value name="textAlignment" value="center" />	
 		</template>	
+		<template name="gcMdContentLayout" anchor="middleTop" extends="gcBase_text">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="left" />
+			<value name="position" value="0px -80px" />
+			<value name="size" value="900px 200px" />
+		</template>
+		<template name="gcMdContentIcon" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="150px 150px" />
+			<value name="imageColor" value="glass1_90" />
+			<value name="imageUVs" value="icon_roundBig" />
+		</template>
+		<template name="gcMdContentIconTyp" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="50px 80px" />
+			<value name="imageColor" value="orange" />
+		</template>
 		<template name="gcMdContentText" anchor="leftTop" extends="gcBase_text">
-			<value name="position" value="50px -80px" />
+			<value name="position" value="50px 0px" />
 			<value name="textSize" value="20px" />
 			<value name="textAlignment" value="left" />	
-			<value name="textWrapWidth" value="900px" />	
-			<value name="textMaxNumLines" value="3" />		
+			<value name="textWrapWidth" value="700px" />	
+			<value name="textMaxNumLines" value="8" />		
 		</template>	
-		<template name="gcMdContentButtons" anchor="leftTop" extends="gcHotelContentInteraction">
+		<template name="gcMdContentButtonsLayout" anchor="middleBottom" extends="gcBase_text">
 			<value name="orientation" value="x" />
-			<value name="alignment" value="top" />
-			<value name="position" value="0px 0px" />
-			<value name="size" value="800px 400px" />
+			<value name="alignment" value="left" />
+			<value name="position" value="0px 3px" />
+			<value name="size" value="1000px 50px" />
 		</template>
-
+		<template name="gcMdContentButtonsButton" anchor="middleBottom" extends="gcBase">
+			<value name="position" value="0px 0px" />
+			<value name="imageColor" value="gray3" />
+			<value name="imageColor_selected" value="gray2" />
+			<value name="hasOverlay" value="true" />
+			<value name="hasText" value="true" />
+			<value name="textAlignment" value="center" />	
+			<value name="textMargin" value="0px 0px 0px 15px" />	
+		</template>	
 
 
 
