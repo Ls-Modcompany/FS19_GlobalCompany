@@ -59,7 +59,7 @@ function GC_DebugUtils:new(customMt)
 	local setMax = self.isDev and GC_DebugUtils.setDevLevelMax;
 
 	self.registeredScriptNames = {};
-	
+
 	self.registeredScripts = {};
 	self.registeredScriptsCount = 0;
 
@@ -94,6 +94,16 @@ function GC_DebugUtils:new(customMt)
 	return self;
 end;
 
+function GC_DebugUtils:getLevelFromName(levelName, printError)
+	local level = GC_DebugUtils[levelName:upper()];
+
+	if printError == true and level == nil then
+		print("  [LSMC - GlobalCompany > GC_DebugUtils] - 'printLevel' with name '" .. levelName:upper() .. "' does not exist!");
+	end;
+
+	return level;
+end;
+
 function GC_DebugUtils:setLevel(level, value)
 	if value == nil or type(value) ~= "boolean" then
 		value = false;
@@ -103,7 +113,7 @@ function GC_DebugUtils:setLevel(level, value)
 		self.printLevel[level] = value;
 		return true;
 	end;
-	
+
 	return false;
 end;
 
@@ -119,7 +129,7 @@ function GC_DebugUtils:setAllLevels(value)
 			count = count + 1;
 		end;
 	end;
-	
+
 	return count;
 end;
 
@@ -128,13 +138,13 @@ function GC_DebugUtils:registerScriptName(scriptName)
 		print("  [LSMC - GlobalCompany > GC_DebugUtils] - 'registerScriptName' failed! '" .. tostring(scriptName) .. "' is not a string value.");
 		return;
 	end;
-	
-	if self.registeredScriptNames[scriptName] == nil then	
+
+	if self.registeredScriptNames[scriptName] == nil then
 		self.registeredScriptsCount = self.registeredScriptsCount + 1;
-		
+
 		self.registeredScripts[self.registeredScriptsCount] = scriptName;
 		self.registeredScriptNames[scriptName] = self.registeredScriptsCount;
-	
+
 		return self.registeredScriptsCount;
 	else
 		print(string.format("  [LSMC - GlobalCompany > GC_DebugUtils] - Script name %s is already registered! Registered Script Id = %d", scriptName, self.registeredScriptNames[scriptName]));
@@ -143,10 +153,10 @@ end;
 
 function GC_DebugUtils:getDebugData(scriptId, target, customEnvironment)
 	local parentScriptId, modName = nil, "";
-	
+
 	if target ~= nil then
 		parentScriptId = target.debugIndex;
-		
+
 		if customEnvironment ~= nil then
 			modName = " - [" .. tostring(customEnvironment) .. "]"; -- Optional to overwrite modName.
 		elseif target.debugModName ~= nil then
@@ -159,14 +169,14 @@ function GC_DebugUtils:getDebugData(scriptId, target, customEnvironment)
 			modName = " - [" .. tostring(customEnvironment) .. "]";  -- Optional to show modName in header if no target is given.
 		end;
 	end;
-	
+
 	local scriptName = self:getScriptNameFromIndex(scriptId);
 	if scriptName ~= "" then
 		local parentScriptName = self:getScriptNameFromIndex(parentScriptId);
 		if parentScriptName ~= "" then
 			scriptName =  parentScriptName .. " > " .. scriptName;
 		end;
-	
+
 		local header = "  [LSMC - GlobalCompany] - [" .. scriptName .. "]" .. modName;
 
 		return {scriptId = scriptId,
@@ -181,7 +191,7 @@ function GC_DebugUtils:getDebugData(scriptId, target, customEnvironment)
 				TABLET = 4,
 				MODDING = 5,
 				DEV = 6};
-	end;	
+	end;
 
 	return nil;
 end;
@@ -191,13 +201,13 @@ function GC_DebugUtils:singleLogWrite(data, level, message, ...)
 	if self.printLevel[level] == true then
 		if data ~= nil then
 			local registeredScriptName, header;
-		
+
 			if type(data) == "table" then
 				registeredScriptName = self.registeredScripts[data.scriptId];
 			else
 				registeredScriptName = self.registeredScripts[data];
 			end;
-		
+
 			if registeredScriptName ~= nil then
 				print("  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[level] .. string.format(message, ...));
 			else
@@ -212,7 +222,7 @@ function GC_DebugUtils:logWrite(data, level, message, ...)
 	if self.printLevel[level] == true then
 		if data ~= nil then
 			local registeredScriptName, header;
-		
+
 			if type(data) == "table" then
 				registeredScriptName = self.registeredScripts[data.scriptId];
 				header = data.header;
@@ -220,9 +230,9 @@ function GC_DebugUtils:logWrite(data, level, message, ...)
 				registeredScriptName = self.registeredScripts[data];
 				header = "  [LSMC - GlobalCompany] - [" .. registeredScriptName .. "]";
 			end;
-		
+
 			if registeredScriptName ~= nil then
-				if header ~= nil then				
+				if header ~= nil then
 					print(header, "    " .. self.printLevelPrefix[level] .. string.format(message, ...));
 				else
 					print("  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[level] .. string.format(message, ...));
@@ -234,18 +244,63 @@ function GC_DebugUtils:logWrite(data, level, message, ...)
 	end;
 end;
 
+-- Direct print functions (With Header Only).
+function GC_DebugUtils:writeBlank(data, message, ...)
+	self:logWrite(data, -2, message, ...);
+end;
+
+function GC_DebugUtils:writeError(data, message, ...)
+	self:logWrite(data, -1, message, ...);
+end;
+
+function GC_DebugUtils:writeWarning(data, message, ...)
+	self:logWrite(data, 0, message, ...);
+end;
+
+function GC_DebugUtils:writeInformations(data, message, ...)
+	self:logWrite(data, 1, message, ...);
+end;
+
+function GC_DebugUtils:writeLoad(data, message, ...)
+	self:logWrite(data, 2, message, ...);
+end;
+
+function GC_DebugUtils:writeOnCreate(data, message, ...)
+	self:logWrite(data, 3, message, ...);
+end;
+
+function GC_DebugUtils:writeTablet(data, message, ...)
+	self:logWrite(data, 4, message, ...);
+end;
+
+function GC_DebugUtils:writeModding(data, message, ...)
+	self:logWrite(data, 5, message, ...);
+end;
+
+function GC_DebugUtils:writeDev(data, message, ...)
+	self:logWrite(data, 6, message, ...);
+end;
+
 function GC_DebugUtils:getScriptNameFromIndex(index)
 	local name = "";
-	
+
 	if index ~= nil and self.registeredScripts[index] ~= nil then
 		name = self.registeredScripts[index];
 	end;
-	
+
 	return name;
 end;
 
 function GC_DebugUtils:getScriptIndexFromName(name)
 	return self.registeredScriptNames[name];
+end;
+
+function GC_DebugUtils:getPrintLevelFromParamater(level) -- another option we could use, call using printLevel name (string).
+	if type(level) == "number" then
+		return level;
+	elseif type(level) == "string" then
+		return GC_DebugUtils[level:upper()] or -10; -- printLevel[-10] does not exist so nothing will print.
+	end;
 end;
 
 function GC_DebugUtils:getIsDev()
@@ -273,14 +328,14 @@ function GC_DebugUtils:loadConsoleCommands()
 	if self.consoleCommandsLoaded == true then
 		return;
 	end;
-	
+
 	if self.isDev then
 		-- Load dev only debug commands when added.
 	end;
-	
+
 	addConsoleCommand("gcSetDebugLevelState", "Set the state of the given debug level. [level] [state]", "consoleCommandSetDebugLevel", self);
 	addConsoleCommand("gcSetAllDebugLevelsState", "Set the state of all debug levels. [state]", "consoleCommandSetAllDebugLevels", self);
-	
+
 	self.consoleCommandsLoaded = true;
 end;
 
@@ -288,7 +343,7 @@ function GC_DebugUtils:deleteConsoleCommands()
 	if self.isDev then
 		-- Load dev only debug commands when added
 	end;
-	
+
 	removeConsoleCommand("gcSetDebugLevelState");
 	removeConsoleCommand("gcSetAllDebugLevelsState");
 end;
@@ -297,8 +352,8 @@ function GC_DebugUtils:consoleCommandSetDebugLevel(level, state)
 	if level == nil then
 		return "'GlobalCompany' Debug printLevel failed to update!  gcSetDebugLevelState [level] [state]";
 	end;
-	
-	local newLevel;	
+
+	local newLevel;
 	if GC_DebugUtils[level:upper()] ~= nil then
 		newLevel = GC_DebugUtils[level:upper()];
 	else
@@ -307,7 +362,7 @@ function GC_DebugUtils:consoleCommandSetDebugLevel(level, state)
 
 	local value = Utils.stringToBoolean(state);
 	local success = self:setLevel(newLevel, value);
-	
+
 	if success then
 		return "'GlobalCompany' Debug printLevel " .. tostring(newLevel) .. " = " .. tostring(value);
 	else
@@ -330,7 +385,7 @@ function debugPrint(name, text, depth, referenceText)
 	if referenceText ~= nil then
 		refName = tostring(referenceText);
 	end;
-	
+
 	if name ~= nil then
 		if text == nil then
 			if type(name) == "table" then
