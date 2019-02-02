@@ -45,6 +45,8 @@ function GC_Lighting:new(isServer, isClient, customMt)
 	end;
 
 	local self = Object:new(isServer, isClient, customMt);
+	
+	self.enable = false;
 
 	return self;
 end
@@ -88,12 +90,22 @@ function GC_Lighting:load(nodeId, target, xmlFile, xmlKey, allowProfileOverride,
 	for filename, file in pairs (loadedXmlFiles) do
 		delete(file);
 		loadedXmlFiles = nil;
+	end;	
+	
+	-- Register Script here so it does not need to be done in parent script.
+	if self.enable then
+		self:register(true);
+		return true;
 	end;
 	
-	return true
+	return false;
 end;
 
 function GC_Lighting:delete()
+	if self.isRegistered then
+		self:unregister(true);
+	end;
+	
 	if self.beaconLights ~= nil then
 		for _, beaconLight in pairs(self.beaconLights) do
 			if beaconLight.filename ~= nil then
@@ -298,6 +310,8 @@ function GC_Lighting:loadStrobeLights(xmlFile, xmlKey, loadedXmlFiles)
 		i = i + 1;
 	end;
 	
+	self.enable = strobeLights ~= nil;
+	
 	return strobeLights;
 end;
 
@@ -441,6 +455,8 @@ function GC_Lighting:loadBeaconLights(xmlFile, xmlKey, loadedXmlFiles)
 		end;
 		i = i + 1;
 	end;
+	
+	self.enable = beaconLights ~= nil;
 	
 	return beaconLights;
 end;
