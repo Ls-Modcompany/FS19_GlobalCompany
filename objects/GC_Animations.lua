@@ -41,8 +41,8 @@ function GC_Animations:new(isServer, isClient, customMt)
 
 	local self = Object:new(isServer, isClient, customMt);
 
-	self.isServer = isServer;
-	self.isClient = isClient;
+	--self.isServer = isServer;
+	--self.isClient = isClient;
 
 	self.isMoving = false;
 	self.sendIsMoving = false;
@@ -50,11 +50,11 @@ function GC_Animations:new(isServer, isClient, customMt)
 	return self;
 end;
 
-function GC_Animations:load(nodeId, enableSync, referenceKey, xmlFile, baseKey)
+function GC_Animations:load(nodeId, enableSync, referenceKey, xmlFile, baseKey, i3dMappings)
 	self.nodeId = nodeId;
 	self.enableSync = Utils.getNoNil(enableSync, true); -- This allows the MP sync to be disabled when not needed.
 
-	if xmlFile ~= nil and baseKey ~= nil or referenceKey ~= nil then
+	if xmlFile ~= nil and (baseKey ~= nil or referenceKey ~= nil) then
 		local key = referenceKey;
 		if key == nil then
 			key = string.format("%s.animation", baseKey);
@@ -76,7 +76,7 @@ function GC_Animations:load(nodeId, enableSync, referenceKey, xmlFile, baseKey)
 				break;
 			end;
 
-			local node = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, partKey.."#index"));
+			local node = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, partKey.."#index"), i3dMappings);
 			if node ~= nil then
 				local part = {};
 				part.node = node;
@@ -328,4 +328,5 @@ function GC_Animations.linearInterpolatorN(first, second, alpha)
     end;
     return ret;
 end;
+
 
