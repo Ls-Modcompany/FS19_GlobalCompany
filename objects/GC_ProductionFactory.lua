@@ -62,7 +62,7 @@ function ProductionFactory:load(transformId, xmlFilename, baseKey, indexName, is
 	local xmlFile = loadXMLFile("ProductionFactory", xmlFilename);
 
 	if xmlFile ~= nil and xmlFile ~= 0 then
-		local xmlKey = self:getXmlKey(xmlFile, baseKey, "productionFactory", indexName);
+		local xmlKey = g_company.xmlUtils:getXmlKey(xmlFile, baseKey, "productionFactory", indexName);
 
 		self.triggerManager = GC_TriggerManager:new(self); -- init trigger manager.
 
@@ -148,7 +148,7 @@ function ProductionFactory:load(transformId, xmlFilename, baseKey, indexName, is
 							local fillTypeTitle = fillType.title;
 							local customTitle = getXMLString(xmlFile, fillTypesKey .. "#title");
 							if customTitle ~= nil then
-								fillTypeTitle = g_i18n:getText(customTitle);
+								fillTypeTitle = g_company.languageManager:getText(customTitle);
 							end;
 		
 							table.insert(concatTitles, fillTypeTitle);
@@ -175,7 +175,7 @@ function ProductionFactory:load(transformId, xmlFilename, baseKey, indexName, is
 					inputProduct.title = tostring(registeredProducts.input) .. ":";
 					local productTitle = getXMLString(xmlFile, inputProductKey .. "#title");
 					if productTitle ~= nil then
-						inputProduct.title = g_i18n:getText(productTitle) .. ":";
+						inputProduct.title = g_company.languageManager:getText(productTitle) .. ":";
 					end;				
 		
 					
@@ -263,7 +263,7 @@ function ProductionFactory:load(transformId, xmlFilename, baseKey, indexName, is
 						outputProduct.title = tostring(registeredProducts.output) .. ":";
 						local productTitle = getXMLString(xmlFile, outputProductKey .. "#title");
 						if productTitle ~= nil then
-							outputProduct.title = g_i18n:getText(productTitle) .. ":";
+							outputProduct.title =  g_company.languageManager:getText(productTitle) .. ":";
 						end;
 						
 						
@@ -353,7 +353,7 @@ function ProductionFactory:load(transformId, xmlFilename, baseKey, indexName, is
 
 				local productLineName = getXMLString(xmlFile, productLineKey .. "#name");
 				if productLineName ~= nil and productLineName ~= "DEFAULT" then
-					productLine.name = g_i18n:getText(productLineName);
+					productLine.name = g_company.languageManager:getText(productLineName);
 				end;
 
 				local productLineImage = getXMLString(xmlFile, productLineKey .. "imageFilename");
@@ -814,32 +814,5 @@ function ProductionFactory:playerTriggerUpdate(dt, triggerReference)
 			g_currentMission:addExtraPrintText("Factory is Stopped");
 		end;
 	end;
-end;
-
-
-
--- Extras we may move to Util scripts
-
-function ProductionFactory:getXmlKey(xmlFile, baseKey, key, indexName)
-	local xmlKey = string.format("%s.%s", baseKey, key);
-
-	if indexName ~= nil then
-		local i = 0;
-		while true do
-			local indexNameKey = string.format("%s.%s(%d)", baseKey, key, i);
-			if not hasXMLProperty(xmlFile, indexNameKey) then
-				break;
-			end;
-
-			local factoryIndex = getXMLString(xmlFile, indexNameKey .. "#indexName");
-			if factoryIndex == indexName then
-				xmlKey = indexNameKey;
-				break;
-			end;
-			i = i + 1;
-		end;
-	end;
-
-	return xmlKey;
 end;
 

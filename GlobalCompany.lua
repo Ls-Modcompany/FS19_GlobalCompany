@@ -46,7 +46,7 @@ function GlobalCompany.initialLoad()
 	
 	GlobalCompany.loadSourceFiles();
 	
-	for _, mod in pairs(g_modManager.mods) do		
+	for _, mod in pairs(g_modSelectionScreen.missionDynamicInfo.mods) do
 		local path = nil;
 		local modName = mod.modName;
 		if mod.modDir ~= nil then	
@@ -71,6 +71,8 @@ function GlobalCompany.initialLoad()
 			GlobalCompany.environments[modName].densityMapHeightOverwriteOrginalFunction = getXMLBool(xmlFile, "globalCompany.densityMapHeight#overwriteOrginalFunction");
 		end;
 	end;
+	
+	g_company.languageManager:load(); -- Load language manager.
 
 	for modName, values in pairs(GlobalCompany.environments) do
 		if values.specializations ~= nil and values.specializations ~= "" then	
@@ -79,9 +81,7 @@ function GlobalCompany.initialLoad()
 		if values.densityMapHeightOverwriteOrginalFunction then	
 			g_densityMapHeightManager.loadMapData = function() return true; end;		
 		end;
-	end;
-	
-	g_company.languageManager:load(); -- Load language manager.
+	end;	
 
 	GlobalCompany.initialLoadComplete = true;
 	g_company.debug:singleLogWrite(GlobalCompany.debugIndex, GC_DebugUtils.BLANK, "Loaded Version: %s", version);	
@@ -223,4 +223,16 @@ function GlobalCompany:getLoadParameterEnvironment(name)
 	return GlobalCompany.loadParameters[name].environment;
 end;
 
+function  GlobalCompany:addPlaceableType(name, className, filename)	
+	g_placeableTypeManager.placeableTypes[name] = {name=name, className=className, filename=filename};
+end
+
 GlobalCompany.initialLoad();
+
+--convert ExtendedPlaceable.lua from ls17
+PlacementScreenController.DISPLACEMENT_COST_PER_M3 = 1; 
+PlacementUtil.hasObjectOverlap = function() return false end;
+PlacementUtil.isInsidePlacementPlaces = function() return false end;
+PlacementUtil.isInsideRestrictedZone = function() return false end;
+PlacementUtil.hasOverlapWithPoint = function() return false end;
+TerrainDeformation.setBlockedAreaMap = function() return true end;

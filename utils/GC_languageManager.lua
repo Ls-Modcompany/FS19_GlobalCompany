@@ -26,7 +26,7 @@ g_company.languageManager = GC_languageManager;
 
 function GC_languageManager:load()	
 
-	for _, mod in pairs(g_modManager.mods) do	
+	for _, mod in pairs(g_modSelectionScreen.missionDynamicInfo.mods) do
 		local currentPath = string.format("%s%s/", g_modsDirectory, mod.modName);
 				
 		local fullPath = string.format("%sl10n%s.xml", currentPath, g_languageSuffix);
@@ -49,7 +49,7 @@ function GC_languageManager:load()
 		
 		if fullPath ~= nil then
 			local langXml = loadXMLFile("TempConfig", fullPath);
-			g_i18n:loadEntriesFromXML(langXml, "l10n.elements.e(%d)", "Warning: Duplicate text in l10n %s",  g_i18n.texts);
+			getfenv(0)["g_i18n"]:loadEntriesFromXML(langXml, "l10n.elements.e(%d)", "Warning: Duplicate text in l10n %s",  getfenv(0)["g_i18n"].texts);
 		end;
 	end;
 end;
@@ -63,9 +63,9 @@ function GC_languageManager:getText(text)
 			addColon = true;
 		end;
 		if text:sub(1,6) == "$l10n_" then
-			text = g_i18n:getText(text:sub(7));
-		elseif g_i18n:hasText(text) then
-			text = g_i18n:getText(text);
+			text = getfenv(0)["g_i18n"]:getText(text:sub(7));
+		elseif getfenv(0)["g_i18n"]:hasText(text) then
+			text = getfenv(0)["g_i18n"]:getText(text);
 		end;
 		if addColon and text ~= "" then
 			text = text .. ":";
