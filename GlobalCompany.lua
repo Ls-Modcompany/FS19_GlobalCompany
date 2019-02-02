@@ -234,3 +234,17 @@ function GlobalCompany:getLoadParameterEnvironment(name)
 end;
 
 GlobalCompany.initialLoad();
+
+function  GlobalCompany:addPlaceableType(name, className, filename)	
+	g_placeableTypeManager.placeableTypes[name] = {name=name, className=className, filename=filename};
+end
+
+GlobalCompany.initialLoad();
+
+--convert ExtendedPlaceable.lua from ls17
+PlacementScreenController.DISPLACEMENT_COST_PER_M3 = 1; 
+PlacementUtil.hasObjectOverlap = function() return false end;
+PlacementUtil.isInsidePlacementPlaces = function() return false end;
+PlacementUtil.isInsideRestrictedZone = function() return false end;
+PlacementUtil.hasOverlapWithPoint = function() return false end;
+TerrainDeformation.setBlockedAreaMap = function() return true end; 

@@ -40,6 +40,8 @@ function GC_MovingPart:load(nodeId, xmlFile, key, i3dMappings)
 	self.mouseSpeedFactor = Utils.getNoNil(getXMLFloat(xmlFile, key.."#mouseSpeedFactor"), 1.0);
 		
 	self.axisIndex = InputBinding[self.axis];
+
+	g_gui.inputManager:registerActionEvent(InputAction.MENU_AXIS_LEFT_RIGHT, GC_MovingPart, self.onMoveY, false, true, false, true);
 		
 	return true;
 end;
@@ -83,6 +85,13 @@ function GC_MovingPart:update(dt)
 	print(move)
 
 end;
+
+function GC_MovingPart:onMoveY(a,b)
+	GC_MovingPart:superClass().delete(self);
+	print("onMoveY")
+	print(a)
+	print(b)
+end
 
 
 function GC_MovingPart:mouseEvent(posX, posY, isDown, isUp, button)
