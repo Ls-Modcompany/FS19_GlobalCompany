@@ -72,7 +72,7 @@ function GC_ActivableObject:onActivateObject()
 	self.isOn = not self.isOn;
 
 	if self.target.onActivableObject ~= nil then
-		self.target:onActivableObject(self.reference);
+		self.target:onActivableObject(self.reference, self.isOn);
 	end;
 
 	if self.isOn then
