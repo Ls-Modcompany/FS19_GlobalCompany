@@ -70,7 +70,6 @@ function GC_Lighting:load(nodeId, target, xmlFile, xmlKey, baseDirectory, allowP
 
 	self.baseDirectory = baseDirectory;
 	
-	
 	self.allowProfileOverride = Utils.getNoNil(allowProfileOverride, false);
 	
 	self.syncedLightState = false;
@@ -552,15 +551,17 @@ function GC_Lighting:update(dt)
 	end;
 end;
 
-function GC_Lighting:setAllLightsState(state)	
-	self.syncedLightState = state;
+function GC_Lighting:setAllLightsState(state)
+	if state ~= nil then
+		self.syncedLightState = state;
 	
-	if self.beaconLights ~= nil then
-		self:setBeaconLightsState(state)
-	end;
+		if self.beaconLights ~= nil then
+			self:setBeaconLightsState(self.syncedLightState)
+		end;
 	
-	if self.strobeLights ~= nil then
-		self:setStrobeLightsState(state)
+		if self.strobeLights ~= nil then
+			self:setStrobeLightsState(self.syncedLightState)
+		end;
 	end;
 end;
 
@@ -586,6 +587,10 @@ function GC_Lighting:setStrobeLightsState(state)
 	end;
 	
 	if self.isClient then	
+		if state == nil then
+			state = not self.strobeLightsActive;
+		end;
+	
 		if state ~= self.strobeLightsActive then
 			for _, strobeLight in pairs(self.strobeLights) do
 				strobeLight.realBeaconLights = self:getUseRealLights(GC_Lighting.STROBE_LIGHT_TYPE, strobeLight);
@@ -595,7 +600,7 @@ function GC_Lighting:setStrobeLightsState(state)
 			
 			self:raiseActive();
 			
-			return true;
+			return state;
 		end
 	else
 		g_company.debug:writeDev(self.debugData, "'setStrobeLightsState' is a client only function!");
@@ -608,6 +613,10 @@ function GC_Lighting:setBeaconLightsState(state)
 	end;
 	
 	if self.isClient then	
+		if state == nil then
+			state = not self.beaconLightsActive;
+		end;
+		
 		if state ~= self.beaconLightsActive then
 			self.beaconLightsActive = state;
 	
@@ -636,7 +645,7 @@ function GC_Lighting:setBeaconLightsState(state)
 			
 			self:raiseActive();
 			
-			return true;
+			return state;
 		end
 	else
 		g_company.debug:writeDev(self.debugData, "'setBeaconLightsState' is a client only function!");
@@ -649,6 +658,10 @@ end;
 
 function GC_Lighting:getBeaconLightsActive()
 	return self.beaconLightsActive;
+end;
+
+function GC_Lighting:getSyncedLightState()
+	return self.syncedLightState;
 end;
 
 function GC_Lighting:getUseRealLights(lightType, light)
