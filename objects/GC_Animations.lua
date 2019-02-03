@@ -44,9 +44,6 @@ function GC_Animations:new(isServer, isClient, customMt)
 
 	local self = Object:new(isServer, isClient, customMt);
 
-	--self.isServer = isServer;
-	--self.isClient = isClient;
-
 	self.isMoving = false;
 	self.sendIsMoving = false;
 
