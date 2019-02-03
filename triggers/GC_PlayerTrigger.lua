@@ -49,8 +49,8 @@ function GC_PlayerTrigger:new(isServer, isClient, customMt)
 
 	local self = Object:new(isServer, isClient, customMt);
 
-	self.isServer = isServer;
-	self.isClient = isClient;
+	--self.isServer = isServer;
+	--self.isClient = isClient;
 
 	self.triggerManagerRegister = true; -- 'GC_TriggerManager' Requirement.
 
