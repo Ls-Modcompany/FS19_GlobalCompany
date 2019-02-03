@@ -608,7 +608,17 @@ function GC_Lighting:setBeaconLightsState(state)
 	end;
 	
 	if self.isClient then	
-		if state ~= self.beaconLightsActive then
+		local run = false;
+		if state ~= nil then
+			if state ~= self.beaconLightsActive then
+				run = true;
+			end;
+		else
+			state = not self.beaconLightsActive;
+			run = true;
+		end;
+
+		if run then
 			self.beaconLightsActive = state;
 	
 			for _, beaconLight in pairs(self.beaconLights) do
