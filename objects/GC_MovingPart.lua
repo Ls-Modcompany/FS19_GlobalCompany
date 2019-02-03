@@ -30,7 +30,7 @@ function GC_MovingPart:new(isServer, isClient, customMt)
 end;
 
 function GC_MovingPart:load(nodeId, xmlFile, key, i3dMappings)
-	GC_MovingPart:superClass().delete(self, nodeId, xmlFile, key, i3dMappings);
+	--GC_MovingPart:superClass().delete(self, nodeId, xmlFile, key, i3dMappings);
 	
 	self.animation = GC_Animations:new(self.isServer, self.isClient);
 	self.animation:load(nodeId, true, key, xmlFile, nil, i3dMappings);
@@ -45,27 +45,11 @@ function GC_MovingPart:load(nodeId, xmlFile, key, i3dMappings)
 end;
 
 function GC_MovingPart:delete()
-	GC_MovingPart:superClass().delete(self);
+	--GC_MovingPart:superClass().delete(self);
 end
 
-function GC_MovingPart:readStream(streamId, connection)
-	GC_MovingPart:superClass().readStream(self, streamId, connection);
-end;
-
-function GC_MovingPart:writeStream(streamId, connection)
-	GC_MovingPart:superClass().writeStream(self, streamId, connection);
-end;
-
-function GC_MovingPart:readUpdateStream(streamId, timestamp, connection)
-	GC_MovingPart:superClass().readUpdateStream(self, streamId, timestamp, connection);
-end;
-
-function GC_MovingPart:writeUpdateStream(streamId, connection, dirtyMask)
-	GC_MovingPart:superClass().writeUpdateStream(self, streamId, connection, dirtyMask);
-end;
-
 function GC_MovingPart:update(dt)
-	GC_MovingPart:superClass().update(self, dt);
+	--GC_MovingPart:superClass().update(self, dt);
 	
 	self.animation:setAnimationsState2(self.animationState);
 	self.animationState = 0;
