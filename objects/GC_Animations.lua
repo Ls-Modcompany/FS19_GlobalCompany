@@ -63,6 +63,7 @@ function GC_Animations:load(nodeId, enableSync, referenceKey, xmlFile, baseKey, 
 		self.animation = {};
 		self.animation.parts = {};
 		self.animation.duration = Utils.getNoNil(getXMLFloat(xmlFile, key.."#duration"), 3) * 1000;
+		self.animation.canLoop = Utils.getNoNil(getXMLBool(xmlFile, key .. "#canLoop"), false);
 		if self.animation.duration == 0 then
 			self.animation.duration = 1000;
 		end;
@@ -224,6 +225,22 @@ function GC_Animations:setAnimationsState(setPositive)
 	end;
 end;
 
+function GC_Animations:setAnimationsState2(state)
+	
+	--create own event
+	if g_server == nil and self.enableSync then
+		--g_client:getServerConnection():sendEvent(SetGcAnimationsEvent:new(self, isPositive));
+	end;
+
+	if state > 0 then
+		self.animation.direction = 1;
+	elseif state < 0 then
+		self.animation.direction = -1;
+	else
+		self.animation.direction = 0;
+	end;	
+end
+
 function GC_Animations:update(dt)
 	GC_Animations:superClass().update(self, dt);
 	if self.enableSync then	
@@ -232,8 +249,16 @@ function GC_Animations:update(dt)
 				local newAnimTime = MathUtil.clamp(self.animation.time + (self.animation.direction*dt)/self.animation.duration, 0, 1);
 				self:setAnimTime(newAnimTime);
 				
-				if newAnimTime == 0 or newAnimTime == 1 then
-					self.animation.direction = 0;
+				if self.animation.canLoop then
+					if newAnimTime == 0 and self.animation.direction < 0 then
+						newAnimTime = 1;
+					elseif newAnimTime == 1 and self.animation.direction > 0 then
+						newAnimTime = 0;
+					end;
+				else
+					if newAnimTime == 0 or newAnimTime == 1 then
+						self.animation.direction = 0;
+					end;
 				end;
 	
 				self:raiseDirtyFlags(self.gcAnimationsDirtyFlag);
@@ -250,8 +275,16 @@ function GC_Animations:update(dt)
 			local newAnimTime = MathUtil.clamp(self.animation.time + (self.animation.direction*dt)/self.animation.duration, 0, 1);
 			self:setAnimTime(newAnimTime);
 			
-			if newAnimTime == 0 or newAnimTime == 1 then
-				self.animation.direction = 0;
+			if self.animation.canLoop then
+				if newAnimTime == 0 and self.animation.direction < 0 then
+					newAnimTime = 1;
+				elseif newAnimTime == 1 and self.animation.direction > 0 then
+					newAnimTime = 0;
+				end;
+			else
+				if newAnimTime == 0 or newAnimTime == 1 then
+					self.animation.direction = 0;
+				end;
 			end;
 		end
 	
