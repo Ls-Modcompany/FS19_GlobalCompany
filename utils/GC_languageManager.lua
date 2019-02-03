@@ -44,7 +44,7 @@ function GC_languageManager:load(modLanguageFiles)
 	local fullPathCount = 0;
 	for modName, fullPath in pairs(modLanguageFiles) do
 		local langXml = loadXMLFile("TempConfig", fullPath);
-		g_i18n:loadEntriesFromXML(langXml, "l10n.elements.e(%d)", "Warning: Duplicate text in l10n %s",  g_i18n.texts);
+		getfenv(0)["g_i18n"]:loadEntriesFromXML(langXml, "l10n.elements.e(%d)", "Warning: Duplicate text in l10n %s",  getfenv(0)["g_i18n"].texts);
 		
 		fullPathCount = fullPathCount + 1;
 	end;
@@ -53,22 +53,22 @@ function GC_languageManager:load(modLanguageFiles)
 end;
 
 function GC_languageManager:getLanguagesFullPath(modPath)
-	local fullPath = string.format("%s/l10n%s.xml", modPath, g_languageSuffix);
+	local fullPath = string.format("%sl10n%s.xml", modPath, g_languageSuffix);
 	if fileExists(fullPath) then
 		return fullPath;
 	end;	
 
-	fullPath = string.format("%s/languages/l10n%s.xml", modPath, g_languageSuffix);
+	fullPath = string.format("%slanguages/l10n%s.xml", modPath, g_languageSuffix);
 	if fileExists(fullPath) then
 		return fullPath;
 	end;
 
-	fullPath = string.format("%s/l10n_en.xml", modPath);
+	fullPath = string.format("%sl10n_en.xml", modPath);
 	if fileExists(fullPath) then
 		return fullPath;
 	end;	
 	
-	fullPath = string.format("%s/languages/l10n_en.xml", modPath);
+	fullPath = string.format("%slanguages/l10n_en.xml", modPath);
 	if fileExists(fullPath) then
 		return fullPath;
 	end;
