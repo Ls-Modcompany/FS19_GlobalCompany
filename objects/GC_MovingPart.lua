@@ -33,20 +33,16 @@ function GC_MovingPart:load(nodeId, xmlFile, key, i3dMappings)
 	GC_MovingPart:superClass().delete(self, nodeId, xmlFile, key, i3dMappings);
 	
 	self.animation = GC_Animations:new(self.isServer, self.isClient);
-	self.animation:load(nodeId, true, nil, xmlFile, key, i3dMappings);
+	self.animation:load(nodeId, true, key, xmlFile, nil, i3dMappings);
 
-	self.axis = getXMLString(xmlFile, key .. "#axis");
-	self.iconName = getXMLString(xmlFile, key .. "#iconName");
 	self.mouseSpeedFactor = Utils.getNoNil(getXMLFloat(xmlFile, key.."#mouseSpeedFactor"), 1.0);
-		
-	self.axisIndex = InputBinding[self.axis];
 
-	g_gui.inputManager:registerActionEvent(InputAction.MENU_AXIS_LEFT_RIGHT, GC_MovingPart, self.onMoveY, false, true, false, true);
-		
+	self.axis = InputAction[getXMLString(xmlFile, key.."#axis")];
+
+	self.animationState = 0;
+
 	return true;
 end;
-
-
 
 function GC_MovingPart:delete()
 	GC_MovingPart:superClass().delete(self);
@@ -71,30 +67,25 @@ end;
 function GC_MovingPart:update(dt)
 	GC_MovingPart:superClass().update(self, dt);
 	
-	
-	local move, axisType = getInputAxis(self.axisActionIndex);
-
-	if axisType == InputBinding.INPUTTYPE_MOUSE_AXIS then
-		move = move * self.mouseSpeedFactor;
-	else
-		move = move * g_gameSettings:getValue("vehicleArmSensitivity")
-	end
-
-	local rotSpeed = 0;
-
-	print(move)
-
+	self.animation:setAnimationsState2(self.animationState);
+	self.animationState = 0;
 end;
 
-function GC_MovingPart:onMoveY(a,b)
-	GC_MovingPart:superClass().delete(self);
-	print("onMoveY")
-	print(a)
-	print(b)
+function GC_MovingPart:addRemoveInputs()
+	if self.eventId == nil then
+		local _, eventId = g_inputBinding:registerActionEvent(self.axis, self, self.onMove, false, false, true, true);
+		self.eventId = eventId;
+	else
+		g_inputBinding:removeActionEvent(self.eventId);
+		self.eventId = nil;
+	end;
+end;
+
+function GC_MovingPart:onMove(_,value,_,_,isMouse)
+	if value > 0 then
+		self.animationState = 1;
+	elseif value < 0 then
+		self.animationState = -1;
+	end;
 end
 
-
-function GC_MovingPart:mouseEvent(posX, posY, isDown, isUp, button)
-    GC_MovingPart:superClass().mouseEvent(self, posX, posY, isDown, isUp, button);
-
-end
