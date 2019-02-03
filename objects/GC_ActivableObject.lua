@@ -20,7 +20,7 @@
 
 GC_ActivableObject = {};
 
-local GC_ActivableObject_mt = Class(GC_ActivableObject);
+local GC_ActivableObject_mt = Class(GC_ActivableObject, Object);
 InitObjectClass(GC_ActivableObject, "GC_ActivableObject");
 GC_ActivableObject.debugIndex = g_company.debug:registerScriptName("GC_ActivableObject");
 
@@ -31,10 +31,7 @@ function GC_ActivableObject:new(isServer, isClient, customMt)
 		customMt = GC_ActivableObject_mt;
 	end;
 
-	local self = setmetatable({}, customMt)
-
-	self.isServer = isServer;
-	self.isClient = isClient;
+	local self = Object:new(isServer, isClient, customMt);
 
 	self.isOn = false;
 
@@ -55,17 +52,10 @@ function GC_ActivableObject:load(target, reference, inputAction)
 end;
 
 function GC_ActivableObject:delete()
-	
-end;
-
-function GC_ActivableObject:update(dt)
-	if self:getIsActivatable() then
-        self:raiseActive();
-    end;
-end;
-
-function GC_ActivableObject:getIsActivatable()
-	return g_currentMission.controlPlayer and g_currentMission.controlledVehicle == nil;
+	if self.eventId ~= nil then
+		g_inputBinding:removeActionEvent(self.eventId);
+		self.eventId = nil;
+	end;
 end;
 
 function GC_ActivableObject:onActivateObject()
