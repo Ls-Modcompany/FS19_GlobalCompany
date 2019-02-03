@@ -2,13 +2,16 @@
 -- GlobalCompany - Objects - Animations
 -- 
 -- @Interface: --
--- @Author: LS-Modcompany / GtX
--- @Date: 13.12.2018
--- @Version: 1.1.0.0
+-- @Author: LS-Modcompany / GtX / kevink98
+-- @Date: 02.03.2019
+-- @Version: 1.2.0.0
 -- 
 -- @Support: LS-Modcompany
 -- 
 -- Changelog:
+-- 	v1.2.0.0 (03.02.2019):
+--		- add `canLoop` for external steering with 360° rotation of an object (kevink98)
+--
 -- 	v1.1.0.0 (13.12.2018):
 --		- convert in fs19 (kevink98)
 --		
@@ -251,9 +254,9 @@ function GC_Animations:update(dt)
 				
 				if self.animation.canLoop then
 					if newAnimTime == 0 and self.animation.direction < 0 then
-						newAnimTime = 1;
+						self:setAnimTime(1);
 					elseif newAnimTime == 1 and self.animation.direction > 0 then
-						newAnimTime = 0;
+						self:setAnimTime(0);
 					end;
 				else
 					if newAnimTime == 0 or newAnimTime == 1 then
