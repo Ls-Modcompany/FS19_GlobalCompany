@@ -83,6 +83,7 @@ function GC_RotationNodes:load(nodeId, target, xmlFile, xmlKey, rotationNodes)
 					rotationNode.fadeOnTime = getXMLFloat(xmlFile, key.."#fadeOnTime");
 					rotationNode.fadeOffTime = getXMLFloat(xmlFile, key.."#fadeOffTime");
 					rotationNode.operatingInterval = getXMLFloat(xmlFile, key.."#operatingIntervalSeconds");
+					rotationNode.stoppedInterval = getXMLFloat(xmlFile, key.."#stoppedIntervalSeconds");
 					rotationNode.delayStart = getXMLBool(xmlFile, key.."#delayedStart");
 
 					table.insert(rotationNodes, rotationNode);
@@ -130,6 +131,8 @@ function GC_RotationNodes:loadRotationNodes(rotationNodes)
 
 				local operatingInterval = Utils.getNoNil(rotationNode.operatingInterval, 0);
 				if operatingInterval > 0 then
+					local stoppedInterval = Utils.getNoNil(rotationNode.stoppedInterval, operatingInterval);
+					
 					local delayStart = Utils.getNoNil(rotationNode.delayStart, false);
 					local operatingTime = 0;
 					if delayStart then
@@ -139,6 +142,8 @@ function GC_RotationNodes:loadRotationNodes(rotationNodes)
 					node.delayTime = operatingTime;
 					node.operatingTime = operatingTime;
 					node.operatingInterval = operatingInterval * 1000;
+					node.stoppedInterval = stoppedInterval * 1000;
+					node.interval = operatingTime;
 					node.active = false;
 				end;
 
@@ -156,12 +161,19 @@ function GC_RotationNodes:update(dt)
 	if self.isClient and self:getCanUpdateRotation() then
 		local rotatingNodes = 0;
 		for _, node in pairs(self.rotationNodes) do
-			if node.operatingInterval ~= nil then
+			if node.interval ~= nil then
 				if self.rotationActive then
 					node.operatingTime = node.operatingTime - dt;
 					if node.operatingTime <= 0 then
-						node.operatingTime = node.operatingTime + node.operatingInterval;
-						node.active = not node.active
+						if node.active then
+							node.active = false;
+							node.interval = node.stoppedInterval;
+						else
+							node.active = true;
+							node.interval = node.operatingInterval;
+						end;
+						
+						node.operatingTime = node.operatingTime + node.interval;
 					end;
 					if node.active then
 						node.currentRotation = math.min(1, node.currentRotation + dt / node.fadeOnTime);

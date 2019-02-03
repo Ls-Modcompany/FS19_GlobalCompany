@@ -149,15 +149,16 @@ function GlobalCompany.loadSourceFiles()
 	
 	
 	--|| Objects ||--
+	source(GlobalCompany.dir .. "objects/GC_Sounds.lua");
 	source(GlobalCompany.dir .. "objects/GC_Lighting.lua");
 	source(GlobalCompany.dir .. "objects/GC_MovingPart.lua");
 	source(GlobalCompany.dir .. "objects/GC_Animations.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicHeap.lua");
 	source(GlobalCompany.dir .. "objects/GC_RotationNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
+	source(GlobalCompany.dir .. "objects/GC_ActivableObject.lua");
 	source(GlobalCompany.dir .. "objects/GC_ParticleEffects.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
-	source(GlobalCompany.dir .. "objects/GC_ActivableObject.lua");
 	
 	
 	--|| Triggers ||--
