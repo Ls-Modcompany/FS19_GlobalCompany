@@ -16,7 +16,7 @@
 
 
 GC_MovingPart = {};
-getfenv(0)["GC_MovingPart"] = GC_MovingPart;
+g_company.movingPart = GC_MovingPart;
 
 GC_MovingPart_mt = Class(GC_MovingPart, Object);
 InitObjectClass(GC_MovingPart, "GC_MovingPart");
