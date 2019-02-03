@@ -47,7 +47,7 @@ function GC_Sounds:new(isServer, isClient, customMt)
 	return self;
 end;
 
-function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, path)
+function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
 	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
 		local text = "Loading failed! 'nodeId' paramater = %s, 'target' paramater = %s 'xmlFile' paramater = %s, 'xmlKey' paramater = %s";
 		g_company.debug:logWrite(GC_Sounds.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil);
@@ -58,14 +58,15 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, path)
 
 	self.rootNode = nodeId;
 	self.target = target;
+	
+	if baseDirectory == nil or baseDirectory == "" then
+		baseDirectory = self.target.baseDirectory;
+		if baseDirectory == nil or baseDirectory == "" then
+			baseDirectory = g_currentMission.baseDirectory;
+		end;
+	end;
 
-	local filePath = g_currentMission.baseDirectory;
-	if self.target.baseDirectory ~= nil and self.target.baseDirectory ~= "" then
-		filePath = self.target.baseDirectory;
-	end;
-	if path ~= nil and path ~= "" then
-		filePath = path;
-	end;
+	self.baseDirectory = baseDirectory;
 
 	if self.isClient then
 		if hasXMLProperty(xmlFile, xmlKey .. ".sounds") then
@@ -83,7 +84,7 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, path)
 					sound.node = soundNode;
 					setVisibility(soundNode, false); -- Use sound source already in GE.
 				else
-					sound.sample = g_soundManager:loadSampleFromXML(xmlFile, key, "sample", filePath, self.rootNode, 0, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
+					sound.sample = g_soundManager:loadSampleFromXML(xmlFile, key, "sample", self.baseDirectory, self.rootNode, 0, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
 				end;
 
 				if sound.sample ~= nil or sound.node ~= nil then
@@ -124,9 +125,9 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, path)
 			local key = xmlKey .. ".operateSounds";
 
 			self.operateSamples = {};
-			self.operateSamples.start = g_soundManager:loadSampleFromXML(xmlFile, key, "start", filePath, self.rootNode, 1, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
-			self.operateSamples.run = g_soundManager:loadSampleFromXML(xmlFile, key, "run", filePath, self.rootNode, 0, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
-			self.operateSamples.stop = g_soundManager:loadSampleFromXML(xmlFile, key, "stop", filePath, self.rootNode, 1, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
+			self.operateSamples.start = g_soundManager:loadSampleFromXML(xmlFile, key, "start", self.baseDirectory, self.rootNode, 1, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
+			self.operateSamples.run = g_soundManager:loadSampleFromXML(xmlFile, key, "run", self.baseDirectory, self.rootNode, 0, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
+			self.operateSamples.stop = g_soundManager:loadSampleFromXML(xmlFile, key, "stop", self.baseDirectory, self.rootNode, 1, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
 		end;
 	end;
 
