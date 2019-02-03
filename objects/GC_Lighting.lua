@@ -51,7 +51,7 @@ function GC_Lighting:new(isServer, isClient, customMt)
 	return self;
 end
 
-function GC_Lighting:load(nodeId, target, xmlFile, xmlKey, allowProfileOverride, noBeacon, noStrobe, noArea)
+function GC_Lighting:load(nodeId, target, xmlFile, xmlKey, baseDirectory, allowProfileOverride, noBeacon, noStrobe, noArea)
 	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
 		return false;
 	end;
@@ -60,6 +60,16 @@ function GC_Lighting:load(nodeId, target, xmlFile, xmlKey, allowProfileOverride,
 
 	self.rootNode = nodeId;
 	self.target = target;
+
+	if baseDirectory == nil then
+		baseDirectory = self.target.baseDirectory;
+		if baseDirectory == nil or baseDirectory == "" then
+			baseDirectory = g_currentMission.baseDirectory;
+		end;
+	end;
+
+	self.baseDirectory = baseDirectory;
+	
 	
 	self.allowProfileOverride = Utils.getNoNil(allowProfileOverride, false);
 	
@@ -109,7 +119,7 @@ function GC_Lighting:delete()
 	if self.beaconLights ~= nil then
 		for _, beaconLight in pairs(self.beaconLights) do
 			if beaconLight.filename ~= nil then
-				g_i3DManager:releaseSharedI3DFile(beaconLight.filename, self.target.baseDirectory, true);
+				g_i3DManager:releaseSharedI3DFile(beaconLight.filename, self.baseDirectory, true);
 			end;
 		end;
 	end;
@@ -117,7 +127,7 @@ function GC_Lighting:delete()
 	if self.strobeLights ~= nil then
 		for _, strobeLight in pairs(self.strobeLights) do
 			if strobeLight.filename ~= nil then
-				g_i3DManager:releaseSharedI3DFile(strobeLight.filename, self.target.baseDirectory, true);
+				g_i3DManager:releaseSharedI3DFile(strobeLight.filename, self.baseDirectory, true);
 			end;
 		end;
 	end;
@@ -125,7 +135,7 @@ function GC_Lighting:delete()
 	if self.areaLights ~= nil then
 		for _, areaLight in pairs(self.areaLights) do
 			if areaLight.filename ~= nil then
-				g_i3DManager:releaseSharedI3DFile(areaLight.filename, self.target.baseDirectory, true);
+				g_i3DManager:releaseSharedI3DFile(areaLight.filename, self.baseDirectory, true);
 			end;
 		end;
 	end;
@@ -184,7 +194,7 @@ function GC_Lighting:loadStrobeLights(xmlFile, xmlKey, loadedXmlFiles)
 			-- local keyIndexName = getXMLString(xmlFile, key .. "#indexName");
 			local strobeXmlFilename = getXMLString(xmlFile, key .. "#filename")
 			if strobeXmlFilename ~= nil then
-				strobeXmlFilename = Utils.getFilename(strobeXmlFilename, self.target.baseDirectory);
+				strobeXmlFilename = Utils.getFilename(strobeXmlFilename, self.baseDirectory);
 	
 				local strobeXmlFile, success;
 				if loadedXmlFiles[strobeXmlFilename] ~= nil then
@@ -220,7 +230,7 @@ function GC_Lighting:loadStrobeLights(xmlFile, xmlKey, loadedXmlFiles)
 					if strobeKey ~= nil then
 						local i3dFilename = getXMLString(strobeXmlFile, strobeKey .. ".filename");
 						if i3dFilename ~= nil then
-							local i3dNode = g_i3DManager:loadSharedI3DFile(i3dFilename, self.target.baseDirectory, false, false, false);
+							local i3dNode = g_i3DManager:loadSharedI3DFile(i3dFilename, self.baseDirectory, false, false, false);
 							if i3dNode ~= nil and i3dNode ~= 0 then
 								local rootNode = I3DUtil.indexToObject(i3dNode, getXMLString(strobeXmlFile, strobeKey .. ".rootNode#node"));
 		
@@ -330,7 +340,7 @@ function GC_Lighting:loadBeaconLights(xmlFile, xmlKey, loadedXmlFiles)
 			-- Load from shared XML
 			local lightXmlFilename = getXMLString(xmlFile, key .. "#filename");
 			if lightXmlFilename ~= nil then
-				lightXmlFilename = Utils.getFilename(lightXmlFilename, self.target.baseDirectory);
+				lightXmlFilename = Utils.getFilename(lightXmlFilename, self.baseDirectory);
 				
 				local lightXmlFile, success;
 				if loadedXmlFiles[lightXmlFilename] ~= nil then
@@ -347,7 +357,7 @@ function GC_Lighting:loadBeaconLights(xmlFile, xmlKey, loadedXmlFiles)
 				if success then
 					local i3dFilename = getXMLString(lightXmlFile, "beaconLight.filename");
 					if i3dFilename ~= nil then
-						local i3dNode = g_i3DManager:loadSharedI3DFile(i3dFilename, self.target.baseDirectory, false, false, false);
+						local i3dNode = g_i3DManager:loadSharedI3DFile(i3dFilename, self.baseDirectory, false, false, false);
 						if i3dNode ~= nil and i3dNode ~= 0 then
 							local rootNode = I3DUtil.indexToObject(i3dNode, getXMLString(lightXmlFile, "beaconLight.rootNode#node"));							
 							local lightNode = I3DUtil.indexToObject(i3dNode, getXMLString(lightXmlFile, "beaconLight.light#node"));
