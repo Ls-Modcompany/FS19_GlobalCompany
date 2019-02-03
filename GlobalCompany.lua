@@ -157,6 +157,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
 	source(GlobalCompany.dir .. "objects/GC_ParticleEffects.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
+	source(GlobalCompany.dir .. "objects/GC_ActivableObject.lua");
 	
 	
 	--|| Triggers ||--
