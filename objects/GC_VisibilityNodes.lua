@@ -1,0 +1,351 @@
+--
+-- GlobalCompany - Objects - GC_VisibilityNodes
+--
+-- @Interface: --
+-- @Author: LS-Modcompany / GtX
+-- @Date: 06.02.2019
+-- @Version: 1.1.0.0
+--
+-- @Support: LS-Modcompany
+--
+-- Changelog:
+--
+--
+-- 	v1.1.0.0 (07.02.2019):
+-- 		- convert to fs19
+--
+-- 	v1.0.0.0 (29.04.2018):
+-- 		- initial fs17 (GtX)
+--
+-- Notes:
+--
+--		- Client Side Only.
+--		- Parent script 'MUST' call delete().
+--
+-- ToDo:
+--
+--
+
+GC_VisibilityNodes = {};
+
+GC_VisibilityNodes_mt = Class(GC_VisibilityNodes);
+InitObjectClass(GC_VisibilityNodes, "GC_VisibilityNodes");
+
+GC_VisibilityNodes.debugIndex = g_company.debug:registerScriptName("VisibilityNodes");
+
+g_company.visibilityNodes = GC_VisibilityNodes;
+
+function GC_VisibilityNodes:new(isServer, isClient)
+	local self = {};
+
+	setmetatable(self, GC_VisibilityNodes_mt);
+
+	self.isServer = isServer;
+	self.isClient = isClient;
+
+	return self;
+end;
+
+function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, disableFillType)
+	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
+		local text = "Loading failed! 'nodeId' paramater = %s, 'target' paramater = %s 'xmlFile' paramater = %s, 'xmlKey' paramater = %s";
+		g_company.debug:logWrite(GC_VisibilityNodes.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil);
+		return false;
+	end;
+
+	self.debugData = g_company.debug:getDebugData(GC_VisibilityNodes.debugIndex, target);
+
+	self.rootNode = nodeId;
+	self.target = target;
+
+	local returnValue = false;
+	if self.isClient then
+		self.disableFillType = Utils.getNoNil(disableFillType, false);
+
+		local i = 0;
+		while true do
+			local key = string.format("%s.visibilityNodes.nodeGroup(%d)", xmlKey, i);
+			if not hasXMLProperty(xmlFile, key) then
+				break;
+			end;
+
+			local loadedNodes = {};
+			local hasChildCollisions = Utils.getNoNil(getXMLString(xmlFile, key.."#hasChildCollisions"), false);  -- No need to look if there is none!
+
+			local nodeType = "VISIBILITY";
+			local userNodeType = getXMLString(xmlFile, key .. "#type"); -- Options: 'VISIBILITY' or 'INVISIBILITY'
+			if userNodeType ~= nil then
+				local upperNodeType = userNodeType:upper();
+				if upperNodeType == "VISIBILITY" or upperNodeType == "INVISIBILITY" then
+					nodeType = userNodeType;
+				else
+					g_company.debug:writeModding(self.debugData, "Unknown type '%s' given at %s. Use 'VISIBILITY' or 'INVISIBILITY'", typ, key);
+				end;
+			end;
+
+			local parentNode = I3DUtil.indexToObject(self.rootNode, getXMLString(xmlFile, key .. "#node"), self.target.i3dMappings);
+			if parentNode ~= nil then
+				-- Load from all children of given 'parent'.				
+				local numInGroup = getNumOfChildren(parentNode);
+				if numInGroup > 0 then
+					local filename = getXMLString(xmlFile, key .. "#filename");
+					local sharedI3dNode = Utils.getNoNil(getXMLString(xmlFile, key .. "#sharedI3dNode"), "0");					
+					for id = 0, numInGroup - 1 do
+						local node = getChildAt(parentNode, id);
+						self:loadVisibilityNode(node, loadedNodes, hasChildCollisions, nodeType, filename, sharedI3dNode, key)
+					end;
+				end;
+			else
+				-- Load from individual given children as give in xml.
+				local j = 0;
+				while true do
+					local childKey = string.format("%s.child(%d)", key, j);
+					if not hasXMLProperty(xmlFile, childKey) then
+						break;
+					end;
+
+					local node = I3DUtil.indexToObject(self.rootNode, getXMLString(xmlFile, childKey .. "#node"), self.target.i3dMappings);
+					if node ~= nil then
+						local filename = getXMLString(xmlFile, childKey .. "#filename");
+						local sharedI3dNode = Utils.getNoNil(getXMLString(xmlFile, childKey .. "#sharedI3dNode"), "0");
+						self:loadVisibilityNode(node, loadedNodes, hasChildCollisions, nodeType, filename, sharedI3dNode, childKey)
+					end;
+
+					j = j + 1;
+				end;
+			end;
+
+			if #loadedNodes > 0 then
+				local visNodes = {};
+
+				if not self.disableFillType then
+					local fillTypeName = getXMLString(xmlFile, key .. "#fillType");
+					if fillTypeName ~= nil then
+						local fillTypeIndex = g_fillTypeManager.nameToIndex[fillTypeName];
+						if fillTypeIndex ~= nil then
+							visNodes.fillTypeIndex = fillTypeIndex;
+						else
+							g_company.debug:writeModding(self.debugData, "fillType '%s' is not registered or could not be found! ( %s )", fillTypeName, key);
+						end;
+					else
+						g_company.debug:writeModding(self.debugData, "fillType attribute is empty or nil at %s", key);
+					end;
+				end;
+
+				visNodes.startLevel = math.max(Utils.getNoNil(getXMLFloat(xmlFile, key .. "#startChangeFillLevel"), 0), 0);
+				visNodes.endLevel = math.max(Utils.getNoNil(getXMLFloat(xmlFile, key.."#endChangeFillLevel"), 0), 0);
+				visNodes.originalEndLevel = visNodes.endLevel;
+				
+				visNodes.nodes = loadedNodes;
+				visNodes.nodeType = nodeType;
+				visNodes.hasChildCollisions = hasChildCollisions;
+
+				if self.visNodes == nil then
+					self.visNodes = {};
+				end;
+
+				if self.disableFillType then
+					table.insert(self.visNodes, visNodes);
+					returnValue = true;
+				else
+					if visNodes.fillTypeIndex ~= nil then
+						if self.visNodes[visNodes.fillTypeIndex] == nil then
+							self.visNodes[visNodes.fillTypeIndex] = {};
+						end;
+
+						table.insert(self.visNodes[visNodes.fillTypeIndex], visNodes);
+						returnValue = true;
+					end;
+				end;
+			end;
+
+			i = i + 1;
+		end;
+	else
+		g_company.debug:writeDev(self.debugData, "Failed to load 'CLIENT ONLY' script on server!");
+		returnValue = true; -- Send true so we can also print 'function' warnings if called by server.
+	end;
+	
+	g_company.addRaisedUpdateable(self);
+
+	return returnValue;
+end;
+
+function GC_VisibilityNodes:loadVisibilityNode(node, loadedNodes, hasChildCollisions, nodeType, filename, sharedI3dNode, key)
+	local loadedNode = {};
+	loadedNode.node = node;
+
+	if filename ~= nil and sharedI3dNode ~= nil then
+		local i3dNode = g_i3DManager:loadSharedI3DFile(filename, self.baseDirectory, false, false, false);
+		if i3dNode ~= 0 then
+			local sharedRootNode = I3DUtil.indexToObject(i3dNode, sharedI3dNode);
+			if sharedRootNode ~= nil then
+				loadedNode.node = sharedRootNode;
+				loadedNode.filename = filename;
+				link(node, sharedRootNode);
+				addToPhysics(sharedRootNode);
+			else
+				g_company.debug:writeWarning(self.debugData, "sharedI3dNode '%s' could not be found in i3d file '%s' at ( %s )", sharedI3dNode, filename, key);
+			end;
+
+			delete(i3dNode);
+		else
+			g_company.debug:writeWarning(self.debugData, "Could not load file '%s' at ( %s )", filename, key);
+		end;
+	end;
+
+	loadedNode.rigidBody = getRigidBodyType(loadedNode.node);
+	loadedNode.active = nodeType ~= "VISIBILITY"
+
+	local visibility, rigidBodyType = self:getTypeData(loadedNode.rigidBody, nodeType);
+	setRigidBodyType(loadedNode.node, rigidBodyType);
+	setVisibility(loadedNode.node, visibility);
+
+	if hasChildCollisions then
+		local childColIndexs = {};
+		self:getChildCollisionNodes(loadedNode.node, childColIndexs);
+		if #childColIndexs > 0 then
+			loadedNode.childNodes = {};
+			for childId = 1, #childColIndexs do
+				local childNodes = {};
+				childNodes.node = childColIndexs[childId];
+				childNodes.rigidBody = getRigidBodyType(childNodes.node);
+				local _, rigidBodyType = self:getTypeData(childNodes.rigidBody, nodeType);
+				setRigidBodyType(childNodes.node, rigidBodyType);
+				table.insert(loadedNode.childNodes, childNodes);
+			end;
+		else
+			hasChildCollisions = false;
+		end;
+	end;
+
+	table.insert(loadedNodes, loadedNode);
+end;
+
+function GC_VisibilityNodes:delete()
+	if self.isClient and self.visNodes ~= nil then
+		for _, visNodes in pairs(self.visNodes) do
+			for i = 1, #visNodes.nodes do
+				if visNodes.nodes[i].filename ~= nil then
+					g_i3DManager:releaseSharedI3DFile(visNodes.nodes[i].filename, self.baseDirectory, true);
+				end;
+			end;
+		end;		
+	end;
+end;
+
+function GC_VisibilityNodes:updateNodes(fillLevel, capacity, fillType)
+	if self.isClient then
+		if self.visNodes ~= nil then
+			if self.disableFillType then
+				for _, visNodes in pairs(self.visNodes) do
+					self:setNodes(visNodes, fillLevel, capacity);
+				end;
+			else
+				if self.visNodes[fillType] ~= nil then
+					for _, visNodes in pairs(self.visNodes[fillType]) do
+						self:setNodes(visNodes, fillLevel, capacity);
+					end;
+				end;
+			end;
+		end;
+	else
+		g_company.debug:writeDev(self.debugData, "'updateNodes' is a client only function!");
+	end;
+end;
+
+-- IMPORTANT: Do not call this function outside this script. Use 'updateNodes' instead.
+function GC_VisibilityNodes:setNodes(visNodes, fillLevel, capacity)
+	local numNodes = #visNodes.nodes;
+	if visNodes.endLevel <= 0 then
+		visNodes.endLevel = capacity;
+	end;
+
+	local nodesVisible = math.ceil(numNodes * (fillLevel - visNodes.startLevel) / (visNodes.endLevel - visNodes.startLevel));
+
+	for i = 1, numNodes do
+		if visNodes.nodeType == "VISIBILITY" then
+			local active = i <= nodesVisible;
+			if visNodes.nodes[i].active ~= active then
+				visNodes.nodes[i].active = active;
+				setVisibility(visNodes.nodes[i].node, active);
+				setRigidBodyType(visNodes.nodes[i].node, active and visNodes.nodes[i].rigidBody or "NoRigidBody");
+				if visNodes.hasChildCollisions then
+					if visNodes.nodes[i].childNodes ~= nil then
+						for _, childNode in pairs (visNodes.nodes[i].childNodes) do
+							setRigidBodyType(childNode.node, active and childNode.rigidBody or "NoRigidBody");
+						end;
+					end;
+				end;
+			end;
+		elseif visNodes.nodeType == "INVISIBILITY" then
+			local active = i > nodesVisible;
+			if visNodes.nodes[i].active ~= active then
+				visNodes.nodes[i].active = active;
+				setVisibility(visNodes.nodes[i].node, active);
+				setRigidBodyType(visNodes.nodes[i].node, active and visNodes.nodes[i].rigidBody or "NoRigidBody");
+				if visNodes.hasChildCollisions then
+					if visNodes.nodes[i].childNodes ~= nil then
+						for _, childNode in pairs (visNodes.nodes[i].childNodes) do
+							setRigidBodyType(childNode.node, active and childNode.rigidBody or "NoRigidBody");
+						end;
+					end;
+				end;
+			end;
+		end;
+	end;
+end;
+
+-- Use this to update 'endLevel' if the capacity can change on target.
+-- value will be added or subtracted from the 'originalEndLevel' as set in the XML or default.
+function GC_VisibilityNodes:updateVisNodesEndLevel(value, fillType)
+	if self.isClient then
+		if value == nil then
+			value = 0;
+		end;
+
+		if self.visNodes ~= nil then
+			if self.disableFillType then
+				for _, visNodes in pairs(self.visNodes) do
+					visNodes.endLevel = visNodes.originalEndLevel + value;
+				end;
+			else
+				if fillType ~= nil and self.visNodes[fillType] ~= nil then
+					for _, visNodes in pairs(self.visNodes[fillType]) do
+						visNodes.endLevel = visNodes.originalEndLevel + value;
+					end;
+				end;
+			end;
+		end;
+	end;
+end;
+
+function GC_VisibilityNodes:getTypeData(currentRBT, nodeType)
+	local visibility, rigidBodyType = false, "NoRigidBody";
+
+	if nodeType == "INVISIBILITY" then
+		visibility = true;
+		rigidBodyType = currentRBT;
+	end;
+
+	return visibility, rigidBodyType;
+end;
+
+function GC_VisibilityNodes:getChildCollisionNodes(node, childTable)
+	local childCount = getNumOfChildren(node);
+	if childCount > 0 then
+		for i = 0, childCount - 1 do
+			local child = getChildAt(node, i);
+			if getRigidBodyType(child) ~= "NoRigidBody" then
+				table.insert(childTable, child);
+			end;
+
+			self:getChildCollisionNodes(child, childTable);
+		end;
+	end;
+end;
+
+
+
+
+

@@ -1,15 +1,26 @@
--- 
--- GlobalCompany 
--- 
+--
+-- GlobalCompany
+--
 -- @Interface: --
--- @Author: LS-Modcompany / kevink98
+-- @Author: LS-Modcompany / kevink98 / GtX
 -- @Date: 11.05.2018
--- @Version: 1.0.0.0
--- 
+-- @Version: 1.1.1.0
+--
 -- @Support: LS-Modcompany
 --
-
--- note: loadParameters only for one environment! this is not good
+-- Changelog:
+--
+-- 	v1.0.0.0 (11.05.2018):
+--
+--
+-- Notes:
+--
+--
+-- ToDo:
+--		- 'loadParameters' only for one environment! this is not good (kevink98)
+--		- convert all scripts to use 'GC_DebugUtils' (kevink98 / GtX)
+--
+--
 
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
@@ -24,36 +35,38 @@ source(GlobalCompany.dir .. "Debug.lua"); -- TEMP 'Need to convert all then scri
 
 function GlobalCompany.initialLoad()
 	if GlobalCompany.initialLoadComplete ~= nil then
+		print("  [LSMC - GlobalCompany] - ERROR: 'initialLoad' failed! This function is only called on initial load.")
 		return;
 	end;
 
-	Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, GlobalCompany.init);	
+	Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, GlobalCompany.init);
 
 	--| Debug |--
 	source(GlobalCompany.dir .. "utils/GC_DebugUtils.lua");
 	g_company.debug = GC_DebugUtils:new();
 	--getfenv(0)["gc_debug "] = g_company.debug; --[[ This is in case we need a superGlobal version ]]--
-	
+
 	GlobalCompany.debugIndex = g_company.debug:registerScriptName("GlobalCompany");
 	g_company.debug:singleLogWrite(GlobalCompany.debugIndex, GC_DebugUtils.BLANK, "Loading Version: %s", GlobalCompany.version);
 
-	
+
 	GlobalCompany.inits = {};
 	GlobalCompany.loadables = {};
 	GlobalCompany.updateables = {};
+	GlobalCompany.raisedUpdateables = {};
 	GlobalCompany.environments = {};
 	GlobalCompany.loadParameters = {};
 	GlobalCompany.loadParametersToEnvironment = {};
-	
+
 	GlobalCompany.loadSourceFiles();
-	
+
 	local modLanguageFiles = {}; -- Check for language file during this pass and send with 'g_company.languageManager:load(modLanguageFiles)'.
 	local selectedMods = g_modSelectionScreen.missionDynamicInfo.mods;
 	for _, mod in pairs(selectedMods) do
 		local path = nil;
 		local modName = mod.modName;
 
-		if mod.modDir ~= nil then	
+		if mod.modDir ~= nil then
 			path = mod.modDir .. "globalCompany.xml";
 			if not fileExists(path) then
 				path = mod.modDir .. "xml/globalCompany.xml";
@@ -61,7 +74,7 @@ function GlobalCompany.initialLoad()
 					path = nil;
 				end;
 			end;
-		
+
 			-- Also find language files now.
 			local langFullPath = g_company.languageManager:getLanguagesFullPath(mod.modDir);
 			if langFullPath ~= nil then
@@ -71,7 +84,7 @@ function GlobalCompany.initialLoad()
 
 		if path ~= nil then
 			local xmlFile = loadXMLFile("globalCompany", path);
-			
+
 			GlobalCompany.environments[modName] = {};
 			GlobalCompany.environments[modName].fullPath = path;
 			GlobalCompany.environments[modName].xmlFile = xmlFile;
@@ -83,17 +96,17 @@ function GlobalCompany.initialLoad()
 	end;
 
 	for modName, values in pairs(GlobalCompany.environments) do
-		if values.specializations ~= nil and values.specializations ~= "" then	
+		if values.specializations ~= nil and values.specializations ~= "" then
 			g_company.specializations:loadFromXML(modName, g_company.utils.createModPath(modName, values.specializations));
 		end;
-		if values.densityMapHeightOverwriteOrginalFunction then	
-			g_densityMapHeightManager.loadMapData = function() return true; end;		
+		if values.densityMapHeightOverwriteOrginalFunction then
+			g_densityMapHeightManager.loadMapData = function() return true; end;
 		end;
 	end;
 
 	g_company.languageManager:load(modLanguageFiles); -- Load language manager.
 
-	GlobalCompany.initialLoadComplete = true;	
+	GlobalCompany.initialLoadComplete = true;
 end;
 
 --|| Init ||--
@@ -101,9 +114,32 @@ function GlobalCompany.addInit(target, init)
 	table.insert(GlobalCompany.inits, {init=init, target=target});
 end;
 
---|| Load ||--	
+--|| Load ||--
 function GlobalCompany.addLoadable(target, loadF)
 	table.insert(GlobalCompany.loadables, {loadF=loadF, target=target});
+end;
+
+--|| Raised Updateables ||--
+function GlobalCompany.addRaisedUpdateable(target, raiseOnFirstRun)
+	if target.update ~= nil then
+		target.updateableCanUpdate = raiseOnFirstRun == true; -- If 'raiseOnFirstRun' then set update loop to do a single pass when first loaded.
+
+		if target.raiseUpdate == nil then
+			target.raiseUpdate = function() target.updateableCanUpdate = true; end; -- Add 'raiseUpdate' function if 'nil' in target.
+		end;
+
+		GlobalCompany.raisedUpdateables[target] = target;
+	else
+		local debugName = g_company.debug:getScriptNameFromIndex(target.debugIndex);
+		print(string.format("  [LSMC - GlobalCompany > %s] - ERROR: 'addRaisedUpdateable' failed, function 'update(dt)' could not be found.", debugName));
+	end;
+end;
+
+function GlobalCompany.removeRaisedUpdateable(target)
+	if GlobalCompany.raisedUpdateables[target] ~= nil then
+		target.updateableCanUpdate = false;
+		GlobalCompany.raisedUpdateables[target] = nil;
+	end;
 end;
 
 --|| Updateables ||--
@@ -130,8 +166,8 @@ function GlobalCompany.loadSourceFiles()
 	if GlobalCompany.initialLoadComplete ~= nil then
 		return;
 	end;
-	
-	
+
+
 	--|| Utils / Managers ||--
 	source(GlobalCompany.dir .. "utils/GC_utils.lua");
 	source(GlobalCompany.dir .. "utils/GC_xmlUtils.lua");
@@ -141,15 +177,16 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "utils/GC_TriggerManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_specializations.lua");
 	source(GlobalCompany.dir .. "utils/GC_languageManager.lua");
-	source(GlobalCompany.dir .. "utils/GC_densityMapHeight.lua");	
-	
-	
+	source(GlobalCompany.dir .. "utils/GC_densityMapHeight.lua");
+
+
 	--|| Gui ||--
 	source(GlobalCompany.dir .. "GlobalCompanyGui.lua");
-	
-	
+
+
 	--|| Objects ||--
 	source(GlobalCompany.dir .. "objects/GC_Sounds.lua");
+	source(GlobalCompany.dir .. "objects/GC_Shaders.lua");
 	source(GlobalCompany.dir .. "objects/GC_Lighting.lua");
 	source(GlobalCompany.dir .. "objects/GC_MovingPart.lua");
 	source(GlobalCompany.dir .. "objects/GC_Animations.lua");
@@ -158,9 +195,10 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
 	source(GlobalCompany.dir .. "objects/GC_ActivableObject.lua");
 	source(GlobalCompany.dir .. "objects/GC_ParticleEffects.lua");
+	source(GlobalCompany.dir .. "objects/GC_VisibilityNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
-	
-	
+
+
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_PlayerTrigger.lua");
@@ -168,14 +206,15 @@ function GlobalCompany.loadSourceFiles()
 end;
 
 --| Main |--
-function GlobalCompany:init() 
+function GlobalCompany:init()
 	for _, init in pairs(GlobalCompany.inits) do
 		init.init(init.target);
-	end; 
-end;	
+	end;
+end;
 
 function GlobalCompany:loadMap()
-	g_company.debug:loadConsoleCommands(); -- Load Debug console commands.
+	-- Load Debug console commands.
+	g_company.debug:loadConsoleCommands();
 
 	-- Load parameters from environments table.
 	for modName, e in pairs(GlobalCompany.environments) do
@@ -187,16 +226,16 @@ function GlobalCompany:loadMap()
 					GlobalCompany.loadParameters[name].environment = modName;
 				end;
 			end;
-		end;		
-		
-		if e.shopManager ~= nil and e.shopManager ~= "" then	
+		end;
+
+		if e.shopManager ~= nil and e.shopManager ~= "" then
 			g_company.shopManager:loadFromXML(modName, g_company.utils.createModPath(modName, e.shopManager));
 		end;
 
-		if e.densityMapHeight ~= nil and e.densityMapHeight ~= "" then	
+		if e.densityMapHeight ~= nil and e.densityMapHeight ~= "" then
 			g_company.densityMapHeight:loadFromXML(modName, g_company.utils.createModPath(modName, e.densityMapHeight));
 		end;
-		
+
 		delete(e.xmlFile);
 	end;
 
@@ -206,52 +245,52 @@ function GlobalCompany:loadMap()
 	end;
 end;
 
-function GlobalCompany:update(dt) 
+function GlobalCompany:update(dt)
 	for _,updateable in pairs(GlobalCompany.updateables) do
 		updateable.update(updateable.target, dt);
-	end; 
+	end;
+
+	for _, raisedUpdateable in pairs(GlobalCompany.raisedUpdateables) do
+		if raisedUpdateable.updateableCanUpdate then
+			raisedUpdateable.updateableCanUpdate = false;
+			raisedUpdateable:update(dt);
+		end;
+	end;
 end;
 
 function GlobalCompany:delete()
-	for _,updateable in pairs(GlobalCompany.updateables) do
-        if updateable.delete ~= nil then
-			updateable:delete();
-		end;
-    end;
 end;
 
 function GlobalCompany:deleteMap()
 	g_company.debug:deleteConsoleCommands();
 end;
 
-function GlobalCompany:getLoadParameterValue(name) 
-	if GlobalCompany.loadParameters[name] == nil or GlobalCompany.loadParameters[name].value == nil then 
+function GlobalCompany:getLoadParameterValue(name)
+	if GlobalCompany.loadParameters[name] == nil or GlobalCompany.loadParameters[name].value == nil then
 		return "";
 	end;
-	
+
 	return GlobalCompany.loadParameters[name].value;
 end;
 
-function GlobalCompany:getLoadParameterEnvironment(name) 
+function GlobalCompany:getLoadParameterEnvironment(name)
 	if GlobalCompany.loadParameters[name] == nil or GlobalCompany.loadParameters[name].environment == nil then
 		return "";
 	end;
-	
+
 	return GlobalCompany.loadParameters[name].environment;
 end;
 
-GlobalCompany.initialLoad();
-
-function  GlobalCompany:addPlaceableType(name, className, filename)	
+function  GlobalCompany:addPlaceableType(name, className, filename)
 	g_placeableTypeManager.placeableTypes[name] = {name=name, className=className, filename=filename};
 end
 
 GlobalCompany.initialLoad();
 
 --convert ExtendedPlaceable.lua from ls17
-PlacementScreenController.DISPLACEMENT_COST_PER_M3 = 1; 
+PlacementScreenController.DISPLACEMENT_COST_PER_M3 = 1;
 PlacementUtil.hasObjectOverlap = function() return false end;
 PlacementUtil.isInsidePlacementPlaces = function() return false end;
 PlacementUtil.isInsideRestrictedZone = function() return false end;
 PlacementUtil.hasOverlapWithPoint = function() return false end;
-TerrainDeformation.setBlockedAreaMap = function() return true end; 
+TerrainDeformation.setBlockedAreaMap = function() return true end;

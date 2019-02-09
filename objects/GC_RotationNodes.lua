@@ -3,12 +3,15 @@
 --
 -- @Interface: --
 -- @Author: LS-Modcompany / GtX
--- @Date: 03.02.2019
+-- @Date: 06.02.2019
 -- @Version: 1.1.1.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+--
+-- 	v1.1.1.0 (06.02.2019):
+-- 		- change to 'raiseUpdate' Updateable instead of using 'Object' class as this is a client side script only.
 --
 -- 	v1.1.0.0 (03.02.2019):
 -- 		- convert to fs19
@@ -18,6 +21,7 @@
 --
 -- Notes:
 --		- Client Side Only.
+--		- Parent script 'MUST' call delete()
 --
 -- ToDo:
 --
@@ -25,7 +29,7 @@
 
 GC_RotationNodes = {};
 
-local GC_RotationNodes_mt = Class(GC_RotationNodes, Object);
+local GC_RotationNodes_mt = Class(GC_RotationNodes);
 InitObjectClass(GC_RotationNodes, "GC_RotationNodes");
 
 GC_RotationNodes.debugIndex = g_company.debug:registerScriptName("RotationNodes");
@@ -37,7 +41,11 @@ function GC_RotationNodes:new(isServer, isClient, customMt)
 		customMt = GC_RotationNodes_mt;
 	end;
 
-	local self = Object:new(isServer, isClient, customMt);
+	local self = {};
+	setmetatable(self, customMt);
+
+	self.isServer = isServer;
+    self.isClient = isClient;
 
 	self.rotationNodes = nil;
 	self.rotationActive = false;
@@ -51,59 +59,74 @@ function GC_RotationNodes:new(isServer, isClient, customMt)
 	return self;
 end;
 
-function GC_RotationNodes:load(nodeId, target, xmlFile, xmlKey, rotationNodes)
+function GC_RotationNodes:load(nodeId, target, xmlFile, xmlKey, groupKey, rotationNodes)
 	if nodeId == nil or target == nil then
-		local text = "Loading failed! 'nodeId' paramater missing = %s, 'target' paramater missing = %s";
-		g_company.debug:logWrite(GC_RotationNodes.debugIndex, GC_DebugUtils.DEV, text, nodeId == nil, target == nil);
+		local text = "Loading failed! 'nodeId' paramater = %s, 'target' paramater = %s";
+		g_company.debug:logWrite(GC_RotationNodes.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil);
 		return false;
 	end;
 
 	self.rootNode = nodeId;
 	self.target = target;
+	
 	self.debugData = g_company.debug:getDebugData(GC_RotationNodes.debugIndex, target);
-
-	if rotationNodes == nil then
-		rotationNodes = {};
-
-		if xmlFile ~= nil and xmlKey ~= nil then
-			local i = 0;
-			while true do
-				local key = string.format("%s.rotationNodes.rotationNode(%d)", xmlKey, i);
-				if not hasXMLProperty(xmlFile, key) then
-					break;
+	
+	local returnValue = false;
+	if self.isClient then
+		if rotationNodes == nil then
+			rotationNodes = {};
+	
+			if xmlFile ~= nil and xmlKey ~= nil then
+				if groupKey == nil then
+					groupKey = "rotationNodes";
 				end;
-
-				local node = I3DUtil.indexToObject(self.rootNode, getXMLString(xmlFile, key .. "#node"), self.target.i3dMappings);
-				if node ~= nil then
-					rotationNode = {};
-					rotationNode.node = node;
-					local rotateAxis = getXMLString(xmlFile, key.."#rotationAxis"); -- X, Y, Z
-					rotationNode.rotateAxis = self.rotationAxes[rotateAxis];
-					rotationNode.rotationSpeed = getXMLFloat(xmlFile, key.."#rotationSpeed");
-					rotationNode.fadeOnTime = getXMLFloat(xmlFile, key.."#fadeOnTime");
-					rotationNode.fadeOffTime = getXMLFloat(xmlFile, key.."#fadeOffTime");
-					rotationNode.operatingInterval = getXMLFloat(xmlFile, key.."#operatingIntervalSeconds");
-					rotationNode.stoppedInterval = getXMLFloat(xmlFile, key.."#stoppedIntervalSeconds");
-					rotationNode.delayStart = getXMLBool(xmlFile, key.."#delayedStart");
-
-					table.insert(rotationNodes, rotationNode);
+				
+				local i = 0;
+				while true do
+					local key = string.format("%s.%s.rotationNode(%d)", xmlKey, groupKey, i);
+					if not hasXMLProperty(xmlFile, key) then
+						break;
+					end;
+	
+					local node = I3DUtil.indexToObject(self.rootNode, getXMLString(xmlFile, key .. "#node"), self.target.i3dMappings);
+					if node ~= nil then
+						rotationNode = {};
+						rotationNode.node = node;
+						local rotateAxis = getXMLString(xmlFile, key.."#rotationAxis"); -- X, Y, Z
+						rotationNode.rotateAxis = self.rotationAxes[rotateAxis];
+						rotationNode.rotationSpeed = getXMLFloat(xmlFile, key.."#rotationSpeed");
+						rotationNode.fadeOnTime = getXMLFloat(xmlFile, key.."#fadeOnTime");
+						rotationNode.fadeOffTime = getXMLFloat(xmlFile, key.."#fadeOffTime");
+						rotationNode.operatingInterval = getXMLFloat(xmlFile, key.."#operatingIntervalSeconds");
+						rotationNode.stoppedInterval = getXMLFloat(xmlFile, key.."#stoppedIntervalSeconds");
+						rotationNode.delayStart = getXMLBool(xmlFile, key.."#delayedStart");
+	
+						table.insert(rotationNodes, rotationNode);
+					end;
+					i = i + 1;
 				end;
-				i = i + 1;
+			else
+				local text = "Loading failed! 'xmlFile' paramater = %s, 'xmlKey' paramater = %s";
+				g_company.debug:logWrite(GC_RotationNodes.debugIndex, GC_DebugUtils.DEV, text, xmlFile ~= nil, xmlKey ~= nil);
+				returnValue = false;
 			end;
 		end;
+	
+		if self:loadRotationNodes(rotationNodes) then
+			g_company.addRaisedUpdateable(self);
+			returnValue = true;
+		end;
+	else
+		g_company.debug:writeDev(self.debugData, "Failed to load 'CLIENT ONLY' script on server!");
+		returnValue = true; -- Send true so we can also print 'function' warnings if called by server.
 	end;
 
-	if self:loadRotationNodes(rotationNodes) then
-		self:register(true);
-		return true;
-	end;
-
-	return false;
+	return returnValue;
 end;
 
 function GC_RotationNodes:delete()
-	if self.isRegistered then
-		self:unregister(true);
+	if self.isClient then
+		g_company.removeRaisedUpdateable(self);
 	end;
 end;
 
@@ -212,7 +235,7 @@ function GC_RotationNodes:update(dt)
 
 		self.rotationsRunning = rotatingNodes ~= 0;
 
-		self:raiseActive();
+		self:raiseUpdate();
 	end;
 end;
 
@@ -231,7 +254,7 @@ function GC_RotationNodes:setRotationNodesState(forceActive)
 			self.rotationActive = not self.rotationActive;
 		end;
 
-		self:raiseActive();
+		self:raiseUpdate();
 	else
 		g_company.debug:writeDev(self.debugData, "'setRotationNodesState' is a client only function!");
 	end;

@@ -3,12 +3,15 @@
 --
 -- @Interface: --
 -- @Author: LS-Modcompany / GtX
--- @Date: 28.01.2019
+-- @Date: 06.02.2019
 -- @Version: 1.1.1.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+--
+-- 	v1.1.1.0 (06.02.2019):
+-- 		- change to 'raiseUpdate' Updateable instead of using 'Object' class as this is a client side script only.
 --
 -- 	v1.1.0.0 (28.01.2019):
 -- 		- convert to fs19
@@ -21,6 +24,7 @@
 --		- Part of the original code as found in ‘Beleuchtung v3.1.1’
 --
 --		- Client Side Only.
+--		- Parent script 'MUST' call delete().
 --
 -- ToDo:
 --
@@ -28,7 +32,7 @@
 
 GC_Lighting = {};
 
-local GC_Lighting_mt = Class(GC_Lighting, Object);
+local GC_Lighting_mt = Class(GC_Lighting);
 InitObjectClass(GC_Lighting, "GC_Lighting");
 
 GC_Lighting.debugIndex = g_company.debug:registerScriptName("Lighting");
@@ -44,9 +48,11 @@ function GC_Lighting:new(isServer, isClient, customMt)
 		customMt = GC_Lighting_mt;
 	end;
 
-	local self = Object:new(isServer, isClient, customMt);
+	local self = {};
+	setmetatable(self, customMt);
 
-	self.enable = false;
+	self.isServer = isServer;
+    self.isClient = isClient;
 
 	return self;
 end
@@ -72,72 +78,77 @@ function GC_Lighting:load(nodeId, target, xmlFile, xmlKey, baseDirectory, allowP
 
 	self.baseDirectory = baseDirectory;
 
-	self.allowProfileOverride = Utils.getNoNil(allowProfileOverride, false);
+	local returnValue = false;
+	if self.isClient then
+		self.allowProfileOverride = Utils.getNoNil(allowProfileOverride, false);
 
-	self.syncedLightState = false;
+		self.syncedLightState = false;
 
-	local loadedXmlFiles = {};
+		local loadedXmlFiles = {};
 
-	-- Beacon Lights --
-	if noBeacon ~= true then
-		self.beaconLights = self:loadBeaconLights(xmlFile, xmlKey, loadedXmlFiles);
-		self.beaconLightsActive = false;
+		-- Beacon Lights --
+		if noBeacon ~= true then
+			self.beaconLights = self:loadBeaconLights(xmlFile, xmlKey, loadedXmlFiles);
+			self.beaconLightsActive = false;
+		end;
+
+		-- Strobe Lights --
+		if noStrobe ~= true then
+			self.strobeLights = self:loadStrobeLights(xmlFile, xmlKey, loadedXmlFiles);
+			self.strobeLightsActive = false;
+			self.strobeLightsReset = false;
+		end;
+
+		-- Area Lights (Work / Operating Lights) --
+		if noArea ~= true then
+			self.areaLights = self:loadAreaLights(xmlFile, xmlKey, loadedXmlFiles);
+			self.areaLightsActive = false;
+		end;
+
+		-- Cleanup Shared XML Files --
+		for filename, file in pairs (loadedXmlFiles) do
+			delete(file);
+		end;
+
+		loadedXmlFiles = nil;
+
+		if self.beaconLights ~= nil or self.strobeLights ~= nil or self.areaLights ~= nil then
+			g_company.addRaisedUpdateable(self);
+			returnValue = true;
+		end;
+	else
+		g_company.debug:writeDev(self.debugData, "Failed to load 'CLIENT ONLY' script on server!");
+		returnValue = true; -- Send true so we can also print 'function' warnings if called.
 	end;
 
-	-- Strobe Lights --
-	if noStrobe ~= true then
-		self.strobeLights = self:loadStrobeLights(xmlFile, xmlKey, loadedXmlFiles);
-		self.strobeLightsActive = false;
-		self.strobeLightsReset = false;
-	end;
-
-	-- Area Lights (Work / Operating Lights) --
-	if noArea ~= true then
-		self.areaLights = self:loadAreaLights(xmlFile, xmlKey, loadedXmlFiles);
-		self.areaLightsActive = false;
-	end;
-
-	-- Cleanup Shared XML Files --
-	for filename, file in pairs (loadedXmlFiles) do
-		delete(file);
-	end;
-	
-	loadedXmlFiles = nil;
-
-	-- Register Script here so it does not need to be done in parent script.
-	if self.enable then
-		self:register(true);
-		return true;
-	end;
-
-	return false;
+	return returnValue;
 end;
 
 function GC_Lighting:delete()
-	if self.isRegistered then
-		self:unregister(true);
-	end;
+	if self.isClient then
+		g_company.removeRaisedUpdateable(self);
 
-	if self.beaconLights ~= nil then
-		for _, beaconLight in pairs(self.beaconLights) do
-			if beaconLight.filename ~= nil then
-				g_i3DManager:releaseSharedI3DFile(beaconLight.filename, self.baseDirectory, true);
+		if self.beaconLights ~= nil then
+			for _, beaconLight in pairs(self.beaconLights) do
+				if beaconLight.filename ~= nil then
+					g_i3DManager:releaseSharedI3DFile(beaconLight.filename, self.baseDirectory, true);
+				end;
 			end;
 		end;
-	end;
 
-	if self.strobeLights ~= nil then
-		for _, strobeLight in pairs(self.strobeLights) do
-			if strobeLight.filename ~= nil then
-				g_i3DManager:releaseSharedI3DFile(strobeLight.filename, self.baseDirectory, true);
+		if self.strobeLights ~= nil then
+			for _, strobeLight in pairs(self.strobeLights) do
+				if strobeLight.filename ~= nil then
+					g_i3DManager:releaseSharedI3DFile(strobeLight.filename, self.baseDirectory, true);
+				end;
 			end;
 		end;
-	end;
 
-	if self.areaLights ~= nil then
-		for _, areaLight in pairs(self.areaLights) do
-			if areaLight.filename ~= nil then
-				g_i3DManager:releaseSharedI3DFile(areaLight.filename, self.baseDirectory, true);
+		if self.areaLights ~= nil then
+			for _, areaLight in pairs(self.areaLights) do
+				if areaLight.filename ~= nil then
+					g_i3DManager:releaseSharedI3DFile(areaLight.filename, self.baseDirectory, true);
+				end;
 			end;
 		end;
 	end;
@@ -263,7 +274,7 @@ function GC_Lighting:loadAreaLights(xmlFile, xmlKey, loadedXmlFiles)
 
 										j = j + 1;
 									end;
-									
+
 									-- Adjust shader dirt
 									local dirtLevel = Utils.getNoNil(getXMLFloat(xmlFile, key .. "#shaderDirtLevel"), 0);
 									self:setDirtLevel(light.rootNode, dirtLevel);
@@ -318,8 +329,6 @@ function GC_Lighting:loadAreaLights(xmlFile, xmlKey, loadedXmlFiles)
 		end;
 		i = i + 1;
 	end;
-
-	self.enable = areaLights ~= nil;
 
 	return areaLights;
 end;
@@ -493,8 +502,6 @@ function GC_Lighting:loadStrobeLights(xmlFile, xmlKey, loadedXmlFiles)
 		i = i + 1;
 	end;
 
-	self.enable = strobeLights ~= nil;
-
 	return strobeLights;
 end;
 
@@ -646,14 +653,10 @@ function GC_Lighting:loadBeaconLights(xmlFile, xmlKey, loadedXmlFiles)
 		i = i + 1;
 	end;
 
-	self.enable = beaconLights ~= nil;
-
 	return beaconLights;
 end;
 
 function GC_Lighting:update(dt)
-	local raiseActive = false;
-
 	if self.beaconLights ~= nil and self.beaconLightsActive then
 		for _, beaconLight in pairs(self.beaconLights) do
 			if beaconLight.rotatorNode ~= nil then
@@ -661,7 +664,7 @@ function GC_Lighting:update(dt)
 			end;
 		end;
 
-		raiseActive = true;
+		self:raiseUpdate();
 	end;
 
 	if self.strobeLights ~= nil then
@@ -706,7 +709,7 @@ function GC_Lighting:update(dt)
 				end;
 			end;
 
-			raiseActive = true;
+			self:raiseUpdate();
 		else
 			if self.strobeLightsReset then
 				for _, st in ipairs(self.strobeLights) do
@@ -725,10 +728,6 @@ function GC_Lighting:update(dt)
 				self.strobeLightsReset = false;
 			end;
 		end;
-	end;
-
-	if raiseActive then
-		self:raiseActive();
 	end;
 end;
 
@@ -832,7 +831,7 @@ function GC_Lighting:setStrobeLightsState(state)
 
 			self.strobeLightsActive = state;
 
-			self:raiseActive();
+			self:raiseUpdate();
 
 			return state;
 		end
@@ -877,7 +876,7 @@ function GC_Lighting:setBeaconLightsState(state)
 				end;
 			end;
 
-			self:raiseActive();
+			self:raiseUpdate();
 
 			return state;
 		end
@@ -935,4 +934,7 @@ function GC_Lighting:setDirtLevel(rootNode, level)
         setShaderParameter(dirtNode, "RDT", x, dirtLevel, z, w, false);
     end;
 end;
+
+
+
 
