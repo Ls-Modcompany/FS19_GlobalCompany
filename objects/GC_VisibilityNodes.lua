@@ -46,7 +46,7 @@ function GC_VisibilityNodes:new(isServer, isClient)
 	return self;
 end;
 
-function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, disableFillType)
+function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, baseDirectory, disableFillType)
 	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
 		local text = "Loading failed! 'nodeId' paramater = %s, 'target' paramater = %s 'xmlFile' paramater = %s, 'xmlKey' paramater = %s";
 		g_company.debug:logWrite(GC_VisibilityNodes.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil);
@@ -57,6 +57,15 @@ function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, disableFillTyp
 
 	self.rootNode = nodeId;
 	self.target = target;
+	
+	if baseDirectory == nil then
+		baseDirectory = self.target.baseDirectory;
+		if baseDirectory == nil or baseDirectory == "" then
+			baseDirectory = g_currentMission.baseDirectory;
+		end;
+	end;
+
+	self.baseDirectory = baseDirectory;
 
 	local returnValue = false;
 	if self.isClient then
@@ -165,8 +174,6 @@ function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, disableFillTyp
 		g_company.debug:writeDev(self.debugData, "Failed to load 'CLIENT ONLY' script on server!");
 		returnValue = true; -- Send true so we can also print 'function' warnings if called by server.
 	end;
-	
-	g_company.addRaisedUpdateable(self);
 
 	return returnValue;
 end;

@@ -18,17 +18,16 @@
 -- 
 --
 -- ToDo:
--- 		- debug text needs to be fixed.
---		- Warning options (Maybe)
+--		- Warning options and remove test prints!!
 --
 
 
-local debugIndex = g_debug.registerMod("GlobalCompany-GC_WoodTrigger");
-
 GC_WoodTrigger = {};
 
-local GC_WoodTrigger_mt = Class(GC_WoodTrigger, Object);
+local GC_WoodTrigger_mt = Class(GC_WoodTrigger);
 InitObjectClass(GC_WoodTrigger, "GC_WoodTrigger");
+
+GC_WoodTrigger.debugIndex = g_company.debug:registerScriptName("WoodTrigger");
 
 g_company.woodTrigger = GC_WoodTrigger;
 
@@ -37,13 +36,13 @@ function GC_WoodTrigger:new(isServer, isClient, customMt)
 		customMt = GC_WoodTrigger_mt;
 	end;
 
-	local self = Object:new(isServer, isClient, customMt);
+	local self = {};
+	setmetatable(self, customMt);
 
 	self.isServer = isServer;
 	self.isClient = isClient;
 	
-	self.triggerManagerRegister = false;  -- 'GC_TriggerManager' Requirement.
-	
+	self.triggerManagerRegister = false;  -- 'GC_TriggerManager' Requirement.	
 	self.extraParamater = nil;
 
 	return self;
@@ -51,28 +50,22 @@ end;
 
 function GC_WoodTrigger:load(nodeId, target, xmlFile, xmlKey, fillTypeName)
 	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
+		local text = "Loading failed! 'nodeId' paramater = %s, 'target' paramater = %s 'xmlFile' paramater = %s, 'xmlKey' paramater = %s";
+		g_company.debug:logWrite(GC_WoodTrigger.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil);
 		return false;
 	end;
 	
-	if target.addFillLevel == nil then
-		g_debug.write(debugIndex, g_debug.DEV, "Target function 'addFillLevel' could not be found!");
-		return false;
-	end;
-			
-	if target.getFreeCapacity == nil then
-		g_debug.write(debugIndex, g_debug.DEV, "Target function 'getFreeCapacity' could not be found!");
-		return false;
-	end;
-
+	self.debugData = g_company.debug:getDebugData(GC_WoodTrigger.debugIndex, target);
+	
 	self.rootNode = nodeId;
 	self.target = target;
 
-	if xmlFile ~= nil and xmlKey ~= nil then
-		local woodTriggerNode = getXMLString(xmlFile, xmlKey .. "#triggerNode");		
-		if woodTriggerNode ~= nil then
+	local woodTriggerNode = getXMLString(xmlFile, xmlKey .. "#triggerNode");		
+	if woodTriggerNode ~= nil then
+		if target.addFillLevel ~= nil and target.getFreeCapacity ~= nil then	
 			self.woodTriggerNode = I3DUtil.indexToObject(nodeId, woodTriggerNode, target.i3dMappings);
 			if self.woodTriggerNode ~= nil then
-	
+		
 				self.maxAllowedLength = Utils.getNoNil(getXMLFloat(xmlFile, xmlKey.."#maxAllowedLength"), 0);
 				self.maxAllowedAttachments = getXMLFloat(xmlFile, xmlKey.."#maxAllowedAttachments");
 		
@@ -92,6 +85,14 @@ function GC_WoodTrigger:load(nodeId, target, xmlFile, xmlKey, fillTypeName)
 				addTrigger(self.woodTriggerNode, "woodTriggerCallback", self);
 				
 				return true;
+			end;
+		else
+			if target.addFillLevel == nil then
+				g_company.debug:writeDev(self.debugData, "Target function 'addFillLevel' could not be found!");
+			end;
+			
+			if target.getFreeCapacity == nil then
+				g_company.debug:writeDev(self.debugData, "Target function 'getFreeCapacity' could not be found!");
 			end;
 		end;
 	end;
