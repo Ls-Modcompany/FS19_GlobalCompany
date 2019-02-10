@@ -224,10 +224,15 @@ end;
 
 function GC_Sounds:setSoundsState(forceActive)
 	if self.isClient then
+		local oldActive = self.soundsRunning;
 		if forceActive ~= nil then
 			self.soundsRunning = forceActive;
 		else
 			self.soundsRunning = not self.soundsRunning;
+		end;
+
+		if oldActive == self.soundsRunning then
+			return;
 		end;
 
 		if self.operateSamples ~= nil then

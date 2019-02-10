@@ -35,10 +35,7 @@ function GC_MovingPart:load(nodeId, xmlFile, key, i3dMappings)
 	self.animation = GC_Animations:new(self.isServer, self.isClient);
 	self.animation:load(nodeId, true, key, xmlFile, nil, i3dMappings);
 
-	self.mouseSpeedFactor = Utils.getNoNil(getXMLFloat(xmlFile, key.."#mouseSpeedFactor"), 1.0);
-
 	self.axis = InputAction[getXMLString(xmlFile, key.."#axis")];
-
 	self.animationState = 0;
 
 	return true;
@@ -51,6 +48,7 @@ end
 function GC_MovingPart:update(dt)
 	--GC_MovingPart:superClass().update(self, dt);
 	
+	self.lastAnimationState = self.animationState;
 	self.animation:setAnimationsState2(self.animationState);
 	self.animationState = 0;
 end;

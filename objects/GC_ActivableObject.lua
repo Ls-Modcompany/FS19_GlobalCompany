@@ -38,11 +38,31 @@ function GC_ActivableObject:new(isServer, isClient, customMt)
 	return self;
 end
 
-function GC_ActivableObject:load(target, reference, inputAction)
+function GC_ActivableObject:load(target, reference, inputAction, triggerOnlyKeys, triggerUp, triggerDown, triggerAlways, delayTime)
     self.target = target;
     self.reference = reference;
     self.inputAction = InputAction[inputAction];
+    self.triggerOnlyKeys = triggerOnlyKeys;
 	self.debugData = g_company.debug:getDebugData(GC_ActivableObject.debugIndex, target);
+
+	self.triggerUp = true;
+	self.triggerDown = false;
+	self.triggerAlways = false;
+	self.delayTime = delayTime;
+	self.currentDelayTime = 0;
+	
+	if triggerUp ~= nil then
+		self.triggerUp = triggerUp;
+	end;
+	if triggerDown ~= nil then
+		self.triggerDown = triggerDown;
+	end;
+	if triggerAlways ~= nil then
+		self.triggerAlways = triggerAlways;
+	end;
+	if delayTime ~= nil then
+		self.delayTime = delayTime;
+	end;
 
     self.onText = "onText";
     self.offText = "offText";
@@ -59,23 +79,33 @@ function GC_ActivableObject:delete()
 end;
 
 function GC_ActivableObject:onActivateObject()
-	self.isOn = not self.isOn;
-
-	if self.target.onActivableObject ~= nil then
-		self.target:onActivableObject(self.reference, self.isOn);
-	end;
-
-	if self.isOn then
-		self:setActivateText(self.offText);
+	if self.triggerOnlyKeys then
+		if self.currentDelayTime == 0 then
+			if self.target.onActivableObject ~= nil then
+				self.target:onActivableObject(self.reference, self.isOn);
+			end;
+			self.currentDelayTime = self.delayTime;
+		end;
 	else
-		self:setActivateText(self.onText);
+		self.isOn = not self.isOn;
+
+		if self.target.onActivableObject ~= nil then
+			self.target:onActivableObject(self.reference, self.isOn);
+		end;
+
+		if self.isOn then
+			self:setActivateText(self.offText);
+		else
+			self:setActivateText(self.onText);
+		end;
 	end;
 end;
 
 function GC_ActivableObject:addActivatableObject()	
-	local _, eventId = g_inputBinding:registerActionEvent(self.inputAction, self, self.onActivateObject, true, false, false, true);
+	local _, eventId = g_inputBinding:registerActionEvent(self.inputAction, self, self.onActivateObject, self.triggerUp, self.triggerDown, self.triggerAlways, true);
 	self.eventId = eventId;
 	self:setActivateText(self.onText);
+	self.currentDelayTime = 0;
 end;
 
 function GC_ActivableObject:removeActivatableObject()
@@ -99,6 +129,10 @@ end;
 
 function GC_ActivableObject:getOn()
     return self.isOn;
+end;
+
+function GC_ActivableObject:update(dt)
+	self.currentDelayTime = math.max(0, self.currentDelayTime - dt);
 end;
 
 
