@@ -264,7 +264,7 @@ function GC_VisibilityNodes:delete()
 	end;
 end;
 
-function GC_VisibilityNodes:updateNodes(fillLevel, fillType)
+function GC_VisibilityNodes:updateNodes(fillLevel, fillTypeIndex)
 	if self.isClient then
 		if self.visNodes ~= nil then
 			if self.disableFillType then
@@ -272,8 +272,8 @@ function GC_VisibilityNodes:updateNodes(fillLevel, fillType)
 					self:setNodes(visNodes, fillLevel);
 				end;
 			else
-				if self.visNodes[fillType] ~= nil then
-					for _, visNodes in pairs(self.visNodes[fillType]) do
+				if self.visNodes[fillTypeIndex] ~= nil then
+					for _, visNodes in pairs(self.visNodes[fillTypeIndex]) do
 						self:setNodes(visNodes, fillLevel);
 					end;
 				end;
@@ -325,7 +325,7 @@ end;
 
 -- Use this to update 'endLevel' if the capacity can change on target.
 -- value will be added or subtracted from the 'originalEndLevel' as set in the XML or default.
-function GC_VisibilityNodes:updateVisNodesEndLevel(value, fillType)
+function GC_VisibilityNodes:updateVisNodesEndLevel(value, fillTypeIndex)
 	if self.isClient then
 		if value == nil then
 			value = 0;
@@ -337,13 +337,15 @@ function GC_VisibilityNodes:updateVisNodesEndLevel(value, fillType)
 					visNodes.endLevel = visNodes.originalEndLevel + value;
 				end;
 			else
-				if fillType ~= nil and self.visNodes[fillType] ~= nil then
-					for _, visNodes in pairs(self.visNodes[fillType]) do
+				if fillTypeIndex ~= nil and self.visNodes[fillTypeIndex] ~= nil then
+					for _, visNodes in pairs(self.visNodes[fillTypeIndex]) do
 						visNodes.endLevel = visNodes.originalEndLevel + value;
 					end;
 				end;
 			end;
 		end;
+	else
+		g_company.debug:writeDev(self.debugData, "'updateVisNodesEndLevel' is a client only function!");
 	end;
 end;
 
