@@ -3,13 +3,17 @@
 -- 
 -- @Interface: --
 -- @Author: LS-Modcompany / GtX
--- @Date: 19.12.2018
+-- @Date: 09.02.2018
 -- @Version: 1.0.0.0
 -- 
 -- @Support: LS-Modcompany
 -- 
 -- Changelog:
 --		
+--	v1.1.0.0 (09.02.2019):
+-- 		- added new function 'setCustomDischargeNotAllowedWarning'
+--		- add 'GC_DebugUtils' support.
+--
 -- 	v1.0.0.0 (19.12.2018):
 -- 		- initial fs19 (GtX)
 -- 
@@ -29,12 +33,12 @@
 --
 
 
-local debugIndex = g_debug.registerMod("GlobalCompany-GC_UnloadingTrigger");
-
 GC_UnloadingTrigger = {};
 
 local GC_UnloadingTrigger_mt = Class(GC_UnloadingTrigger, UnloadTrigger);
 InitObjectClass(GC_UnloadingTrigger, "GC_UnloadingTrigger");
+
+GC_UnloadingTrigger.debugIndex = g_company.debug:registerScriptName("UnloadingTrigger");
 
 g_company.unloadingTrigger = GC_UnloadingTrigger;
 
@@ -44,9 +48,6 @@ function GC_UnloadingTrigger:new(isServer, isClient, customMt)
     end;
 
 	local self = UnloadTrigger:new(isServer, isClient, customMt);
-	
-	self.isServer = isServer;
-	self.isClient = isClient;
 	
 	self.triggerManagerRegister = true; -- 'GC_TriggerManager' Requirement.
 	
@@ -58,8 +59,12 @@ end;
 
 function GC_UnloadingTrigger:load(nodeId, target, xmlFile, xmlKey, forcedFillTypes, forcedToolTypes)
 	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
+		local text = "Loading failed! 'nodeId' paramater = %s, 'target' paramater = %s 'xmlFile' paramater = %s, 'xmlKey' paramater = %s";
+		g_company.debug:logWrite(GC_UnloadingTrigger.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil);
 		return false;
 	end;
+	
+	self.debugData = g_company.debug:getDebugData(GC_UnloadingTrigger.debugIndex, target);
 	
 	self.rootNode = nodeId;
 	self.target = target;
@@ -75,9 +80,8 @@ function GC_UnloadingTrigger:load(nodeId, target, xmlFile, xmlKey, forcedFillTyp
 				if target.i3dMappings ~= nil and target.i3dMappings[exactFillRootNode] ~= nil then
 					name = target.i3dMappings[exactFillRootNode];
 				end;
-				
-				g_debug.write(debugIndex, g_debug.ERROR, "Invalid exactFillRootNode collision mask for 'unloadingTrigger' [%s]. Bit 30 needs to be set!", name);			
-				
+			
+				g_company.debug:writeModding(self.debugData, "Invalid exactFillRootNode collision mask for 'unloadingTrigger' [%s]. Bit 30 needs to be set!", name);
 				return false;
 			end;
 		
@@ -107,9 +111,11 @@ function GC_UnloadingTrigger:load(nodeId, target, xmlFile, xmlKey, forcedFillTyp
 				local fillTypeCategories = getXMLString(xmlFile, xmlKey .. "#fillTypeCategories"); -- Allow adding by FillTypeCategories.
 		
 				if fillTypeCategories ~= nil and fillTypeNames == nil then
-					fillTypes = g_fillTypeManager:getFillTypesByCategoryNames(fillTypeCategories, "Warning: __ has invalid fillTypeCategory '%s'.");
+					local warning = self.debugData.header .. "Warning: Invalid fillTypeCategory '%s' given at " .. xmlKey .. ".";					
+					fillTypes = g_fillTypeManager:getFillTypesByCategoryNames(fillTypeCategories, warning);
 				elseif fillTypeNames ~= nil then
-					fillTypes = g_fillTypeManager:getFillTypesByNames(fillTypeNames, "Warning: __ has invalid fillType '%s'.");
+					local warning = self.debugData.header .. "Warning: Invalid fillType '%s' given at " .. xmlKey .. ".";
+					fillTypes = g_fillTypeManager:getFillTypesByNames(fillTypeNames, warning);
 				end;
 			end;
 			
@@ -145,17 +151,17 @@ function GC_UnloadingTrigger:load(nodeId, target, xmlFile, xmlKey, forcedFillTyp
 			end;
 		else
 			if target.addFillLevel == nil then
-				g_debug.write(debugIndex, g_debug.DEV, "Target function 'addFillLevel' could not be found for 'unloadingTrigger'!");
+				g_company.debug:writeDev(self.debugData, "Target function 'addFillLevel' could not be found!");
 			end;
 			
 			if target.getFreeCapacity == nil then
-				g_debug.write(debugIndex, g_debug.DEV, "Target function 'getFreeCapacity' could not be found for 'unloadingTrigger'!");
+				g_company.debug:writeDev(self.debugData, "Target function 'getFreeCapacity' could not be found!");
 			end;
 
 			return false;
 		end;
 	else
-		g_debug.write(debugIndex, g_debug.ERROR, "No 'exactFillRootNode' or 'baleTriggerNode' was found for 'unloadingTrigger'!");
+		g_company.debug:writeModding(self.debugData, "No 'exactFillRootNode' or 'baleTriggerNode' was found!");
 		return false;
 	end;
     
@@ -166,7 +172,7 @@ function GC_UnloadingTrigger:addFillUnitFillLevel(farmId, fillUnitIndex, fillLev
 	local changed = 0;
 	
 	if self.target ~= nil then
-		local freeCapacity = self.target:getFreeCapacity(fillTypeIndex, nil, triggerId);
+		local freeCapacity = self.target:getFreeCapacity(fillTypeIndex, nil, self.extraParamater);
 		local maxFillDelta = math.min(fillLevelDelta - changed, freeCapacity);
 		changed = changed + maxFillDelta;
 		
@@ -303,6 +309,14 @@ function GC_UnloadingTrigger:setAcceptedFillTypeState(fillTypeInt, state)
 	
 	self.fillTypes[fillTypeInt] = true;
 end;
+
+function GC_UnloadingTrigger:setCustomDischargeNotAllowedWarning(text)
+    if text ~= nil and text ~= "" then
+		self.notAllowedWarningText = text;
+	else
+		self.notAllowedWarningText = nil;
+	end;
+end
 
 
 

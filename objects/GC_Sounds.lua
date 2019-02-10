@@ -3,12 +3,15 @@
 --
 -- @Interface: --
 -- @Author: LS-Modcompany / GtX
--- @Date: 28.01.2019
+-- @Date: 06.02.2019
 -- @Version: 1.1.1.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+--
+-- 	v1.1.1.0 (06.02.2019):
+-- 		- change to 'raiseUpdate' Updateable instead of using 'Object' class as this is a client side script only.
 --
 -- 	v1.1.0.0 (28.01.2019):
 -- 		- convert to fs19
@@ -27,7 +30,7 @@
 
 GC_Sounds = {};
 
-local GC_Sounds_mt = Class(GC_Sounds, Object);
+local GC_Sounds_mt = Class(GC_Sounds);
 InitObjectClass(GC_Sounds, "GC_Sounds");
 
 GC_Sounds.debugIndex = g_company.debug:registerScriptName("Sounds");
@@ -35,11 +38,11 @@ GC_Sounds.debugIndex = g_company.debug:registerScriptName("Sounds");
 g_company.sounds = GC_Sounds;
 
 function GC_Sounds:new(isServer, isClient, customMt)
-	if customMt == nil then
-		customMt = GC_Sounds_mt;
-	end;
+	local self = {};
+	setmetatable(self, customMt or GC_Sounds_mt);
 
-	local self = Object:new(isServer, isClient, customMt);
+	self.isServer = isServer;
+    self.isClient = isClient;
 
 	self.soundsRunning = false;
 	self.disableSoundEffects = false;
@@ -67,7 +70,8 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
 	end;
 
 	self.baseDirectory = baseDirectory;
-
+	
+	local returnValue = false;
 	if self.isClient then
 		if hasXMLProperty(xmlFile, xmlKey .. ".sounds") then
 			local i = 0;
@@ -81,8 +85,13 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
 
 				local soundNode = I3DUtil.indexToObject(self.rootNode, getXMLString(xmlFile, key .. "#geSoundNode"), self.target.i3dMappings);
 				if soundNode ~= nil then
-					sound.node = soundNode;
-					setVisibility(soundNode, false); -- Use sound source already in GE.
+					-- Only use if 'soundNode' has a valid 'AUDIO_SOURCE' ClassId.
+					if getHasClassId(soundNode, ClassIds.AUDIO_SOURCE) then
+						sound.node = soundNode;
+						setVisibility(soundNode, false);
+					else
+						g_company.debug:writeModding(self.debugData, "'geSoundNode' at '%s' (%s) is not a valid AUDIO_SOURCE!", key, getName(soundNode));
+					end;
 				else
 					sound.sample = g_soundManager:loadSampleFromXML(xmlFile, key, "sample", self.baseDirectory, self.rootNode, 0, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
 				end;
@@ -106,12 +115,14 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
 
 						if self.intervalSounds == nil then
 							self.intervalSounds = {};
+							returnValue = true;
 						end;
 
 						table.insert(self.intervalSounds, sound);
 					else
 						if self.standardSounds == nil then
 							self.standardSounds = {};
+							returnValue = true;
 						end;
 
 						table.insert(self.standardSounds, sound);
@@ -129,20 +140,19 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
 			self.operateSamples.run = g_soundManager:loadSampleFromXML(xmlFile, key, "run", self.baseDirectory, self.rootNode, 0, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
 			self.operateSamples.stop = g_soundManager:loadSampleFromXML(xmlFile, key, "stop", self.baseDirectory, self.rootNode, 1, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
 		end;
+	
+		if self.intervalSounds ~= nil then
+			g_company.addRaisedUpdateable(self);
+		end;
+	else
+		g_company.debug:writeDev(self.debugData, "Failed to load 'CLIENT ONLY' script on server!");
+		returnValue = true; -- Send true so we can also print 'function' warnings if called by server.
 	end;
 
-	if self.intervalSounds ~= nil then
-		self:register(true);
-	end;
-
-	return true;
+	return returnValue;
 end;
 
 function GC_Sounds:delete()
-	if self.isRegistered then
-		self:unregister(true);
-	end;
-
 	if self.isClient then
 		if self.operateSamples ~= nil then
 			g_soundManager:deleteSamples(self.operateSamples);
@@ -154,6 +164,8 @@ function GC_Sounds:delete()
 					g_soundManager:deleteSample(self.intervalSounds[i].sample);
 				end;
 			end;
+			
+			g_company.removeRaisedUpdateable(self);
 		end;
 
 		if self.standardSounds ~= nil then
@@ -201,7 +213,7 @@ function GC_Sounds:update(dt)
 					self.disableSoundEffects = true;
 				end;
 
-				self:raiseActive();
+				self:raiseUpdate();
 			else
 				if self.disableSoundEffects then
 					self.disableSoundEffects = false;
@@ -262,7 +274,7 @@ function GC_Sounds:setSoundsState(forceActive)
 		end;
 
 		if self.intervalSounds ~= nil then
-			self:raiseActive();
+			self:raiseUpdate();
 		end;
 	else
 		g_company.debug:writeDev(self.debugData, "'setSoundsState' is a client only function!");
