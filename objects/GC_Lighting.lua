@@ -44,12 +44,8 @@ GC_Lighting.AREA_LIGHT_TYPE = 3;
 g_company.lighting = GC_Lighting;
 
 function GC_Lighting:new(isServer, isClient, customMt)
-	if customMt == nil then
-		customMt = GC_Lighting_mt;
-	end;
-
 	local self = {};
-	setmetatable(self, customMt);
+	setmetatable(self, customMt or GC_Lighting_mt);
 
 	self.isServer = isServer;
     self.isClient = isClient;
@@ -255,7 +251,7 @@ function GC_Lighting:loadAreaLights(xmlFile, xmlKey, loadedXmlFiles)
 										end;
 
 										local name = getXMLString(xmlFile, rotateNodesKey .. "#name");
-										local rotation = Utils.getNoNil(StringUtil.getRadiansFromString(getXMLString(xmlFile, rotateNodesKey .. "#rotation"), 3), {0, 0, 0});
+										local rotation = Utils.getNoNil(GlobalCompanyUtils.getNumbersFromString(xmlFile, rotateNodesKey .. "#rotation", 3, true, self.debugData), {0, 0, 0});
 										if name ~= nil then
 											local keyToFind = areaLightKey .. "." .. name;
 											if hasXMLProperty(areaLightXmlFile, keyToFind) then

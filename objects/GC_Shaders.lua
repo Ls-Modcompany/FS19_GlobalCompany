@@ -36,12 +36,8 @@ GC_Shaders.debugIndex = g_company.debug:registerScriptName("Shaders");
 g_company.shaders = GC_Shaders;
 
 function GC_Shaders:new(isServer, isClient, customMt)
-	if customMt == nil then
-		customMt = GC_Shaders_mt;
-	end;
-
 	local self = {};
-	setmetatable(self, customMt);
+	setmetatable(self, customMt, GC_Shaders_mt);
 
 	self.isServer = isServer;
 	self.isClient = isClient;
@@ -86,8 +82,8 @@ function GC_Shaders:load(nodeId, target, xmlFile, xmlKey, groupKey)
 					shader.shaderParameter = shaderParameter;
 
 					local values = {getShaderParameter(node, shaderParameter)};
-					shader.offValues = Utils.getNoNil(StringUtil.getVectorNFromString(getXMLString(xmlFile, key .. "#offValues"), 4), values);
-					shader.onValues = Utils.getNoNil(StringUtil.getVectorNFromString(getXMLString(xmlFile, key .. "#onValue"), 4), values);
+					shader.offValues = Utils.getNoNil(GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. "#offValues", 4, false, self.debugData), values);
+					shader.onValues = Utils.getNoNil(GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. "#onValue", 4, false, self.debugData), values);
 					shader.shared = Utils.getNoNil(getXMLBool(xmlFile, key .. "#shared"), false);
 
 					local operatingInterval = Utils.getNoNil(getXMLFloat(xmlFile, key .. "#operatingIntervalSeconds"), 0);

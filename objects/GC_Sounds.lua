@@ -38,12 +38,8 @@ GC_Sounds.debugIndex = g_company.debug:registerScriptName("Sounds");
 g_company.sounds = GC_Sounds;
 
 function GC_Sounds:new(isServer, isClient, customMt)
-	if customMt == nil then
-		customMt = GC_Sounds_mt;
-	end;
-
 	local self = {};
-	setmetatable(self, customMt);
+	setmetatable(self, customMt or GC_Sounds_mt);
 
 	self.isServer = isServer;
     self.isClient = isClient;

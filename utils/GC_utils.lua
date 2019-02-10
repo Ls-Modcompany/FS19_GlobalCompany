@@ -54,7 +54,6 @@ end
 
 function GlobalCompanyUtils.getTableLength(t)
 	if t == nil or type(t) ~= "table" then
-		--print(tostring(t).." is not a 'table' value")
 		return 0
 	end
 
@@ -192,28 +191,31 @@ function GlobalCompanyUtils.getSplitClassName(object, backupString)
 end;
 
 
-
--- This will allow placeable / onCreate to have different keys.
--- Might be better in i3dLoader ?? Example of use in Factory Script soon.
-function GlobalCompanyUtils.getXmlKey(xmlFile, baseKey, key, indexName)
-	local xmlKey = string.format("%s.%s", baseKey, key);
-
-	if indexName ~= nil then
-		local i = 0;
-		while true do
-			local indexNameKey = string.format("%s.%s(%d)", baseKey, key, i);
-			if not hasXMLProperty(xmlFile, indexNameKey) then
-				break;
+function GlobalCompanyUtils.getNumbersFromString(xmlFile, key, count, returnRadians, debugData)
+    local stringValue = getXMLString(xmlFile, key);	
+	if stringValue ~= nil and count ~= nil then	
+		local stringTable = StringUtil.splitString(" ", stringValue);
+		if #stringTable >= count then
+			stringValue = {};		
+			for i = 1, count do
+				if returnRadians == true then
+					table.insert(stringValue, math.rad(tonumber(stringTable[i])));
+				else
+					table.insert(stringValue, tonumber(stringTable[i]));
+				end;
 			end;
-
-			local factoryIndex = getXMLString(xmlFile, indexNameKey .. "#indexName");
-			if factoryIndex == indexName then
-				xmlKey = indexNameKey;
-				break;
+		else
+			if debugData ~= nil then
+				g_company.debug:writeModding(debugData, "%d-vector given, %d-vector required at %s", #stringTable, count, key);
+			else
+				print(string.format("    ERROR: %d-vector given, %d-vector required at %s", #stringTable, count, key));
 			end;
-			i = i + 1;
+			stringValue = nil;
 		end;
 	end;
 
-	return xmlKey;
+   return stringValue;
 end;
+
+
+

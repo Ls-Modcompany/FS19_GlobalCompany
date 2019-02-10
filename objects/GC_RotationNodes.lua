@@ -37,12 +37,8 @@ GC_RotationNodes.debugIndex = g_company.debug:registerScriptName("RotationNodes"
 g_company.rotationNodes = GC_RotationNodes;
 
 function GC_RotationNodes:new(isServer, isClient, customMt)
-	if customMt == nil then
-		customMt = GC_RotationNodes_mt;
-	end;
-
 	local self = {};
-	setmetatable(self, customMt);
+	setmetatable(self, customMt or GC_RotationNodes_mt);
 
 	self.isServer = isServer;
     self.isClient = isClient;

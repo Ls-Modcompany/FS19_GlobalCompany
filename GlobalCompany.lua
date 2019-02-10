@@ -169,8 +169,8 @@ function GlobalCompany.loadSourceFiles()
 
 
 	--|| Utils / Managers ||--
-	source(GlobalCompany.dir .. "utils/GC_utils.lua");
-	source(GlobalCompany.dir .. "utils/GC_xmlUtils.lua");
+	source(GlobalCompany.dir .. "utils/GC_Utils.lua");
+	source(GlobalCompany.dir .. "utils/GC_XmlUtils.lua");
 	source(GlobalCompany.dir .. "utils/GC_i3dLoader.lua");
 	source(GlobalCompany.dir .. "utils/GC_cameraUtil.lua");
 	source(GlobalCompany.dir .. "utils/GC_shopManager.lua");
@@ -186,6 +186,7 @@ function GlobalCompany.loadSourceFiles()
 
 	--|| Objects ||--
 	source(GlobalCompany.dir .. "objects/GC_Sounds.lua");
+	source(GlobalCompany.dir .. "objects/GC_Movers.lua");
 	source(GlobalCompany.dir .. "objects/GC_Shaders.lua");
 	source(GlobalCompany.dir .. "objects/GC_Lighting.lua");
 	source(GlobalCompany.dir .. "objects/GC_MovingPart.lua");
