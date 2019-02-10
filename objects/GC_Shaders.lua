@@ -37,7 +37,7 @@ g_company.shaders = GC_Shaders;
 
 function GC_Shaders:new(isServer, isClient, customMt)
 	local self = {};
-	setmetatable(self, customMt, GC_Shaders_mt);
+	setmetatable(self, customMt or GC_Shaders_mt);
 
 	self.isServer = isServer;
 	self.isClient = isClient;
