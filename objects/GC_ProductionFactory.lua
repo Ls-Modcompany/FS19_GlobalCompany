@@ -2,76 +2,79 @@
 local debugIndex = g_debug.registerMod("GlobalCompany-ProductionFactory");
 
 ProductionFactory = {};
+getfenv(0)["ProductionFactory"] = ProductionFactory;
+g_company.productionFactory = ProductionFactory; -- Link so we can be talked to by other non GC scripts.
+
 ProductionFactory_mt = Class(ProductionFactory, Object);
 InitObjectClass(ProductionFactory, "ProductionFactory");
 
-g_company.productionFactory = ProductionFactory; -- Link so we can be talked to by other non GC scripts.
+local saveId = -1;
+local function getNextSaveId() saveId = saveId + 1; return tostring(saveId); end;
 
-function ProductionFactory.onCreate(transformId)
-	local indexName = getUserAttribute(transformId, "indexName");
-	local xmlFilename = getUserAttribute(transformId, "xmlFile");
-
-	if indexName ~= nil and xmlFilename ~= nil then
-		local customMt = nil;
-		local customEnvironment = g_currentMission.loadingMapModName;
-		local baseDirectory = g_currentMission.loadingMapBaseDirectory;
-
-		local isPlaceable = false;
-		local baseKey = "globalCompany.productionFactories";
-		xmlFilename = Utils.getFilename(xmlFilename, baseDirectory);
-
-		local object = ProductionFactory:new(g_server ~= nil, g_client ~= nil, customMt, baseDirectory, customEnvironment);
-		if object:load(transformId, xmlFilename, baseKey, indexName, isPlaceable) then
-			g_currentMission:addOnCreateLoadedObject(object);
-			--g_currentMission:addOnCreateLoadedObjectToSave(object); -- Need function.
-			object:register(true);
-		else
-			object:delete();
-		end;
+function ProductionFactory.onCreate(nodeId)
+	local object = ProductionFactory:new(g_server ~= nil, g_client ~= nil);
+	if object:load(nodeId) then
+		object.baseDirectory = g_currentMission.loadingMapModName;
+		object.customEnvironment = g_currentMission.loadingMapBaseDirectory;
+		g_currentMission:addOnCreateLoadedObject(object);
+		g_currentMission:addOnCreateLoadedObjectToSave(object);
+		object:register(true);
+	else
+		object:delete();
 	end;
 end;
--- ??
-g_onCreateUtil.addOnCreateFunction("ProductionFactory", ProductionFactory.onCreate);
 
-function ProductionFactory:new(isServer, isClient, customMt, baseDirectory, customEnvironment)
-	if customMt == nil then
-		customMt = ProductionFactory_mt;
-	end;
+function ProductionFactory:new(isServer, isClient, customMt)	
+	return Object:new(isServer, isClient, customMt or ProductionFactory_mt);
+end;
 
-	local self = Object:new(isServer, isClient, customMt);
+function ProductionFactory:load(nodeId, productionKey, indexName, parent)	
+	self.nodeId = nodeId;	
 
-	self.isServer = isServer;
-	self.isClient = isClient;
-
-	self.baseDirectory = baseDirectory;
-	self.customEnvironment = customEnvironment;
-
+	self.productionKey = productionKey;	
+	self.indexName = indexName;	
+	self.parent = parent;	
+	self.isPlaceable = productionKey ~= nil and parent ~= nil;
+		
 	self.fillTypeIndexToInput = {};
 	self.fillTypeIndexToOutput = {};
 
 	self.levelChangeTimer = -1;
 
-	return self;
+	if not self.isPlaceable then
+		if not self:finalizePlacement() then return false; end;
+	end;
+
+	return true;
 end;
 
-function ProductionFactory:load(transformId, xmlFilename, baseKey, indexName, isPlaceable)	
-	self.rootNode = transformId;
-	self.isPlaceable = isPlaceable; -- maybe for gui for categories.
+function ProductionFactory:finalizePlacement()		
+	local xmlFile, xmlKey, indexName;
+	local addKey = "";	
+	if self.isPlaceable then
+		xmlFile = loadXMLFile("ProductionFactory", self.parent.configFileName);
+		addKey = "placeable.";
+		xmlKey = self.productionKey
+		indexName = self.indexName
+	else
+		indexName = getUserAttribute(self.nodeId, "indexName");
+		local xmlFilenameAttribute = getUserAttribute(self.nodeId, "xmlFile");
+		if indexName ~= nil and xmlFilenameAttribute ~= nil then
+			xmlFile = loadXMLFile("ProductionFactory", Utils.getFilename(xmlFilenameAttribute, self.baseDirectory));
+			xmlKey = g_company.xmlUtils:getXmlKey(xmlFile, "globalCompany.productionFactories", "productionFactory", indexName);
+		end;
+	end;
 
 	local loaded = false;
-	local xmlFile = loadXMLFile("ProductionFactory", xmlFilename);
-
 	if xmlFile ~= nil and xmlFile ~= 0 then
-		local xmlKey = g_company.xmlUtils:getXmlKey(xmlFile, baseKey, "productionFactory", indexName);
-
 		self.triggerManager = GC_TriggerManager:new(self); -- init trigger manager.
+		self.i3dMappings = GC_i3dLoader:loadI3dMapping(xmlFile, addKey .. "globalCompany.i3dMappings");	-- i3dMappings support.
 
-		self.i3dMappings = GC_i3dLoader:loadI3dMapping(xmlFile, "globalCompany.i3dMappings");	-- i3dMappings support.
-
-		self.saveId = getXMLString(xmlFile, xmlKey .. "#saveId");
-		if self.saveId == nil then
-			self.saveId = "ProductionFactory_" .. indexName;
+		local saveId = Utils.getNoNil(getXMLString(xmlFile, xmlKey .. "#saveId"), "_");
+		if saveId ~= "_" then
+			self.saveId = string.format( "_%s_", saveId)
 		end;
+		self.saveId = "ProductionFactory" .. saveId .. getNextSaveId();
 
 		self.showInGlobalGUI = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. ".operation#showInGlobalGUI"), true);
 		self.drawFactoryInformation = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. ".operation#drawFactoryInformation"), true);
@@ -176,8 +179,7 @@ function ProductionFactory:load(transformId, xmlFilename, baseKey, indexName, is
 					local productTitle = getXMLString(xmlFile, inputProductKey .. "#title");
 					if productTitle ~= nil then
 						inputProduct.title = g_company.languageManager:getText(productTitle) .. ":";
-					end;				
-		
+					end;	
 					
 					if hasXMLProperty(xmlFile, inputProductKey .. ".inputMethods") then					
 						-- Rain Water
@@ -198,7 +200,7 @@ function ProductionFactory:load(transformId, xmlFilename, baseKey, indexName, is
 						local woodTriggerKey = inputProductKey .. ".inputMethods.woodTrigger";
 						if hasXMLProperty(xmlFile, woodTriggerKey) then
 							if inputProduct.fillTypes[FillType.WOODCHIPS] ~= nil then -- Only for WOODCHIPS
-								local trigger = self.triggerManager:loadTrigger(GC_WoodTrigger, self.rootNode, xmlFile, woodTriggerKey, "WOODCHIPS");
+								local trigger = self.triggerManager:loadTrigger(GC_WoodTrigger, self.nodeId, xmlFile, woodTriggerKey, "WOODCHIPS");
 								if trigger ~= nil then
 									trigger.extraParamater = trigger.managerId;
 									self.triggerIdToProduct[trigger.managerId] = inputProduct;
@@ -216,7 +218,7 @@ function ProductionFactory:load(transformId, xmlFilename, baseKey, indexName, is
 								table.insert(forcedFillTypes, index)
 							end;
 							
-							local trigger = self.triggerManager:loadTrigger(GC_UnloadingTrigger, self.rootNode, xmlFile, unloadTriggerKey, forcedFillTypes);
+							local trigger = self.triggerManager:loadTrigger(GC_UnloadingTrigger, self.nodeId, xmlFile, unloadTriggerKey, forcedFillTypes);
 							if trigger ~= nil then
 								trigger.extraParamater = trigger.managerId;
 								self.triggerIdToProduct[trigger.managerId] = inputProduct;
@@ -301,7 +303,7 @@ function ProductionFactory:load(transformId, xmlFilename, baseKey, indexName, is
 								-- Dynamic Heap
 								local dynamicHeapKey = outputProductKey .. ".outputMethods.dynamicHeap";
 								if hasXMLProperty(xmlFile, dynamicHeapKey) then
-									local trigger = self.triggerManager:loadTrigger(GC_DynamicHeap, self.rootNode, xmlFile, dynamicHeapKey, fillTypeName);
+									local trigger = self.triggerManager:loadTrigger(GC_DynamicHeap, self.nodeId, xmlFile, dynamicHeapKey, fillTypeName);
 									if trigger ~= nil then
 										trigger.extraParamater = trigger.managerId;
 										outputProduct.dynamicHeap = trigger;										
@@ -441,7 +443,7 @@ function ProductionFactory:load(transformId, xmlFilename, baseKey, indexName, is
 
 			local playerTriggerKey = xmlKey .. ".playerTrigger";
 			if hasXMLProperty(xmlFile, playerTriggerKey) then
-				self.triggerManager:loadTrigger(GC_PlayerTrigger, self.rootNode, xmlFile, playerTriggerKey, "globalTrigger", true);
+				self.triggerManager:loadTrigger(GC_PlayerTrigger, self.nodeId, xmlFile, playerTriggerKey, "globalTrigger", true);
 			end;
 
 			---------------------------
@@ -455,7 +457,7 @@ function ProductionFactory:load(transformId, xmlFilename, baseKey, indexName, is
 			self.factoryDirtyFlag = self:getNextDirtyFlag();
 		else
 			loaded = false;
-			g_debug.write(debugIndex, g_debug.ERROR, "[FACTORY - %s] No 'inputProducts' have been registered factory cannot be loaded!", indexName);
+			g_debug.write(debugIndex, g_debug.ERROR, "[FACTORY - %s] No 'inputProducts' or/and 'outputProducts' have been registered factory cannot be loaded!", indexName);
 		end;
 	end;
 
@@ -463,8 +465,16 @@ function ProductionFactory:load(transformId, xmlFilename, baseKey, indexName, is
 end;
 
 function ProductionFactory:delete()
-	self.triggerManager:unregisterAllTriggers();
+	if self.triggerManager ~= nil then
+		self.triggerManager:unregisterAllTriggers();
+	end;
+    unregisterObjectClassName(self)
+    ProductionFactory:superClass().delete(self)
 end;
+
+function ProductionFactory:deleteFinal()
+    ProductionFactory:superClass().deleteFinal(self)
+end
 
 function ProductionFactory:update(dt)
 	local raiseActive = false;
@@ -816,3 +826,4 @@ function ProductionFactory:playerTriggerUpdate(dt, triggerReference)
 	end;
 end;
 
+g_onCreateUtil.addOnCreateFunction("ProductionFactory", ProductionFactory.onCreate);
