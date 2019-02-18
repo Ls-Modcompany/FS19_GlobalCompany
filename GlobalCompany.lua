@@ -169,8 +169,8 @@ function GlobalCompany.loadSourceFiles()
 
 
 	--|| Utils / Managers ||--
-	source(GlobalCompany.dir .. "utils/GC_Utils.lua");
-	source(GlobalCompany.dir .. "utils/GC_XmlUtils.lua");
+	source(GlobalCompany.dir .. "utils/GC_utils.lua");
+	source(GlobalCompany.dir .. "utils/GC_xmlUtils.lua");
 	source(GlobalCompany.dir .. "utils/GC_i3dLoader.lua");
 	source(GlobalCompany.dir .. "utils/GC_cameraUtil.lua");
 	source(GlobalCompany.dir .. "utils/GC_shopManager.lua");
@@ -199,6 +199,11 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_VisibilityNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
 
+	--|| Placeables ||--
+	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");
+
+
+	
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
