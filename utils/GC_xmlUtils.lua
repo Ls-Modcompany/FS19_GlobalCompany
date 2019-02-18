@@ -34,10 +34,9 @@ function GlobalCompanyXmlUtils:getXmlKey(xmlFile, baseKey, key, indexName)
 				break;
 			end;
 
-			local factoryIndex = getXMLString(xmlFile, indexNameKey .. "#indexName");
-			if factoryIndex == indexName then
-				xmlKey = indexNameKey;
-				break;
+			local index = getXMLString(xmlFile, indexNameKey .. "#indexName");
+			if index == indexName then
+				return xmlKey;
 			end;
 			i = i + 1;
 		end;
