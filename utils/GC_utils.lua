@@ -217,5 +217,47 @@ function GlobalCompanyUtils.getNumbersFromString(xmlFile, key, count, returnRadi
    return stringValue;
 end;
 
+function GlobalCompanyUtils.getHasPrefix(text)
+	local start, _ = string.find(text, "_", 1, true);	
+	if start ~= nil then
+		local prefix = string.sub(text, 1, start - 1);		
+		if prefix == "GC" or prefix == "SRS" then
+			return true;
+		end;
+	end;
+	
+	return false;
+end;
+
+-- function GlobalCompanyUtils.getHasPrefix(customPrefix, prefixSplit, returnErrorText)
+	-- local split = prefixSplit or "_";	
+	-- local start, _ = string.find(name, split, 1, true);	
+	-- if start ~= nil then
+		-- local prefix = string.sub(name, 1, start - 1);
+		-- if customPrefix ~= nil then
+			-- if prefix == customPrefix then
+				-- return true;
+			-- else
+				-- local text = "Incorrect prefix '" .. prefix .. "' was found for '%s'! Entries must contain '" .. customPrefix .. "_'."
+				-- return false, text;
+			-- end;
+		-- else
+			-- if prefix == "GC" or prefix == "SRS" then
+				-- return true;
+			-- else
+				-- local text = "Incorrect prefix '" .. prefix .. "' was found for '%s'! Entries must contain 'GC_' for ( GlobalCompany ) mods or 'SRS_' for ( SkiRegionSimulator ) mods."
+				-- return false, text;
+			-- end;
+		-- end;
+	-- else
+		-- local text = "No prefix was found for '%s'! Entries must contain 'GC_' for ( GlobalCompany ) mods or 'SRS_' for ( SkiRegionSimulator ) mods."
+		-- if customPrefix ~= nil then
+			-- text = "No prefix was found for '%s'! Entries must contain '" .. customPrefix .. "_'."
+		-- end;
+		
+		-- return false, text;
+	-- end;
+-- end;
+
 
 

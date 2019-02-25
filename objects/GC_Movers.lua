@@ -96,7 +96,7 @@ function GC_Movers:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capaciti
 			else	
 				local fillTypeName = getXMLString(xmlFile, key .. "#fillType");
 				if fillTypeName ~= nil then
-					fillTypeIndex = g_fillTypeManager.nameToIndex[fillTypeName];
+					fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillTypeName);
 					if fillTypeIndex ~= nil then
 						capacity = capacities[fillTypeIndex];						
 						if capacity == nil then					
@@ -321,13 +321,15 @@ function GC_Movers:setMover(mover, fillLevel)
 		if fillLevel >= mover.startColourChange then
 			mover.colourReset = true;
 			
-			local colourScale = {0, 0, 0};
-			local factor = (fillLevel - mover.startColourChange) / (mover.stopColourChange - mover.startColourChange);
-			for i = 1, 3 do
-				colourScale[i] = MathUtil.clamp(mover.colourMin[i] + factor * (mover.colourMax[i] - mover.colourMin[i]), 0, 1);
-			end;			
-			
-			setShaderParameter(mover.node, "colorScale", colourScale[1], colourScale[2], colourScale[3], 0, false);
+			if fillLevel < mover.stopColourChange then
+				local colourScale = {0, 0, 0};
+				local factor = (fillLevel - mover.startColourChange) / (mover.stopColourChange - mover.startColourChange);
+				for i = 1, 3 do
+					colourScale[i] = MathUtil.clamp(mover.colourMin[i] + factor * (mover.colourMax[i] - mover.colourMin[i]), 0, 1);
+				end;			
+				
+				setShaderParameter(mover.node, "colorScale", colourScale[1], colourScale[2], colourScale[3], 0, false);
+			end;
 		else
 			if mover.colourReset then
 				setShaderParameter(mover.node, "colorScale", mover.colourMin[1], mover.colourMin[2], mover.colourMin[3], 0, false);

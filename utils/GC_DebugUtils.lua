@@ -24,6 +24,7 @@
 
 GC_DebugUtils = {};
 local GC_DebugUtils_mt = Class(GC_DebugUtils);
+InitObjectClass(GC_DebugUtils, "GC_DebugUtils");
 
 GC_DebugUtils.setDevLevelMax = true; -- Override isDev maxLevel loading to 'false' if needed. (LSMC DEV ONLY)
 
@@ -92,6 +93,17 @@ function GC_DebugUtils:new(customMt)
 	self.printLevelPrefix[GC_DebugUtils.DEV] = "DEVELOPMENT: ";
 
 	return self;
+end;
+
+-- Standard formatted printing for 'unregistered' scripts. This has no 'level' or 'data' requirement.
+function GC_DebugUtils:printToLog(prefix, message, ...)
+	if prefix ~= nil then
+		prefix = string.format("%s:  ", prefix:upper());
+	else
+		prefix = "WARNING:  ";
+	end;
+	
+	print("  [LSMC - GlobalCompany] - " .. prefix .. string.format(message, ...));
 end;
 
 function GC_DebugUtils:getLevelFromName(levelName, printError)

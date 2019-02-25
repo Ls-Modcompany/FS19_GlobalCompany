@@ -37,6 +37,8 @@ function GC_ParticleEffects:new(isServer, isClient)
 
 	self.isServer = isServer;
 	self.isClient = isClient;
+	
+	print("", "", "GLOBAL COMPANY - DEVELOPMENT INFORMATION:  'GC_ParticleEffects' has been depreciated. Use 'GC_Effects' instead!", "", "");
 
 	return self;
 end;

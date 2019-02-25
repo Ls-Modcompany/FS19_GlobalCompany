@@ -139,6 +139,8 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
 			self.operateSamples.start = g_soundManager:loadSampleFromXML(xmlFile, key, "start", self.baseDirectory, self.rootNode, 1, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
 			self.operateSamples.run = g_soundManager:loadSampleFromXML(xmlFile, key, "run", self.baseDirectory, self.rootNode, 0, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
 			self.operateSamples.stop = g_soundManager:loadSampleFromXML(xmlFile, key, "stop", self.baseDirectory, self.rootNode, 1, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
+		
+			returnValue = true;
 		end;
 	
 		if self.intervalSounds ~= nil then
@@ -153,9 +155,10 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
 end;
 
 function GC_Sounds:delete()
-	if self.isClient then
+	if self.isClient then		
 		if self.operateSamples ~= nil then
 			g_soundManager:deleteSamples(self.operateSamples);
+			self.operateSamples = nil;
 		end;
 
 		if self.intervalSounds ~= nil then
@@ -164,6 +167,7 @@ function GC_Sounds:delete()
 					g_soundManager:deleteSample(self.intervalSounds[i].sample);
 				end;
 			end;
+			self.intervalSounds = nil;
 			
 			g_company.removeRaisedUpdateable(self);
 		end;
@@ -174,6 +178,7 @@ function GC_Sounds:delete()
 					g_soundManager:deleteSample(self.standardSounds[i].sample);
 				end;
 			end;
+			self.standardSounds = nil;
 		end;
 	end;
 end;
@@ -234,47 +239,42 @@ function GC_Sounds:update(dt)
 	end;
 end;
 
-function GC_Sounds:setSoundsState(forceActive)
-	if self.isClient then
-		local oldActive = self.soundsRunning;
-		if forceActive ~= nil then
-			self.soundsRunning = forceActive;
-		else
-			self.soundsRunning = not self.soundsRunning;
-		end;
+function GC_Sounds:setSoundsState(state, forceState)
+	if self.isClient then		
+		local setState = state or (not self.soundsRunning);
 
-		if oldActive == self.soundsRunning then
-			return;
-		end;
+		if self.soundsRunning ~= setState or forceState == true then
+			self.soundsRunning = setState;
 
-		if self.operateSamples ~= nil then
-			if self.soundsRunning then
-				g_soundManager:stopSample(self.operateSamples.stop);
-				g_soundManager:playSample(self.operateSamples.start);
-				g_soundManager:playSample(self.operateSamples.run, 0, self.operateSamples.start);
-			else
-				g_soundManager:stopSample(self.operateSamples.start);
-				g_soundManager:stopSample(self.operateSamples.run);
-				g_soundManager:playSample(self.operateSamples.stop);
-			end;
-		end;
-
-		if self.standardSounds ~= nil then
-			for i = 1, #self.standardSounds do
-				if self.standardSounds[i].sample ~= nil then
-					if self.soundsRunning then
-						g_soundManager:playSample(self.standardSounds[i].sample);
-					else
-						g_soundManager:stopSample(self.standardSounds[i].sample);
-					end;
-				elseif self.standardSounds[i].node ~= nil then
-					setVisibility(self.standardSounds[i].node, self.soundsRunning);
+			if self.operateSamples ~= nil then
+				if self.soundsRunning then
+					g_soundManager:stopSample(self.operateSamples.stop);
+					g_soundManager:playSample(self.operateSamples.start);
+					g_soundManager:playSample(self.operateSamples.run, 0, self.operateSamples.start);
+				else
+					g_soundManager:stopSample(self.operateSamples.start);
+					g_soundManager:stopSample(self.operateSamples.run);
+					g_soundManager:playSample(self.operateSamples.stop);
 				end;
 			end;
-		end;
-
-		if self.intervalSounds ~= nil then
-			self:raiseUpdate();
+	
+			if self.standardSounds ~= nil then
+				for i = 1, #self.standardSounds do
+					if self.standardSounds[i].sample ~= nil then
+						if self.soundsRunning then
+							g_soundManager:playSample(self.standardSounds[i].sample);
+						else
+							g_soundManager:stopSample(self.standardSounds[i].sample);
+						end;
+					elseif self.standardSounds[i].node ~= nil then
+						setVisibility(self.standardSounds[i].node, self.soundsRunning);
+					end;
+				end;
+			end;
+	
+			if self.intervalSounds ~= nil then
+				self:raiseUpdate();
+			end;
 		end;
 	else
 		g_company.debug:writeDev(self.debugData, "'setSoundsState' is a client only function!");

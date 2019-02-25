@@ -2,7 +2,7 @@
 -- GlobalCompany - Objects - GC_VisibilityNodes
 --
 -- @Interface: --
--- @Author: LS-Modcompany / GtX
+-- @Author: LS-Modcompany / GtX / kevink98
 -- @Date: 06.02.2019
 -- @Version: 1.1.0.0
 --
@@ -15,7 +15,7 @@
 -- 		- convert to fs19
 --
 -- 	v1.0.0.0 (29.04.2018):
--- 		- initial fs17 (GtX)
+-- 		- initial fs17
 --
 -- Notes:
 --
@@ -95,7 +95,7 @@ function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, baseDirectory,
 			else	
 				local fillTypeName = getXMLString(xmlFile, key .. "#fillType");
 				if fillTypeName ~= nil then
-					fillTypeIndex = g_fillTypeManager.nameToIndex[fillTypeName];
+					fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillTypeName);
 					if fillTypeIndex ~= nil then
 						capacity = capacities[fillTypeIndex];						
 						if capacity == nil then					

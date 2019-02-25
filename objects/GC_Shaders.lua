@@ -184,26 +184,26 @@ function GC_Shaders:update(dt)
 	end;
 end;
 
-function GC_Shaders:setShadersState(forceActive)
-	if forceActive ~= nil then
-		self.shadersActive = forceActive;
-	else
-		self.shadersActive = not self.shadersActive;
-	end;
-
+function GC_Shaders:setShadersState(state, forceState)
 	if self.isClient then
-		if self.standardShaders ~= nil then
-			for _, shader in pairs (self.standardShaders) do
-				if self.shadersActive then
-					setShaderParameter(shader.node, shader.shaderParameter, shader.onValues[1], shader.onValues[2], shader.onValues[3], shader.onValues[4], shader.shared);
-				else
-					setShaderParameter(shader.node, shader.shaderParameter, shader.offValues[1], shader.offValues[2], shader.offValues[3], shader.offValues[4], shader.shared);
+		local setState = state or (not self.shadersActive);
+		
+		if self.shadersActive ~= setState or forceState == true then
+			self.shadersActive = setState;
+		
+			if self.standardShaders ~= nil then
+				for _, shader in pairs (self.standardShaders) do
+					if self.shadersActive then
+						setShaderParameter(shader.node, shader.shaderParameter, shader.onValues[1], shader.onValues[2], shader.onValues[3], shader.onValues[4], shader.shared);
+					else
+						setShaderParameter(shader.node, shader.shaderParameter, shader.offValues[1], shader.offValues[2], shader.offValues[3], shader.offValues[4], shader.shared);
+					end;
 				end;
 			end;
-		end;
-
-		if self.intervalShaders ~= nil then
-			self:raiseUpdate();
+	
+			if self.intervalShaders ~= nil then
+				self:raiseUpdate();
+			end;
 		end;
 	else
 		g_company.debug:writeDev(self.debugData, "'setShadersState' is a client only function!");

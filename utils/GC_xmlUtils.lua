@@ -24,23 +24,53 @@ GlobalCompanyXmlUtils = {};
 g_company.xmlUtils = GlobalCompanyXmlUtils;
 
 function GlobalCompanyXmlUtils:getXmlKey(xmlFile, baseKey, key, indexName)
+	g_company.debug:printToLog("DEV WARNING", "'g_company.xmlUtils:getXmlKey()' is depreciated, use 'g_company.xmlUtils:findXMLKey()' instead.");
+	
 	local xmlKey = string.format("%s.%s", baseKey, key);
+	return GlobalCompanyXmlUtils:findXMLKey(xmlFile, xmlKey, indexName)
+end;
 
-	if indexName ~= nil then
-		local i = 0;
-		while true do
-			local indexNameKey = string.format("%s.%s(%d)", baseKey, key, i);
-			if not hasXMLProperty(xmlFile, indexNameKey) then
-				break;
+function GlobalCompanyXmlUtils:findXMLKey(xmlFile, xmlKey, index, keyName)
+	local foundKey;
+	
+	if xmlFile ~= nil and xmlFile ~= 0 then		
+		local indexName = keyName or "indexName";
+			
+		if xmlKey ~= nil then			
+			local i = 0;
+			while true do
+				local key = string.format("%s(%d)", xmlKey, i);
+				if not hasXMLProperty(xmlFile, key) then
+					break;
+				end;
+		
+				local foundName = getXMLString(xmlFile, string.format("%s#%s", key, indexName));
+				if foundName == index then
+					foundKey = key;
+					break;
+				end;
+				i = i + 1;
 			end;
-
-			local index = getXMLString(xmlFile, indexNameKey .. "#indexName");
-			if index == indexName then
-				return xmlKey;
-			end;
-			i = i + 1;
 		end;
 	end;
 
-	return xmlKey;
+	return foundKey;
 end;
+
+function GlobalCompanyXmlUtils:getXMLFileAndKey(filename, baseDirectory, xmlKey, indexKeyName, indexKey)
+	local xmlFile, foundKey;
+	
+	local xmlFilename = Utils.getFilename(filename, baseDirectory);
+	if xmlFilename ~= nil and fileExists(xmlFilename) then
+		xmlFile = loadXMLFile("TempXML", xmlFilename);
+		foundKey = GlobalCompanyXmlUtils:findXMLKey(xmlFile, xmlKey, indexKeyName, indexKey);
+	end;
+
+	return xmlFile, foundKey;	
+end;
+
+
+
+
+
+

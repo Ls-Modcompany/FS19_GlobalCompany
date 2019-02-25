@@ -242,12 +242,12 @@ function GC_RotationNodes:getCanUpdateRotation()
 	return true;
 end;
 
-function GC_RotationNodes:setRotationNodesState(forceActive)
+function GC_RotationNodes:setRotationNodesState(state, forceState)
 	if self.isClient then
-		if forceActive ~= nil then
-			self.rotationActive = forceActive;
-		else
-			self.rotationActive = not self.rotationActive;
+		local setState = state or (not self.rotationActive);
+		
+		if self.rotationActive ~= setState or forceState == true then
+			self.rotationActive = setState;
 		end;
 
 		self:raiseUpdate();

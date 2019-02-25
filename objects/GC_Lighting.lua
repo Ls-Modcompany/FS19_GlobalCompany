@@ -727,58 +727,46 @@ function GC_Lighting:update(dt)
 	end;
 end;
 
-function GC_Lighting:setAllLightsState(state)
-	if state ~= nil then
-		self.syncedLightState = state;
+function GC_Lighting:setAllLightsState(state, forceState)
+	local setState = state or (not self.syncedLightState);
+		
+	if self.syncedLightState ~= setState or forceState == true then
+		self.syncedLightState = setState;
 
 		if self.beaconLights ~= nil then
-			self:setBeaconLightsState(self.syncedLightState)
+			self:setBeaconLightsState(self.syncedLightState, true)
 		end;
 
 		if self.strobeLights ~= nil then
-			self:setStrobeLightsState(self.syncedLightState)
+			self:setStrobeLightsState(self.syncedLightState, true)
 		end;
 
 		if self.areaLights ~= nil then
-			self:setAreaLightsState(self.syncedLightState);
+			self:setAreaLightsState(self.syncedLightState, true);
 		end;
 	end;
 end;
 
-function GC_Lighting:setLightsState(lightType, forceState)
+function GC_Lighting:setLightsState(lightType, state)
 	if lightType == GC_Lighting.BEACON_LIGHT_TYPE and self.beaconLights ~= nil then
-		if forceState == nil then
-			forceState = not self.beaconLightsActive;
-		end;
-
-		self:setBeaconLightsState(forceState);
+		self:setBeaconLightsState(state);
 	elseif lightType == GC_Lighting.STROBE_LIGHT_TYPE and self.strobeLights ~= nil then
-		if forceState == nil then
-			forceState = not self.beaconLightsActive;
-		end;
-
-		self:setStrobeLightsState(forceState);
+		self:setStrobeLightsState(state);
 	elseif lightType == GC_Lighting.AREA_LIGHT_TYPE and self.areaLights ~= nil then
-		if forceState == nil then
-			forceState = not self.areaLightsActive;
-		end;
-
-		self:setAreaLightsState(forceState);
+		self:setAreaLightsState(state);
 	end;
 end;
 
-function GC_Lighting:setAreaLightsState(state)
+function GC_Lighting:setAreaLightsState(state, forceState)
 	if self.areaLights == nil then
 		return false;
 	end;
 
 	if self.isClient then
-		if state == nil then
-			state = not self.areaLightsActive;
-		end;
-
-		if state ~= self.areaLightsActive then
-			self.areaLightsActive = state;
+		local setState = state or (not self.areaLightsActive);
+		
+		if self.areaLightsActive ~= setState or forceState == true then
+			self.areaLightsActive = setState;
 
 			for _, areaLight in pairs(self.areaLights) do
 				local useRealLights = self:getUseRealLights(GC_Lighting.AREA_LIGHT_TYPE, areaLight);
@@ -810,22 +798,20 @@ function GC_Lighting:setAreaLightsState(state)
 	end;
 end;
 
-function GC_Lighting:setStrobeLightsState(state)
+function GC_Lighting:setStrobeLightsState(state, forceState)
 	if self.strobeLights == nil then
 		return false;
 	end;
 
 	if self.isClient then
-		if state == nil then
-			state = not self.strobeLightsActive;
-		end;
+		local setState = state or (not self.strobeLightsActive);
+		
+		if self.strobeLightsActive ~= setState or forceState == true then
+			self.strobeLightsActive = setState;
 
-		if state ~= self.strobeLightsActive then
 			for _, strobeLight in pairs(self.strobeLights) do
 				strobeLight.realBeaconLights = self:getUseRealLights(GC_Lighting.STROBE_LIGHT_TYPE, strobeLight);
 			end;
-
-			self.strobeLightsActive = state;
 
 			self:raiseUpdate();
 
@@ -836,18 +822,16 @@ function GC_Lighting:setStrobeLightsState(state)
 	end;
 end;
 
-function GC_Lighting:setBeaconLightsState(state)
+function GC_Lighting:setBeaconLightsState(state, forceState)
 	if self.beaconLights == nil then
 		return false;
 	end;
 
 	if self.isClient then
-		if state == nil then
-			state = not self.beaconLightsActive;
-		end;
-
-		if state ~= self.beaconLightsActive then
-			self.beaconLightsActive = state;
+		local setState = state or (not self.beaconLightsActive);
+		
+		if self.beaconLightsActive ~= setState or forceState == true then
+			self.beaconLightsActive = setState;
 
 			for _, beaconLight in pairs(self.beaconLights) do
 				local useRealLights = self:getUseRealLights(GC_Lighting.BEACON_LIGHT_TYPE, beaconLight);
