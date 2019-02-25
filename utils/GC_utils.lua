@@ -69,7 +69,7 @@ function GlobalCompanyUtils.getFileExt(filename)
     local extensionType = nil
 	
 	if filename ~= nil then
-		local splitFilename = Utils.splitString(".", filename)
+		local splitFilename = StringUtil.splitString(".", filename)
 		-- Make sure we only take the final table item in case the file path has '.' in it.
 		extensionType = splitFilename[#splitFilename]
     end
@@ -217,47 +217,24 @@ function GlobalCompanyUtils.getNumbersFromString(xmlFile, key, count, returnRadi
    return stringValue;
 end;
 
+-- Looking for [ PREFIX GC_ or SRS_ ] e.g 'input_GC_OpenDoor' or 'gui_GC_Capacity_Shown' or 'GC_OpenDoor' or 'SRS_OpenDoor' --
 function GlobalCompanyUtils.getHasPrefix(text)
-	local start, _ = string.find(text, "_", 1, true);	
-	if start ~= nil then
-		local prefix = string.sub(text, 1, start - 1);		
-		if prefix == "GC" or prefix == "SRS" then
-			return true;
+	local splitText = Utils.splitString("_", text)
+	if #splitText > 1 then
+		local prefix = splitText[1];
+		if "input" == prefix or "gui" == prefix then
+			prefix = splitText[2];
+			if "GC" == prefix or "SRS" == prefix then
+				return true;
+			end;
+		else
+			if "GC" == prefix or "SRS" == prefix then
+				return true;
+			end;
 		end;
 	end;
 	
 	return false;
 end;
-
--- function GlobalCompanyUtils.getHasPrefix(customPrefix, prefixSplit, returnErrorText)
-	-- local split = prefixSplit or "_";	
-	-- local start, _ = string.find(name, split, 1, true);	
-	-- if start ~= nil then
-		-- local prefix = string.sub(name, 1, start - 1);
-		-- if customPrefix ~= nil then
-			-- if prefix == customPrefix then
-				-- return true;
-			-- else
-				-- local text = "Incorrect prefix '" .. prefix .. "' was found for '%s'! Entries must contain '" .. customPrefix .. "_'."
-				-- return false, text;
-			-- end;
-		-- else
-			-- if prefix == "GC" or prefix == "SRS" then
-				-- return true;
-			-- else
-				-- local text = "Incorrect prefix '" .. prefix .. "' was found for '%s'! Entries must contain 'GC_' for ( GlobalCompany ) mods or 'SRS_' for ( SkiRegionSimulator ) mods."
-				-- return false, text;
-			-- end;
-		-- end;
-	-- else
-		-- local text = "No prefix was found for '%s'! Entries must contain 'GC_' for ( GlobalCompany ) mods or 'SRS_' for ( SkiRegionSimulator ) mods."
-		-- if customPrefix ~= nil then
-			-- text = "No prefix was found for '%s'! Entries must contain '" .. customPrefix .. "_'."
-		-- end;
-		
-		-- return false, text;
-	-- end;
--- end;
-
 
 
