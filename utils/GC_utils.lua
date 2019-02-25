@@ -219,7 +219,7 @@ end;
 
 -- Looking for [ PREFIX GC_ or SRS_ ] e.g 'input_GC_OpenDoor' or 'gui_GC_Capacity_Shown' or 'GC_OpenDoor' or 'SRS_OpenDoor' --
 function GlobalCompanyUtils.getHasPrefix(text)
-	local splitText = Utils.splitString("_", text)
+	local splitText = StringUtil.splitString("_", text)
 	if #splitText > 1 then
 		local prefix = splitText[1];
 		if "input" == prefix or "gui" == prefix then
