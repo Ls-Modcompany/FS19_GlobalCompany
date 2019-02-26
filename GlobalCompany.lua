@@ -31,7 +31,7 @@ GlobalCompany.LOADTYP_XMLFILENAME = 1;
 getfenv(0)["g_company"] = GlobalCompany;
 addModEventListener(GlobalCompany);
 
-source(GlobalCompany.dir .. "Debug.lua"); -- TEMP 'Need to convert all then scripts using this to remove it'
+--source(GlobalCompany.dir .. "Debug.lua"); -- TEMP 'Need to convert all then scripts using this to remove it'
 
 function GlobalCompany.initialLoad()
 	if GlobalCompany.initialLoadComplete ~= nil then
@@ -61,8 +61,7 @@ function GlobalCompany.initialLoad()
 	GlobalCompany.loadSourceFiles();
 	GlobalCompany.loadPlaceables();
 
-
-	local modLanguageFiles = {}; -- Check for language file during this pass and send with 'g_company.languageManager:load(modLanguageFiles)'.
+	local modLanguageFiles = {};
 	local selectedMods = g_modSelectionScreen.missionDynamicInfo.mods;
 	for _, mod in pairs(selectedMods) do
 		local path = nil;
@@ -77,7 +76,6 @@ function GlobalCompany.initialLoad()
 				end;
 			end;
 
-			-- Also find language files now.
 			local langFullPath = g_company.languageManager:getLanguagesFullPath(mod.modDir);
 			if langFullPath ~= nil then
 				modLanguageFiles[modName] = langFullPath;
@@ -106,7 +104,7 @@ function GlobalCompany.initialLoad()
 		end;
 	end;
 
-	g_company.languageManager:load(modLanguageFiles); -- Load language manager.
+	g_company.languageManager:load(modLanguageFiles);
 
 	GlobalCompany.initialLoadComplete = true;
 end;
@@ -169,9 +167,9 @@ function GlobalCompany.loadSourceFiles()
 		return;
 	end;
 
-
 	--|| Utils / Managers ||--
 	source(GlobalCompany.dir .. "utils/GC_utils.lua");
+	source(GlobalCompany.dir .. "utils/GC_mathUtils.lua");
 	source(GlobalCompany.dir .. "utils/GC_xmlUtils.lua");
 	source(GlobalCompany.dir .. "utils/GC_i3dLoader.lua");
 	source(GlobalCompany.dir .. "utils/GC_cameraUtil.lua");
@@ -181,10 +179,8 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "utils/GC_languageManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_densityMapHeight.lua");
 
-
 	--|| Gui ||--
 	source(GlobalCompany.dir .. "GlobalCompanyGui.lua");
-
 
 	--|| Objects ||--
 	source(GlobalCompany.dir .. "objects/GC_Sounds.lua");
@@ -199,17 +195,15 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_RotationNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
 	source(GlobalCompany.dir .. "objects/GC_ActivableObject.lua");
-	source(GlobalCompany.dir .. "objects/GC_ParticleEffects.lua"); -- Replaced with 'GC_Effects'!! Need to remove if all scripts using this are corrected.
+	--source(GlobalCompany.dir .. "objects/GC_ParticleEffects.lua"); -- Replaced with 'GC_Effects'!! Need to remove if all scripts using this are corrected.
 	source(GlobalCompany.dir .. "objects/GC_VisibilityNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
-
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_PlayerTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_UnloadingTrigger.lua");
-	
-	
+		
 	--|| Placeables ||--
 	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");	
 end;
@@ -231,10 +225,8 @@ function GlobalCompany:init()
 end;
 
 function GlobalCompany:loadMap()
-	-- Load Debug console commands.
 	g_company.debug:loadConsoleCommands();
 
-	-- Load parameters from environments table.
 	for modName, e in pairs(GlobalCompany.environments) do
 		for name, v in pairs(GlobalCompany.loadParameters) do
 			if v.typ == GlobalCompany.LOADTYP_XMLFILENAME then
@@ -257,7 +249,6 @@ function GlobalCompany:loadMap()
 		delete(e.xmlFile);
 	end;
 
-	-- Update loadables
 	for _,loadable in pairs(GlobalCompany.loadables) do
 		loadable.loadF(loadable.target);
 	end;
@@ -300,16 +291,15 @@ function GlobalCompany:getLoadParameterEnvironment(name)
 end;
 
 function GlobalCompany:addPlaceableType(name, className, filename)	
-	--[[ @kevink98 - I think we should force all GlobalCompany Placeables to use a 'PREFIX' (GC_ or SRS_) so that it is clear these are not GIANTS Placeables??
+	--[[ @kevink98 - I think we should force all GlobalCompany Placeables to use a 'PREFIX' (GC_ or SRS_) so that it is clear these are not GIANTS Placeables?? ]]--
 	if g_company.utils.getHasPrefix(name) then
 		g_placeableTypeManager.placeableTypes[name] = {name=name, className=className, filename=filename};
 	else
 		print(string.format("  [LSMC - GlobalCompany] - ERROR: Failed to add placeable type using name '%s'! Incorrect or No prefix found.", name));
 		print("    Use prefix 'GC_' for ( GlobalCompany ) placeable mods.", "    Use prefix 'SRS_' for ( SkiRegionSimulator ) placeable mods.");
 	end;	
-	]]--
 	
-	g_placeableTypeManager.placeableTypes[name] = {name=name, className=className, filename=filename};
+	--g_placeableTypeManager.placeableTypes[name] = {name=name, className=className, filename=filename};
 end;
 
 GlobalCompany.initialLoad();
