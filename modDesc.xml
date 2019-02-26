@@ -6,8 +6,8 @@
         <en>GlobalCompany</en>
     </title>
     <description>
-        <de><![CDATA[123]]></de>
-		<en><![CDATA[123]]></en>
+        <de><![CDATA[GlobalCompany]]></de>
+		<en><![CDATA[GlobalCompany]]></en>
 
     </description>
     <iconFilename>globalCompany.dds</iconFilename>
@@ -15,18 +15,20 @@
 	<extraSourceFiles>	
 		<sourceFile filename="GlobalCompany.lua" /> 
 	</extraSourceFiles>
+
+    <l10n>		
+		<text name="input_GC_BALESHREADER_TURNON_AREALIGHTS"><en>turnAreaLights</en></text>
+	</l10n>		
 	
-	<l10n>		
-		<text name="input_SHOW_FARMSHOP"><en>Open farmshop</en><de>Farmshop öffnen</de></text>
-		<text name="input_FARMSHOPPALLET_CHANGESTATE"><en>Ls-Modcompany GC</en></text>
-		<text name="input_FARMSHOPPALLET_BUILDPALLET"><en>Ls-Modcompany GC</en></text>
-		<text name="input_FARMSHOPPALLET_BUILDPALLET2"><en>Ls-Modcompany GC</en></text>
-	</l10n>	
-	
-	<inputBindings>
-        <input name="SHOW_FARMSHOP" category="ONFOOT" key1="KEY_r" key2="" button="" device="" mouse=""/>
-        <input name="FARMSHOPPALLET_CHANGESTATE" category="ONFOOT" key1="KEY_t" key2="" button="" device="" mouse=""/>
-        <input name="FARMSHOPPALLET_BUILDPALLET" category="ONFOOT" key1="KEY_y" key2="" button="" device="" mouse=""/>
-        <input name="FARMSHOPPALLET_BUILDPALLET2" category="ONFOOT" key1="KEY_u" key2="" button="" device="" mouse=""/>
-    </inputBindings>
+	<actions>
+        <action name="GC_BALESHREADER_TURNON_AREALIGHTS" />
+    </actions>
+
+    <inputBinding>
+        <actionBinding action="GC_BALESHREADER_TURNON_AREALIGHTS">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_f" axisComponent="+" neutralInput="0" index="1"/>
+            <binding device="0_XINPUT_GAMEPAD" input="BUTTON_6 BUTTON_3" axisComponent="+" neutralInput="0" index="1"/>
+        </actionBinding>   
+    </inputBinding>
+
 </modDesc>
