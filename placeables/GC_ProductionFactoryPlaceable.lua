@@ -94,6 +94,8 @@ function GC_ProductionFactoryPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRa
 						g_company.debug:writeError(self.debugData, "Can not load factory '%s' from XML file '%s'!", indexName, filenameToUse);
 						break;
 					end;
+				else
+					g_company.debug:writeError(self.debugData, "Can not load factory. 'indexName' is missing. From XML file '%s'!", filenameToUse);
 				end;
 
 				i = i + 1;
