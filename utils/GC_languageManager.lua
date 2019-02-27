@@ -44,9 +44,10 @@ function GC_languageManager:load(modLanguageFiles)
 	local fullPathCount = 0;
 	for modName, fullPath in pairs(modLanguageFiles) do
 		local langXml = loadXMLFile("TempConfig", fullPath);
-		g_i18n:loadEntriesFromXML(langXml, "l10n.elements.e(%d)", "Warning: Duplicate text in l10n %s",  g_i18n.texts);
+		--g_i18n:loadEntriesFromXML(langXml, "l10n.elements.e(%d)", "Warning: Duplicate text in l10n %s",  g_i18n.texts);
 		
 		
+		GC_languageManager:loadEntries(modName, fullPath, "l10n.elements.e(%d)")
 		
 		--[[@kevink98 - I think we should force all GlobalCompany l10n entries to use a 'PREFIX' (GC_ or SRS_) so we do not have any issues??
 			-- e.g  <e k="GC_gui_buttons_ok" v="OK"/>  or <e k="GC_activateBeacons" v="Turn Beacon Light On"/>
