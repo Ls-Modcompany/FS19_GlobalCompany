@@ -22,7 +22,7 @@
 -- ToDo:
 -- 
 
-local debugIndex = g_debug.registerMod("GlobalCompany-GC_specializations");
+local debugIndex = gc_debug.registerMod("GlobalCompany-GC_specializations");
 
 GC_specializations = {};
 g_company.specializations = GC_specializations;
@@ -86,10 +86,10 @@ function GC_specializations:load()
 					end;
 				end;
 			else
-				g_debug.write(debugIndex, g_debug.ERROR, "[%s] at %s missing required function 'registerEventListeners'!  Specialization cannot be added to vehicles.", s.className, s.filename);
+				--gc_debug.write(debugIndex, gc_debug.ERROR, "[%s] at %s missing required function 'registerEventListeners'!  Specialization cannot be added to vehicles.", s.className, s.filename);
 			end;
 		else
-			g_debug.write(debugIndex, g_debug.ERROR, "[%s] at %s missing required function 'prerequisitesPresent'!  Specialization cannot be added to vehicles.", s.className, s.filename);
+			--gc_debug.write(debugIndex, gc_debug.ERROR, "[%s] at %s missing required function 'prerequisitesPresent'!  Specialization cannot be added to vehicles.", s.className, s.filename);
 		end;
 	end;
 end;

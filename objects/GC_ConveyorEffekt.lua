@@ -23,7 +23,7 @@
 -- check if scripts work in fs19!
 --
 
-local debugIndex = g_debug.registerMod("GlobalCompany-GC_ConveyorEffekt");
+local debugIndex = gc_debug.registerMod("GlobalCompany-GC_ConveyorEffekt");
 
 GC_ConveyorEffekt = {};
 getfenv(0)["GC_ConveyorEffekt"] = GC_ConveyorEffekt;

@@ -19,7 +19,7 @@
 -- ToDo:
 -- sortCategories: type not used in script
 -- 
-local debugIndex = g_debug.registerMod("GlobalCompany-GC_i3dLoader");
+local debugIndex = gc_debug.registerMod("GlobalCompany-GC_i3dLoader");
 
 GC_shopManager = {};
 g_company.shopManager = GC_shopManager;

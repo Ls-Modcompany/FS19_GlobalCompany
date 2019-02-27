@@ -19,7 +19,7 @@
 -- ToDo:
 --      -- add possibility to add cameras with trans and rot values (no link to cameraobject)
 -- 
-local debugIndex = g_debug.registerMod("GlobalCompany-GC_cameraUtil");
+local debugIndex = gc_debug.registerMod("GlobalCompany-GC_cameraUtil");
 
 GC_cameraUtil = {};
 g_company.cameraUtil = GC_cameraUtil;
