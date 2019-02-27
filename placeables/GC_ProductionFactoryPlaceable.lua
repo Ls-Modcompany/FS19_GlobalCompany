@@ -15,7 +15,7 @@
 --		- Add GC Placeable registration method instead of script specific.
 --
 -- 	v1.0.0.0 (06.02.2019):
--- 		- initial fs19 (GtX)
+-- 		- initial fs19 (GtX / kevink98)
 --
 --
 -- Notes:
@@ -105,6 +105,8 @@ function GC_ProductionFactoryPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRa
 		end;
 
 		delete(xmlFile);
+	else
+		g_company.debug:writeError(self.debugData, "Cannot load placeable type [GC_ProductionFactoryPlaceable]! Unable to load XML file '%s'.", filenameToUse);
 	end;
 
 	return canLoad;
@@ -172,14 +174,14 @@ function GC_ProductionFactoryPlaceable:loadFromXMLFile(xmlFile, key, resetVehicl
 		end;
 
 		local index = getXMLInt(xmlFile, factoryKey .. "#index");
-		local indexName = Utils.getNoNil(getXMLString(xmlFile, factoryKey .. "#indexName"), "NAME ERROR");
+		local indexName = Utils.getNoNil(getXMLString(xmlFile, factoryKey .. "#indexName"), "");
 		if index ~= nil then
 			if self.productionFactories[index] ~= nil then
 				if not self.productionFactories[index]:loadFromXMLFile(xmlFile, factoryKey) then
 					return false;
 				end;
 			else
-				g_company.debug:writeWarning(self.debugData, "Could not load bunkersilo. Given 'index' '%d' for '%s' is not defined!", index, indexName);
+				g_company.debug:writeWarning(self.debugData, "Could not load productionFactory '%s'. Given 'index' '%d' is not defined!", indexName, index);
 			end;
 		end;
 		
