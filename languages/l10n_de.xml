@@ -2,9 +2,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <l10n><elements>
 
-<e k="gui_buttons_ok" v="OK"/>
-<e k="gui_buttons_yes" v="Ja"/>
-<e k="gui_buttons_no" v="Nein"/>
+<e k="GC_gui_buttons_ok" v="OK"/>
+<e k="GC_gui_buttons_yes" v="Ja"/>
+<e k="GC_gui_buttons_no" v="Nein"/>
+
+<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
+
+<!-- BaleShreader -->
+<e k="GC_baleShreader_openSteer" v="Steuerung öffnen"/>
+<e k="GC_baleShreader_closeSteer" v="Steuerung schließen"/>
+<e k="GC_baleShreader_startWork" v="Ballenschredder starten"/>
+<e k="GC_baleShreader_endWork" v="Ballenschredder stoppen"/>
+<e k="GC_baleShreader_toggleOnWorkLight" v="Arbeitslicht anschalten"/>
+<e k="GC_baleShreader_toggleOffWorkLight" v="Arbeitslicht ausschalten"/>
 
 
 </elements></l10n>

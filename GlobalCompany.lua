@@ -198,6 +198,7 @@ function GlobalCompany.loadSourceFiles()
 	--source(GlobalCompany.dir .. "objects/GC_ParticleEffects.lua"); -- Replaced with 'GC_Effects'!! Need to remove if all scripts using this are corrected.
 	source(GlobalCompany.dir .. "objects/GC_VisibilityNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
+	source(GlobalCompany.dir .. "objects/GC_BaleShreader.lua");
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
@@ -206,6 +207,7 @@ function GlobalCompany.loadSourceFiles()
 		
 	--|| Placeables ||--
 	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");	
+	source(GlobalCompany.dir .. "placeables/GC_BaleShreaderPlaceable.lua");	
 end;
 
 --| Add Base GC Placeables |--
@@ -215,6 +217,7 @@ function GlobalCompany.loadPlaceables()
 	end;
 	
 	GlobalCompany:addPlaceableType("GC_ProductionFactoryPlaceable", "GC_ProductionFactoryPlaceable", GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");
+	GlobalCompany:addPlaceableType("GC_BaleShreaderPlaceable", "GC_BaleShreaderPlaceable", GlobalCompany.dir .. "placeables/GC_BaleShreaderPlaceable.lua");
 end;
 
 --| Main |--
