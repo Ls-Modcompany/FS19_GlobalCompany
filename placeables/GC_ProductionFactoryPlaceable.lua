@@ -15,7 +15,7 @@
 --		- Add GC Placeable registration method instead of script specific.
 --
 -- 	v1.0.0.0 (06.02.2019):
--- 		- initial fs19 (GtX)
+-- 		- initial fs19 (GtX / kevink98)
 --
 --
 -- Notes:
