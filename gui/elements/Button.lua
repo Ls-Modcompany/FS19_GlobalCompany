@@ -8,7 +8,7 @@
 -- 
 -- @Support: LS-Modcompany
 -- 
-local debugIndex = g_debug.registerMod("GlobalCompany-Gui-Button");
+local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui-Button");
 
 GC_Gui_button = {};
 

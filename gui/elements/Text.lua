@@ -8,7 +8,7 @@
 -- 
 -- @Support: LS-Modcompany
 -- 
-local debugIndex = g_debug.registerMod("GlobalCompany-Gui-Text");
+local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui-Text");
 
 GC_Gui_text = {};
 local GC_Gui_text_mt = Class(GC_Gui_text, GC_Gui_element);

@@ -20,7 +20,7 @@
 -- 	delete i3d node after loading?
 -- 
 
-local debugIndex = gc_debug.registerMod("GlobalCompany-GC_i3dLoader");
+local debugIndex = g_company.debug:registerScriptName("GlobalCompany-GC_i3dLoader");
 
 GC_i3dLoader = {};
 g_company.i3dLoader = GC_i3dLoader;

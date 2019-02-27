@@ -8,7 +8,7 @@
 -- 
 -- @Support: LS-Modcompany
 -- 
-local debugIndex = g_debug.registerMod("GlobalCompany-Gui-Borders");
+local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui-Borders");
 
 GC_Gui_borders = {};
 local GC_Gui_borders_mt = Class(GC_Gui_borders, GC_Gui_element);

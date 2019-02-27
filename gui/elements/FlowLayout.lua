@@ -8,7 +8,7 @@
 -- 
 -- @Support: LS-Modcompany
 -- 
-local debugIndex = g_debug.registerMod("GlobalCompany-Gui-Text");
+local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui-FlowLayout");
 
 GC_Gui_flowLayout = {};
 

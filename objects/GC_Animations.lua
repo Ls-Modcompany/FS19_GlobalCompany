@@ -32,7 +32,7 @@
 --source(g_company.dir.."events/SetGcAnimationsEvent.lua");
 
 GC_Animations = {};
-getfenv(0)["GC_Animations"] = GC_Animations;
+g_company.animations = GC_Animations;
 
 GC_Animations_mt = Class(GC_Animations, Object);
 InitObjectClass(GC_Animations, "GC_Animations");

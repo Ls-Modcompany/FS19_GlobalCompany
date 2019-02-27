@@ -25,7 +25,7 @@
 --
 
 
-local debugIndex = g_debug.registerMod("GlobalCompany-DynamicHeap");
+local debugIndex = g_company.debug:registerScriptName("GlobalCompany-DynamicHeap");
 
 GC_DynamicHeap = {};
 

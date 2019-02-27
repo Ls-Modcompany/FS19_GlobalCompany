@@ -8,7 +8,7 @@
 -- 
 -- @Support: LS-Modcompany
 -- 
-local debugIndex = g_debug.registerMod("GlobalCompany-Gui-Table");
+local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui-Table");
 
 GC_Gui_table = {};
 local GC_Gui_table_mt = Class(GC_Gui_table, GC_Gui_element);

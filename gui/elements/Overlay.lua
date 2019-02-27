@@ -8,7 +8,7 @@
 -- 
 -- @Support: LS-Modcompany
 -- 
-local debugIndex = g_debug.registerMod("GlobalCompany-Gui-Overlay");
+local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui-Overlay");
 
 GC_Gui_overlay = {};
 local GC_Gui_overlay_mt = Class(GC_Gui_overlay, GC_Gui_element);
