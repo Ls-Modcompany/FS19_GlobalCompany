@@ -123,7 +123,7 @@ function GC_UnloadingTrigger:load(nodeId, target, xmlFile, xmlKey, forcedFillTyp
 			
 			if fillTypes ~= nil then
 				for _, fillTypeInt in pairs(fillTypes) do
-					self:setAcceptedFillTypeState(fillTypeInt, state)
+					self:setAcceptedFillTypeState(fillTypeInt, true)
 				end;
 			end;
 			
@@ -312,7 +312,7 @@ function GC_UnloadingTrigger:setAcceptedFillTypeState(fillTypeInt, state)
 		self.fillTypes = {};
 	end;
 	
-	self.fillTypes[fillTypeInt] = true;
+	self.fillTypes[fillTypeInt] = state;
 end;
 
 function GC_UnloadingTrigger:setCustomDischargeNotAllowedWarning(text)
