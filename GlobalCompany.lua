@@ -194,6 +194,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_DynamicHeap.lua");
 	source(GlobalCompany.dir .. "objects/GC_RotationNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
+	source(GlobalCompany.dir .. "objects/GC_DigitalDisplays.lua");
 	source(GlobalCompany.dir .. "objects/GC_ActivableObject.lua");
 	--source(GlobalCompany.dir .. "objects/GC_ParticleEffects.lua"); -- Replaced with 'GC_Effects'!! Need to remove if all scripts using this are corrected.
 	source(GlobalCompany.dir .. "objects/GC_VisibilityNodes.lua");
