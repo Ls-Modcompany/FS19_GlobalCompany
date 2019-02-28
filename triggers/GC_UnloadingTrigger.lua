@@ -53,6 +53,8 @@ function GC_UnloadingTrigger:new(isServer, isClient, customMt)
 	
 	self.isEnabled = true;
 	self.extraParamater = nil;
+
+	self.onlyUpdateOneBale = false;
 	
     return self;
 end;
@@ -198,10 +200,13 @@ function GC_UnloadingTrigger:updateBales(dt)
 					if fillLevelDelta > 0 then
 						self.target:addFillLevel(bale:getOwnerFarmId(), fillLevelDelta, fillTypeIndex, ToolType.BALE, fillPositionData, self.extraParamater);				
 						bale:setFillLevel(fillLevel - fillLevelDelta);
-						local newFillLevel = bale:getFillLevel();
+						local newFillLevel = bale:getFillLevel();			
 						if newFillLevel < 0.01 then
 							bale:delete();
 							table.remove(self.balesInTrigger, index);
+							break;
+						end;
+						if self.onlyUpdateOneBale then
 							break;
 						end;
 					end;
