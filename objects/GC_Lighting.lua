@@ -248,7 +248,7 @@ function GC_Lighting:loadAreaLights(xmlFile, xmlKey, areaKey, loadedXmlFiles)
 									end;
 
 									-- Load 'realLights' that are part of the main.i3d
-									local realLightNode = I3DUtil.indexToObject(self.components, getXMLString(xmlFile, key .. "#realLightNode"), self.target.i3dMappings);
+									local realLightNode = I3DUtil.indexToObject(self.rootNode, getXMLString(xmlFile, key .. "#realLightNode"), self.target.i3dMappings);
 									if realLightNode ~= nil then
 										light.defaultColor = {getLightColor(realLightNode)};
 										setVisibility(realLightNode, false);
@@ -449,7 +449,7 @@ function GC_Lighting:loadStrobeLights(xmlFile, xmlKey, strobeKey, loadedXmlFiles
 									end;
 
 									-- Load 'realLights' that are part of the main.i3d
-									local realLightNode = I3DUtil.indexToObject(self.components, getXMLString(xmlFile, key .. "#realLightNode"), self.target.i3dMappings);
+									local realLightNode = I3DUtil.indexToObject(self.rootNode, getXMLString(xmlFile, key .. "#realLightNode"), self.target.i3dMappings);
 									if realLightNode ~= nil then
 										light.defaultColor = {getLightColor(realLightNode)};
 										setVisibility(realLightNode, false);
