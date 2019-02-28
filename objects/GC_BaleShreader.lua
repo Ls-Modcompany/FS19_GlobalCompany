@@ -126,6 +126,41 @@ function BaleShreader:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	self.playerTrigger = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.nodeId , xmlFile, string.format("%s.playerTrigger", xmlKey), nil, true);
 	self.playerTrigger:setActivateText(g_company.languageManager:getText("GC_baleShreader_openSteer"));
 
+
+
+
+	local fillTypesKey = string.format("%s.fillTypes", xmlKey);
+	if not hasXMLProperty(xmlFile, fillTypesKey) then
+		--debug
+		return false;
+	end;
+
+	self.baleFillTypes = {};
+	local i = 0;
+	while true do
+		local fillTypeKey = string.format("%s.fillType(%d)", fillTypesKey, i);
+		if not hasXMLProperty(xmlFile, fillTypeKey) then
+			break;
+		end;
+
+		local fillTypeName = getXMLString(xmlFile, fillTypeKey .. "#name");
+		print(fillTypeName)
+		if fillTypeName ~= nil then
+			local fillType = g_fillTypeManager:getFillTypeByName(fillTypeName);
+			if fillType ~= nil then
+				table.insert(self.baleFillTypes, fillType.index)		
+			else
+				if fillType == nil then
+					g_company.debug:writeModding(self.debugData, "[BALESHREADER - %s] Unknown fillType ( %s ) found", indexName, fillTypeName);
+				end;
+			end;
+		end;
+		i = i + 1;
+	end;
+	self.baleTrigger = self.triggerManager:loadTrigger(GC_UnloadingTrigger, self.nodeId , xmlFile, string.format("%s.baleTrigger", xmlKey), self.baleFillTypes, {[1] = "BALE"});
+	self.baleTrigger.onlyUpdateOneBale = true;
+	self.baleTrigger.baleDeleteLitersPerMS = 0;
+
 	self.BaleShreaderDirtyFlag = self:getNextDirtyFlag();
 
 	return true;
@@ -219,4 +254,13 @@ function BaleShreader:onActivableObject(reference)
 	elseif reference == BaleShreader.WORKING_LIGHT then   
 		self.workLight:setAllLightsState();     
     end;
+end
+
+function BaleShreader:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, toolType, fillPositionData, triggerId)
+	print("addFillLevel")
+	print(fillLevelDelta)
+end;
+
+function BaleShreader:getFreeCapacity()
+	return 100000;	
 end
