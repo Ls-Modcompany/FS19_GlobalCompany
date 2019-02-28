@@ -37,9 +37,10 @@ InitObjectClass(GC_Lighting, "GC_Lighting");
 
 GC_Lighting.debugIndex = g_company.debug:registerScriptName("Lighting");
 
-GC_Lighting.BEACON_LIGHT_TYPE = 1;
-GC_Lighting.STROBE_LIGHT_TYPE = 2;
-GC_Lighting.AREA_LIGHT_TYPE = 3;
+GC_Lighting.TYPES = {};
+GC_Lighting.TYPES["BEACON"] = 1;
+GC_Lighting.TYPES["STROBE"] = 2;
+GC_Lighting.TYPES["AREA"] = 3;
 
 g_company.lighting = GC_Lighting;
 
@@ -53,7 +54,7 @@ function GC_Lighting:new(isServer, isClient, customMt)
 	return self;
 end
 
-function GC_Lighting:load(nodeId, target, xmlFile, xmlKey, baseDirectory, allowProfileOverride, noBeacon, noStrobe, noArea)
+function GC_Lighting:load(nodeId, target, xmlFile, xmlKey, baseDirectory, allowProfileOverride, beaconKey, strobeKey, areaKey, noBeacon, noStrobe, noArea)
 	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
 		local text = "Loading failed! 'nodeId' paramater = %s, 'target' paramater = %s 'xmlFile' paramater = %s, 'xmlKey' paramater = %s";
 		g_company.debug:logWrite(GC_Lighting.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil);
@@ -84,20 +85,32 @@ function GC_Lighting:load(nodeId, target, xmlFile, xmlKey, baseDirectory, allowP
 
 		-- Beacon Lights --
 		if noBeacon ~= true then
-			self.beaconLights = self:loadBeaconLights(xmlFile, xmlKey, loadedXmlFiles);
+			if beaconKey == nil then
+				beaconKey = "beaconLights.beaconLight";
+			end;
+
+			self.beaconLights = self:loadBeaconLights(xmlFile, xmlKey, beaconKey, loadedXmlFiles);
 			self.beaconLightsActive = false;
 		end;
 
 		-- Strobe Lights --
 		if noStrobe ~= true then
-			self.strobeLights = self:loadStrobeLights(xmlFile, xmlKey, loadedXmlFiles);
+			if strobeKey == nil then
+				strobeKey = "strobeLights.strobeLight";
+			end;
+		
+			self.strobeLights = self:loadStrobeLights(xmlFile, xmlKey, strobeKey, loadedXmlFiles);
 			self.strobeLightsActive = false;
 			self.strobeLightsReset = false;
 		end;
 
 		-- Area Lights (Work / Operating Lights) --
 		if noArea ~= true then
-			self.areaLights = self:loadAreaLights(xmlFile, xmlKey, loadedXmlFiles);
+			if areaKey == nil then
+				areaKey = "areaLights.areaLight";
+			end;
+
+			self.areaLights = self:loadAreaLights(xmlFile, xmlKey, areaKey, loadedXmlFiles);
 			self.areaLightsActive = false;
 		end;
 
@@ -150,12 +163,12 @@ function GC_Lighting:delete()
 	end;
 end;
 
-function GC_Lighting:loadAreaLights(xmlFile, xmlKey, loadedXmlFiles)
+function GC_Lighting:loadAreaLights(xmlFile, xmlKey, areaKey, loadedXmlFiles)
 	local areaLights;
 
 	local i = 0;
 	while true do
-		local key = string.format("%s.areaLights.areaLight(%d)", xmlKey, i);
+		local key = string.format("%s.%s(%d)", xmlKey, areaKey, i);
 		if not hasXMLProperty(xmlFile, key) then
 			break;
 		end;
@@ -329,12 +342,12 @@ function GC_Lighting:loadAreaLights(xmlFile, xmlKey, loadedXmlFiles)
 	return areaLights;
 end;
 
-function GC_Lighting:loadStrobeLights(xmlFile, xmlKey, loadedXmlFiles)
+function GC_Lighting:loadStrobeLights(xmlFile, xmlKey, strobeKey, loadedXmlFiles)
 	local strobeLights;
 
 	local i = 0;
 	while true do
-		local key = string.format("%s.strobeLights.strobeLight(%d)", xmlKey, i);
+		local key = string.format("%s.%s(%d)", xmlKey, strobeKey, i);
 		if not hasXMLProperty(xmlFile, key) then
 			break;
 		end;
@@ -501,12 +514,12 @@ function GC_Lighting:loadStrobeLights(xmlFile, xmlKey, loadedXmlFiles)
 	return strobeLights;
 end;
 
-function GC_Lighting:loadBeaconLights(xmlFile, xmlKey, loadedXmlFiles)
+function GC_Lighting:loadBeaconLights(xmlFile, xmlKey, beaconKey, loadedXmlFiles)
 	local beaconLights;
 
 	local i = 0;
 	while true do
-		local key = string.format("%s.beaconLights.beaconLight(%d)", xmlKey, i);
+		local key = string.format("%s.%s(%d)", xmlKey, beaconKey, i);
 		if not hasXMLProperty(xmlFile, key) then
 			break;
 		end;
@@ -747,13 +760,25 @@ function GC_Lighting:setAllLightsState(state, forceState)
 	end;
 end;
 
-function GC_Lighting:setLightsState(lightType, state)
-	if lightType == GC_Lighting.BEACON_LIGHT_TYPE and self.beaconLights ~= nil then
-		self:setBeaconLightsState(state);
-	elseif lightType == GC_Lighting.STROBE_LIGHT_TYPE and self.strobeLights ~= nil then
-		self:setStrobeLightsState(state);
-	elseif lightType == GC_Lighting.AREA_LIGHT_TYPE and self.areaLights ~= nil then
-		self:setAreaLightsState(state);
+-- This function can be used to send Event to all clients if using the light with a switch etc.
+-- lightType = "BEACON" or "STROBE" or AREA".
+function GC_Lighting:setLightsState(lightType, state, noEventSend)
+	local lightTypeId = lightType;
+	if type(lightType) == "string" then
+		local lightTypeName = lightType:upper();
+		lightTypeId = GC_Lighting.TYPES[lightTypeName];
+	end;
+	
+	if lightTypeId ~= nil and state ~= nil then	
+		--GC_LightingEvent.sendEvent(self, lightTypeId, state, noEventSend); -- Will be added when MP works are started.
+	
+		if lightTypeId == 1 and self.beaconLights ~= nil then
+			self:setBeaconLightsState(state);
+		elseif lightTypeId == 2 and self.strobeLights ~= nil then
+			self:setStrobeLightsState(state);
+		elseif lightTypeId == 3 and self.areaLights ~= nil then
+			self:setAreaLightsState(state);
+		end;
 	end;
 end;
 
@@ -769,20 +794,20 @@ function GC_Lighting:setAreaLightsState(state, forceState)
 			self.areaLightsActive = setState;
 
 			for _, areaLight in pairs(self.areaLights) do
-				local useRealLights = self:getUseRealLights(GC_Lighting.AREA_LIGHT_TYPE, areaLight);
+				local useRealLights = self:getUseRealLights(GC_Lighting.TYPES.AREA, areaLight);
 
 				if useRealLights and areaLight.realLightNode ~= nil then
-					setVisibility(areaLight.realLightNode, state);
+					setVisibility(areaLight.realLightNode, setState);
 				end;
 
 				if areaLight.lightNode ~= nil then
-					setVisibility(areaLight.lightNode, state);
+					setVisibility(areaLight.lightNode, setState);
 				end;
 
 				if areaLight.lightShaderNode ~= nil then
 					local value = 1 * areaLight.intensity;
 
-					if not state then
+					if not setState then
 						value = 0;
 					end;
 
@@ -791,7 +816,7 @@ function GC_Lighting:setAreaLightsState(state, forceState)
 				end;
 			end;
 
-			return state;
+			return setState;
 		end;
 	else
 		g_company.debug:writeDev(self.debugData, "'setAreaLightsState' is a client only function!");
@@ -810,12 +835,12 @@ function GC_Lighting:setStrobeLightsState(state, forceState)
 			self.strobeLightsActive = setState;
 
 			for _, strobeLight in pairs(self.strobeLights) do
-				strobeLight.realBeaconLights = self:getUseRealLights(GC_Lighting.STROBE_LIGHT_TYPE, strobeLight);
+				strobeLight.realBeaconLights = self:getUseRealLights(GC_Lighting.TYPES.STROBE, strobeLight);
 			end;
 
 			self:raiseUpdate();
 
-			return state;
+			return setState;
 		end
 	else
 		g_company.debug:writeDev(self.debugData, "'setStrobeLightsState' is a client only function!");
@@ -834,20 +859,20 @@ function GC_Lighting:setBeaconLightsState(state, forceState)
 			self.beaconLightsActive = setState;
 
 			for _, beaconLight in pairs(self.beaconLights) do
-				local useRealLights = self:getUseRealLights(GC_Lighting.BEACON_LIGHT_TYPE, beaconLight);
+				local useRealLights = self:getUseRealLights(GC_Lighting.TYPES.BEACON, beaconLight);
 
 				if useRealLights and beaconLight.realLightNode ~= nil then
-					setVisibility(beaconLight.realLightNode, state);
+					setVisibility(beaconLight.realLightNode, setState);
 				end;
 
 				if beaconLight.lightNode ~= nil then
-					setVisibility(beaconLight.lightNode, state);
+					setVisibility(beaconLight.lightNode, setState);
 				end;
 
 				if beaconLight.lightShaderNode ~= nil then
 					local value = 1 * beaconLight.intensity;
 
-					if not state then
+					if not setState then
 						value = 0;
 					end;
 
@@ -858,7 +883,7 @@ function GC_Lighting:setBeaconLightsState(state, forceState)
 
 			self:raiseUpdate();
 
-			return state;
+			return setState;
 		end
 	else
 		g_company.debug:writeDev(self.debugData, "'setBeaconLightsState' is a client only function!");
@@ -881,18 +906,28 @@ function GC_Lighting:getSyncedLightState()
 	return self.syncedLightState;
 end;
 
-function GC_Lighting:getUseRealLights(lightType, light)
+function GC_Lighting:getStateById(typeId)
+	if typeId == 1 then
+		return self.beaconLightsActive;
+	elseif typeId == 2 then
+		return self.strobeLightsActive;
+	elseif typeId == 3 then
+		return self.areaLightsActive;
+	end;
+end;
+
+function GC_Lighting:getUseRealLights(lightTypeName, light)
 	if light ~= nil then
 		if light.ignoreGameLightSettings == true then
 			return true;
 		end;
 	end;
 
-	if lightType == GC_Lighting.BEACON_LIGHT_TYPE or GC_Lighting.STROBE_LIGHT_TYPE then
+	if lightType == GC_Lighting.TYPES.BEACON or GC_Lighting.TYPES.STROBE then
 		return g_gameSettings:getValue("realBeaconLights");
 	end;
 
-	if lightType == GC_Lighting.AREA_LIGHT_TYPE then
+	if lightType == GC_Lighting.TYPES.AREA then
 		local lightsProfile = g_gameSettings:getValue("lightsProfile");
 		return lightsProfile == GS_PROFILE_HIGH or lightsProfile == GS_PROFILE_VERY_HIGH;
 	end;
