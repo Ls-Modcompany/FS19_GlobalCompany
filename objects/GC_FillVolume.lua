@@ -14,7 +14,7 @@
 -- 		- convert to fs19
 --
 -- 	v1.0.0.0 (??.??.2018):
--- 		- initial fs17
+-- 		- initial fs17(kevink98)
 --
 -- Notes:
 --
@@ -48,7 +48,7 @@ end;
 
 function GC_FillVolume:load(nodeId, target, xmlFile, xmlKey, capacity, forceCapacity, defaultFillType)
 	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil or capacity == nil then
-		local text = "Loading failed! 'nodeId' paramater = %s, 'target' paramater = %s 'xmlFile' paramater = %s, 'xmlKey' paramater = %s, 'capacity' paramater = %s";
+		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s, 'capacity' parameter = %s";
 		g_company.debug:logWrite(GC_FillVolume.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil, capacity ~= nil);
 		return false;
 	end;
@@ -161,14 +161,18 @@ function GC_FillVolume:setFillType(fillTypeIndex, volume)
 end;
 
 function GC_FillVolume:addFillLevel(fillLevel, volume)
-	local deltaTable = {};
+	local deltaTable;
 
 	if self.isClient then
 		if volume ~= nil then
-			deltaTable[1] = self:addFillLevelVolume(fillLevel, volume); -- Faster than 'table.insert' for single item.
+			local delta = self:addFillLevelVolume(fillLevel, volume);
+			deltaTable = {delta};
 		else
-			for _, volume in pairs(self.fillVolumes) do
-				table.insert(deltaTable, self:addFillLevelVolume(fillLevel, volume));
+			deltaTable = {};
+			for i = 1, #self.fillVolumes do
+				local fillVolume = self.fillVolumes[i];
+				local delta = self:addFillLevelVolume(fillLevel, fillVolume);
+				deltaTable[i] = delta;
 			end;
 		end;
 	else

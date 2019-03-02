@@ -41,6 +41,8 @@ function GC_VisibilityNodes:new(isServer, isClient, customMt)
 
 	self.isServer = isServer;
 	self.isClient = isClient;
+	
+	self.visNodes = nil;
 
 	return self;
 end;
@@ -57,9 +59,9 @@ end;
 -- @param table capacities = [disableFillType = false / nil] - All fillType capacities of parent. Table structure = (key = fillTypeIndex, variable = capacity).
 -- @param boolan disableFillType = If 'true' fillTypeIndexing will be ignored.
 -- @return instance loaded correctly.
-function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capacities, disableFillType)	
+function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capacities, disableFillType)
 	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil or capacities == nil then
-		local text = "Loading failed! 'nodeId' paramater = %s, 'target' paramater = %s 'xmlFile' paramater = %s, 'xmlKey' paramater = %s, 'capacities' paramater = %s";
+		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s, 'capacities' parameter = %s";
 		g_company.debug:logWrite(GC_Movers.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil, capacities ~= nil);
 		return false;
 	end;
@@ -68,15 +70,8 @@ function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, baseDirectory,
 
 	self.rootNode = nodeId;
 	self.target = target;
-	
-	if baseDirectory == nil then
-		baseDirectory = self.target.baseDirectory;
-		if baseDirectory == nil or baseDirectory == "" then
-			baseDirectory = g_currentMission.baseDirectory;
-		end;
-	end;
 
-	self.baseDirectory = baseDirectory;
+	self.baseDirectory = GlobalCompanyUtils.getParentBaseDirectory(target, baseDirectory);
 
 	local returnValue = false;
 	if self.isClient then
@@ -88,17 +83,17 @@ function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, baseDirectory,
 			if not hasXMLProperty(xmlFile, key) then
 				break;
 			end;
-			
+
 			local fillTypeIndex, capacity;
 			if self.disableFillType then
 				capacity = capacities;
-			else	
+			else
 				local fillTypeName = getXMLString(xmlFile, key .. "#fillType");
 				if fillTypeName ~= nil then
 					fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillTypeName);
 					if fillTypeIndex ~= nil then
-						capacity = capacities[fillTypeIndex];						
-						if capacity == nil then					
+						capacity = capacities[fillTypeIndex];
+						if capacity == nil then
 							g_company.debug:writeModding(self.debugData, "fillType '%s' can not be used at %s", fillTypeName, key);
 						end;
 					else
@@ -108,11 +103,11 @@ function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, baseDirectory,
 					g_company.debug:writeModding(self.debugData, "No 'fillType' given at %s", key);
 				end;
 			end;
-			
+
 			if capacity ~= nil then
 				local loadedNodes = {};
 				local hasChildCollisions = Utils.getNoNil(getXMLString(xmlFile, key.."#hasChildCollisions"), false);  -- No need to look if there is none!
-	
+
 				local nodeType = "VISIBILITY";
 				local userNodeType = getXMLString(xmlFile, key .. "#type"); -- Options: 'VISIBILITY' or 'INVISIBILITY'
 				if userNodeType ~= nil then
@@ -123,14 +118,14 @@ function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, baseDirectory,
 						g_company.debug:writeModding(self.debugData, "Unknown type '%s' given at %s. Use 'VISIBILITY' or 'INVISIBILITY'", typ, key);
 					end;
 				end;
-	
+
 				local parentNode = I3DUtil.indexToObject(self.rootNode, getXMLString(xmlFile, key .. "#node"), self.target.i3dMappings);
 				if parentNode ~= nil then
-					-- Load from all children of given 'parent'.				
+					-- Load from all children of given 'parent'.
 					local numInGroup = getNumOfChildren(parentNode);
 					if numInGroup > 0 then
 						local filename = getXMLString(xmlFile, key .. "#filename");
-						local sharedI3dNode = Utils.getNoNil(getXMLString(xmlFile, key .. "#sharedI3dNode"), "0");					
+						local sharedI3dNode = Utils.getNoNil(getXMLString(xmlFile, key .. "#sharedI3dNode"), "0");
 						for id = 0, numInGroup - 1 do
 							local node = getChildAt(parentNode, id);
 							self:loadVisibilityNode(node, loadedNodes, hasChildCollisions, nodeType, filename, sharedI3dNode, key)
@@ -144,21 +139,21 @@ function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, baseDirectory,
 						if not hasXMLProperty(xmlFile, childKey) then
 							break;
 						end;
-	
+
 						local node = I3DUtil.indexToObject(self.rootNode, getXMLString(xmlFile, childKey .. "#node"), self.target.i3dMappings);
 						if node ~= nil then
 							local filename = getXMLString(xmlFile, childKey .. "#filename");
 							local sharedI3dNode = Utils.getNoNil(getXMLString(xmlFile, childKey .. "#sharedI3dNode"), "0");
 							self:loadVisibilityNode(node, loadedNodes, hasChildCollisions, nodeType, filename, sharedI3dNode, childKey)
 						end;
-	
+
 						j = j + 1;
 					end;
 				end;
-	
+
 				if #loadedNodes > 0 then
 					local visNodes = {};
-	
+
 					visNodes.startLevel = math.max(Utils.getNoNil(getXMLFloat(xmlFile, key .. "#startChangeFillLevel"), 0), 0);
 					local endLevel = getXMLFloat(xmlFile, key.."#endChangeFillLevel");
 					if endLevel == nil or endLevel <= 0 or endLevel > capacity then
@@ -168,15 +163,15 @@ function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, baseDirectory,
 					end;
 
 					visNodes.originalEndLevel = visNodes.endLevel;
-					
+
 					visNodes.nodes = loadedNodes;
 					visNodes.nodeType = nodeType;
 					visNodes.hasChildCollisions = hasChildCollisions;
-	
+
 					if self.visNodes == nil then
 						self.visNodes = {};
 					end;
-	
+
 					if self.disableFillType then
 						table.insert(self.visNodes, visNodes);
 						returnValue = true;
@@ -184,7 +179,7 @@ function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, baseDirectory,
 						if self.visNodes[fillTypeIndex] == nil then
 							self.visNodes[fillTypeIndex] = {};
 						end;
-	
+
 						table.insert(self.visNodes[fillTypeIndex], visNodes);
 						returnValue = true;
 					end;
@@ -260,7 +255,7 @@ function GC_VisibilityNodes:delete()
 					g_i3DManager:releaseSharedI3DFile(visNodes.nodes[i].filename, self.baseDirectory, true);
 				end;
 			end;
-		end;		
+		end;
 	end;
 end;
 

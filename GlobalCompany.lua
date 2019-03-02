@@ -183,6 +183,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "GlobalCompanyGui.lua");
 
 	--|| Objects ||--
+	source(GlobalCompany.dir .. "objects/GC_Clock.lua");
 	source(GlobalCompany.dir .. "objects/GC_Sounds.lua");
 	source(GlobalCompany.dir .. "objects/GC_Movers.lua");
 	source(GlobalCompany.dir .. "objects/GC_Shaders.lua");
@@ -192,11 +193,12 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_Animations.lua");
 	source(GlobalCompany.dir .. "objects/GC_FillVolume.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicHeap.lua");
+	--source(GlobalCompany.dir .. "objects/GC_PalletSpawner.lua");
 	source(GlobalCompany.dir .. "objects/GC_RotationNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
 	source(GlobalCompany.dir .. "objects/GC_DigitalDisplays.lua");
 	source(GlobalCompany.dir .. "objects/GC_ActivableObject.lua");
-	--source(GlobalCompany.dir .. "objects/GC_ParticleEffects.lua"); -- Replaced with 'GC_Effects'!! Need to remove if all scripts using this are corrected.
+	--source(GlobalCompany.dir .. "objects/GC_ParticleEffects.lua"); -- Depreciated. Use 'GC_Effects' instead!
 	source(GlobalCompany.dir .. "objects/GC_VisibilityNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
 	source(GlobalCompany.dir .. "objects/GC_BaleShreader.lua");
@@ -206,10 +208,10 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_PlayerTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_UnloadingTrigger.lua");
-		
+
 	--|| Placeables ||--
-	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");	
-	source(GlobalCompany.dir .. "placeables/GC_BaleShreaderPlaceable.lua");	
+	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");
+	source(GlobalCompany.dir .. "placeables/GC_BaleShreaderPlaceable.lua");
 end;
 
 --| Add Base GC Placeables |--
@@ -217,9 +219,11 @@ function GlobalCompany.loadPlaceables()
 	if GlobalCompany.initialLoadComplete ~= nil then
 		return;
 	end;
-	
-	GlobalCompany:addPlaceableType("GC_ProductionFactoryPlaceable", "GC_ProductionFactoryPlaceable", GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");
-	GlobalCompany:addPlaceableType("GC_BaleShreaderPlaceable", "GC_BaleShreaderPlaceable", GlobalCompany.dir .. "placeables/GC_BaleShreaderPlaceable.lua");
+
+	local placeablesDir = GlobalCompany.dir .. "placeables/";
+
+	GlobalCompany:addPlaceableType("GC_ProductionFactoryPlaceable", "GC_ProductionFactoryPlaceable", placeablesDir .. "GC_ProductionFactoryPlaceable.lua");
+	GlobalCompany:addPlaceableType("GC_BaleShreaderPlaceable", "GC_BaleShreaderPlaceable", placeablesDir .. "GC_BaleShreaderPlaceable.lua");
 end;
 
 --| Main |--
@@ -295,15 +299,15 @@ function GlobalCompany:getLoadParameterEnvironment(name)
 	return GlobalCompany.loadParameters[name].environment;
 end;
 
-function GlobalCompany:addPlaceableType(name, className, filename)	
-	--[[ @kevink98 - I think we should force all GlobalCompany Placeables to use a 'PREFIX' (GC_ or SRS_) so that it is clear these are not GIANTS Placeables?? ]]--
+function GlobalCompany:addPlaceableType(name, className, filename)
+	-- Force all GlobalCompany Placeables to use a 'PREFIX' (GC_ or SRS_) so that it is clear these are not GIANTS Placeables.
 	if g_company.utils.getHasPrefix(name) then
 		g_placeableTypeManager.placeableTypes[name] = {name=name, className=className, filename=filename};
 	else
-		print(string.format("  [LSMC - GlobalCompany] - ERROR: Failed to add placeable type using name '%s'! Incorrect or No prefix found.", name));
+		print(string.format("  [LSMC - GlobalCompany] - ERROR: Failed to add placeable type using name '%s'! Incorrect / No prefix found.", name));
 		print("    Use prefix 'GC_' for ( GlobalCompany ) placeable mods.", "    Use prefix 'SRS_' for ( SkiRegionSimulator ) placeable mods.");
-	end;	
-	
+	end;
+
 	--g_placeableTypeManager.placeableTypes[name] = {name=name, className=className, filename=filename};
 end;
 

@@ -28,20 +28,20 @@ InitObjectClass(GC_DebugUtils, "GC_DebugUtils");
 
 GC_DebugUtils.setDevLevelMax = true; -- Override isDev maxLevel loading to 'false' if needed. (LSMC DEV ONLY)
 
-GC_DebugUtils.defaultLevel = 4; -- Default level used on load.
+GC_DebugUtils.defaultLevel = 5; -- Default level used on load. (TEMP SET TO '5', SHOULD BE '1')
 
-GC_DebugUtils.numLevels = 6; -- This is starting at `GC_DebugUtils.INFORMATIONS` as we do not disable 'ERROR' or 'WARNING'.
+GC_DebugUtils.numLevels = 5; -- This is starting at `GC_DebugUtils.INFORMATIONS` as we do not disable 'ERROR' or 'WARNING' or 'MODDING'.
 GC_DebugUtils.maxLevels = 20;
 
-GC_DebugUtils.BLANK = -2; -- No 'PREFIX' and can not be disabled in console. (Used for main loading)
+GC_DebugUtils.BLANK = -3; -- No 'PREFIX' and can not be disabled in console. (Used for main loading)
+GC_DebugUtils.MODDING = -2;
 GC_DebugUtils.ERROR = -1;
 GC_DebugUtils.WARNING = 0;
 GC_DebugUtils.INFORMATIONS = 1;
 GC_DebugUtils.LOAD = 2;
 GC_DebugUtils.ONCREATE = 3;
 GC_DebugUtils.TABLET = 4;
-GC_DebugUtils.MODDING = 5;
-GC_DebugUtils.DEV = 6;
+GC_DebugUtils.DEV = 5;
 
 function GC_DebugUtils:new(customMt)
 	if g_company.debug ~= nil then
@@ -71,7 +71,7 @@ function GC_DebugUtils:new(customMt)
 	self.printLevelPrefix = {};
 
 	-- Set print levels.
-	for i = -2, GC_DebugUtils.numLevels + 3 do
+	for i = -3, GC_DebugUtils.numLevels + 4 do
 		if i <= GC_DebugUtils.defaultLevel or setMax then
 			self.printLevel[i] = true;
 		else
@@ -83,13 +83,13 @@ function GC_DebugUtils:new(customMt)
 
 	-- Set print levels prefix.
 	self.printLevelPrefix[GC_DebugUtils.BLANK] = "";
+	self.printLevelPrefix[GC_DebugUtils.MODDING] = "MODDING ERROR: ";
 	self.printLevelPrefix[GC_DebugUtils.ERROR] = "ERROR: ";
 	self.printLevelPrefix[GC_DebugUtils.WARNING] = "WARNING: ";
 	self.printLevelPrefix[GC_DebugUtils.INFORMATIONS] = "INFORMATIONS: ";
 	self.printLevelPrefix[GC_DebugUtils.LOAD] = "LOAD: ";
 	self.printLevelPrefix[GC_DebugUtils.ONCREATE] = "ONCREATE: ";
 	self.printLevelPrefix[GC_DebugUtils.TABLET] = "TABLET: ";
-	self.printLevelPrefix[GC_DebugUtils.MODDING] = "MODDING: ";
 	self.printLevelPrefix[GC_DebugUtils.DEV] = "DEVELOPMENT: ";
 
 	return self;
@@ -102,7 +102,7 @@ function GC_DebugUtils:printToLog(prefix, message, ...)
 	else
 		prefix = "WARNING:  ";
 	end;
-	
+
 	print("  [LSMC - GlobalCompany] - " .. prefix .. string.format(message, ...));
 end;
 
@@ -194,15 +194,15 @@ function GC_DebugUtils:getDebugData(scriptId, target, customEnvironment)
 		return {scriptId = scriptId,
 				header = header,
 				modName = modName,
-				BLANK = -2,
+				BLANK = -3,
+				MODDING = -2,
 				ERROR = -1,
 				WARNING = 0,
 				INFORMATIONS = 1,
 				LOAD = 2,
 				ONCREATE = 3,
 				TABLET = 4,
-				MODDING = 5,
-				DEV = 6};
+				DEV = 5};
 	end;
 
 	return nil;
@@ -258,6 +258,10 @@ end;
 
 -- Direct print functions (With Header Only).
 function GC_DebugUtils:writeBlank(data, message, ...)
+	self:logWrite(data, -3, message, ...);
+end;
+
+function GC_DebugUtils:writeModding(data, message, ...)
 	self:logWrite(data, -2, message, ...);
 end;
 
@@ -285,12 +289,8 @@ function GC_DebugUtils:writeTablet(data, message, ...)
 	self:logWrite(data, 4, message, ...);
 end;
 
-function GC_DebugUtils:writeModding(data, message, ...)
-	self:logWrite(data, 5, message, ...);
-end;
-
 function GC_DebugUtils:writeDev(data, message, ...)
-	self:logWrite(data, 6, message, ...);
+	self:logWrite(data, 5, message, ...);
 end;
 
 function GC_DebugUtils:getScriptNameFromIndex(index)

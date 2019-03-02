@@ -57,7 +57,7 @@ end;
 
 function GC_RotationNodes:load(nodeId, target, xmlFile, xmlKey, groupKey, rotationNodes)
 	if nodeId == nil or target == nil then
-		local text = "Loading failed! 'nodeId' paramater = %s, 'target' paramater = %s";
+		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s";
 		g_company.debug:logWrite(GC_RotationNodes.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil);
 		return false;
 	end;

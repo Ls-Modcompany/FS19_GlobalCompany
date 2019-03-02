@@ -26,6 +26,8 @@
 --		- Client Side Only.
 --		- Parent script 'MUST' call delete().
 --
+--
+--
 -- ToDo:
 --
 --
@@ -37,10 +39,9 @@ InitObjectClass(GC_Lighting, "GC_Lighting");
 
 GC_Lighting.debugIndex = g_company.debug:registerScriptName("Lighting");
 
-GC_Lighting.TYPES = {};
-GC_Lighting.TYPES["BEACON"] = 1;
-GC_Lighting.TYPES["STROBE"] = 2;
-GC_Lighting.TYPES["AREA"] = 3;
+GC_Lighting.TYPES = {["BEACON"] = 1,
+					 ["STROBE"] = 2,
+					 ["AREA"] = 3};
 
 g_company.lighting = GC_Lighting;
 
@@ -49,14 +50,18 @@ function GC_Lighting:new(isServer, isClient, customMt)
 	setmetatable(self, customMt or GC_Lighting_mt);
 
 	self.isServer = isServer;
-    self.isClient = isClient;
+	self.isClient = isClient;
+	
+	self.beaconLights = nil;
+	self.strobeLights = nil;
+	self.areaLights = nil;
 
 	return self;
 end
 
 function GC_Lighting:load(nodeId, target, xmlFile, xmlKey, baseDirectory, allowProfileOverride, beaconKey, strobeKey, areaKey, noBeacon, noStrobe, noArea)
 	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
-		local text = "Loading failed! 'nodeId' paramater = %s, 'target' paramater = %s 'xmlFile' paramater = %s, 'xmlKey' paramater = %s";
+		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s";
 		g_company.debug:logWrite(GC_Lighting.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil);
 		return false;
 	end;
@@ -65,15 +70,8 @@ function GC_Lighting:load(nodeId, target, xmlFile, xmlKey, baseDirectory, allowP
 
 	self.rootNode = nodeId;
 	self.target = target;
-
-	if baseDirectory == nil then
-		baseDirectory = self.target.baseDirectory;
-		if baseDirectory == nil or baseDirectory == "" then
-			baseDirectory = g_currentMission.baseDirectory;
-		end;
-	end;
-
-	self.baseDirectory = baseDirectory;
+	
+	self.baseDirectory = GlobalCompanyUtils.getParentBaseDirectory(target, baseDirectory);
 
 	local returnValue = false;
 	if self.isClient then
@@ -98,7 +96,7 @@ function GC_Lighting:load(nodeId, target, xmlFile, xmlKey, baseDirectory, allowP
 			if strobeKey == nil then
 				strobeKey = "strobeLights.strobeLight";
 			end;
-		
+
 			self.strobeLights = self:loadStrobeLights(xmlFile, xmlKey, strobeKey, loadedXmlFiles);
 			self.strobeLightsActive = false;
 			self.strobeLightsReset = false;
@@ -118,7 +116,6 @@ function GC_Lighting:load(nodeId, target, xmlFile, xmlKey, baseDirectory, allowP
 		for filename, file in pairs (loadedXmlFiles) do
 			delete(file);
 		end;
-
 		loadedXmlFiles = nil;
 
 		if self.beaconLights ~= nil or self.strobeLights ~= nil or self.areaLights ~= nil then
@@ -143,6 +140,7 @@ function GC_Lighting:delete()
 					g_i3DManager:releaseSharedI3DFile(beaconLight.filename, self.baseDirectory, true);
 				end;
 			end;
+			self.beaconLights = nil;
 		end;
 
 		if self.strobeLights ~= nil then
@@ -151,6 +149,7 @@ function GC_Lighting:delete()
 					g_i3DManager:releaseSharedI3DFile(strobeLight.filename, self.baseDirectory, true);
 				end;
 			end;
+			self.strobeLights = nil;
 		end;
 
 		if self.areaLights ~= nil then
@@ -159,6 +158,7 @@ function GC_Lighting:delete()
 					g_i3DManager:releaseSharedI3DFile(areaLight.filename, self.baseDirectory, true);
 				end;
 			end;
+			self.areaLights = nil;
 		end;
 	end;
 end;
@@ -270,7 +270,7 @@ function GC_Lighting:loadAreaLights(xmlFile, xmlKey, areaKey, loadedXmlFiles)
 											if hasXMLProperty(areaLightXmlFile, keyToFind) then
 												local rotationNode = I3DUtil.indexToObject(i3dNode, getXMLString(areaLightXmlFile, keyToFind .. "#node"));
 												if rotationNode ~= nil then
-													setRotation(rotationNode, unpack(rotation));
+													setRotation(rotationNode, rotation[1], rotation[2], rotation[3]);
 												end;
 											else
 												local text = "XML Property ( <%s /> ) does not exist in %s, rotationNode(%d) will be ignored!";
@@ -742,7 +742,7 @@ end;
 
 function GC_Lighting:setAllLightsState(state, forceState)
 	local setState = state or (not self.syncedLightState);
-		
+
 	if self.syncedLightState ~= setState or forceState == true then
 		self.syncedLightState = setState;
 
@@ -768,10 +768,10 @@ function GC_Lighting:setLightsState(lightType, state, noEventSend)
 		local lightTypeName = lightType:upper();
 		lightTypeId = GC_Lighting.TYPES[lightTypeName];
 	end;
-	
-	if lightTypeId ~= nil and state ~= nil then	
+
+	if lightTypeId ~= nil and state ~= nil then
 		--GC_LightingEvent.sendEvent(self, lightTypeId, state, noEventSend); -- Will be added when MP works are started.
-	
+
 		if lightTypeId == 1 and self.beaconLights ~= nil then
 			self:setBeaconLightsState(state);
 		elseif lightTypeId == 2 and self.strobeLights ~= nil then
@@ -789,7 +789,7 @@ function GC_Lighting:setAreaLightsState(state, forceState)
 
 	if self.isClient then
 		local setState = state or (not self.areaLightsActive);
-		
+
 		if self.areaLightsActive ~= setState or forceState == true then
 			self.areaLightsActive = setState;
 
@@ -830,7 +830,7 @@ function GC_Lighting:setStrobeLightsState(state, forceState)
 
 	if self.isClient then
 		local setState = state or (not self.strobeLightsActive);
-		
+
 		if self.strobeLightsActive ~= setState or forceState == true then
 			self.strobeLightsActive = setState;
 
@@ -854,7 +854,7 @@ function GC_Lighting:setBeaconLightsState(state, forceState)
 
 	if self.isClient then
 		local setState = state or (not self.beaconLightsActive);
-		
+
 		if self.beaconLightsActive ~= setState or forceState == true then
 			self.beaconLightsActive = setState;
 
@@ -946,8 +946,8 @@ function GC_Lighting:setDirtLevel(rootNode, level)
 
 	for _, dirtNode in pairs(dirtNodes) do
 		local x, _, z, w = getShaderParameter(dirtNode, "RDT");
-        setShaderParameter(dirtNode, "RDT", x, dirtLevel, z, w, false);
-    end;
+		setShaderParameter(dirtNode, "RDT", x, dirtLevel, z, w, false);
+	end;
 end;
 
 

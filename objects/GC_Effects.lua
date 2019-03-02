@@ -67,7 +67,7 @@ end;
 
 function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKey)
 	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
-		local text = "Loading failed! 'nodeId' paramater = %s, 'target' paramater = %s 'xmlFile' paramater = %s, 'xmlKey' paramater = %s";
+		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s";
 		g_company.debug:logWrite(GC_Effects.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil);
 		return false;
 	end;
@@ -77,21 +77,13 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 	self.rootNode = nodeId;
 	self.target = target;
 
-	if baseDirectory == nil then
-		baseDirectory = self.target.baseDirectory;
-		if baseDirectory == nil or baseDirectory == "" then
-			baseDirectory = g_currentMission.baseDirectory;
-		end;
-	end;
-
-	self.baseDirectory = baseDirectory;
+	self.baseDirectory = GlobalCompanyUtils.getParentBaseDirectory(target, baseDirectory);
 
 	local returnValue = false;
 	if self.isClient then
 		if groupKey == nil then
 			groupKey = "effectTypes";
 		end;
-
 
 		--| Exhaust Systems |--
 		local exhaustSystemsKey = string.format("%s.%s.exhaustSystems", xmlKey, groupKey);
@@ -116,16 +108,16 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 								local baseParam = {0.2, 0.2, 0.2, 0.8};
 								local particleColor = Utils.getNoNil(GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. "#particleColor", 4, false, self.debugData), baseParam);
 
-								local exhaustEffect = {};
-								exhaustEffect.node = node;
-								exhaustEffect.linkNode = linkNode;
-								exhaustEffect.filename = filename;
-								link(linkNode, exhaustEffect.node);
-								setVisibility(exhaustEffect.node, false);
-								setShaderParameter(exhaustEffect.node, "param", 0, 0, 0, 0.4, false);
-								setShaderParameter(exhaustEffect.node, "exhaustColor", particleColor[1], particleColor[2], particleColor[3], particleColor[4], false);
+								link(linkNode, node);
+								setVisibility(node, false);
+								setShaderParameter(node, "param", 0, 0, 0, 0.4, false);
+								setShaderParameter(node, "exhaustColor", particleColor[1], particleColor[2], particleColor[3], particleColor[4], false);
 
-								table.insert(self.exhaustSystems, exhaustEffect);
+								if self.exhaustSystems == nil then
+									self.exhaustSystems = {};
+								end;
+
+								table.insert(self.exhaustSystems, {node = node, linkNode = linkNode, filename = filename});
 
 								returnValue = true;
 								delete(i3dNode);
@@ -139,7 +131,6 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 				i = i + 1;
 			end;
 		end;
-
 
 		--| Particle Systems |--
 		local particleSystemsKey = string.format("%s.%s.particleSystems", xmlKey, groupKey);
@@ -189,12 +180,13 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 
 						table.insert(self.standardParticleSystems, particleSystem);
 					end;
+
+					particleSystem = nil;
 				end;
 
 				i = i + 1;
 			end;
 		end;
-
 
 		--| Material Holder Effects |--
 		local materialHolderEffectsKey = string.format("%s.%s.materialHolder", xmlKey, groupKey);
@@ -222,7 +214,7 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 							effects.fillTypeIndex = FillType.WHEAT; -- Keep 'wheat' as a backup incase nothing is listed.
 						end;
 					end;
-					
+
 					local operatingInterval = Utils.getNoNil(getXMLFloat(xmlFile, key.."#operatingIntervalSeconds"), 0);
 					if operatingInterval > 0 then
 						if fillTypeNames ~= nil then
@@ -281,12 +273,13 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 
 						table.insert(self.standardEffects, effects);
 					end;
+
+					effects = nil;
 				end;
 
 				i = i + 1;
 			end;
 		end;
-
 
 		--| Custom Materials |--
 		local customMaterialsKey = string.format("%s.%s.customMaterials", xmlKey, groupKey);
@@ -346,18 +339,21 @@ function GC_Effects:delete()
 			for _, exhaustEffect in pairs (self.exhaustSystems) do
 				g_i3DManager:releaseSharedI3DFile(exhaustEffect.filename, self.baseDirectory, true);
 			end;
+			self.exhaustSystems = nil;
 		end;
 
 		if self.standardParticleSystems ~= nil then
 			for _, particleSystem in pairs (self.standardParticleSystems) do
 				ParticleUtil.deleteParticleSystem(particleSystem);
 			end;
+			self.standardParticleSystems = nil;
 		end;
 
 		if self.standardEffects ~= nil then
 			for _, effects in pairs (self.standardEffects) do
 				g_effectManager:deleteEffects(effects.effects);
 			end;
+			self.standardEffects = nil;
 		end;
 
 		if self.intervalParticleSystems ~= nil or self.intervalEffects ~= nil then
@@ -365,12 +361,14 @@ function GC_Effects:delete()
 				for _, particleSystem in pairs (self.intervalParticleSystems) do
 					ParticleUtil.deleteParticleSystem(particleSystem);
 				end;
+				self.intervalParticleSystems = nil;
 			end;
 
 			if self.intervalEffects ~= nil then
 				for _, effects in pairs (self.intervalEffects) do
 					g_effectManager:deleteEffects(effects.effects);
 				end;
+				self.intervalEffects = nil;
 			end;
 
 			g_company.removeRaisedUpdateable(self);
@@ -464,7 +462,7 @@ function GC_Effects:update(dt)
 						g_effectManager:stopEffects(effects.effects);
 						effects.operatingTime = effects.delayTime;
 						effects.active = false;
-						
+
 						if effects.resetOnStart then
 							effects.nextFillType = 1;
 						end;
