@@ -51,7 +51,7 @@ function GC_DynamicHeap:new(isServer, isClient, customMt)
     return self;
 end
 
-function GC_DynamicHeap:load(nodeId, target, xmlFile, xmlKey, fillTypeName, maxHeapLevel)
+function GC_DynamicHeap:load(nodeId, target, xmlFile, xmlKey, fillTypeName, maxHeapLevel, isFixedFillTypeArea)
 	if nodeId == nil or target == nil then
 		return false;
 	end;
@@ -85,9 +85,11 @@ function GC_DynamicHeap:load(nodeId, target, xmlFile, xmlKey, fillTypeName, maxH
 			end;
 			self.maxHeapLevel = maxHeapLevel;
 
-			local fillTypes = {};
-			fillTypes[self.fillTypeIndex] = true;
-			g_densityMapHeightManager:setFixedFillTypesArea(self.heapArea, fillTypes);
+			if isFixedFillTypeArea or isFixedFillTypeArea == nil then
+				local fillTypes = {};
+				fillTypes[self.fillTypeIndex] = true;
+				g_densityMapHeightManager:setFixedFillTypesArea(self.heapArea, fillTypes);
+			end;
 			
 			if self.isServer then
 				self.vehiclesInTrigger = {};
@@ -197,7 +199,7 @@ function GC_DynamicHeap:getLineData(add, xs, zs, ux, uz, vx, vz, forceRandom)
 	if self.randomDrop or forceRandom == true then
 		sx = xs + (math.random()*ux) + (math.random()*vx);
 		sz = zs + (math.random()*uz) + (math.random()*vz);
-		sy = getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, sx,0,sz);
+		sy = getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, sx, 0, sz);
 		ex = xs + (math.random()*ux) + (math.random()*vx);
 		ez = zs + (math.random()*uz) + (math.random()*vz);
 		ey = sy;
@@ -205,14 +207,14 @@ function GC_DynamicHeap:getLineData(add, xs, zs, ux, uz, vx, vz, forceRandom)
 		if add then
 			sx = xs + 0.40 * ux + 0.5 * vx;
 			sz = zs + 0.40 * uz + 0.5 * vz;
-			sy = getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, sx, 0, sz) + 10.0;
+			sy = getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, sx, 0, sz) + 10;
 			ex = xs + 0.60 * ux + 0.5 * vx;
 			ez = zs + 0.60 * uz + 0.5 * vz;
 			ey = sy;
 		else
 			sx = xs + 0.5 * ux + 0.5 * vx;
 			sz = zs + 0.5 * uz + 0.5 * vz;
-			sy = getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, sx,0,sz) + 10;
+			sy = getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, sx, 0, sz) + 10;
 			ex = xs + 0.5 * ux + 0.5 * vx;
 			ez = zs + 0.5 * uz + 0.5 * vz;
 		end;
@@ -346,6 +348,13 @@ function GC_DynamicHeap:getHeightCenter()
 	--print(string.format("%s %s", xw,xs));
 	--print(string.format("%s %s", zh,zs));
 	return DensityMapHeightUtil.getHeightAtWorldPos(x,0,z) - getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, x,0,z);
+end;
+
+function GC_DynamicHeap:getIsHeapEmpty()
+    local xs, _, zs = getWorldTranslation(self.heapArea.start);
+    local xw, _, zw = getWorldTranslation(self.heapArea.width);
+    local xh, _, zh = getWorldTranslation(self.heapArea.height);
+	return DensityMapHeightUtil.getFillTypeAtArea(xs, zs, xw, zw, xh, zh) == FillType.UNKNOWN;
 end;
 
 
