@@ -179,10 +179,17 @@ function GC_PlayerTrigger:playerTriggerCallback(triggerId, otherId, onEnter, onL
 		if onEnter or onLeave then
 			if onEnter then
 				self.playerInTrigger = true;
-
-				if self.isActivatable then
-					g_currentMission:addActivatableObject(self);
-				end;
+				if self.target.playerTriggerCanActivable ~= nil then
+					if self.target:playerTriggerCanActivable(self.triggerReference) then
+						if self.isActivatable then
+							g_currentMission:addActivatableObject(self);
+						end;
+					end;
+				else
+					if self.isActivatable then
+						g_currentMission:addActivatableObject(self);
+					end;
+				end;				
 			elseif onLeave then
 				self.playerInTrigger = false;
 
