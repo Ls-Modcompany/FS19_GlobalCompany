@@ -30,5 +30,6 @@
             <binding device="0_XINPUT_GAMEPAD" input="BUTTON_6 BUTTON_3" axisComponent="+" neutralInput="0" index="1"/>
         </actionBinding>   
     </inputBinding>
+    
 
 </modDesc>
