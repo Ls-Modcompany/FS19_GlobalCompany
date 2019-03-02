@@ -144,7 +144,6 @@ function BaleShreader:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		end;
 
 		local fillTypeName = getXMLString(xmlFile, fillTypeKey .. "#name");
-		print(fillTypeName)
 		if fillTypeName ~= nil then
 			local fillType = g_fillTypeManager:getFillTypeByName(fillTypeName);
 			if fillType ~= nil then
@@ -257,8 +256,7 @@ function BaleShreader:onActivableObject(reference)
 end
 
 function BaleShreader:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, toolType, fillPositionData, triggerId)
-	print("addFillLevel")
-	print(fillLevelDelta)
+	
 end;
 
 function BaleShreader:getFreeCapacity()
