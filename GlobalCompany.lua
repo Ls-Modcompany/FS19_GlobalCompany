@@ -200,6 +200,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_VisibilityNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
 	source(GlobalCompany.dir .. "objects/GC_BaleShreader.lua");
+	source(GlobalCompany.dir .. "objects/GC_DirtyObjects.lua");
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
