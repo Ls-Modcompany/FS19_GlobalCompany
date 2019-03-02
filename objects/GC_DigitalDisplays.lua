@@ -20,6 +20,13 @@
 --
 --		- Client Side Only.
 --
+--		- LEVEL = FillLevel in litres.
+--		- PERCENT = FillLevel in percent.
+--		- SPACE = Available storage space.
+--		- SPACEPERCENT = Available storage space in percent.
+--		- CAPACITY = Max storage capacity.
+--		- TEXT = Display text using a shader. (Coming soon)
+--
 --
 -- ToDo:
 --		- Add text shader support.
@@ -31,13 +38,12 @@ GC_DigitalDisplays = {};
 local GC_DigitalDisplays_mt = Class(GC_DigitalDisplays);
 InitObjectClass(GC_DigitalDisplays, "GC_DigitalDisplays");
 
-GC_DigitalDisplays.TYPES = {};
-GC_DigitalDisplays.TYPES["LEVEL"] = 1;				-- FillLevel in litres
-GC_DigitalDisplays.TYPES["PERCENT"] = 2;			-- FillLevel in percent
-GC_DigitalDisplays.TYPES["SPACE"] = 3;				-- Available storage space
-GC_DigitalDisplays.TYPES["SPACEPERCENT"]= 4;		-- Available storage space in percent
-GC_DigitalDisplays.TYPES["CAPACITY"] = 5;			-- Max storage capacity
-GC_DigitalDisplays.TYPES["TEXT"] = 6; 				-- Coming soon.
+GC_DigitalDisplays.TYPES = {["LEVEL"] = 1,
+							["PERCENT"] = 2,
+							["SPACE"] = 3,
+							["SPACEPERCENT"] = 4,
+							["CAPACITY"] = 5,
+							["TEXT"] = 6};
 
 GC_DigitalDisplays.debugIndex = g_company.debug:registerScriptName("DigitalDisplays");
 
@@ -58,7 +64,7 @@ end;
 
 function GC_DigitalDisplays:load(nodeId, target, xmlFile, xmlKey, groupKey, disableFillType)
 	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
-		local text = "Loading failed! 'nodeId' paramater = %s, 'target' paramater = %s 'xmlFile' paramater = %s, 'xmlKey' paramater = %s";
+		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s";
 		g_company.debug:logWrite(GC_DigitalDisplays.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil);
 		return false;
 	end;
@@ -78,7 +84,7 @@ function GC_DigitalDisplays:load(nodeId, target, xmlFile, xmlKey, groupKey, disa
 
 		local i = 0;
 		while true do
-			local key = string.format(xmlKey .. "%s.%s.display(%d)", xmlKey, groupKey, i);
+			local key = string.format("%s.%s.display(%d)", xmlKey, groupKey, i);
 			if not hasXMLProperty(xmlFile, key) then
 				break;
 			end;
@@ -90,40 +96,37 @@ function GC_DigitalDisplays:load(nodeId, target, xmlFile, xmlKey, groupKey, disa
 					local colourToSet;
 
 					local display = {};
-					display.typeIndex = typeIndex;
 
 					if typeIndex == GC_DigitalDisplays.TYPES.TEXT then
 						display = nil;
 					else
 						local numbers = I3DUtil.indexToObject(self.rootNode, getXMLString(xmlFile, key .. "#numbers"), self.target.i3dMappings)
 						if numbers ~= nil then
-							display.numbers = numbers;
-							display.lastvalue = 0;
-							display.numberColour = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. "#numberColor", 4, false, self.debugData);
-							display.currentColourIndex = 1;
-							colourToSet = display.numberColour;
+							local numMeshes = getNumOfChildren(numbers);
+							if numMeshes > 0 then
+								display.numbers = numbers;
+								display.lastvalue = 0;
+								display.numberColour = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. "#numberColor", 4, false, self.debugData);
+								display.currentColourIndex = 1;
+								colourToSet = display.numberColour;
 
-							display.precision = 0;
-							display.showOnEmpty = Utils.getNoNil(getXMLBool(xmlFile, key .. "#showOnEmpty"), true);
+								display.showOnEmpty = Utils.getNoNil(getXMLBool(xmlFile, key .. "#showOnEmpty"), true);
 
-							if display.numberColour ~= nil and display.typeIndex ~= GC_DigitalDisplays.TYPES.CAPACITY then
-								display.emptyNumberColour = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. "#emptyNumberColor", 4, false, self.debugData);
-								display.fullNumberColour = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. "#fullNumberColor", 4, false, self.debugData);
+								if display.numberColour ~= nil and typeIndex ~= GC_DigitalDisplays.TYPES.CAPACITY then
+									display.emptyNumberColour = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. "#emptyNumberColor", 4, false, self.debugData);
+									display.fullNumberColour = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. "#fullNumberColor", 4, false, self.debugData);
 
-								if display.emptyNumberColour ~= nil then
-									colourToSet = display.emptyNumberColour;
-									display.currentColourIndex = 2;
+									if display.emptyNumberColour ~= nil then
+										colourToSet = display.emptyNumberColour;
+										display.currentColourIndex = 2;
+									end;
 								end;
+
+								display.setColour = display.emptyNumberColour ~= nil or display.fullNumberColour ~= nil;
+								display.maxValue = (10 ^ (numMeshes)) - 1;
 							end;
-
-							display.setColour = display.emptyNumberColour ~= nil or display.fullNumberColour ~= nil;
-
-							-- REFERANCE: VehicleHudUtils.lua @ https://gdn.giants-software.com/documentation_scripting_fs19.php?version=script&category=69&class=8923#setHudValue142801
-							display.numChildren = getNumOfChildren(display.numbers);
-							display.numChildren = display.numChildren - display.precision;
-							display.maxValue = (10 ^ (display.numChildren)) - 1 / (10^display.precision); -- e.g. max with 2 childs and 1 float -> 10^2 - 1/10 -> 99.9 -> makes sure that display doesn't show 00.0 if value is 100
 						else
-							g_company.debug:writeWarning(self.debugData, "Missing numbers node for display '%s'", key);
+							g_company.debug:writeModding(self.debugData, "Missing numbers node for display '%s'", key);
 							display = nil;
 						end;
 					end;
@@ -136,7 +139,11 @@ function GC_DigitalDisplays:load(nodeId, target, xmlFile, xmlKey, groupKey, disa
 						end;
 
 						if self.disableFillType == true then
-							table.insert(self.levelDisplays, display);
+							if self.levelDisplays[typeIndex] == nil then
+								self.levelDisplays[typeIndex] = {};
+							end;
+
+							table.insert(self.levelDisplays[typeIndex], display);
 							returnValue = true;
 						else
 							local fillTypeName = getXMLString(xmlFile, key .. "#fillType");
@@ -147,13 +154,17 @@ function GC_DigitalDisplays:load(nodeId, target, xmlFile, xmlKey, groupKey, disa
 										self.levelDisplays[fillTypeIndex] = {};
 									end;
 
-									table.insert(self.levelDisplays[fillTypeIndex], display);
+									if self.levelDisplays[fillTypeIndex][typeIndex] == nil then
+										self.levelDisplays[fillTypeIndex][typeIndex] = {};
+									end;
+
+									table.insert(self.levelDisplays[fillTypeIndex][typeIndex], display);
 									returnValue = true;
 								else
-									g_company.debug:writeWarning(self.debugData, "fillType '%s' is not valid at %s", fillTypeName, key);
+									g_company.debug:writeModding(self.debugData, "fillType '%s' is not valid at %s", fillTypeName, key);
 								end;
 							else
-								g_company.debug:writeWarning(self.debugData, "No 'fillType' given at %s", key);
+								g_company.debug:writeModding(self.debugData, "No 'fillType' given at %s", key);
 							end;
 						end;
 					end;
@@ -161,7 +172,7 @@ function GC_DigitalDisplays:load(nodeId, target, xmlFile, xmlKey, groupKey, disa
 
 				end;
 			else
-				g_company.debug:writeWarning(self.debugData, "Unknown displayType '%s' given at '%s'", displayType, key);
+				g_company.debug:writeModding(self.debugData, "Unknown displayType '%s' given at '%s'", displayType, key);
 			end;
 
 			i = i + 1;
@@ -178,13 +189,21 @@ function GC_DigitalDisplays:updateLevelDisplays(fillLevel, capacity, fillTypeInd
 	if self.isClient then
 		if self.levelDisplays ~= nil then
 			if self.disableFillType then
-				for i = 1, #self.levelDisplays do
-					self:setDisplayValue(self.levelDisplays[i], fillLevel, capacity);
+				for typeIndex, displayType in pairs (self.levelDisplays) do
+					local value = self:getLevelDisplayValue(typeIndex, fillLevel, capacity);
+
+					for i = 1, #displayType do
+						self:setLevelDisplayValue(displayType[i], value, capacity);
+					end;
 				end;
 			else
 				if self.levelDisplays[fillTypeIndex] ~= nil then
-					for i = 1, #self.levelDisplays[fillTypeIndex] do
-						self:setDisplayValue(self.levelDisplays[i], fillLevel, capacity);
+					for typeIndex, displayType in pairs (self.levelDisplays[fillTypeIndex]) do
+						local value = self:getLevelDisplayValue(typeIndex, fillLevel, capacity);
+
+						for i = 1, #displayType do
+							self:setLevelDisplayValue(displayType[i], value, capacity);
+						end;
 					end;
 				end;
 			end;
@@ -194,26 +213,31 @@ function GC_DigitalDisplays:updateLevelDisplays(fillLevel, capacity, fillTypeInd
 	end;
 end;
 
--- IMPORTANT: Do not call this function outside this script. Use 'updateDisplays' instead.
-function GC_DigitalDisplays:setDisplayValue(display, level, maxLevel)
+function GC_DigitalDisplays:getLevelDisplayValue(typeIndex, level, maxLevel)
 	local value = 0;
 
-	if display.typeIndex == GC_DigitalDisplays.TYPES.LEVEL then
+	if typeIndex == GC_DigitalDisplays.TYPES.LEVEL then
 		value = math.min(maxLevel, math.max(0, level));
-	elseif display.typeIndex == GC_DigitalDisplays.TYPES.PERCENT then
+	elseif typeIndex == GC_DigitalDisplays.TYPES.PERCENT then
 		local percent = math.min(math.max(level / maxLevel, 0), 1);
 		value = math.abs(percent * 100);
-	elseif display.typeIndex == GC_DigitalDisplays.TYPES.SPACE then
+	elseif typeIndex == GC_DigitalDisplays.TYPES.SPACE then
 		value = math.max(0, maxLevel - math.max(0, level));
-	elseif display.typeIndex == GC_DigitalDisplays.TYPES.SPACEPERCENT then
+	elseif typeIndex == GC_DigitalDisplays.TYPES.SPACEPERCENT then
 		local percent = math.min(math.max(level / maxLevel, 0), 1);
 		value = 100 - math.abs(percent * 100);
-	elseif display.typeIndex == GC_DigitalDisplays.TYPES.CAPACITY then
+	elseif typeIndex == GC_DigitalDisplays.TYPES.CAPACITY then
 		value = math.max(0, maxLevel);
 	end;
 
-	--local actualValue = math.floor(math.min(value, display.maxValue));
-	local actualValue = tonumber(string.format("%." .. display.precision .. "f", value)); -- More testing needed.
+	return value;
+end;
+
+-- IMPORTANT: Do not call this function outside this script. Use 'updateDisplays' instead.
+function GC_DigitalDisplays:setLevelDisplayValue(display, value, maxLevel)
+	local valueToSet = math.min(display.maxValue, math.max(0, value));
+	--local actualValue = tonumber(string.format("%.0f", valueToSet));
+	local actualValue = math.floor(valueToSet); -- Precision is always '0' so this will operate much faster.
 
 	if display.lastvalue ~= actualValue then
 		display.lastvalue = actualValue;

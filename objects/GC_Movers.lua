@@ -35,13 +35,15 @@ GC_Movers.debugIndex = g_company.debug:registerScriptName("Movers");
 g_company.movers = GC_Movers;
 
 function GC_Movers:new(isServer, isClient, customMt)
-	local self = {};	
+	local self = {};
 	setmetatable(self, customMt or GC_Movers_mt);
 
 	self.isServer = isServer;
 	self.isClient = isClient;
 
-    return self;
+	self.movers = nil;
+
+	return self;
 end;
 
 -- Load instance.
@@ -58,7 +60,7 @@ end;
 -- @return instance loaded correctly.
 function GC_Movers:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capacities, disableFillType)
 	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil or capacities == nil then
-		local text = "Loading failed! 'nodeId' paramater = %s, 'target' paramater = %s 'xmlFile' paramater = %s, 'xmlKey' paramater = %s, 'capacities' paramater = %s";
+		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s, 'capacities' parameter = %s";
 		g_company.debug:logWrite(GC_Movers.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil, capacities ~= nil);
 		return false;
 	end;
@@ -68,38 +70,29 @@ function GC_Movers:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capaciti
 	self.rootNode = nodeId;
 	self.target = target;
 	
-	if baseDirectory == nil then
-		baseDirectory = self.target.baseDirectory;
-		if baseDirectory == nil or baseDirectory == "" then
-			baseDirectory = g_currentMission.baseDirectory;
-		end;
-	end;
+	self.baseDirectory = GlobalCompanyUtils.getParentBaseDirectory(target, baseDirectory);
 
-	self.baseDirectory = baseDirectory;	
-	
 	local returnValue = false;
 	if self.isClient then
 		self.disableFillType = Utils.getNoNil(disableFillType, false);
 
-		self.movers = {};
-
 		local i = 0;
 		while true do
-			local key = string.format(xmlKey .. ".movers.mover(%d)", i);		
+			local key = string.format(xmlKey .. ".movers.mover(%d)", i);
 			if not hasXMLProperty(xmlFile, key) then
 				break;
 			end;
-			
+
 			local fillTypeIndex, capacity;
 			if self.disableFillType then
 				capacity = capacities;
-			else	
+			else
 				local fillTypeName = getXMLString(xmlFile, key .. "#fillType");
 				if fillTypeName ~= nil then
 					fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillTypeName);
 					if fillTypeIndex ~= nil then
-						capacity = capacities[fillTypeIndex];						
-						if capacity == nil then					
+						capacity = capacities[fillTypeIndex];
+						if capacity == nil then
 							g_company.debug:writeModding(self.debugData, "fillType '%s' can not be used at %s", fillTypeName, key);
 						end;
 					else
@@ -109,20 +102,20 @@ function GC_Movers:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capaciti
 					g_company.debug:writeModding(self.debugData, "No 'fillType' given at %s", key);
 				end;
 			end;
-			
-			if capacity ~= nil then			
+
+			if capacity ~= nil then
 				local node = I3DUtil.indexToObject(self.rootNode, getXMLString(xmlFile, key .. "#node"), self.target.i3dMappings);
-				if node ~= nil then				
-					local mover = {};				
+				if node ~= nil then
+					local mover = {};
 					mover.node = node;
 					mover.capacity = capacity;
-					
+
 					local transMax = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. ".translation#maximum", 3, false, self.debugData);
 					if transMax ~= nil then
 						mover.transMin = Utils.getNoNil(GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. ".translation#minimum", 3, false, self.debugData), {getTranslation(mover.node)});
 						mover.transMax = transMax;
-						setTranslation(mover.node, unpack(mover.transMin));
-				
+						setTranslation(mover.node, mover.transMin[1], mover.transMin[2], mover.transMin[3]);
+
 						mover.useTranslation = true;
 						mover.transReset = false;
 						local startTrans = Utils.getNoNil(getXMLFloat(xmlFile, key .. ".translation#start"), 0);
@@ -137,8 +130,8 @@ function GC_Movers:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capaciti
 					if rotMax ~= nil then
 						mover.rotMin = Utils.getNoNil(GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. ".rotation#minimum", 3, true, self.debugData), {getRotation(mover.node)});
 						mover.rotMax = rotMax;
-						setRotation(mover.node, unpack(mover.rotMin));
-				
+						setRotation(mover.node, mover.rotMin[1], mover.rotMin[2], mover.rotMin[3]);
+
 						mover.useRotation = true;
 						mover.rotReset = false;
 						local startRot = Utils.getNoNil(getXMLFloat(xmlFile, key .. ".rotation#start"), 0);
@@ -148,13 +141,13 @@ function GC_Movers:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capaciti
 					else
 						mover.useRotation = false;
 					end;
-					
+
 					local scaleMax = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. ".scale#maximum", 3, false, self.debugData);
 					if scaleMax ~= nil then
 						mover.scaleMin = Utils.getNoNil(GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. ".scale#minimum", 3, false, self.debugData), {getScale(mover.node)});
 						mover.scaleMax = scaleMax;
-						setScale(mover.node, unpack(mover.scaleMin));
-				
+						setScale(mover.node, mover.scaleMin[1], mover.scaleMin[2], mover.scaleMin[3]);
+
 						mover.useScale = true;
 						mover.scaleReset = false;
 						local startScale = Utils.getNoNil(getXMLFloat(xmlFile, key .. ".scale#start"), 0);
@@ -164,8 +157,7 @@ function GC_Movers:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capaciti
 					else
 						mover.useScale = false;
 					end;
-					
-					-- Use 'incorrect' English Spelling of COLOUR on 'key attributes' in keeping with "Giants' to keep XML uniform. :-(
+
 					local colourMin = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. ".shaderColor#minimum", 3, false, self.debugData);
 					local colourMax = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. ".shaderColor#maximum", 3, false, self.debugData);
 					if colourMin ~= nil and colourMax ~= nil then
@@ -174,7 +166,7 @@ function GC_Movers:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capaciti
 							mover.colourMin = colourMin;
 							mover.colourMax = colourMax;
 							setShaderParameter(mover.node, "colorScale", colourMin[1], colourMin[2], colourMin[3], 0, false);
-							
+
 							mover.useColourChange = true;
 							mover.colourReset = false;
 							local startColourChange = Utils.getNoNil(getXMLFloat(xmlFile, key .. ".shaderColor#start"), 0);
@@ -182,16 +174,20 @@ function GC_Movers:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capaciti
 							mover.stopColourChange = self:getAcceptedStopLevel(getXMLFloat(xmlFile, key .. ".shaderColor#stop"), capacity);
 							mover.originalStopColourChange = mover.stopColourChange;
 						else
-							g_company.debug:writeModding(self.debugData, "'allowColorChange' disbaled! Shader Parameter 'colorScale' does not exist on node '%s' at %s", mover.node, key);
+							g_company.debug:writeModding(self.debugData, "'allowColorChange' disbaled! Shader Parameter 'colorScale' does not exist on node '%s' at %s. - Supported Shader: bunkerSiloSilageShader -", mover.node, key);
 						end;
 					else
 						mover.useColourChange = false;
 					end;
-					
+
 					mover.hideAtFillLevel = Utils.getNoNil(getXMLFloat(xmlFile, key .. "#hideAtFillLevel"), -100) + 0.0001;
 					mover.visibility = mover.hideAtFillLevel ~= 0.0001;
 					setVisibility(mover.node, mover.visibility);
-					
+
+					if self.movers == nil then
+						self.movers = {};
+					end;
+
 					if self.disableFillType then
 						table.insert(self.movers, mover);
 						returnValue = true;
@@ -199,15 +195,17 @@ function GC_Movers:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capaciti
 						if self.movers[fillTypeIndex] == nil then
 							self.movers[fillTypeIndex] = {};
 						end;
-						
+
 						table.insert(self.movers[fillTypeIndex], mover);
 						returnValue = true;
 					end;
+					
+					mover = nil;
 				end;
 			end;
-			
+
 			i = i + 1;
-		end;		
+		end;
 	else
 		g_company.debug:writeDev(self.debugData, "Failed to load 'CLIENT ONLY' script on server!");
 		returnValue = true; -- Send true so we can also print 'function' warnings if called by server.
@@ -224,13 +222,13 @@ function GC_Movers:getAcceptedStopLevel(level, capacity)
 			return capacity;
 		end;
 	end;
-	
+
 	return level;
 end;
 
 function GC_Movers:updateMovers(fillLevel, fillTypeIndex)
-	if self.isClient then	
-		if self.movers ~= nil then	
+	if self.isClient then
+		if self.movers ~= nil then
 			if self.disableFillType then
 				for _, mover in pairs(self.movers) do
 					self:setMover(mover, fillLevel);
@@ -249,60 +247,60 @@ function GC_Movers:updateMovers(fillLevel, fillTypeIndex)
 end;
 
 -- IMPORTANT: Do not call this function outside this script. Use 'updateNodes' instead.
-function GC_Movers:setMover(mover, fillLevel)	
+function GC_Movers:setMover(mover, fillLevel)
 	local state = fillLevel > mover.hideAtFillLevel;
 	if state ~= mover.visibility then
 		setVisibility(mover.node, state);
 	end;
-	
+
 	if mover.useTranslation then
 		if fillLevel > mover.startTrans then
 			mover.transReset = true;
-	
+
 			if fillLevel < mover.stopTrans then
 				local trans = {};
 				local factor = (fillLevel-mover.startTrans) / (mover.stopTrans-mover.startTrans);
-				for i = 1, 3 do	
+				for i = 1, 3 do
 					trans[i] = mover.transMin[i] + factor * (mover.transMax[i] - mover.transMin[i]);
 				end;
 				setTranslation(mover.node, trans[1], trans[2], trans[3]);
 			end;
 		else
 			if mover.transReset then
-				setTranslation(mover.node, unpack(mover.transMin));
+				setTranslation(mover.node, mover.transMin[1], mover.transMin[2], mover.transMin[3]);
 				mover.transReset = false;
 			end;
 		end;
 	end;
-	
+
 	if mover.useRotation then
 		if fillLevel > mover.startRot then
 			mover.rotReset = true;
-	
+
 			if fillLevel < mover.stopRot then
 				local rot = {};
 				local factor = (fillLevel-mover.startRot) / (mover.stopRot-mover.startRot);
-				for i = 1, 3 do				
+				for i = 1, 3 do
 					rot[i] = mover.rotMin[i] + factor * (mover.rotMax[i] - mover.rotMin[i]);
 				end;
-				
+
 				setRotation(mover.node, rot[1], rot[2], rot[3]);
 			end;
 		else
 			if mover.rotReset then
-				setRotation(mover.node, unpack(mover.rotMin));
+				setRotation(mover.node, mover.rotMin[1], mover.rotMin[2], mover.rotMin[3]);
 				mover.rotReset = false;
 			end;
 		end;
 	end;
-	
+
 	if mover.useScale then
 		if fillLevel > mover.startScale then
 			mover.scaleReset = true;
-	
+
 			if fillLevel < mover.stopScale then
 				local scale = {};
-				local factor = (fillLevel-mover.startScale) / (mover.stopScale-mover.startScale);				
+				local factor = (fillLevel-mover.startScale) / (mover.stopScale-mover.startScale);
 				for i = 1, 3 do
 					scale[i] = mover.scaleMin[i] + factor * (mover.scaleMax[i] - mover.scaleMin[i]);
 				end;
@@ -311,23 +309,23 @@ function GC_Movers:setMover(mover, fillLevel)
 			end;
 		else
 			if mover.scaleReset then
-				setScale(mover.node, unpack(mover.scaleMin));
+				setScale(mover.node, mover.scaleMin[1], mover.scaleMin[2], mover.scaleMin[3]);
 				mover.scaleReset = false;
 			end;
 		end;
 	end;
-	
+
 	if mover.useColourChange then
 		if fillLevel >= mover.startColourChange then
 			mover.colourReset = true;
-			
+
 			if fillLevel < mover.stopColourChange then
 				local colourScale = {0, 0, 0};
 				local factor = (fillLevel - mover.startColourChange) / (mover.stopColourChange - mover.startColourChange);
 				for i = 1, 3 do
 					colourScale[i] = MathUtil.clamp(mover.colourMin[i] + factor * (mover.colourMax[i] - mover.colourMin[i]), 0, 1);
-				end;			
-				
+				end;
+
 				setShaderParameter(mover.node, "colorScale", colourScale[1], colourScale[2], colourScale[3], 0, false);
 			end;
 		else
@@ -336,7 +334,7 @@ function GC_Movers:setMover(mover, fillLevel)
 				mover.colourReset = false;
 			end;
 		end;
-    end;
+	end;
 end;
 
 -- Use this to update 'endLevel' if the capacity can change on target.
@@ -346,35 +344,35 @@ function GC_Movers:updateMoversEndLevel(value, fillTypeIndex)
 		if value == nil then
 			value = 0;
 		end;
-		
-		if self.movers ~= nil then		
-			if self.disableFillType then				
-				for _, mover in pairs(self.movers) do	
+
+		if self.movers ~= nil then
+			if self.disableFillType then
+				for _, mover in pairs(self.movers) do
 					if mover.stopTrans ~= nil then
 						mover.stopTrans = mover.originalStopTrans + value;
-					end;					
+					end;
 					if mover.stopRot ~= nil then
 						mover.stopRot = mover.originalStopRot + value;
-					end;					
+					end;
 					if mover.stopScale ~= nil then
 						mover.stopScale = mover.originalStopScale + value;
-					end;					
+					end;
 					if mover.stopColourChange ~= nil then
 						mover.stopColourChange = mover.originalStopColourChange + value;
 					end;
 				end;
 			else
 				if fillTypeIndex ~= nil and self.movers[fillTypeIndex] ~= nil then
-					for _, mover in pairs(self.movers[fillTypeIndex]) do	
+					for _, mover in pairs(self.movers[fillTypeIndex]) do
 						if mover.stopTrans ~= nil then
 							mover.stopTrans = mover.originalStopTrans + value;
-						end;						
+						end;
 						if mover.stopRot ~= nil then
 							mover.stopRot = mover.originalStopRot + value;
-						end;						
+						end;
 						if mover.stopScale ~= nil then
 							mover.stopScale = mover.originalStopScale + value;
-						end;						
+						end;
 						if mover.stopColourChange ~= nil then
 							mover.stopColourChange = mover.originalStopColourChange + value;
 						end;

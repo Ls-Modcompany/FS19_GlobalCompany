@@ -42,7 +42,7 @@ function GC_Sounds:new(isServer, isClient, customMt)
 	setmetatable(self, customMt or GC_Sounds_mt);
 
 	self.isServer = isServer;
-    self.isClient = isClient;
+	self.isClient = isClient;
 
 	self.soundsRunning = false;
 	self.disableSoundEffects = false;
@@ -52,7 +52,7 @@ end;
 
 function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
 	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
-		local text = "Loading failed! 'nodeId' paramater = %s, 'target' paramater = %s 'xmlFile' paramater = %s, 'xmlKey' paramater = %s";
+		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s";
 		g_company.debug:logWrite(GC_Sounds.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil);
 		return false;
 	end;
@@ -61,16 +61,9 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
 
 	self.rootNode = nodeId;
 	self.target = target;
-	
-	if baseDirectory == nil or baseDirectory == "" then
-		baseDirectory = self.target.baseDirectory;
-		if baseDirectory == nil or baseDirectory == "" then
-			baseDirectory = g_currentMission.baseDirectory;
-		end;
-	end;
 
-	self.baseDirectory = baseDirectory;
-	
+	self.baseDirectory = GlobalCompanyUtils.getParentBaseDirectory(target, baseDirectory);
+
 	local returnValue = false;
 	if self.isClient then
 		if hasXMLProperty(xmlFile, xmlKey .. ".sounds") then
@@ -127,6 +120,8 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
 
 						table.insert(self.standardSounds, sound);
 					end;
+
+					sound = nil;
 				end;
 				i = i + 1;
 			end;
@@ -139,10 +134,10 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
 			self.operateSamples.start = g_soundManager:loadSampleFromXML(xmlFile, key, "start", self.baseDirectory, self.rootNode, 1, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
 			self.operateSamples.run = g_soundManager:loadSampleFromXML(xmlFile, key, "run", self.baseDirectory, self.rootNode, 0, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
 			self.operateSamples.stop = g_soundManager:loadSampleFromXML(xmlFile, key, "stop", self.baseDirectory, self.rootNode, 1, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
-		
+
 			returnValue = true;
 		end;
-	
+
 		if self.intervalSounds ~= nil then
 			g_company.addRaisedUpdateable(self);
 		end;
@@ -155,7 +150,7 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
 end;
 
 function GC_Sounds:delete()
-	if self.isClient then		
+	if self.isClient then
 		if self.operateSamples ~= nil then
 			g_soundManager:deleteSamples(self.operateSamples);
 			self.operateSamples = nil;
@@ -168,7 +163,7 @@ function GC_Sounds:delete()
 				end;
 			end;
 			self.intervalSounds = nil;
-			
+
 			g_company.removeRaisedUpdateable(self);
 		end;
 
@@ -240,7 +235,7 @@ function GC_Sounds:update(dt)
 end;
 
 function GC_Sounds:setSoundsState(state, forceState)
-	if self.isClient then		
+	if self.isClient then
 		local setState = state or (not self.soundsRunning);
 
 		if self.soundsRunning ~= setState or forceState == true then
@@ -257,7 +252,7 @@ function GC_Sounds:setSoundsState(state, forceState)
 					g_soundManager:playSample(self.operateSamples.stop);
 				end;
 			end;
-	
+
 			if self.standardSounds ~= nil then
 				for i = 1, #self.standardSounds do
 					if self.standardSounds[i].sample ~= nil then
@@ -271,7 +266,7 @@ function GC_Sounds:setSoundsState(state, forceState)
 					end;
 				end;
 			end;
-	
+
 			if self.intervalSounds ~= nil then
 				self:raiseUpdate();
 			end;
