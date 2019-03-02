@@ -16,5 +16,8 @@
 <e k="GC_baleShreader_toggleOnWorkLight" v="Arbeitslicht anschalten"/>
 <e k="GC_baleShreader_toggleOffWorkLight" v="Arbeitslicht ausschalten"/>
 
+<!-- Baler -->
+<e k="GC_baler_cleaner" v="Abkippbereich säubern"/>
+
 
 </elements></l10n>
