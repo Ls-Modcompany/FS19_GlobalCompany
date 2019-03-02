@@ -203,6 +203,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
 	source(GlobalCompany.dir .. "objects/GC_BaleShreader.lua");
 	source(GlobalCompany.dir .. "objects/GC_DirtyObjects.lua");
+	source(GlobalCompany.dir .. "objects/GC_Baler.lua");
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
@@ -212,6 +213,7 @@ function GlobalCompany.loadSourceFiles()
 	--|| Placeables ||--
 	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_BaleShreaderPlaceable.lua");
+	source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
 end;
 
 --| Add Base GC Placeables |--
@@ -224,6 +226,7 @@ function GlobalCompany.loadPlaceables()
 
 	GlobalCompany:addPlaceableType("GC_ProductionFactoryPlaceable", "GC_ProductionFactoryPlaceable", placeablesDir .. "GC_ProductionFactoryPlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_BaleShreaderPlaceable", "GC_BaleShreaderPlaceable", placeablesDir .. "GC_BaleShreaderPlaceable.lua");
+	GlobalCompany:addPlaceableType("GC_BalerPlaceable", "GC_BalerPlaceable", placeablesDir .. "GC_BalerPlaceable.lua");
 end;
 
 --| Main |--
