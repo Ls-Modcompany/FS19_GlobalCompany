@@ -86,15 +86,17 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	if self.saveId == nil then
 		self.saveId = "baler_" .. indexName;
 	end;
-    
-    local fillTypesKey = string.format("%s.fillTypes", xmlKey);
+	
+	local mainPartKey = xmlKey .. ".mainPart";
+	
+    local fillTypesKey = string.format("%s.fillTypes", mainPartKey);
 	if not hasXMLProperty(xmlFile, fillTypesKey) then
 		--debug
 		return false;
     end;
     
     self.fillLevel = 0;    
-    self.capacity = Utils.getNoNil(getXMLInt(xmlFile, xmlKey .. "#capacity"), 50000);
+    self.capacity = Utils.getNoNil(getXMLInt(xmlFile, mainPartKey .. "#capacity"), 50000);
     
     local capacities = {};
     self.fillTypes = {};
@@ -123,10 +125,10 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		i = i + 1;
     end;
 
-    self.unloadTrigger = self.triggerManager:loadTrigger(GC_UnloadingTrigger, self.nodeId , xmlFile, string.format("%s.unloadTrigger", xmlKey), {[1] = self.fillTypes[self.activeFillTypeIndex].index}, {[1] = "DISCHARGEABLE"});
-    self.cleanHeap = self.triggerManager:loadTrigger(GC_DynamicHeap, self.nodeId , xmlFile, string.format("%s.cleanHeap", xmlKey), self.fillTypes[self.activeFillTypeIndex].name, nil, false);
+    self.unloadTrigger = self.triggerManager:loadTrigger(GC_UnloadingTrigger, self.nodeId , xmlFile, string.format("%s.unloadTrigger", mainPartKey), {[1] = self.fillTypes[self.activeFillTypeIndex].index}, {[1] = "DISCHARGEABLE"});
+    self.cleanHeap = self.triggerManager:loadTrigger(GC_DynamicHeap, self.nodeId , xmlFile, string.format("%s.cleanHeap", mainPartKey), self.fillTypes[self.activeFillTypeIndex].name, nil, false);
     
-	self.playerTriggerClean = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.nodeId , xmlFile, string.format("%s.playerTriggerClean", xmlKey), Baler.PLAYERTRIGGER_CLEAN, true, g_company.languageManager:getText("GC_baler_cleaner"), true);
+	self.playerTriggerClean = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.nodeId , xmlFile, string.format("%s.playerTriggerClean", mainPartKey), Baler.PLAYERTRIGGER_CLEAN, true, g_company.languageManager:getText("GC_baler_cleaner"), true);
     
     self.movers = GC_Movers:new(self.isServer, self.isClient);
 	self.movers:load(self.nodeId , self, xmlFile, xmlKey, self.baseDirectory, capacities);
