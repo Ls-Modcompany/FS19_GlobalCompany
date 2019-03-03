@@ -105,7 +105,7 @@ function GC_DigitalDisplays:load(nodeId, target, xmlFile, xmlKey, groupKey, disa
 							local numMeshes = getNumOfChildren(numbers);
 							if numMeshes > 0 then
 								display.numbers = numbers;
-								display.lastvalue = 0;
+								display.lastvalue = -1;
 								display.numberColour = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. "#numberColor", 4, false, self.debugData);
 								display.currentColourIndex = 1;
 								colourToSet = display.numberColour;
