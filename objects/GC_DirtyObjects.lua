@@ -57,7 +57,9 @@ function DirtObjects:new(isServer, isClient, customMt, baseDirectory, customEnvi
 
 	self.debugData = g_company.debug:getDebugData(DirtObjects.debugIndex, nil, customEnvironment);
 
-	g_currentMission.environment:addHourChangeListener(self);
+	if self.isServer then
+		g_currentMission.environment:addHourChangeListener(self);
+	end;
 	return self;
 end;
 
@@ -81,7 +83,7 @@ function DirtObjects:delete()
 	if self.isOnCreate then
 		g_currentMission:removeOnCreateLoadedObjectToSave(self);
 	end;
-	if g_currentMission.environment ~= nil then
+	if g_currentMission.environment ~= nil and self.isServer then
         g_currentMission.environment:removeWeatherChangeListener(self)
     end;	
 	DirtObjects:superClass().delete(self)
@@ -164,23 +166,24 @@ function DirtObjects:saveToXMLFile(xmlFile, key, usedModNames)
 end;
 
 function DirtObjects:update(dt)
-	self:raiseActive();
-	if g_currentMission.missionInfo.timeScale >= 120 then
-		g_currentMission.missionInfo.timeScale = 2000;
-	end;
+	
 end;
 
-function DirtObjects:hourChanged()
-	if self.isServer then
-		local factor = 1;
-		if g_currentMission ~= nil and g_currentMission.environment ~= nil and g_currentMission.environment.weather:getIsRaining() then
-			factor = -2;
+function DirtObjects:hourChanged()	
+	local needRaise = false;
+	local factor = 1;
+	if g_currentMission ~= nil and g_currentMission.environment ~= nil and g_currentMission.environment.weather:getIsRaining() then
+		factor = -2;
+	end;
+	for _,dirtNode in pairs(self.dirtNodes) do			
+		local x, y, z, w = getShaderParameter(dirtNode, "RDT");
+		local newY = math.max(math.min(y + self.factorPerHour * factor, 1), 0);
+		if y ~= newY then
+			setShaderParameter(dirtNode, "RDT", x, newY, z, w, false);
+			needRaise = true;
 		end;
-		for _,dirtNode in pairs(self.dirtNodes) do			
-			local x, y, z, w = getShaderParameter(dirtNode, "RDT");
-			y = math.max(math.min(y + self.factorPerHour * factor, 1), 0);
-			setShaderParameter(dirtNode, "RDT", x, y, z, w, false);
-		end;
+	end;
+	if needRaise then
 		self:raiseDirtyFlags(self.dirtObjectsDirtyFlag);
 	end;
-end
+end;
