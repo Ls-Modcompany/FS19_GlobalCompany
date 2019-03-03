@@ -2,7 +2,7 @@
 -- GlobalCompany - Triggers - GC_DynamicHeap
 --
 -- @Interface: --
--- @Author: LS-Modcompany / kevink98
+-- @Author: LS-Modcompany / kevink98 / GtX
 -- @Date: 14.01.2019
 -- @Version: 1.1.0.0
 --
@@ -11,6 +11,7 @@
 -- Changelog:
 -- 	v1.1.0.0 (14.01.2019):
 -- 		- convert to fs19 (GtX)
+--		- New functions and XML support (GtX / kevink98)
 --
 -- 	v1.0.0.0 (19.05.2018):
 -- 		- initial fs17 (kevink98)
@@ -42,6 +43,10 @@ function GC_DynamicHeap:new(isServer, isClient, customMt)
 
 	self.heapArea = nil;
 	self.fillTypeIndex = nil;
+
+	self.extraParamater = nil;
+	self.vehiclesInRange = nil;
+	self.numVehiclesInRange = 0;
 
 	return self;
 end;
@@ -88,6 +93,20 @@ function GC_DynamicHeap:load(nodeId, target, xmlFile, xmlKey, fillTypeName, fixe
 				g_densityMapHeightManager:setFixedFillTypesArea(self.heapArea, fillTypes);
 			end;
 
+			if self.isServer then
+				local vehicleDetectionTrigger = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, xmlKey .. ".vehicleDetectionTrigger#node"))
+				if vehicleDetectionTrigger ~= nil then
+					if self.target.vehicleChangedHeapLevel ~= nil then
+						self.vehiclesInRange = {};
+						self.vehicleDetectionTrigger = vehicleDetectionTrigger;
+						addTrigger(self.vehicleDetectionTrigger, "vehicleDetectionTriggerCallback", self);
+						g_company.addRaisedUpdateable(self);
+					else
+						g_company.debug:writeDev(self.debugData, "'vehicleDetectionTrigger' can not be loaded! Parent script does not contain function 'vehicleChangedHeapLevel(heapLevel, fillTypeIndex, extraParamater)'.");
+					end;
+				end;
+			end;
+
 			return true;
 		else
 			g_company.debug:writeModding(self.debugData, "'startNode' or 'widthNode' or 'heightNode' is not valid at '%s'", key);
@@ -104,10 +123,42 @@ function GC_DynamicHeap:load(nodeId, target, xmlFile, xmlKey, fillTypeName, fixe
 end;
 
 function GC_DynamicHeap:delete()
+	if self.isServer then
+		if self.vehicleDetectionTrigger ~= nil then
+			removeTrigger(self.vehicleDetectionTrigger)
+			g_company.removeRaisedUpdateable(self);
+			self.vehicleDetectionTrigger = nil;
+			self.vehiclesInRange = nil;
+		end;
+	end;
+
 	if self.isFixedFillTypeArea then
 		g_densityMapHeightManager:removeFixedFillTypesArea(self.heapArea);
 	end;
 end
+
+function GC_DynamicHeap:update(dt)
+	if self.isServer then
+		for node, fillUnitData in pairs(self.vehiclesInRange) do
+			local vehicle = g_currentMission.nodeToObject[node];
+			if vehicle ~= nil then
+				if vehicle:getIsActive() and vehicle:getFillUnitFillLevel(fillUnitData.fillUnitIndex) ~= fillUnitData.fillLevel then
+					fillUnitData.fillLevel = vehicle:getFillUnitFillLevel(fillUnitData.fillUnitIndex);
+
+					local heapLevel = self:getHeapLevel();
+					self.target:vehicleChangedHeapLevel(heapLevel, self.fillTypeIndex, self.extraParamater);
+				end;
+			else
+				self.vehiclesInRange[node] = nil;
+				self.numVehiclesInRange = self.numVehiclesInRange - 1;
+			end;
+		end;
+
+		if self.numVehiclesInRange > 0 then
+			self:raiseUpdate();
+		end;
+	end;
+end;
 
 function GC_DynamicHeap:setFillTypeIndex(fillTypeIndex)
 	if g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex) ~= nil then
@@ -116,7 +167,7 @@ function GC_DynamicHeap:setFillTypeIndex(fillTypeIndex)
 			return true;
 		end;
 	end;
-	
+
 	return false;
 end;
 
@@ -216,7 +267,7 @@ function GC_DynamicHeap:getHeightCenter()
 
 	local x = xs - ((xs - xw) / 2);
 	local z = zs + ((zh - zs) / 2);
-	
+
 	return DensityMapHeightUtil.getHeightAtWorldPos(x,0,z) - getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, x,0,z);
 end;
 
@@ -224,9 +275,45 @@ function GC_DynamicHeap:getIsHeapEmpty()
 	local xs, _, zs = getWorldTranslation(self.heapArea.start);
 	local xw, _, zw = getWorldTranslation(self.heapArea.width);
 	local xh, _, zh = getWorldTranslation(self.heapArea.height);
-	
+
 	return DensityMapHeightUtil.getFillTypeAtArea(xs, zs, xw, zw, xh, zh) == FillType.UNKNOWN;
 end;
+
+function GC_DynamicHeap:vehicleDetectionTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay, otherShapeId)
+	if onEnter or onLeave then
+		local vehicle = g_currentMission.nodeToObject[otherShapeId]
+		if vehicle ~= nil and vehicle.setBunkerSiloInteractorCallback ~= nil then
+			if onEnter then
+				if self.vehiclesInRange[vehicle] == nil then
+					for fillUnitIndex, fillUnit in pairs (vehicle.spec_fillUnit.fillUnits) do
+						if vehicle:getFillUnitSupportsFillType(fillUnitIndex, self.fillTypeIndex) then
+							local fillLevel = vehicle:getFillUnitFillLevel(fillUnitIndex);
+							self.vehiclesInRange[otherShapeId] = {fillLevel = fillLevel, fillUnitIndex = fillUnitIndex};
+							self.numVehiclesInRange = self.numVehiclesInRange + 1;
+
+							self:raiseUpdate();
+							--vehicle:setBunkerSiloInteractorCallback(GC_DynamicHeap.onChangedFillLevelCallback, self);
+						end;
+					end;
+				end;
+			else
+				if self.vehiclesInRange[otherShapeId] ~= nil then
+					self.vehiclesInRange[otherShapeId] = nil;
+					self.numVehiclesInRange = self.numVehiclesInRange - 1;
+
+					self:raiseUpdate();
+					--vehicle:setBunkerSiloInteractorCallback(nil);
+				end;
+			end;
+		end;
+	end;
+end;
+
+-- Removed as this is only updated when the shovel is removing!
+-- function GC_DynamicHeap.onChangedFillLevelCallback(self, vehicle, fillDelta, fillTypeIndex)
+	-- local heapLevel = self:getHeapLevel();
+	-- self.target:vehicleChangedHeapLevel(heapLevel, fillTypeIndex, self.extraParamater)
+-- end;
 
 
 
