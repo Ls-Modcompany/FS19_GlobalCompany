@@ -31,6 +31,16 @@ Baler.debugIndex = g_company.debug:registerScriptName("Baler");
 Baler.PLAYERTRIGGER_MAIN = 0;
 Baler.PLAYERTRIGGER_CLEAN = 1;
 
+Baler.STATE_OFF = 0;
+Baler.STATE_TURN_ON = 1;
+Baler.STATE_ON = 2;
+Baler.STATE_TURN_OFF = 3;
+
+Baler.ANIMATION_CANSTACK = 0;
+Baler.ANIMATION_ISSTACKING = 1;
+Baler.ANIMATION_CANSTACKEND = 2;
+Baler.ANIMATION_ISSTACKINGEND = 3;
+
 getfenv(0)["GC_Baler"] = Baler;
 
 function Baler:onCreate(transformId)
@@ -71,6 +81,9 @@ function Baler:new(isServer, isClient, customMt, xmlFilename, baseDirectory, cus
 
 	self.debugData = g_company.debug:getDebugData(Baler.debugIndex, nil, customEnvironment);
 
+	self.state = Baler.STATE_OFF;
+	self.turnOnFillTypes = false;
+
 	return self;
 end;
 
@@ -95,11 +108,14 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		return false;
     end;
     
-    self.fillLevel = 0;    
+	self.fillLevel = 0;    
+	self.fillLevelBunker = 0;
     self.capacity = Utils.getNoNil(getXMLInt(xmlFile, mainPartKey .. "#capacity"), 50000);
+    self.pressPerSecond = Utils.getNoNil(getXMLInt(xmlFile, mainPartKey .. "#pressPerSecond"), 400);
     
     local capacities = {};
-    self.fillTypes = {};
+	self.fillTypes = {};
+	self.fillTypeToBaleType = {};
 	local i = 0;
 	while true do
 		local fillTypeKey = string.format("%s.fillType(%d)", fillTypesKey, i);
@@ -108,11 +124,13 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
         end;
 
         local fillTypeName = getXMLString(xmlFile, fillTypeKey .. "#name");
+        local baleTypeName = getXMLString(xmlFile, fillTypeKey .. "#baleTypeName");
 		if fillTypeName ~= nil then
 			local fillType = g_fillTypeManager:getFillTypeByName(fillTypeName);
 			if fillType ~= nil then
                 self.fillTypes[fillType.index] = fillType;
-                capacities[fillType.index] = self.capacity;
+				capacities[fillType.index] = self.capacity;
+				self.fillTypeToBaleType[fillType.index] = g_baleTypeManager.nameToBaleType[baleTypeName];
                 if self.activeFillTypeIndex == nil then
                     self:setFillTyp(fillType.index);
                 end;
@@ -123,7 +141,9 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 			end;
 		end;
 		i = i + 1;
-    end;
+	end;
+	
+	self.autoOn = Utils.getNoNil(getXMLBool(xmlFile, mainPartKey .. "#autoOn"), true);
 
     self.unloadTrigger = self.triggerManager:loadTrigger(GC_UnloadingTrigger, self.nodeId , xmlFile, string.format("%s.unloadTrigger", mainPartKey), {[1] = self.fillTypes[self.activeFillTypeIndex].index}, {[1] = "DISCHARGEABLE"});
     self.cleanHeap = self.triggerManager:loadTrigger(GC_DynamicHeap, self.nodeId , xmlFile, string.format("%s.cleanHeap", mainPartKey), self.fillTypes[self.activeFillTypeIndex].name, nil, false);
@@ -131,7 +151,59 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	self.playerTriggerClean = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.nodeId , xmlFile, string.format("%s.playerTriggerClean", mainPartKey), Baler.PLAYERTRIGGER_CLEAN, true, g_company.languageManager:getText("GC_baler_cleaner"), true);
     
     self.movers = GC_Movers:new(self.isServer, self.isClient);
-	self.movers:load(self.nodeId , self, xmlFile, xmlKey, self.baseDirectory, capacities);
+	self.movers:load(self.nodeId , self, xmlFile, mainPartKey, self.baseDirectory, capacities);
+	
+    self.conveyorFillType = GC_Conveyor:new(self.isServer, self.isClient);
+	self.conveyorFillType:load(self.nodeId, self, xmlFile, string.format("%s.conveyor", mainPartKey));
+    self.conveyorFillTypeEffect = GC_ConveyorEffekt:new(self.isServer, self.isClient);
+	self.conveyorFillTypeEffect:load(self.nodeId, self, xmlFile, string.format("%s.conveyor.effect", mainPartKey));
+
+	self.baleAnimation = GC_Animations:new(self.isServer, self.isClient)
+	self.baleAnimation:load(self.nodeId, self, true, nil, xmlFile, string.format("%s.baleAnimation", mainPartKey));
+
+	self.baleAnimationObjectNode = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, string.format("%s.baleAnimation.objects#node", mainPartKey)), self.i3dMappings);
+	self.baleAnimationObjects = {};
+	i = 0;
+	while true do
+		local objectKey = string.format("%s.baleAnimation.objects.object(%d)", mainPartKey, i);
+		if not hasXMLProperty(xmlFile, objectKey) then
+			break;
+        end;
+
+		local node = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, objectKey .. "#node"), self.i3dMappings);
+		local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(getXMLString(xmlFile, objectKey .. "#fillTypeName"));
+		
+		setVisibility(node, false);
+		table.insert(self.baleAnimationObjects, {node=node, fillTypeIndex=fillTypeIndex});
+		
+		i = i + 1;
+	end;
+
+
+	local stackPartKey = xmlKey .. ".stack";
+	self.hasStack = hasXMLProperty(xmlFile, stackPartKey);
+	if self.hasStack then
+
+		self.animationState = Baler.ANIMATION_CANSTACK;
+		self.stackBalesNum = 0;
+		self.stackBalesTarget = 3;
+		self.baleInsideCounter = 0;
+		self.stackBales = {};
+		
+		self.forkNode = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, stackPartKey .. "#forkNode"), self.i3dMappings);
+		self.baleTriggerNode = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, stackPartKey .. ".baleTrigger#node"), self.i3dMappings);
+		addTrigger(self.baleTriggerNode, "baleTriggerCallback", self);
+
+		self.raisedAnimationKeys = {};
+		self.doStackAnimationEnd = GC_Animations:new(self.isServer, self.isClient)
+		self.doStackAnimationEnd:load(self.nodeId, self, true, string.format("%s.doStackAnimationEnd", stackPartKey), xmlFile);
+		self.doStackAnimationStart = GC_Animations:new(self.isServer, self.isClient)
+		self.doStackAnimationStart:load(self.nodeId, self, true, string.format("%s.doStackAnimationStart", stackPartKey), xmlFile);
+			
+
+	end;
+
+
 
 	self.balerDirtyFlag = self:getNextDirtyFlag();
 
@@ -195,11 +267,92 @@ function Baler:saveToXMLFile(xmlFile, key, usedModNames)
 end;
 
 function Baler:update(dt)
-	
+	if self.isServer then
+
+		if self.fillLevelBunker == 0 then
+			if self.fillLevel >= 4000 then
+				self:setFillLevelBunker(nil, dt / 1000 * self.pressPerSecond);
+			else
+				--nicht mehr genug lvl, um ein ballen zu produzieren
+			end;
+		else									
+			if self.fillLevelBunker == 4000 then
+				if self:canUnloadBale() then					
+					self:setBaleObjectToAnimation();
+					self.baleAnimation:setAnimationsState(true);
+					self:setFillLevelBunker(0);
+				end;
+			else		
+				self:setFillLevelBunker(nil, math.min(dt / 1000 * self.pressPerSecond, 4000 - self.fillLevelBunker));
+			end;
+			if self.baleAnimation:getAnimationTime() == 1 then
+				self:createBale(self.baleAnimationObjectNode);
+				self.baleAnimation:setAnimTime(0);
+				delete(getChildAt(self.baleAnimationObjectNode, 0));
+			end;
+		end;
+
+		if self.hasStack then
+			if self.animationState == Baler.ANIMATION_CANSTACK then
+				if self:getBaleIsInside() then					
+					self.stackBalesNum = self.stackBalesNum + 1;
+					if self.stackBalesNum < self.stackBalesTarget then
+						self.animationState = Baler.ANIMATION_ISSTACKING;
+						self.doStackAnimationStart:setAnimationsState(true);
+					else
+						-- move all bales
+					end;
+				end;
+			elseif self.animationState == Baler.ANIMATION_ISSTACKING then
+				if self.doStackAnimationStart:getAnimationTime() == 1 then
+					self.animationState = Baler.ANIMATION_CANSTACKEND;
+					self.raisedAnimationKeys = {};
+				elseif self.doStackAnimationStart:getAnimationTime() >= 0.6 and self.raisedAnimationKeys["0.6"] == nil then
+					self:setBaleObjectToFork();
+					for _,bale in pairs(self.stackBales) do
+						bale:delete();
+					end;
+					self.stackBales = {};
+					self.baleInsideCounter = 0;
+					self.raisedAnimationKeys["0.6"] = true;
+				end;
+			elseif self.animationState == Baler.ANIMATION_CANSTACKEND then
+				if self:getBaleIsInside() then
+					self.animationState = Baler.ANIMATION_ISSTACKINGEND;
+					self.doStackAnimationEnd:setAnimationsState(true);
+				end
+			elseif self.animationState == Baler.ANIMATION_ISSTACKINGEND then
+				if self.doStackAnimationEnd:getAnimationTime() == 1 then
+					self.animationState = Baler.ANIMATION_CANSTACK;
+					self.raisedAnimationKeys = {};				
+					self.doStackAnimationEnd:setAnimTime(0);	
+					self.doStackAnimationStart:setAnimTime(0);	
+				elseif self.doStackAnimationEnd:getAnimationTime() >= 0.3 and self.raisedAnimationKeys["0.3"] == nil then
+					print(getNumOfChildren(self.forkNode));
+					for i=1, getNumOfChildren(self.forkNode) do
+						local child = getChildAt(self.forkNode, 0);
+						self:createBale(child);
+						delete(child);
+					end;
+					self.raisedAnimationKeys["0.3"] = true;
+				end;
+			end;
+
+
+		end;
+
+		self:raiseActive();
+
+	end;
+
 end;
 
 function Baler:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, toolType, fillPositionData, triggerId)
 	self:setFillLevel(self.fillLevel + fillLevelDelta);
+	
+	if self.autoOn and self.fillLevel > 0 then
+		self:onTurnOn();
+	end;
 end;
 
 function Baler:getFreeCapacity(dt)
@@ -231,11 +384,106 @@ function Baler:playerTriggerActivated(ref)
     end;
 end;
 
+function Baler:setFillLevelBunker(level, delta)    
+	if level ~= nil then
+		local oldLevel = self.fillLevelBunker;
+		self.fillLevelBunker = level;
+		self:setFillLevel(self.fillLevel + (oldLevel - self.fillLevelBunker));
+	elseif delta ~= nil then
+		self.fillLevelBunker = self.fillLevelBunker + delta;
+		self:setFillLevel(self.fillLevel + (delta * -1));
+	end;	
+end;
+
 function Baler:setFillLevel(level)    
     self.fillLevel = level;
-    self.movers:updateMovers(level, self.activeFillTypeIndex);    
+	self.movers:updateMovers(level, self.activeFillTypeIndex);    
 end;
 
 function Baler:setFillTyp(fillTypeIndex)    
     self.activeFillTypeIndex = fillTypeIndex; 
+end;
+
+function Baler:onTurnOn()	
+	--event
+	self.state = Baler.STATE_TURN_ON;
+	self:onTurnOnFillTypes();
+	self:raiseActive();
+end
+
+function Baler:onTurnOnFillTypes()
+	if self.fillLevel > 0 and not self.turnOnFillTypes and (self.state == Baler.STATE_ON or self.state == Baler.STATE_TURN_ON) then
+		if self.isClient then
+			self.conveyorFillTypeEffect:setFillType(self.activeFillTypeIndex);
+			self.conveyorFillTypeEffect:start();
+			self.conveyorFillType:start();
+		end;
+		self.turnOnFillTypes = true;
+	end;
+end
+
+function Baler:setBaleObjectToAnimation()
+	for _,info in pairs (self.baleAnimationObjects) do
+		if info.fillTypeIndex == self.activeFillTypeIndex then
+			local newBale = clone(info.node, false, false, false);
+			setVisibility(newBale, true);
+			link(self.baleAnimationObjectNode, newBale);		
+			break;
+		end;
+	end;
+end;
+
+function Baler:setBaleObjectToFork()
+	for _,info in pairs (self.baleAnimationObjects) do
+		if info.fillTypeIndex == self.activeFillTypeIndex then
+			for i=1, self.stackBalesNum do
+				local newBale = clone(info.node, false, false, false);
+				setVisibility(newBale, true);
+				setTranslation(newBale, 0, 0.946 + (i-1)*0.9,0);
+				link(self.forkNode, newBale);		
+			end;
+			break;
+		end;
+	end;
+end;
+
+function Baler:canUnloadBale()
+	local canUnloadBale = false;
+
+	canUnloadBale = self.baleAnimation:getAnimationTime() == 0;
+
+	if canUnloadBale and self.hasStack then
+		canUnloadBale = not self:getBaleIsInside();
+	end;
+
+	return canUnloadBale;
+end;
+
+function Baler:createBale(ref)
+	local t = self.fillTypeToBaleType[self.activeFillTypeIndex];
+	local baleType = g_baleTypeManager:getBale(self.activeFillTypeIndex, false, t.width, t.height, t.length, t.diameter);	
+	local filename = Utils.getFilename(baleType.filename, self.baseDirectory);
+	local baleObject = Bale:new(self.isServer, self.isClient);
+	local x,y,z = getWorldTranslation(ref);
+	local rx,ry,rz = getWorldRotation(ref);
+	baleObject:load(filename, x,y,z,rx,ry,rz, 4000);
+	baleObject:setOwnerFarmId(self:getOwnerFarmId(), true);
+	baleObject:register();
+	baleObject:setCanBeSold(false);
+	table.insert(self.stackBales, baleObject);
+end
+
+function Baler:getBaleIsInside()
+	return self.baleInsideCounter ~= 0;
+end;
+
+function Baler:baleTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay, otherShapeId)
+	local object = g_currentMission:getNodeObject(otherId)
+	if object ~= nil and object:isa(Bale) then
+		if onEnter  then	
+			self.baleInsideCounter = self.baleInsideCounter + 1;
+		elseif onLeave then
+			self.baleInsideCounter = math.max(self.baleInsideCounter - 1, 0);
+		end;
+	end;
 end;

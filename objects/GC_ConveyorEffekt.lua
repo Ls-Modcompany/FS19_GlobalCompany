@@ -23,10 +23,11 @@
 -- check if scripts work in fs19!
 --
 
-local debugIndex = g_company.debug:registerScriptName("GlobalCompany-GC_ConveyorEffekt");
 
 GC_ConveyorEffekt = {};
 getfenv(0)["GC_ConveyorEffekt"] = GC_ConveyorEffekt;
+
+GC_ConveyorEffekt.debugIndex = g_company.debug:registerScriptName("GlobalCompany-GC_ConveyorEffekt");
 
 GC_ConveyorEffekt.STATE_OFF = 0;
 GC_ConveyorEffekt.STATE_TURNING_OFF = 1;
@@ -47,7 +48,11 @@ function GC_ConveyorEffekt:new(isServer, isClient)
 	return self;
 end;
 
-function GC_ConveyorEffekt:load(id, xmlFile, baseKey)
+function GC_ConveyorEffekt:load(id, target, xmlFile, baseKey)
+	self.target = target;
+
+	self.debugData = g_company.debug:getDebugData(GC_ConveyorEffekt.debugIndex, target);
+
 	if self.isClient then
 		self.shaders = {};
 		local i = 0;
@@ -57,7 +62,7 @@ function GC_ConveyorEffekt:load(id, xmlFile, baseKey)
 				break;
 			end;
 			local shader = {};
-			shader.node = I3DUtil.indexToObject(id, getXMLString(xmlFile, key.."#index"));
+			shader.node = I3DUtil.indexToObject(id, getXMLString(xmlFile, key.."#node"), self.target.i3dMappings);
 			shader.fadeTime = Utils.getNoNil(getXMLFloat(xmlFile, key.."#fadeTime"), 1) * 1000;
 			shader.startDelay = Utils.getNoNil(getXMLFloat(xmlFile, key.."#startDelay"), 0) * 1000;
 			shader.stopDelay = Utils.getNoNil(getXMLFloat(xmlFile, key.."#stopDelay"), 0) * 1000;
@@ -73,9 +78,11 @@ function GC_ConveyorEffekt:load(id, xmlFile, baseKey)
 			shader.scrollPosition = 0;
 			
 			shader.fadeCur = {0,0};
-			shader.fadeDir = {0,0};			
+			shader.fadeDir = {0,0};		
 			
-			setShaderParameter(shader.node, "morphPosition", 0.0, 0.0, 1.0, 0.0, false);
+			setVisibility(shader.node, false)
+
+			setShaderParameter(shader.node, "morphPosition", 0.0, 1.0, 1.0, 0.0, false);
 
 			table.insert(self.shaders, shader);
 			
@@ -97,20 +104,27 @@ end;
 function GC_ConveyorEffekt:update(dt)
 	if self.isClient then
 		for _, shader in pairs(self.shaders) do 
-			shader.currentDelay = shader.currentDelay - dt;
-			if shader.currentDelay <= 0 then	
-				shader.fadeCur[1] = math.max(0, math.min(1, shader.fadeCur[1] + shader.fadeDir[1] * (dt / shader.fadeTime)));
-				shader.fadeCur[2] = math.max(0, math.min(1, shader.fadeCur[2] + shader.fadeDir[2] * (dt / shader.fadeTime)));
-				setShaderParameter(shader.node, "morphPosition", shader.fadeCur[1], shader.fadeCur[2], 1.0, shader.speed, false);       
-	   
-				shader.scrollPosition = (shader.scrollPosition + dt*shader.scrollSpeed) % shader.scrollLength;
-				setShaderParameter(shader.node, "offsetUV", shader.scrollPosition,0,0,0, false);
-				
-				if shader.state == GC_ConveyorEffekt.STATE_TURNING_ON and shader.fadeCur[1] == shader.fadeDir[1] and shader.fadeCur[2] == shader.fadeDir[2] then
-					shader.state = GC_ConveyorEffekt.STATE_ON;
-				elseif shader.state == GC_ConveyorEffekt.STATE_TURNING_OFF and shader.fadeCur[1] == shader.fadeDir[1] and shader.fadeCur[2] == shader.fadeDir[2] then
-					shader.state = GC_ConveyorEffekt.STATE_OFF;
-				end;
+			if shader.state ~= GC_ConveyorEffekt.STATE_OFF then
+				shader.currentDelay = shader.currentDelay - dt;
+				if shader.currentDelay <= 0 then	
+					shader.fadeCur[1] = math.max(0, math.min(1, shader.fadeCur[1] + shader.fadeDir[1] * (dt / shader.fadeTime)));
+					shader.fadeCur[2] = math.max(0, math.min(1, shader.fadeCur[2] + shader.fadeDir[2] * (dt / shader.fadeTime)));
+					shader.scrollPosition = (shader.scrollPosition + dt*shader.scrollSpeed) % shader.scrollLength;
+
+					setShaderParameter(shader.node, "morphPosition", shader.fadeCur[1], shader.fadeCur[2], 0.1, shader.speed, false);    					
+					setShaderParameter(shader.node, "offsetUV", shader.scrollPosition,0,-100,100, false);
+
+					local isVisible = true;					
+					if shader.state == GC_ConveyorEffekt.STATE_TURNING_ON and shader.fadeCur[1] == shader.fadeDir[1] and shader.fadeCur[2] == shader.fadeDir[2] then
+						shader.state = GC_ConveyorEffekt.STATE_ON;
+					elseif shader.state == GC_ConveyorEffekt.STATE_TURNING_OFF and shader.fadeCur[1] == shader.fadeDir[1] and shader.fadeCur[2] == shader.fadeDir[2] then
+						shader.state = GC_ConveyorEffekt.STATE_OFF;
+						shader.fadeCur[1] = 0;
+						shader.fadeCur[2] = 0;
+						isVisible = false;
+					end;
+					setVisibility(shader.node, isVisible);
+				end;		
 			end;		
 		end;
 	end;
@@ -136,6 +150,7 @@ function GC_ConveyorEffekt:stop(shader)
 	end;
 end;
 
+--Dont call from outside!! Only form GC_ConveyorEffekt.start!
 function GC_ConveyorEffekt:startShader(shader)
 	if shader.state ~= GC_ConveyorEffekt.STATE_TURNING_ON and shader.state ~= GC_ConveyorEffekt.STATE_ON then
 		shader.state = GC_ConveyorEffekt.STATE_TURNING_ON;
@@ -147,6 +162,7 @@ function GC_ConveyorEffekt:startShader(shader)
 	return false;
 end;
 
+--Dont call from outside!! Only form GC_ConveyorEffekt.stop!
 function GC_ConveyorEffekt:stopShader(shader)
 	if shader.state ~= GC_ConveyorEffekt.STATE_TURNING_OFF and shader.state ~= GC_ConveyorEffekt.STATE_OFF then
 		shader.state = GC_ConveyorEffekt.STATE_TURNING_OFF;
@@ -158,14 +174,16 @@ function GC_ConveyorEffekt:stopShader(shader)
 end;
 
 function GC_ConveyorEffekt:resetShader(shader)
-	shader.fadeCur = {0, 0};
-    shader.fadeDir = {0, 1};
-    setShaderParameter(shader.node, "morphPosition", shader.fadeCur[1], shader.fadeCur[2], 0.0, shader.speed, false);
-    shader.state = GC_ConveyorEffekt.STATE_OFF;
+	if self.isServer then
+		shader.fadeCur = {0, 0};
+		shader.fadeDir = {0, 1};
+		setShaderParameter(shader.node, "morphPosition", shader.fadeCur[1], shader.fadeCur[2], 0.1, shader.speed, false);
+		shader.state = GC_ConveyorEffekt.STATE_OFF;
+	end;
 end;
 
 function GC_ConveyorEffekt:setMorphPosition(shader, fade1, fade2)
-	setShaderParameter(shader.node, "morphPosition", fade1, fade2, 1.0, shader.speed, false);
+	setShaderParameter(shader.node, "morphPosition", fade1, fade2, 0.1, shader.speed, false);
 end;
 
 function GC_ConveyorEffekt:getIsOn(shader, index)
@@ -218,7 +236,6 @@ end;
 function GC_ConveyorEffekt:setFillType(fillType)
 	for _,shader in pairs(self.shaders) do
 		if shader.materialType ~= nil and shader.materialTypeId ~= nil then
-			--local material = MaterialManager:getMaterial("fillType", shader.materialType, shader.materialTypeId);
 			local material = g_materialManager.materials[fillType][shader.materialType][shader.materialTypeId]
 			if material ~= nil then
 				setMaterial(shader.node, material, 0);

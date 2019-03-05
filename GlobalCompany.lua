@@ -196,6 +196,7 @@ function GlobalCompany.loadSourceFiles()
 	--source(GlobalCompany.dir .. "objects/GC_PalletSpawner.lua");
 	source(GlobalCompany.dir .. "objects/GC_RotationNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
+	source(GlobalCompany.dir .. "objects/GC_Conveyor.lua");
 	source(GlobalCompany.dir .. "objects/GC_DigitalDisplays.lua");
 	source(GlobalCompany.dir .. "objects/GC_ActivableObject.lua");
 	--source(GlobalCompany.dir .. "objects/GC_ParticleEffects.lua"); -- Depreciated. Use 'GC_Effects' instead!

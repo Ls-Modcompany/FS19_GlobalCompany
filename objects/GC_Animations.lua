@@ -50,7 +50,7 @@ function GC_Animations:new(isServer, isClient, customMt)
 	return self;
 end;
 
-function GC_Animations:load(nodeId, enableSync, referenceKey, xmlFile, baseKey, i3dMappings)
+function GC_Animations:load(nodeId, target, enableSync, referenceKey, xmlFile, baseKey)
 	self.nodeId = nodeId;
 	self.enableSync = Utils.getNoNil(enableSync, true); -- This allows the MP sync to be disabled when not needed.
 
@@ -77,7 +77,7 @@ function GC_Animations:load(nodeId, enableSync, referenceKey, xmlFile, baseKey, 
 				break;
 			end;
 
-			local node = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, partKey.."#index"), i3dMappings);
+			local node = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, partKey.."#index"), target.i3dMappings);
 			if node ~= nil then
 				local part = {};
 				part.node = node;
