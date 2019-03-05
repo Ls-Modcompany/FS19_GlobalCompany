@@ -718,6 +718,7 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 end;
 
 function GlobalCompanyGui:getOutputSize()
+	--[[
 	if g_screenWidth == 640 then                                                     
 		return GlobalCompanyGui:getSizeWithFactor(3);
 	elseif g_screenWidth == 800 then                                                          
@@ -743,11 +744,17 @@ function GlobalCompanyGui:getOutputSize()
 	elseif g_screenWidth == 1920 then                                                          
 		return GlobalCompanyGui:getSizeWithFactor(1);
 	end;
+	]]--
+
+	local factor =  1920 / g_screenWidth;
+	return {g_screenWidth * factor, g_screenHeight * factor};
 end
 
+--[[
 function GlobalCompanyGui:getSizeWithFactor(factor)
 	return {g_screenWidth * factor, g_screenHeight * factor};
 end
+]]--
 
 -- http://alienryderflex.com/polygon/
 function GlobalCompanyGui:checkClickZone(x,y, clickZone, isRound)		
