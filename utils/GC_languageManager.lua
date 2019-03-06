@@ -21,48 +21,39 @@
 -- 
 
 GC_languageManager = {};
-GC_languageManager.debugIndex = g_company.debug:registerScriptName("GC_LanguageManager");
+GC_languageManager.debugIndex = g_company.debug:registerScriptName("LanguageManager");
 
 g_company.languageManager = GC_languageManager;
 
-function GC_languageManager:load(modLanguageFiles)
+function GC_languageManager:load(loadingDirectory)
 	GC_languageManager.debugData = g_company.debug:getDebugData(GC_languageManager.debugIndex, g_company);
-
-	if modLanguageFiles == nil then
-		g_company.debug:writeDev(GC_languageManager.debugData, "'modLanguageFiles' parameter is nil!");
+	
+	if loadingDirectory ~= nil then
+		local dir = loadingDirectory:sub(1, loadingDirectory:len() - 1); -- Remove  /  from end of file path (g_currentModDirectory).
+		local baseLanguageFullPath = g_company.languageManager:getLanguagesFullPath(dir);
+		GC_languageManager:loadEntries(g_currentModName, baseLanguageFullPath, "l10n.elements.e(%d)");
 		
-		local modLanguageFiles = {};
-		-- local selectedMods = g_modSelectionScreen.missionDynamicInfo.mods;
-		-- for _, mod in pairs(selectedMods) do
-			-- local langFullPath = GC_languageManager:getLanguagesFullPath(mod.modDir);
-			-- if langFullPath ~= nil then
-				-- modLanguageFiles[modName] = langFullPath;
-			-- end;
-		-- end;
+		g_company.debug:writeDev(GC_languageManager.debugData, "Standard language XML file has been loaded successfully."); -- Only print in development mode.
 	end;
+end;
 
+function GC_languageManager:loadModLanguageFiles(modLanguageFiles)
 	local fullPathCount = 0;
-	for modName, fullPath in pairs(modLanguageFiles) do
-		local langXml = loadXMLFile("TempConfig", fullPath);
-		--g_i18n:loadEntriesFromXML(langXml, "l10n.elements.e(%d)", "Warning: Duplicate text in l10n %s",  g_i18n.texts);
-		
-		
-		GC_languageManager:loadEntries(modName, fullPath, "l10n.elements.e(%d)")
-		
-		--[[@kevink98 - I think we should force all GlobalCompany l10n entries to use a 'PREFIX' (GC_ or SRS_) so we do not have any issues??
-			-- e.g  <e k="GC_gui_buttons_ok" v="OK"/>  or <e k="GC_activateBeacons" v="Turn Beacon Light On"/>
-		
-		GC_languageManager:loadEntries(modName, fullPath, "l10n.elements.e(%d)")
-		]]
-		
-		fullPathCount = fullPathCount + 1;
+	
+	if modLanguageFiles ~= nil then
+		for modName, fullPath in pairs(modLanguageFiles) do
+			GC_languageManager:loadEntries(modName, fullPath, "l10n.elements.e(%d)");
+			fullPathCount = fullPathCount + 1;
+		end;
 	end;
 	
-	g_company.debug:writeLoad(GC_languageManager.debugData, "'%d' language XML files have been loaded successfully.", fullPathCount);
+	if fullPathCount > 0 then
+		g_company.debug:writeLoad(GC_languageManager.debugData, "'%d' mod language XML files have been loaded successfully.", fullPathCount);
+	end;
 end;
 
 function GC_languageManager:loadEntries(modName, fullPath, baseKey)
-    local globalTexts = getfenv(0).g_i18n.texts -- Make sure we are at superglobal level as 'g_i18n' is still held within each mods 'Enviromant'!
+    local globalTexts = getfenv(0).g_i18n.texts;
 	local duplicateTable = {};
     local prefixErrorTable = {};
 	
@@ -99,9 +90,11 @@ function GC_languageManager:loadEntries(modName, fullPath, baseKey)
 		g_company.debug:writeWarning(GC_languageManager.debugData, text, fullPath, modName);
 		
 		for i = 1, #duplicateTable do
-			local name = prefixErrorTable[i];
-			print(string.format("      %d: %s", i, prefixErrorTable[i]));
+			local name = duplicateTable[i];
+			print(string.format("      %d: %s", i, name));
 		end;
+		
+		duplicateTable = nil;
 	end;
 	
 	if #prefixErrorTable > 0 then
@@ -110,8 +103,10 @@ function GC_languageManager:loadEntries(modName, fullPath, baseKey)
 		
 		for i = 1, #prefixErrorTable do
 			local name = prefixErrorTable[i];
-			print(string.format("      %d: %s", i, prefixErrorTable[i]));
+			print(string.format("      %d: %s", i, name));
 		end;
+
+		prefixErrorTable = nil;
 	end;
 end
 

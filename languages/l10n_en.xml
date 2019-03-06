@@ -1,0 +1,33 @@
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<l10n>
+	<elements>
+		<!-- General -->
+		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
+		
+		<!-- Warnings / Errors -->
+		<e k="GC_mapVersionWarning" v="Map '%s' by %s requires Global Company - Version %s or higher to operate correctly. Please visit modHub download link for the latest official version or visit '%s' for support."/>	
+		<e k="GC_modVersionWarning" v="Mod '%s' by %s requires Global Company - Version %s or higher to operate correctly. Please visit modHub download link for the latest official version or visit '%s' for support."/>	
+		<e k="GC_loadingError" v="Something has gone wrong loading Global Company! Please visit modHub download link for the latest official version or visit '%s' for support."/>	
+		<e k="GC_duplicateError" v="Trying to load Global Company twice! Please remove '%s' from your mod folder and load your game again."/>
+		<e k="GC_combinedError" v="Trying to load Global Company as part of a mod map '%s'! This is not possible and will cause serious errors. Please visit modHub download link for the latest official version or visit '%s' for support."/>
+
+
+		<!-- GUI -->
+		<e k="GC_gui_buttons_ok" v="OK"/>
+		<e k="GC_gui_buttons_yes" v="Ja"/>
+		<e k="GC_gui_buttons_no" v="Nein"/>
+		<e k="GC_gui_modHubLink" v="ModHub Download Link"/>
+		
+		
+		<!-- BaleShreader -->
+		<e k="GC_baleShreader_openSteer" v="Steuerung öffnen"/>
+		<e k="GC_baleShreader_closeSteer" v="Steuerung schließen"/>
+		<e k="GC_baleShreader_startWork" v="Ballenschredder starten"/>
+		<e k="GC_baleShreader_endWork" v="Ballenschredder stoppen"/>
+		<e k="GC_baleShreader_toggleOnWorkLight" v="Arbeitslicht anschalten"/>
+		<e k="GC_baleShreader_toggleOffWorkLight" v="Arbeitslicht ausschalten"/>
+
+
+	</elements>
+</l10n>

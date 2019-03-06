@@ -24,14 +24,12 @@
 
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
-GlobalCompany.version = "1.0.0.0 (04.05.2018)";
+
+GlobalCompany.version = "1.0.0.0"; -- Release Version.
+GlobalCompany.versionDate = "04.05.2018"; -- Release Date ??
+GlobalCompany.currentVersionId = 1000; -- Mod Manager ID. (Version number without periods.)
 
 GlobalCompany.LOADTYP_XMLFILENAME = 1;
-
-getfenv(0)["g_company"] = GlobalCompany;
-addModEventListener(GlobalCompany);
-
---source(GlobalCompany.dir .. "Debug.lua"); -- TEMP 'Need to convert all then scripts using this to remove it'
 
 function GlobalCompany.initialLoad()
 	if GlobalCompany.initialLoadComplete ~= nil then
@@ -39,72 +37,99 @@ function GlobalCompany.initialLoad()
 		return;
 	end;
 
-	Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, GlobalCompany.init);
+	-- Protect from duplicate loading.
+	-- Load these critical source files first in case we fail.
+	local duplicateLoad = false;
+	if g_company == nil then
+		getfenv(0)["g_company"] = GlobalCompany;
 
-	--| Debug |--
-	source(GlobalCompany.dir .. "utils/GC_DebugUtils.lua");
-	g_company.debug = GC_DebugUtils:new();
-	--getfenv(0)["gc_debug "] = g_company.debug; --[[ This is in case we need a superGlobal version ]]--
+		--| Load Utils |--
+		source(GlobalCompany.dir .. "utils/GC_utils.lua");
 
-	GlobalCompany.debugIndex = g_company.debug:registerScriptName("GlobalCompany");
-	g_company.debug:singleLogWrite(GlobalCompany.debugIndex, GC_DebugUtils.BLANK, "Loading Version: %s", GlobalCompany.version);
+		--| Load Debug |--
+		source(GlobalCompany.dir .. "utils/GC_DebugUtils.lua");
+		g_company.debug = GC_DebugUtils:new();
+		GlobalCompany.debugIndex = g_company.debug:registerScriptName("GlobalCompany");
 
+		--| Load Language Manager |--
+		source(GlobalCompany.dir .. "utils/GC_languageManager.lua");
+		g_company.languageManager:load(GlobalCompany.dir); -- We need to load Global Company texts first so they are not overwritten and for 'modManager' to use.
 
-	GlobalCompany.inits = {};
-	GlobalCompany.loadables = {};
-	GlobalCompany.updateables = {};
-	GlobalCompany.raisedUpdateables = {};
-	GlobalCompany.environments = {};
-	GlobalCompany.loadParameters = {};
-	GlobalCompany.loadParametersToEnvironment = {};
+		--| Load Mod Manager |--
+		source(GlobalCompany.dir .. "utils/GC_ModManager.lua");
+		g_company.modManager = GC_ModManager:new();
+	else
+		duplicateLoad = true;
+	end;
 
-	GlobalCompany.loadSourceFiles();
-	GlobalCompany.loadPlaceables();
+	-- Can we load?
+	if g_company.modManager:doLoadCheck(g_currentModName, duplicateLoad) then
+		g_company.debug:singleLogWrite(GlobalCompany.debugIndex, GC_DebugUtils.BLANK, "Loading Version: %s (%s)", GlobalCompany.version, GlobalCompany.versionDate);
+		addModEventListener(GlobalCompany);
 
-	local modLanguageFiles = {};
-	local selectedMods = g_modSelectionScreen.missionDynamicInfo.mods;
-	for _, mod in pairs(selectedMods) do
-		local path = nil;
-		local modName = mod.modName;
+		Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, GlobalCompany.init);
 
-		if mod.modDir ~= nil then
-			path = mod.modDir .. "globalCompany.xml";
-			if not fileExists(path) then
-				path = mod.modDir .. "xml/globalCompany.xml";
+		GlobalCompany.inits = {};
+		GlobalCompany.loadables = {};
+		GlobalCompany.updateables = {};
+		GlobalCompany.raisedUpdateables = {};
+		GlobalCompany.environments = {};
+		GlobalCompany.loadParameters = {};
+		GlobalCompany.loadParametersToEnvironment = {};
+
+		GlobalCompany.loadSourceFiles();
+		GlobalCompany.loadPlaceables();
+
+		local modLanguageFiles = {};
+		local selectedMods = g_modSelectionScreen.missionDynamicInfo.mods;
+		for _, mod in pairs(selectedMods) do
+			local path = nil;
+			local modName = mod.modName;
+
+			if mod.modDir ~= nil then
+				path = mod.modDir .. "globalCompany.xml";
 				if not fileExists(path) then
-					path = nil;
+					path = mod.modDir .. "xml/globalCompany.xml";
+					if not fileExists(path) then
+						path = nil;
+					end;
+				end;
+
+				-- We have already loaded these so do not try and do it again.
+				if modName ~= "FS19_GlobalCompany" and modName ~= "FS19_GlobalCompany_update" then
+					local langFullPath = g_company.languageManager:getLanguagesFullPath(mod.modDir);
+					if langFullPath ~= nil then
+						modLanguageFiles[modName] = langFullPath;
+					end;
 				end;
 			end;
 
-			local langFullPath = g_company.languageManager:getLanguagesFullPath(mod.modDir);
-			if langFullPath ~= nil then
-				modLanguageFiles[modName] = langFullPath;
+			if path ~= nil then
+				local xmlFile = loadXMLFile("globalCompany", path);
+
+				GlobalCompany.environments[modName] = {};
+				GlobalCompany.environments[modName].fullPath = path;
+				GlobalCompany.environments[modName].xmlFile = xmlFile;
+				GlobalCompany.environments[modName].specializations = getXMLString(xmlFile, "globalCompany.specializations#xmlFilename");
+				GlobalCompany.environments[modName].shopManager = getXMLString(xmlFile, "globalCompany.shopManager#xmlFilename");
+				GlobalCompany.environments[modName].densityMapHeight = getXMLString(xmlFile, "globalCompany.densityMapHeight#xmlFilename");
+				GlobalCompany.environments[modName].densityMapHeightOverwriteOrginalFunction = getXMLBool(xmlFile, "globalCompany.densityMapHeight#overwriteOrginalFunction");
 			end;
 		end;
 
-		if path ~= nil then
-			local xmlFile = loadXMLFile("globalCompany", path);
-
-			GlobalCompany.environments[modName] = {};
-			GlobalCompany.environments[modName].fullPath = path;
-			GlobalCompany.environments[modName].xmlFile = xmlFile;
-			GlobalCompany.environments[modName].specializations = getXMLString(xmlFile, "globalCompany.specializations#xmlFilename");
-			GlobalCompany.environments[modName].shopManager = getXMLString(xmlFile, "globalCompany.shopManager#xmlFilename");
-			GlobalCompany.environments[modName].densityMapHeight = getXMLString(xmlFile, "globalCompany.densityMapHeight#xmlFilename");
-			GlobalCompany.environments[modName].densityMapHeightOverwriteOrginalFunction = getXMLBool(xmlFile, "globalCompany.densityMapHeight#overwriteOrginalFunction");
+		for modName, values in pairs(GlobalCompany.environments) do
+			if values.specializations ~= nil and values.specializations ~= "" then
+				g_company.specializations:loadFromXML(modName, g_company.utils.createModPath(modName, values.specializations));
+			end;
+			if values.densityMapHeightOverwriteOrginalFunction then
+				g_densityMapHeightManager.loadMapData = function() return true; end;
+			end;
 		end;
+
+		g_company.languageManager:loadModLanguageFiles(modLanguageFiles);
+	else
+		getfenv(0)["g_company"] = nil; -- Clear if there is an error loading or a duplicate.
 	end;
-
-	for modName, values in pairs(GlobalCompany.environments) do
-		if values.specializations ~= nil and values.specializations ~= "" then
-			g_company.specializations:loadFromXML(modName, g_company.utils.createModPath(modName, values.specializations));
-		end;
-		if values.densityMapHeightOverwriteOrginalFunction then
-			g_densityMapHeightManager.loadMapData = function() return true; end;
-		end;
-	end;
-
-	g_company.languageManager:load(modLanguageFiles);
 
 	GlobalCompany.initialLoadComplete = true;
 end;
@@ -168,7 +193,6 @@ function GlobalCompany.loadSourceFiles()
 	end;
 
 	--|| Utils / Managers ||--
-	source(GlobalCompany.dir .. "utils/GC_utils.lua");
 	source(GlobalCompany.dir .. "utils/GC_mathUtils.lua");
 	source(GlobalCompany.dir .. "utils/GC_xmlUtils.lua");
 	source(GlobalCompany.dir .. "utils/GC_i3dLoader.lua");
@@ -176,7 +200,6 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "utils/GC_shopManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_TriggerManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_specializations.lua");
-	source(GlobalCompany.dir .. "utils/GC_languageManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_densityMapHeight.lua");
 
 	--|| Gui ||--
@@ -189,17 +212,16 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_Shaders.lua");
 	source(GlobalCompany.dir .. "objects/GC_Effects.lua");
 	source(GlobalCompany.dir .. "objects/GC_Lighting.lua");
+	source(GlobalCompany.dir .. "objects/GC_Conveyor.lua");
 	source(GlobalCompany.dir .. "objects/GC_MovingPart.lua");
 	source(GlobalCompany.dir .. "objects/GC_Animations.lua");
 	source(GlobalCompany.dir .. "objects/GC_FillVolume.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicHeap.lua");
-	--source(GlobalCompany.dir .. "objects/GC_PalletSpawner.lua");
+	source(GlobalCompany.dir .. "objects/GC_PalletSpawner.lua");
 	source(GlobalCompany.dir .. "objects/GC_RotationNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
-	source(GlobalCompany.dir .. "objects/GC_Conveyor.lua");
 	source(GlobalCompany.dir .. "objects/GC_DigitalDisplays.lua");
 	source(GlobalCompany.dir .. "objects/GC_ActivableObject.lua");
-	--source(GlobalCompany.dir .. "objects/GC_ParticleEffects.lua"); -- Depreciated. Use 'GC_Effects' instead!
 	source(GlobalCompany.dir .. "objects/GC_VisibilityNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
 	source(GlobalCompany.dir .. "objects/GC_BaleShreader.lua");
@@ -239,6 +261,8 @@ end;
 
 function GlobalCompany:loadMap()
 	g_company.debug:loadConsoleCommands();
+
+	g_company.modManager:checkActiveModVersions(); -- Check active mods for version ID
 
 	for modName, e in pairs(GlobalCompany.environments) do
 		for name, v in pairs(GlobalCompany.loadParameters) do
