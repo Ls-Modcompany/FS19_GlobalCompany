@@ -336,6 +336,8 @@ function Baler:update(dt)
 					if self.movedMeters >= 2.6 then
 						self.movedMeters = 0;
 						self.stackBalesNum = 0;
+						self.stackBales = {};
+						self.baleInsideCounter = 0;
 						self:onTurnOffBaleMover();
 						if self.state_baler == Baler.STATE_OFF then
 							self:onTurnOffStacker();
@@ -535,7 +537,7 @@ end
 
 function Baler:onTurnOnStacker()	
 	--event
-	self.state_baler = Baler.STATE_ON;
+	self.state_stacker = Baler.STATE_ON;
 	
 	if self.isServer then
 		self:raiseActive();
