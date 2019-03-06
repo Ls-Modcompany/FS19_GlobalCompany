@@ -28,9 +28,7 @@ getfenv(0)["GC_Conveyor"] = GC_Conveyor;
 GC_Conveyor.debugIndex = g_company.debug:registerScriptName("GlobalCompany-GC_Conveyor");
 
 GC_Conveyor.STATE_OFF = 0;
-GC_Conveyor.STATE_TURNING_OFF = 1;
 GC_Conveyor.STATE_ON = 2;
-GC_Conveyor.STATE_TURNING_ON = 3;
 
 GC_Conveyor_mt = Class(GC_Conveyor);
 InitObjectClass(GC_Conveyor, "GC_Conveyor");
@@ -105,7 +103,7 @@ function GC_Conveyor:update(dt)
                         setShaderParameter(shader.node, "offsetUV", value,0,-100,100, false);
                     else
                         setShaderParameter(shader.node, "offsetUV", 0,value,-100,100, false);
-                    end;
+					end;
 				end;		
 			end;		
 		end;
@@ -138,8 +136,8 @@ end;
 
 --Dont call from outside!! Only form GC_Conveyor.start!
 function GC_Conveyor:startShader(shader)
-	if shader.state ~= GC_Conveyor.STATE_TURNING_ON and shader.state ~= GC_Conveyor.STATE_ON then
-		shader.state = GC_Conveyor.STATE_TURNING_ON;
+	if shader.state ~= GC_Conveyor.STATE_ON then
+		shader.state = GC_Conveyor.STATE_ON;
 		shader.currentDelay = shader.startDelay;
 		return true;
 	end;
@@ -148,8 +146,8 @@ end;
 
 --Dont call from outside!! Only form GC_Conveyor.stop!
 function GC_Conveyor:stopShader(shader)
-	if shader.state ~= GC_Conveyor.STATE_TURNING_OFF and shader.state ~= GC_Conveyor.STATE_OFF then
-		shader.state = GC_Conveyor.STATE_TURNING_OFF;
+	if shader.state ~= GC_Conveyor.STATE_OFF then
+		shader.state = GC_Conveyor.STATE_OFF;
 		shader.currentDelay = shader.stopDelay;
 		return true;
 	end;
