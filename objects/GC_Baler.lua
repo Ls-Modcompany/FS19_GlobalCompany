@@ -32,14 +32,13 @@ Baler.PLAYERTRIGGER_MAIN = 0;
 Baler.PLAYERTRIGGER_CLEAN = 1;
 
 Baler.STATE_OFF = 0;
-Baler.STATE_TURN_ON = 1;
-Baler.STATE_ON = 2;
-Baler.STATE_TURN_OFF = 3;
+Baler.STATE_ON = 1;
 
 Baler.ANIMATION_CANSTACK = 0;
 Baler.ANIMATION_ISSTACKING = 1;
 Baler.ANIMATION_CANSTACKEND = 2;
 Baler.ANIMATION_ISSTACKINGEND = 3;
+
 
 getfenv(0)["GC_Baler"] = Baler;
 
@@ -81,8 +80,9 @@ function Baler:new(isServer, isClient, customMt, xmlFilename, baseDirectory, cus
 
 	self.debugData = g_company.debug:getDebugData(Baler.debugIndex, nil, customEnvironment);
 
-	self.state = Baler.STATE_OFF;
-	self.turnOnFillTypes = false;
+	self.state_baler = Baler.STATE_OFF;
+	self.state_stacker = Baler.STATE_OFF;
+	self.state_balerMove = Baler.STATE_OFF;
 
 	return self;
 end;
@@ -99,6 +99,12 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	if self.saveId == nil then
 		self.saveId = "baler_" .. indexName;
 	end;
+
+	self.autoOn = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. "#autoOn"), true);
+
+	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	-----------------------------------------------------------------------MainPart--------------------------------------------------------------------------------------
+	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	
 	local mainPartKey = xmlKey .. ".mainPart";
 	
@@ -143,8 +149,6 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		i = i + 1;
 	end;
 	
-	self.autoOn = Utils.getNoNil(getXMLBool(xmlFile, mainPartKey .. "#autoOn"), true);
-
     self.unloadTrigger = self.triggerManager:loadTrigger(GC_UnloadingTrigger, self.nodeId , xmlFile, string.format("%s.unloadTrigger", mainPartKey), {[1] = self.fillTypes[self.activeFillTypeIndex].index}, {[1] = "DISCHARGEABLE"});
     self.cleanHeap = self.triggerManager:loadTrigger(GC_DynamicHeap, self.nodeId , xmlFile, string.format("%s.cleanHeap", mainPartKey), self.fillTypes[self.activeFillTypeIndex].name, nil, false);
     
@@ -179,11 +183,12 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		i = i + 1;
 	end;
 
-
+	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	------------------------------------------------------------------------Stacker--------------------------------------------------------------------------------------
+	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	local stackPartKey = xmlKey .. ".stack";
 	self.hasStack = hasXMLProperty(xmlFile, stackPartKey);
 	if self.hasStack then
-
 		self.animationState = Baler.ANIMATION_CANSTACK;
 		self.stackBalesNum = 0;
 		self.stackBalesTarget = 3;
@@ -199,14 +204,25 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		self.doStackAnimationEnd:load(self.nodeId, self, true, string.format("%s.doStackAnimationEnd", stackPartKey), xmlFile);
 		self.doStackAnimationStart = GC_Animations:new(self.isServer, self.isClient)
 		self.doStackAnimationStart:load(self.nodeId, self, true, string.format("%s.doStackAnimationStart", stackPartKey), xmlFile);
-			
-
 	end;
 
+	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	-----------------------------------------------------------------------BaleMover-------------------------------------------------------------------------------------
+	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	local baleMoverKey = xmlKey .. ".baleMover";
+	self.movedMeters = 0;
 
+	self.baleMoveCollision = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, string.format("%s.moveCollision#node", baleMoverKey)), self.i3dMappings);
+	setPairCollision(self.nodeId, self.baleMoveCollision, false);
 
+	self.moveCollisionAnimation = GC_Animations:new(self.isServer, self.isClient)
+	self.moveCollisionAnimation:load(self.nodeId, self, true, string.format("%s.moveCollisionAnimation", baleMoverKey), xmlFile);
+
+	self.moveCollisionAnimationNode = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, string.format("%s.moveCollisionAnimation#node", baleMoverKey)), self.i3dMappings);
+	self.moveCollisionAnimationColliMask = getCollisionMask(self.moveCollisionAnimationNode);
+	setCollisionMask(self.moveCollisionAnimationNode, 0);
+	
 	self.balerDirtyFlag = self:getNextDirtyFlag();
-
 	return true;
 end;
 
@@ -216,6 +232,13 @@ function Baler:delete()
 	if self.triggerManager ~= nil then
 		self.triggerManager:unregisterAllTriggers();
 	end;
+
+	self.conveyorFillType:delete();
+	self.conveyorFillTypeEffect:delete();
+	self.baleAnimation:delete();
+	self.doStackAnimationStart:delete();
+	self.doStackAnimationEnd:delete();
+	self.moveCollisionAnimation:delete();
 	
 	Baler:superClass().delete(self)
 end;
@@ -269,21 +292,19 @@ end;
 function Baler:update(dt)
 	if self.isServer then
 
-		if self.fillLevelBunker == 0 then
-			if self.fillLevel >= 4000 then
-				self:setFillLevelBunker(nil, dt / 1000 * self.pressPerSecond);
-			else
-				--nicht mehr genug lvl, um ein ballen zu produzieren
-			end;
-		else									
-			if self.fillLevelBunker == 4000 then
+		if self.state_baler == Baler.STATE_ON then
+			if self.fillLevelBunker >= 4000 then
 				if self:canUnloadBale() then					
 					self:setBaleObjectToAnimation();
 					self.baleAnimation:setAnimationsState(true);
-					self:setFillLevelBunker(0);
+					self:setFillLevelBunker(-4000, true);
 				end;
-			else		
-				self:setFillLevelBunker(nil, math.min(dt / 1000 * self.pressPerSecond, 4000 - self.fillLevelBunker));
+			elseif self.fillLevel + self.fillLevelBunker >= 4000 then
+				self:setFillLevelBunker(math.min(dt / 1000 * self.pressPerSecond, 4000 - self.fillLevelBunker, self.fillLevel));
+			elseif self.baleAnimation:getAnimationTime() == 0 then
+				if self.autoOn then
+					self:onTurnOffBaler();
+				end;
 			end;
 			if self.baleAnimation:getAnimationTime() == 1 then
 				self:createBale(self.baleAnimationObjectNode);
@@ -292,7 +313,7 @@ function Baler:update(dt)
 			end;
 		end;
 
-		if self.hasStack then
+		if self.hasStack and self.state_stacker == Baler.STATE_ON then
 			if self.animationState == Baler.ANIMATION_CANSTACK then
 				if self:getBaleIsInside() then					
 					self.stackBalesNum = self.stackBalesNum + 1;
@@ -300,7 +321,27 @@ function Baler:update(dt)
 						self.animationState = Baler.ANIMATION_ISSTACKING;
 						self.doStackAnimationStart:setAnimationsState(true);
 					else
-						-- move all bales
+						if self.state_balerMove == Baler.STATE_OFF then
+							self:onTurnOnBaleMover();
+							setCollisionMask(self.moveCollisionAnimationNode, self.moveCollisionAnimationColliMask);
+							self.moveCollisionAnimation:setAnimationsState(true);
+						end;
+						if self.moveCollisionAnimation:getAnimationTime() == 1 then
+							self.moveCollisionAnimation:setAnimTime(0);	
+							setCollisionMask(self.moveCollisionAnimationNode, 0);
+						end;
+					end;
+				end;
+				if self.state_balerMove == Baler.STATE_ON then
+					if self.movedMeters >= 2.6 then
+						self.movedMeters = 0;
+						self.stackBalesNum = 0;
+						self:onTurnOffBaleMover();
+						if self.state_baler == Baler.STATE_OFF then
+							self:onTurnOffStacker();
+						end;
+					else
+						self.movedMeters = self.movedMeters + (dt / 1000 * 0.8);
 					end;
 				end;
 			elseif self.animationState == Baler.ANIMATION_ISSTACKING then
@@ -328,7 +369,6 @@ function Baler:update(dt)
 					self.doStackAnimationEnd:setAnimTime(0);	
 					self.doStackAnimationStart:setAnimTime(0);	
 				elseif self.doStackAnimationEnd:getAnimationTime() >= 0.3 and self.raisedAnimationKeys["0.3"] == nil then
-					print(getNumOfChildren(self.forkNode));
 					for i=1, getNumOfChildren(self.forkNode) do
 						local child = getChildAt(self.forkNode, 0);
 						self:createBale(child);
@@ -337,21 +377,17 @@ function Baler:update(dt)
 					self.raisedAnimationKeys["0.3"] = true;
 				end;
 			end;
-
-
 		end;
-
 		self:raiseActive();
-
 	end;
-
 end;
 
 function Baler:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, toolType, fillPositionData, triggerId)
 	self:setFillLevel(self.fillLevel + fillLevelDelta);
 	
-	if self.autoOn and self.fillLevel > 0 then
-		self:onTurnOn();
+	if self.autoOn and self.fillLevel > 4000 and (self.state_baler == Baler.STATE_OFF) then
+		self:onTurnOnBaler();
+		self:onTurnOnStacker();
 	end;
 end;
 
@@ -384,14 +420,12 @@ function Baler:playerTriggerActivated(ref)
     end;
 end;
 
-function Baler:setFillLevelBunker(level, delta)    
-	if level ~= nil then
-		local oldLevel = self.fillLevelBunker;
-		self.fillLevelBunker = level;
-		self:setFillLevel(self.fillLevel + (oldLevel - self.fillLevelBunker));
-	elseif delta ~= nil then
+function Baler:setFillLevelBunker(delta, onlyBunker)    
+	if delta ~= nil then
 		self.fillLevelBunker = self.fillLevelBunker + delta;
-		self:setFillLevel(self.fillLevel + (delta * -1));
+		if onlyBunker == nil or not onlyBunker then
+			self:setFillLevel(self.fillLevel + (delta * -1));
+		end;
 	end;	
 end;
 
@@ -403,24 +437,6 @@ end;
 function Baler:setFillTyp(fillTypeIndex)    
     self.activeFillTypeIndex = fillTypeIndex; 
 end;
-
-function Baler:onTurnOn()	
-	--event
-	self.state = Baler.STATE_TURN_ON;
-	self:onTurnOnFillTypes();
-	self:raiseActive();
-end
-
-function Baler:onTurnOnFillTypes()
-	if self.fillLevel > 0 and not self.turnOnFillTypes and (self.state == Baler.STATE_ON or self.state == Baler.STATE_TURN_ON) then
-		if self.isClient then
-			self.conveyorFillTypeEffect:setFillType(self.activeFillTypeIndex);
-			self.conveyorFillTypeEffect:start();
-			self.conveyorFillType:start();
-		end;
-		self.turnOnFillTypes = true;
-	end;
-end
 
 function Baler:setBaleObjectToAnimation()
 	for _,info in pairs (self.baleAnimationObjects) do
@@ -439,7 +455,7 @@ function Baler:setBaleObjectToFork()
 			for i=1, self.stackBalesNum do
 				local newBale = clone(info.node, false, false, false);
 				setVisibility(newBale, true);
-				setTranslation(newBale, 0, 0.946 + (i-1)*0.9,0);
+				setTranslation(newBale, 0.015, 0.958 + (i-1)*0.8,-0.063);
 				link(self.forkNode, newBale);		
 			end;
 			break;
@@ -454,6 +470,10 @@ function Baler:canUnloadBale()
 
 	if canUnloadBale and self.hasStack then
 		canUnloadBale = not self:getBaleIsInside();
+	end;
+
+	if canUnloadBale and self.state_balerMove == Baler.STATE_ON then
+		canUnloadBale = false;
 	end;
 
 	return canUnloadBale;
@@ -487,3 +507,77 @@ function Baler:baleTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay,
 		end;
 	end;
 end;
+
+function Baler:onTurnOnBaler()	
+	--event
+	self.state_baler = Baler.STATE_ON;
+	
+	if self.isServer then
+		self:raiseActive();
+	end;
+
+	if self.isClient then
+		self.conveyorFillTypeEffect:setFillType(self.activeFillTypeIndex);
+		self.conveyorFillTypeEffect:start();
+		self.conveyorFillType:start();
+	end;
+end
+
+function Baler:onTurnOffBaler()	
+	--event
+	self.state_baler = Baler.STATE_OFF;
+
+	if self.isClient then
+		self.conveyorFillTypeEffect:stop();
+		self.conveyorFillType:stop();
+	end;
+end
+
+function Baler:onTurnOnStacker()	
+	--event
+	self.state_baler = Baler.STATE_ON;
+	
+	if self.isServer then
+		self:raiseActive();
+	end;
+
+	if self.isClient then
+	
+	end;
+end
+
+function Baler:onTurnOffStacker()	
+	--event
+	self.state_stacker = Baler.STATE_OFF;
+
+	if self.isClient then
+	
+	end;
+end
+
+function Baler:onTurnOnBaleMover()	
+	--event
+	self.state_balerMove = Baler.STATE_ON;
+	
+	if self.isServer then
+		self:raiseActive();
+		setFrictionVelocity(self.baleMoveCollision, 0.8);
+	end;
+
+	if self.isClient then
+	
+	end;
+end
+
+function Baler:onTurnOffBaleMover()	
+	--event
+	self.state_balerMove = Baler.STATE_OFF;
+
+	if self.isServer then
+		setFrictionVelocity(self.baleMoveCollision, 0.0);
+	end;
+
+	if self.isClient then
+	
+	end;
+end
