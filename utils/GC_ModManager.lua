@@ -214,13 +214,17 @@ end;
 
 function GC_ModManager:getVersionId(versionString)
 	local versionId = "";
-	if versionString:len() >= 7 then
-		for i = 1, 7, 2 do
-			versionId = versionId .. versionString:sub(i, i);
-		end;
-		versionId = tonumber(versionId);
-	end;
 	
+	local versionTable = StringUtil.splitString(".", versionString);
+	local stringLength = #versionTable;
+	if stringLength > 0 then
+		for i = 1, stringLength do
+			versionId = versionId .. versionTable[i];		
+		end;
+
+		versionId = tonumber(versionId); -- Letters will not be accepted an will result in a 'nil' value.
+	end;
+
 	return versionId
 end;
 
