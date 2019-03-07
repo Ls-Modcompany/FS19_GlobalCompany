@@ -211,6 +211,7 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	local baleMoverKey = xmlKey .. ".baleMover";
 	self.movedMeters = 0;
+	self.baleInsideMoverCounter = 0;
 
 	self.baleMoveCollision = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, string.format("%s.moveCollision#node", baleMoverKey)), self.i3dMappings);
 	setPairCollision(self.nodeId, self.baleMoveCollision, false);
@@ -221,6 +222,10 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	self.moveCollisionAnimationNode = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, string.format("%s.moveCollisionAnimation#node", baleMoverKey)), self.i3dMappings);
 	self.moveCollisionAnimationColliMask = getCollisionMask(self.moveCollisionAnimationNode);
 	setCollisionMask(self.moveCollisionAnimationNode, 0);
+
+	self.baleTriggerMoverNode = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, baleMoverKey .. ".baleTriggerMover#node"), self.i3dMappings);
+	addTrigger(self.baleTriggerMoverNode, "baleTriggerMoverCallback", self);
+	
 	
 	self.balerDirtyFlag = self:getNextDirtyFlag();
 	return true;
@@ -321,7 +326,7 @@ function Baler:update(dt)
 						self.animationState = Baler.ANIMATION_ISSTACKING;
 						self.doStackAnimationStart:setAnimationsState(true);
 					else
-						if self.state_balerMove == Baler.STATE_OFF then
+						if self.state_balerMove == Baler.STATE_OFF and self:getCanMoveBales() then
 							self:onTurnOnBaleMover();
 							setCollisionMask(self.moveCollisionAnimationNode, self.moveCollisionAnimationColliMask);
 							self.moveCollisionAnimation:setAnimationsState(true);
@@ -499,6 +504,10 @@ function Baler:getBaleIsInside()
 	return self.baleInsideCounter ~= 0;
 end;
 
+function Baler:getCanMoveBales()
+	return self.baleInsideMoverCounter == 0;
+end;
+
 function Baler:baleTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay, otherShapeId)
 	local object = g_currentMission:getNodeObject(otherId)
 	if object ~= nil and object:isa(Bale) then
@@ -506,6 +515,17 @@ function Baler:baleTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay,
 			self.baleInsideCounter = self.baleInsideCounter + 1;
 		elseif onLeave then
 			self.baleInsideCounter = math.max(self.baleInsideCounter - 1, 0);
+		end;
+	end;
+end;
+
+function Baler:baleTriggerMoverCallback(triggerId, otherId, onEnter, onLeave, onStay, otherShapeId)
+	local object = g_currentMission:getNodeObject(otherId)
+	if object ~= nil and object:isa(Bale) then
+		if onEnter  then	
+			self.baleInsideMoverCounter = self.baleInsideMoverCounter + 1;
+		elseif onLeave then
+			self.baleInsideMoverCounter = math.max(self.baleInsideMoverCounter - 1, 0);
 		end;
 	end;
 end;
