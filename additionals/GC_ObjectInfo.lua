@@ -44,9 +44,9 @@ GC_ObjectInfo.textFrame = Overlay:new(GlobalCompany.dir .. "images/frame.dds", G
 GC_ObjectInfo.textFrame:setColor(0.9910, 0.3865, 0.0100, 1);
 
 	
-function GC_ObjectInfo:init(isServer, isClient, customMt)
+function GC_ObjectInfo:init()
 	local self = {};
-	setmetatable(self, customMt or GC_ObjectInfo_mt);
+	setmetatable(self, GC_ObjectInfo_mt);
 
 	self.isServer = g_server ~= nil;
 	self.isClient = g_client ~= nil;
