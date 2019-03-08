@@ -1,23 +1,28 @@
 
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
-<l10n><elements>
+<l10n>
+	<elements>
 
-<e k="GC_gui_buttons_ok" v="OK"/>
-<e k="GC_gui_buttons_yes" v="Ja"/>
-<e k="GC_gui_buttons_no" v="Nein"/>
+		<e k="GC_gui_buttons_ok" v="OK"/>
+		<e k="GC_gui_buttons_yes" v="Ja"/>
+		<e k="GC_gui_buttons_no" v="Nein"/>
 
-<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
+		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
 
-<!-- BaleShreader -->
-<e k="GC_baleShreader_openSteer" v="Steuerung öffnen"/>
-<e k="GC_baleShreader_closeSteer" v="Steuerung schließen"/>
-<e k="GC_baleShreader_startWork" v="Ballenschredder starten"/>
-<e k="GC_baleShreader_endWork" v="Ballenschredder stoppen"/>
-<e k="GC_baleShreader_toggleOnWorkLight" v="Arbeitslicht anschalten"/>
-<e k="GC_baleShreader_toggleOffWorkLight" v="Arbeitslicht ausschalten"/>
+		<!-- BaleShreader -->
+		<e k="GC_baleShreader_openSteer" v="Steuerung öffnen"/>
+		<e k="GC_baleShreader_closeSteer" v="Steuerung schließen"/>
+		<e k="GC_baleShreader_startWork" v="Ballenschredder starten"/>
+		<e k="GC_baleShreader_endWork" v="Ballenschredder stoppen"/>
+		<e k="GC_baleShreader_toggleOnWorkLight" v="Arbeitslicht anschalten"/>
+		<e k="GC_baleShreader_toggleOffWorkLight" v="Arbeitslicht ausschalten"/>
 
-<!-- Baler -->
-<e k="GC_baler_cleaner" v="Abkippbereich säubern"/>
+		<!-- Baler -->
+		<e k="GC_baler_cleaner" v="Abkippbereich säubern"/>
 
+		<!-- ObjectInfo -->
+		<e k="GC_ObjectInfo_filltype" v="Fülltyp: "/>
+		<e k="GC_ObjectInfo_level" v="Füllstand: "/>
 
-</elements></l10n>
+	</elements>
+</l10n>
