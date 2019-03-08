@@ -23,7 +23,6 @@ local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui");
 
 GlobalCompanyGui = {};
 g_company.gui = GlobalCompanyGui;
-GlobalCompanyGui.DevelopementVersion = true;
 GlobalCompanyGui.DevelopementVersionTemplatesFilename = {};
 addModEventListener(GlobalCompanyGui);
 
@@ -53,6 +52,7 @@ source(g_currentModDirectory .. "gui/elements/Table.lua");
 
 source(g_currentModDirectory .. "gui/FakeGui.lua");
 source(g_currentModDirectory .. "gui/MultiDialog.lua");
+source(g_currentModDirectory .. "gui/objects/Baler.lua");
 
 function GlobalCompanyGui:init()	
 	for _,inAc in pairs(self.toInit_actionEvents) do
@@ -65,12 +65,13 @@ function GlobalCompanyGui:loadMap()
 	g_gui:loadGui(g_company.dir .. self.fakeGui.guiInformations.guiXml, "gc_fakeGui", self.fakeGui);
 	
 	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
+	g_company.gui:registerGui("gcPlaceable_baler", InputAction.ACTIVATE_OBJECT, SRSfastMenu, true, true);
 
 	self.activeGuiDialogs = {};
 end;
 
 function GlobalCompanyGui:update(dt)
-	if self.DevelopementVersion then
+	if g_company.debug:getIsDev() then
 		if self.DevelopementVersionTimer == nil or self.DevelopementVersionTimer <= 0 then
 			for _, fileName in pairs(GlobalCompanyGui.DevelopementVersionTemplatesFilename) do				
 				self:loadGuiTemplates(fileName);
@@ -313,7 +314,7 @@ function GlobalCompanyGui:loadGuiTemplates(xmlFilename)
 			g_company.debug.write(debugIndex, Debug.ERROR, "Gui template haven't name at %s", key);--gui
 			break;
 		end;
-		if GlobalCompanyGui.template.colors[name] ~= nil and not GlobalCompanyGui.DevelopementVersion then	
+		if GlobalCompanyGui.template.colors[name] ~= nil and not g_company.debug:getIsDev() then	
 			g_company.debug.write(debugIndex, Debug.ERROR, "Gui template colour %s already exist", name);--gui
 			break;
 		end;
@@ -347,7 +348,7 @@ function GlobalCompanyGui:loadGuiTemplates(xmlFilename)
 				g_company.debug.write(debugIndex, Debug.ERROR, "Gui template haven't name at %s", key);--gui
 				break;
 			end;
-			if GlobalCompanyGui.template.uvs[name] ~= nil and not GlobalCompanyGui.DevelopementVersion then	
+			if GlobalCompanyGui.template.uvs[name] ~= nil and not g_company.debug:getIsDev() then	
 				g_company.debug.write(debugIndex, Debug.ERROR, "Gui template uv %s already exist", name);--gui
 				break;
 			end;
@@ -382,7 +383,7 @@ function GlobalCompanyGui:loadGuiTemplates(xmlFilename)
 			g_company.debug.write(debugIndex, Debug.ERROR, "Gui template haven't name at %s", key); --gui
 			break;
 		end;
-		if GlobalCompanyGui.template.templates[name] ~= nil and not GlobalCompanyGui.DevelopementVersion then	
+		if GlobalCompanyGui.template.templates[name] ~= nil and not g_company.debug:getIsDev() then	
 			g_company.debug.write(debugIndex, Debug.ERROR, "Gui template template %s already exist", name); --gui
 			break;
 		end;
@@ -411,7 +412,7 @@ function GlobalCompanyGui:loadGuiTemplates(xmlFilename)
 			local valueV = getXMLString(xmlFile, string.format("%s#value", key));
 			
 			if nameV ~= nil and nameV ~= "" and valueV ~= nil and valueV ~= "" then
-				if GlobalCompanyGui.template.templates[name].values[nameV] ~= nil and not GlobalCompanyGui.DevelopementVersion then	
+				if GlobalCompanyGui.template.templates[name].values[nameV] ~= nil and not g_company.debug:getIsDev() then	
 					g_company.debug.write(debugIndex, Debug.ERROR, "Gui template template %s already exist", nameV); --gui
 					break;
 				end;

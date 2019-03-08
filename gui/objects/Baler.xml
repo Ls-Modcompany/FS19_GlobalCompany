@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI>
+  <GuiElement type="image" template="gcHotelBackground">    
+    <GuiElement type="image" template="gcHotelHeader">
+      <GuiElement type="text" template="gcHotelHeaderText" onOpen="onOpenHeader" />
+    </GuiElement>   
+    <GuiElement type="image" template="gcHotelContent">        
+      <GuiElement type="image" template="gcHotelContentCameraBackground">
+        <GuiElement type="text" template="gcHotelContentHeader" text="$l10n_srs_hotel_preview" />
+        <GuiElement type="image" template="gcHotelContentCamera" onOpen="onOpenCamera"/>
+      </GuiElement>      
+      <GuiElement type="image" template="gcHotelContentInteraction">      
+        <GuiElement type="flowLayout" template="gcHotelContentInteractionLayout">
+          <GuiElement type="text" template="gcHotelContentInteractionTextHeader" text="$l10n_srs_hotel_needPersonal:" />
+          <GuiElement type="text" template="gcHotelContentInteractionTextText" onOpen="onOpenNeedPersonal" />
+          <GuiElement type="text" template="gcHotelContentInteractionTextHeader" text="$l10n_srs_hotel_lucrativeness:" />
+          <GuiElement type="text" template="gcHotelContentInteractionTextText" onOpen="onOpenLucrativeness" />
+          <GuiElement type="text" template="gcHotelContentInteractionTextHeader" text="$l10n_srs_hotel_stars:" />
+          <GuiElement type="flowLayout" template="gcHotelContentInteractionLayoutStars">
+            <GuiElement type="image" template="gcHotelContentInteractionStar" onOpen="onOpenStars" parameter="1" />
+            <GuiElement type="image" template="gcHotelContentInteractionStar" onOpen="onOpenStars" parameter="2" />
+            <GuiElement type="image" template="gcHotelContentInteractionStar" onOpen="onOpenStars" parameter="3" />
+            <GuiElement type="image" template="gcHotelContentInteractionStar" onOpen="onOpenStars" parameter="4" />
+            <GuiElement type="image" template="gcHotelContentInteractionStar" onOpen="onOpenStars" parameter="5" />
+          </GuiElement>
+        </GuiElement>        
+        <GuiElement type="button" template="gcHotelContentInteractionButton" onOpen="onOpenBuyText" onClick="onClickBuy" />
+      </GuiElement>   
+      <GuiElement type="image" template="gcHotelContentInfoBackground">
+        <GuiElement type="text" template="gcHotelContentHeader" text="$l10n_srs_hotel_information" />
+        <GuiElement type="text" template="gcHotelContentInfoText" onOpen="onOpenInfoText" />
+      </GuiElement> 
+    </GuiElement>
+  </GuiElement>
+</GUI>
+
+
+
