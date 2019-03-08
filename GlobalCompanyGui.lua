@@ -65,7 +65,7 @@ function GlobalCompanyGui:loadMap()
 	g_gui:loadGui(g_company.dir .. self.fakeGui.guiInformations.guiXml, "gc_fakeGui", self.fakeGui);
 	
 	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
-	g_company.gui:registerGui("gcPlaceable_baler", InputAction.ACTIVATE_OBJECT, SRSfastMenu, true, true);
+	--g_company.gui:registerGui("gcPlaceable_baler", InputAction.ACTIVATE_OBJECT, SRSfastMenu, true, true);
 
 	self.activeGuiDialogs = {};
 end;
