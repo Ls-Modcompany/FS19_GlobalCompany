@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <guiTemplates>
 	<colors>
 		<color name="transparent" value="0 0 0 0" />
@@ -177,6 +177,114 @@
 		</template>	
 
 
-
+		<!-- Baler -->
+		<template name="gcBalerBackground" anchor="middleCenter" extends="gcBase gcBorder">
+			<value name="size" value="1000px 700px" />
+			<value name="imageColor" value="glass1_50" />
+			<value name="hasBorders" value="true" />
+			<value name="borderBottomSize" value="6px" />
+			<value name="borderBottomColor" value="orange" />
+		</template>
+		<template name="gcBalerHeader" anchor="middleTop" extends="gcBase gcBorder">
+			<value name="size" value="1000px 50px" />
+			<value name="imageColor" value="transparent" />
+			<value name="hasBorders" value="true" />
+			<value name="borderBottomSize" value="4px" />
+			<value name="borderBottomColor" value="gray2" />
+		</template>
+		<template name="gcBalerHeaderText" anchor="middleCenter" extends="gcBase_text">
+			<value name="textSize" value="25px" />
+			<value name="textAlignment" value="center" />	
+		</template>	
+		<template name="gcBalerContent" anchor="middleTop" extends="gcBase">
+			<value name="size" value="1000px 646px" />
+			<value name="position" value="0px -50px" />
+			<value name="imageColor" value="transparent" />
+		</template>
+		<template name="gcBalerContentLayout" anchor="leftTop" extends="gcHotelContentInteraction">
+			<value name="orientation" value="y" />
+			<value name="alignment" value="top" />
+			<value name="position" value="0px 0px" />
+			<value name="size" value="1000px 581px" />
+			<value name="margin" value="0px 0px 0px 0px" />
+		</template>
+		<template name="gcBalerFillTypesText" anchor="leftTop" extends="gcBase_text">
+			<value name="textSize" value="25px" />
+			<value name="textAlignment" value="center" />	
+			<value name="margin" value="50px 20px 0px 0px" />
+		</template>	
+		<template name="gcBalerFillTypesLayout" anchor="leftTop" extends="gcHotelContentInteraction">
+			<value name="orientation" value="y" />
+			<value name="alignment" value="top" />
+			<value name="position" value="0px 0px" />
+			<value name="size" value="800px 300px" />
+			<value name="margin" value="50px 0px 0px 0px" />
+		</template>
+		<template name="gcBalerFillTypesLayoutTyp" anchor="leftTop" extends="gcHotelContentInteraction">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="left" />
+			<value name="position" value="0px 0px" />
+			<value name="size" value="800px 100px" />
+		</template>
+		<template name="gcBalerFillTypesButtonBackground" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="50px 50px" />
+			<value name="imageColor" value="gray3" />
+		</template>
+		<template name="gcBalerFillTypesButton" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="30px 30px" />
+			<value name="position" value="0px 0px" />
+			<value name="imageColor" value="transparent" />
+			<value name="imageColor_selected" value="orange" />
+			<value name="hasOverlay" value="true" />
+		</template>	
+		<template name="gcBalerFillTypesButtonText" anchor="leftCenter" extends="gcBase_text">
+			<value name="textSize" value="25px" />
+			<value name="textAlignment" value="center" />	
+			<value name="margin" value="50px 0px 0px 0px" />
+		</template>	
+		<template name="gcBalerNumLayout" anchor="middleBottom" extends="gcHotelContentInteraction">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="left" />
+			<value name="position" value="0px -20px" />
+			<value name="size" value="900px 50px" />
+		</template>
+		<template name="gcBalerNumBackground" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="100px 50px" />
+			<value name="imageColor" value="gray3" />
+		</template>
+		<template name="gcBalerNumText" anchor="middleCenter" extends="gcBase_text">
+			<value name="textSize" value="25px" />
+			<value name="textAlignment" value="center" />	
+			<value name="margin" value="0px 0px 0px 0px" />
+		</template>	
+		<template name="gcBalerNumButton" anchor="middleBottom" extends="gcBase">
+			<value name="size" value="50px 50px" />
+			<value name="margin" value="10px 0px 0px 0px" />
+			<value name="imageColor" value="gray3" />
+			<value name="imageColor_selected" value="gray2" />
+			<value name="hasOverlay" value="true" />
+			<value name="hasText" value="true" />
+			<value name="textAlignment" value="center" />	
+			<value name="textMargin" value="10px 0px 0px 15px" />	
+		</template>	
+		<template name="gcBalerButtonLayout" anchor="middleBottom" extends="gcHotelContentInteraction">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="left" />
+			<value name="position" value="0px 10px" />
+			<value name="size" value="900px 50px" />
+		</template>
+		<template name="gcBalerButtonButton" anchor="middleBottom" extends="gcBase">
+			<value name="size" value="400px 50px" />
+			<value name="position" value="0px 0px" />
+			<value name="imageColor" value="gray3" />
+			<value name="imageColor_selected" value="gray2" />
+			<value name="hasOverlay" value="true" />
+			<value name="hasText" value="true" />
+			<value name="textAlignment" value="center" />	
+			<value name="textMargin" value="0px 0px 0px 15px" />	
+		</template>	
+		
+		
+		
 	</templates>	
 </guiTemplates>

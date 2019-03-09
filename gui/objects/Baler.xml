@@ -1,7 +1,52 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <GUI>
-  <GuiElement type="image" template="gcMdMainBackground">    
-    
+  <GuiElement type="image" template="gcBalerBackground">    
+    <GuiElement type="image" template="gcBalerHeader">
+      <GuiElement type="text" template="gcBalerHeaderText" onOpen="onOpenHeader" text="Ballenpresse mit Stapler" />
+    </GuiElement>   
+    <GuiElement type="image" template="gcBalerContent">        
+          
+      <GuiElement type="flowLayout" template="gcBalerContentLayout">
+        <GuiElement type="text" template="gcBalerFillTypesText" onOpen="onOpenHeader" text="Aktueller Ballentyp:" />      
+        <GuiElement type="flowLayout" template="gcBalerFillTypesLayout">
+          <GuiElement type="flowLayout" template="gcBalerFillTypesLayoutTyp">
+            <GuiElement type="image" template="gcBalerFillTypesButtonBackground">    
+              <GuiElement type="button" template="gcBalerFillTypesButton" />
+            </GuiElement>
+            <GuiElement type="text" template="gcBalerFillTypesButtonText" onOpen="onOpenHeader" text="Stroh" />
+          </GuiElement>
+          <GuiElement type="flowLayout" template="gcBalerFillTypesLayoutTyp">
+            <GuiElement type="image" template="gcBalerFillTypesButtonBackground">    
+              <GuiElement type="button" template="gcBalerFillTypesButton" />
+            </GuiElement>
+            <GuiElement type="text" template="gcBalerFillTypesButtonText" onOpen="onOpenHeader" text="Gras" />
+          </GuiElement>
+          <GuiElement type="flowLayout" template="gcBalerFillTypesLayoutTyp">
+            <GuiElement type="image" template="gcBalerFillTypesButtonBackground">    
+              <GuiElement type="button" template="gcBalerFillTypesButton" />
+            </GuiElement>
+            <GuiElement type="text" template="gcBalerFillTypesButtonText" onOpen="onOpenHeader" text="Heu" />
+          </GuiElement>
+        </GuiElement>
+        
+        <GuiElement type="text" template="gcBalerFillTypesText" onOpen="onOpenHeader" text="Anzahl Ballen stapeln:" />
+        
+        <GuiElement type="flowLayout" template="gcBalerNumLayout">
+          <GuiElement type="image" template="gcBalerNumBackground">    
+            <GuiElement type="text" template="gcBalerNumText" onOpen="onOpenHeader" text="5" />
+          </GuiElement> 
+          <GuiElement type="button" template="gcBalerNumButton" text="-" />
+          <GuiElement type="button" template="gcBalerNumButton" text="+" />
+        </GuiElement> 
+
+      </GuiElement>
+
+      <GuiElement type="flowLayout" template="gcBalerButtonLayout">
+        <GuiElement type="button" template="gcBalerButtonButton" text="Entladen" />
+        <GuiElement type="button" template="gcBalerButtonButton" position="100px 0px" text="Schließen" />
+      </GuiElement> 
+
+    </GuiElement>
   </GuiElement>
 </GUI>
 
