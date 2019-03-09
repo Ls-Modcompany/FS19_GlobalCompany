@@ -2,7 +2,7 @@
 -- GlobalCompany - Utils - GC_ModManager
 --
 -- @Interface: --
--- @Author: LS-Modcompany
+-- @Author: LS-Modcompany / GtX
 -- @Date: 05.03.2018
 -- @Version: 1.0.0.0
 --
@@ -11,7 +11,7 @@
 -- Changelog:
 --
 -- 	v1.0.0.0 ():
--- 		- initial fs19 ()
+-- 		- initial fs19 (GtX)
 --
 -- Notes:
 --
@@ -67,7 +67,7 @@ function GC_ModManager:checkActiveModVersions()
 				local xmlFile = loadXMLFile("TempModDesc", mod.modFile);
 
 				local versionString = getXMLString(xmlFile, "modDesc.globalCompany#minimumVersion");
-				if versionString ~= nil then					
+				if versionString ~= nil then
 					local modVersionId = self:getVersionId(versionString);
 					if modVersionId ~= nil and modVersionId ~= "" then
 						if modVersionId > self:getCurrentVersionId() then
@@ -117,7 +117,7 @@ function GC_ModManager:update(dt)
 	end;
 
 	if self.modVersionErrors == nil or self.numModVersionErrors <= 0 then
-		self:delete(); -- Remove update listener as we do not need it anymore.
+		self:delete(); -- Remove update listener and save resources as we do not need it anymore.
 	end;
 end;
 
@@ -184,12 +184,12 @@ end;
 
 function GC_ModManager:showLoadWarningGUI(strg, warningType)
 	local title = string.format("GLOBAL COMPANY - VERSION %s", g_company.version);
-	
+
 	local url = " www.ls-modcompany.com ";
 	if g_languageShort == "de" then
 		url = " www.ls-modcompany.de ";
 	end;
-	
+
 	local text = "";
 	if warningType == "standardError" then
 		text = string.format(self.loadingErrorText, url);
@@ -198,7 +198,7 @@ function GC_ModManager:showLoadWarningGUI(strg, warningType)
 	elseif warningType == "combinedError" then
 		text = string.format(self.combinedErrorText, strg, url);
 	end;
-	
+
 	if self.isClient then
 		g_gui:showYesNoDialog({title = title,
 							text = text,
@@ -208,24 +208,35 @@ function GC_ModManager:showLoadWarningGUI(strg, warningType)
 							yesText = self.okButtonText,
 							noText = self.modHubLinkText});
 	else
-		print(title .. "  " .. text); -- Just print a log error to the server.
+		print(title .. "  " .. text); -- Only print a log error to the server.
 	end;
 end;
 
-function GC_ModManager:getVersionId(versionString)
+function GC_ModManager:getVersionId(versionString) -- This is faster then old function.
 	local versionId = "";
-	
-	local versionTable = StringUtil.splitString(".", versionString);
-	local stringLength = #versionTable;
-	if stringLength > 0 then
-		for i = 1, stringLength do
-			versionId = versionId .. versionTable[i];		
+
+	local length = versionString:len();
+	if length > 6 then
+		local position, periodCount = 1, 0;
+
+		for i = 1, length do
+			local stringStart, stringEnd = versionString:find(".", position, true);
+			if stringStart == nil then
+				versionId = versionId .. versionString:sub(position);
+				break;
+			end;
+
+			versionId = versionId .. versionString:sub(position, stringStart - 1);
+			position = stringEnd + 1;
+			periodCount = periodCount + 1;
 		end;
 
-		versionId = tonumber(versionId); -- Letters will not be accepted an will result in a 'nil' value.
+		if periodCount == 3 then -- Only accept correct version format, 3 decimals. e.g (1.0.0.0 or 1.0.10.4)
+			return tonumber(versionId); -- Letters will not be accepted and will result in a 'nil' value.
+		end;
 	end;
 
-	return versionId
+	return nil;
 end;
 
 function GC_ModManager:getCurrentVersionId()
