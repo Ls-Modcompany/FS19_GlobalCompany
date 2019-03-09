@@ -17,9 +17,20 @@
 		<e k="GC_baleShreader_toggleOnWorkLight" v="Arbeitslicht anschalten"/>
 		<e k="GC_baleShreader_toggleOffWorkLight" v="Arbeitslicht ausschalten"/>
 
-<!-- Baler -->
-<e k="GC_baler_cleaner" v="Abkippbereich säubern"/>
-<e k="GC_baler_openGui" v="Steurung öffnen"/>
+		<!-- Baler -->
+		<e k="GC_baler_title" v="Ballenpresse"/>
+		<e k="GC_baler_title_witStack" v="Ballenpresse mit Stapler"/>
+		<e k="GC_baler_cleaner" v="Abkippbereich säubern"/>
+		<e k="GC_baler_openGui" v="Steurung öffnen"/>
+		<e k="GC_baler_closeGui" v="Steurung schließen"/>
+		<e k="GC_baler_makeEmpty" v="Abladen"/>
+		<e k="GC_baler_turnOn" v="Anschalten"/>
+		<e k="GC_baler_turnOff" v="Ausschalten"/>
+		<e k="GC_baler_info_machineData" v="Anlagendaten"/>
+		<e k="GC_baler_info_fillLevel" v="Füllstand"/>
+		<e k="GC_baler_info_fillLevelBunker" v="Füllstand Bunker"/>
+		<e k="GC_baler_info_counter" v="Gepresste Ballen"/>
+		<e k="GC_baler_info_automatic" v="Automatisch"/>
 
 		<!-- ObjectInfo -->
 		<e k="GC_ObjectInfo_filltype" v="Fülltyp: %s"/>

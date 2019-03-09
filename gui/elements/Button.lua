@@ -246,6 +246,10 @@ function GC_Gui_button:setActive(state, checkNotParent)
 	self:setSelected(state, true);
 end;
 
+function GC_Gui_button:getActive()
+	return self.isActive;
+end;
+
 function GC_Gui_button:onOpen()
 	if self.callback_onOpen ~= nil then
 		self.gui[self.callback_onOpen](self.gui, self, self.parameter);

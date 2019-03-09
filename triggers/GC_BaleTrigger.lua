@@ -41,7 +41,7 @@ function GC_BaleTrigger:new(isServer, isClient, customMt)
 	return self;
 end
 
-function GC_BaleTrigger:load(nodeId, target, xmlFile, xmlKey, mode)
+function GC_BaleTrigger:load(nodeId, target, xmlFile, xmlKey, reference, mode)
 	if nodeId == nil or target == nil then
 		return false;
 	end;
@@ -50,8 +50,10 @@ function GC_BaleTrigger:load(nodeId, target, xmlFile, xmlKey, mode)
 
 	self.rootNode = nodeId;
 	self.target = target;
+    self.reference = reference;
     self.mode = mode;
-    
+	
+	self.baleInsideCounter = 0;
 
 	if xmlFile ~= nil and xmlKey ~= nil then
 		local baleTriggerNode = getXMLString(xmlFile, xmlKey .. "#baletriggerNode");
@@ -91,6 +93,9 @@ function GC_BaleTrigger:baleTriggerCallback(triggerId, otherId, onEnter, onLeave
 		elseif onLeave then
 			if self.mode == GC_BaleTrigger.MODE_COUNTER then
 				self.baleInsideCounter = math.max(self.baleInsideCounter - 1, 0);
+				if self.target.onLeaveBaleTrigger ~= nil then
+					self.target:onLeaveBaleTrigger(self.reference, object);
+				end;
 			end;
 		end;
 	end;
@@ -106,4 +111,8 @@ end;
 
 function GC_BaleTrigger:reset()
 	self.baleInsideCounter = 0;
+end;
+
+function GC_BaleTrigger:getNum()
+	return self.baleInsideCounter;
 end;

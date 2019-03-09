@@ -49,10 +49,12 @@
 			<value name="imageUVs" value="colorBg" />
 			<value name="imageUVs_selected" value="colorBg" />
 			<value name="imageUVs_disabled" value="colorBg" />
+			<value name="imageUVs_disabledSelected" value="colorBg" />
 			
 			<value name="imageColor" value="image" />
 			<value name="imageColor_disabled" value="image_disabled" />
 			<value name="imageColor_selected" value="image_selected" />
+			<value name="imageColor_disabledSelected" value="image_disabled" />
 			
 			<value name="textColor" value="text" />
 			<value name="textColor_disabled" value="text_disabled" />
@@ -235,7 +237,10 @@
 			<value name="position" value="0px 0px" />
 			<value name="imageColor" value="transparent" />
 			<value name="imageColor_selected" value="orange" />
+			<value name="imageColor_disabled" value="transparent" />
+			<value name="imageColor_disabledSelected" value="image_disabled" />
 			<value name="hasOverlay" value="true" />
+			<value name="isActivable" value="true" />
 		</template>	
 		<template name="gcBalerFillTypesButtonText" anchor="leftCenter" extends="gcBase_text">
 			<value name="textSize" value="25px" />
@@ -271,17 +276,61 @@
 			<value name="orientation" value="x" />
 			<value name="alignment" value="left" />
 			<value name="position" value="0px 10px" />
-			<value name="size" value="900px 50px" />
+			<value name="size" value="620px 50px" />
 		</template>
 		<template name="gcBalerButtonButton" anchor="middleBottom" extends="gcBase">
-			<value name="size" value="400px 50px" />
-			<value name="position" value="0px 0px" />
+			<value name="size" value="300px 50px" />
 			<value name="imageColor" value="gray3" />
 			<value name="imageColor_selected" value="gray2" />
 			<value name="hasOverlay" value="true" />
 			<value name="hasText" value="true" />
 			<value name="textAlignment" value="center" />	
 			<value name="textMargin" value="0px 0px 0px 15px" />	
+			<value name="textSize" value="23px" />
+		</template>	
+		<template name="gcBalerInfoBackground" anchor="rightTop" extends="gcBase">
+			<value name="size" value="300px 400px" />
+			<value name="imageColor" value="glass1_80" />
+			<value name="position" value="-50px -20px" />
+		</template>
+		<template name="gcBalerInfoHeader" anchor="leftTop" extends="gcBase_text">
+			<value name="textSize" value="22px" />
+			<value name="textAlignment" value="center" />	
+			<value name="margin" value="15px 15px 0px 0px" />	
+			<value name="textBold" value="true" />	
+		</template>	
+		<template name="gcBalerInfoLayout" anchor="middleBottom" extends="gcHotelContentInteraction">
+			<value name="orientation" value="y" />
+			<value name="alignment" value="top" />
+			<value name="position" value="0px 10px" />
+			<value name="size" value="300px 350px" />
+		</template>
+		<template name="gcBalerInfoTextHeader" anchor="leftTop" extends="gcBase_text">
+			<value name="textSize" value="20px" />
+			<value name="textAlignment" value="left" />	
+			<value name="margin" value="20px 15px 0px 0px" />	
+			<value name="textBold" value="true" />	
+		</template>	
+		<template name="gcBalerInfoText" anchor="leftTop" extends="gcBase_text">
+			<value name="textSize" value="20px" />
+			<value name="textAlignment" value="left" />	
+			<value name="margin" value="25px 15px 0px 0px" />	
+		</template>	
+		<template name="gcBalerInfoSepBackground" anchor="middleBottom" extends="gcBase">
+			<value name="size" value="280px 2px" />
+			<value name="imageColor" value="glass5_70" />
+			<value name="position" value="0px 110px" />
+		</template>
+		<template name="gcBalerInfoTextAutoLayout" anchor="middleBottom" extends="gcHotelContentInteraction">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="left" />
+			<value name="position" value="0px 0px" />
+			<value name="size" value="280px 100px" />
+		</template>
+		<template name="gcBalerInfoTextAutoText" anchor="leftCenter" extends="gcBase_text">
+			<value name="textSize" value="22px" />
+			<value name="textAlignment" value="center" />	
+			<value name="margin" value="20px 0px 0px 0px" />
 		</template>	
 
 		<!-- ObjectInfo -->

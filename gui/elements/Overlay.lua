@@ -25,10 +25,12 @@ function GC_Gui_overlay:new(gui, custom_mt)
 	self.imageColor = {1,1,1,1};
 	self.imageColor_disabled = {1,1,1,1};
 	self.imageColor_selected = {1,1,1,1};
+	self.imageColor_disabledSelected = {1,1,1,1};
 	
 	self.uvs = {0, 0, 0, 1, 1, 0, 1, 1};
 	self.uvs_selected = {0, 0, 0, 1, 1, 0, 1, 1};
 	self.uvs_disabled = {0, 0, 0, 1, 1, 0, 1, 1};
+	self.uvs_disabledSelected = {0, 0, 0, 1, 1, 0, 1, 1};
 	
 	self.borderLeftSize = 0;
 	self.borderRightSize = 0;
@@ -57,10 +59,12 @@ function GC_Gui_overlay:loadTemplate(templateName, xmlFile, key, overlayName)
 	self.uvs = g_company.gui:getTemplateValueUVs(templateName, overlayName .. "UVs", self.imageSize, self.uvs);
 	self.uvs_selected = g_company.gui:getTemplateValueUVs(templateName, overlayName .. "UVs_selected", self.imageSize, self.uvs_selected);
 	self.uvs_disabled = g_company.gui:getTemplateValueUVs(templateName, overlayName .. "UVs_disabled", self.imageSize, self.uvs_disabled);	
+	self.uvs_disabledSelected = g_company.gui:getTemplateValueUVs(templateName, overlayName .. "UVs_disabledSelected", self.imageSize, self.uvs_disabledSelected);	
 	
 	self.imageColor = g_company.gui:getTemplateValueColor(templateName, overlayName .. "Color", self.imageColor);
 	self.imageColor_disabled = g_company.gui:getTemplateValueColor(templateName, overlayName .. "Color_disabled", self.imageColor_disabled);
 	self.imageColor_selected = g_company.gui:getTemplateValueColor(templateName, overlayName .. "Color_selected", self.imageColor_selected);	
+	self.imageColor_disabledSelected = g_company.gui:getTemplateValueColor(templateName, overlayName .. "Color_disabledSelected", self.imageColor_disabledSelected);	
 	
 	self.isCamera = g_company.gui:getTemplateValueBool(templateName, "isCamera", false);	
 	self.hasBorders = g_company.gui:getTemplateValueBool(templateName, "hasBorders", false);	
@@ -92,10 +96,12 @@ function GC_Gui_overlay:copy(src)
 	self.uvs = src.uvs;
 	self.uvs_selected = src.uvs_selected;
 	self.uvs_disabled = src.uvs_disabled;
+	self.uvs_disabledSelected = src.uvs_disabledSelected;
 	
 	self.imageColor = src.imageColor;
 	self.imageColor_disabled = src.imageColor_disabled;
 	self.imageColor_selected = src.imageColor_selected;
+	self.imageColor_disabledSelected = src.imageColor_disabledSelected;
 	
 	self.rotation = src.rotation;
 	self.hasBorders = src.hasBorders;
@@ -161,7 +167,9 @@ function GC_Gui_overlay:setUV(str)
 end;
 
 function GC_Gui_overlay:getUVs()
-    if self:getDisabled() then
+    if self:getDisabled() and self:getIsSelected() then
+        return self.uvs_disabledSelected;
+	elseif self:getDisabled() then
         return self.uvs_disabled;
     elseif self:getIsSelected() then
         return self.uvs_selected;
@@ -171,7 +179,9 @@ function GC_Gui_overlay:getUVs()
 end;
 
 function GC_Gui_overlay:getImageColor()
-    if self:getDisabled() then
+    if self:getDisabled() and self:getIsSelected() then
+        return self.imageColor_disabledSelected;
+	elseif self:getDisabled() then
         return self.imageColor_disabled;
     elseif self:getIsSelected() then
         return self.imageColor_selected;

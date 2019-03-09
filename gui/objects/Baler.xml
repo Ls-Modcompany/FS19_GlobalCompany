@@ -2,48 +2,69 @@
 <GUI>
   <GuiElement type="image" template="gcBalerBackground">    
     <GuiElement type="image" template="gcBalerHeader">
-      <GuiElement type="text" template="gcBalerHeaderText" onOpen="onOpenHeader" text="Ballenpresse mit Stapler" />
+      <GuiElement type="text" template="gcBalerHeaderText" id="gui_txt_title" />
     </GuiElement>   
     <GuiElement type="image" template="gcBalerContent">        
           
       <GuiElement type="flowLayout" template="gcBalerContentLayout">
-        <GuiElement type="text" template="gcBalerFillTypesText" onOpen="onOpenHeader" text="Aktueller Ballentyp:" />      
+        <GuiElement type="text" template="gcBalerFillTypesText" text="Aktueller Ballentyp:" />      
         <GuiElement type="flowLayout" template="gcBalerFillTypesLayout">
           <GuiElement type="flowLayout" template="gcBalerFillTypesLayoutTyp">
             <GuiElement type="image" template="gcBalerFillTypesButtonBackground">    
-              <GuiElement type="button" template="gcBalerFillTypesButton" />
+              <GuiElement type="button" template="gcBalerFillTypesButton" id="gui_btn_fillType1" onClick="onClickBtnFillType" parameter="1" />
             </GuiElement>
-            <GuiElement type="text" template="gcBalerFillTypesButtonText" onOpen="onOpenHeader" text="Stroh" />
+            <GuiElement type="text" template="gcBalerFillTypesButtonText" id="gui_txt_fillType1" />
           </GuiElement>
           <GuiElement type="flowLayout" template="gcBalerFillTypesLayoutTyp">
             <GuiElement type="image" template="gcBalerFillTypesButtonBackground">    
-              <GuiElement type="button" template="gcBalerFillTypesButton" />
+              <GuiElement type="button" template="gcBalerFillTypesButton" id="gui_btn_fillType2" onClick="onClickBtnFillType" parameter="2" />
             </GuiElement>
-            <GuiElement type="text" template="gcBalerFillTypesButtonText" onOpen="onOpenHeader" text="Gras" />
+            <GuiElement type="text" template="gcBalerFillTypesButtonText" id="gui_txt_fillType2" />
           </GuiElement>
           <GuiElement type="flowLayout" template="gcBalerFillTypesLayoutTyp">
             <GuiElement type="image" template="gcBalerFillTypesButtonBackground">    
-              <GuiElement type="button" template="gcBalerFillTypesButton" />
+              <GuiElement type="button" template="gcBalerFillTypesButton" id="gui_btn_fillType3" onClick="onClickBtnFillType" parameter="3" />
             </GuiElement>
-            <GuiElement type="text" template="gcBalerFillTypesButtonText" onOpen="onOpenHeader" text="Heu" />
+            <GuiElement type="text" template="gcBalerFillTypesButtonText" id="gui_txt_fillType3" />
           </GuiElement>
         </GuiElement>
         
-        <GuiElement type="text" template="gcBalerFillTypesText" onOpen="onOpenHeader" text="Anzahl Ballen stapeln:" />
+        <GuiElement type="text" template="gcBalerFillTypesText" text="Anzahl Ballen stapeln:" />
         
         <GuiElement type="flowLayout" template="gcBalerNumLayout">
           <GuiElement type="image" template="gcBalerNumBackground">    
-            <GuiElement type="text" template="gcBalerNumText" onOpen="onOpenHeader" text="5" />
+            <GuiElement type="text" template="gcBalerNumText" id="gui_text_num" />
           </GuiElement> 
-          <GuiElement type="button" template="gcBalerNumButton" text="-" />
-          <GuiElement type="button" template="gcBalerNumButton" text="+" />
+          <GuiElement type="button" template="gcBalerNumButton" text="-" id="gui_btn_removeBale" onClick="onClickBaleNum" parameter="-1" />
+          <GuiElement type="button" template="gcBalerNumButton" text="+" id="gui_btn_addBale" onClick="onClickBaleNum" parameter="1" />
         </GuiElement> 
-
       </GuiElement>
 
+      
+      <GuiElement type="image" template="gcBalerInfoBackground"> 
+        <GuiElement type="text" template="gcBalerInfoHeader" text="$l10n_GC_baler_info_machineData" />
+        <GuiElement type="flowLayout" template="gcBalerInfoLayout">
+          <GuiElement type="text" template="gcBalerInfoTextHeader" text="$l10n_GC_baler_info_fillLevel" />
+          <GuiElement type="text" template="gcBalerInfoText" id="gui_txt_fillLevel" />
+          <GuiElement type="text" template="gcBalerInfoTextHeader" text="$l10n_GC_baler_info_fillLevelBunker" />
+          <GuiElement type="text" template="gcBalerInfoText" id="gui_txt_fillLevelBunker" />
+          <GuiElement type="text" template="gcBalerInfoTextHeader" text="$l10n_GC_baler_info_counter" />
+          <GuiElement type="text" template="gcBalerInfoText" id="gui_txt_baleCounter" />
+        </GuiElement>
+        
+        <GuiElement type="image" template="gcBalerInfoSepBackground" /> 
+        <GuiElement type="flowLayout" template="gcBalerInfoTextAutoLayout">
+          <GuiElement type="image" template="gcBalerFillTypesButtonBackground">    
+            <GuiElement type="button" template="gcBalerFillTypesButton" id="gui_btn_auto" onClick="onClickBtnAutoOnOff"  />
+          </GuiElement>
+          <GuiElement type="text" template="gcBalerInfoTextAutoText" text="$l10n_GC_baler_info_automatic" />
+        </GuiElement>
+      </GuiElement>
+      
+
       <GuiElement type="flowLayout" template="gcBalerButtonLayout">
-        <GuiElement type="button" template="gcBalerButtonButton" text="Entladen" />
-        <GuiElement type="button" template="gcBalerButtonButton" position="100px 0px" text="Schließen" />
+        <GuiElement type="button" template="gcBalerButtonButton" id="gui_btn_turnOnOff" onClick="onClickTurnOnOff" text="$l10n_GC_baler_turnOn" />
+        <GuiElement type="button" template="gcBalerButtonButton" position="20px 0px" onClick="onClickClose" text="$l10n_GC_baler_closeGui" />
       </GuiElement> 
 
     </GuiElement>

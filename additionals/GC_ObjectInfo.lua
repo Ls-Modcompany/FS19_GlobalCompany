@@ -52,7 +52,7 @@ function GC_ObjectInfo:update(dt)
 			if (g_currentMission.player.lastFoundObject ~= nil) then
 				local foundObjectId = g_currentMission.player.lastFoundObject;
 				if not self.debugPrintDone then
-					g_company.debug:writeDev(self.debugData, "New foundObjectId = %s", foundObjectId);
+					--g_company.debug:writeDev(self.debugData, "New foundObjectId = %s", foundObjectId);
 				end;
 				if (foundObjectId ~= g_currentMission.terrainDetailId) then	
 					if getRigidBodyType(foundObjectId) == "Dynamic" then
@@ -118,7 +118,7 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 					end;
 				end;			
 				if not self.debugPrintDone then
-					g_company.debug:writeDev(self.debugData, "hitObjectId = %s, locRigidBodyType = %s", hitObjectId, locRigidBodyType);
+					--g_company.debug:writeDev(self.debugData, "hitObjectId = %s, locRigidBodyType = %s", hitObjectId, locRigidBodyType);
 				end;
 				self.debugPrintDone = true;
 			end;

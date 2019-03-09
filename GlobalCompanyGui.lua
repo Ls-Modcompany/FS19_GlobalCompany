@@ -26,6 +26,8 @@ g_company.gui = GlobalCompanyGui;
 GlobalCompanyGui.DevelopementVersionTemplatesFilename = {};
 addModEventListener(GlobalCompanyGui);
 
+GlobalCompanyGui.devVersion = false;
+
 GlobalCompanyGui.guis = {};
 GlobalCompanyGui.smallGuis = {};
 GlobalCompanyGui.toInit_actionEvents = {};
@@ -61,6 +63,10 @@ function GlobalCompanyGui:init()
 	end;
 end;
 
+function GlobalCompanyGui:getIsDev()
+	return g_company.debug:getIsDev() and GlobalCompanyGui.devVersion;
+end;
+
 function GlobalCompanyGui:loadMap()
 	self.fakeGui = GC_Gui_FakeGui:new();
 	g_gui:loadGui(g_company.dir .. self.fakeGui.guiInformations.guiXml, "gc_fakeGui", self.fakeGui);
@@ -73,7 +79,7 @@ function GlobalCompanyGui:loadMap()
 end;
 
 function GlobalCompanyGui:update(dt)
-	if g_company.debug:getIsDev() then
+	if GlobalCompanyGui:getIsDev() then
 		if self.DevelopementVersionTimer == nil or self.DevelopementVersionTimer <= 0 then
 			for _, fileName in pairs(GlobalCompanyGui.DevelopementVersionTemplatesFilename) do				
 				self:loadGuiTemplates(fileName);
@@ -251,11 +257,18 @@ function GlobalCompanyGui:openGuiWithData(guiName, asDialog, ...)
 	return gui;
 end
 
+function GlobalCompanyGui:updateGuiData(guiName, ...)
+	if self.activeGui == guiName then
+		self.guis[guiName].gui.classGui:updateData(...);
+	end;
+end
+
 function GlobalCompanyGui:openMultiDialog(...)
 	local gui = self:getGuiForOpen("gc_multiDialog", true);
 	gui.classGui:setData(...);
 	gui:openGui();
 end
+
 
 function GlobalCompanyGui:closeGui(name)
 	if self.guis[name].isFullGui then
@@ -317,7 +330,7 @@ function GlobalCompanyGui:loadGuiTemplates(xmlFilename)
 			g_company.debug.write(debugIndex, Debug.ERROR, "Gui template haven't name at %s", key);--gui
 			break;
 		end;
-		if GlobalCompanyGui.template.colors[name] ~= nil and not g_company.debug:getIsDev() then	
+		if GlobalCompanyGui.template.colors[name] ~= nil and not GlobalCompanyGui:getIsDev() then	
 			g_company.debug.write(debugIndex, Debug.ERROR, "Gui template colour %s already exist", name);--gui
 			break;
 		end;
@@ -351,7 +364,7 @@ function GlobalCompanyGui:loadGuiTemplates(xmlFilename)
 				g_company.debug.write(debugIndex, Debug.ERROR, "Gui template haven't name at %s", key);--gui
 				break;
 			end;
-			if GlobalCompanyGui.template.uvs[name] ~= nil and not g_company.debug:getIsDev() then	
+			if GlobalCompanyGui.template.uvs[name] ~= nil and not GlobalCompanyGui:getIsDev() then	
 				g_company.debug.write(debugIndex, Debug.ERROR, "Gui template uv %s already exist", name);--gui
 				break;
 			end;
@@ -386,7 +399,7 @@ function GlobalCompanyGui:loadGuiTemplates(xmlFilename)
 			g_company.debug.write(debugIndex, Debug.ERROR, "Gui template haven't name at %s", key); --gui
 			break;
 		end;
-		if GlobalCompanyGui.template.templates[name] ~= nil and not g_company.debug:getIsDev() then	
+		if GlobalCompanyGui.template.templates[name] ~= nil and not GlobalCompanyGui:getIsDev() then	
 			g_company.debug.write(debugIndex, Debug.ERROR, "Gui template template %s already exist", name); --gui
 			break;
 		end;
@@ -415,7 +428,7 @@ function GlobalCompanyGui:loadGuiTemplates(xmlFilename)
 			local valueV = getXMLString(xmlFile, string.format("%s#value", key));
 			
 			if nameV ~= nil and nameV ~= "" and valueV ~= nil and valueV ~= "" then
-				if GlobalCompanyGui.template.templates[name].values[nameV] ~= nil and not g_company.debug:getIsDev() then	
+				if GlobalCompanyGui.template.templates[name].values[nameV] ~= nil and not GlobalCompanyGui:getIsDev() then	
 					g_company.debug.write(debugIndex, Debug.ERROR, "Gui template template %s already exist", nameV); --gui
 					break;
 				end;
@@ -567,7 +580,7 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 					if i == index then
 						break;
 					else
-						x = x + elementF.size[1] + elementF.margin[1] + elementF.margin[3];
+						x = x + elementF.size[1] + elementF.margin[1] + elementF.margin[3] + elementF.position[1];
 					end;
 				end;
 				
@@ -575,7 +588,7 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 			elseif element.parent.alignment == GC_Gui_flowLayout.ALIGNMENT_MIDDLE then			
 				local fullSize = 0;
 				for i, elementF in pairs(element.parent.elements) do
-					fullSize = fullSize + elementF.size[1] + elementF.margin[1] + elementF.margin[3];
+					fullSize = fullSize + elementF.size[1] + elementF.margin[1] + elementF.margin[3] + elementF.position[1];
 				end;	
 				local leftToStart = (element.parent.size[1] - fullSize) / 2;
 				
@@ -598,7 +611,7 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 							search = false;
 						end;
 					else
-						x = x + elementF.size[1] + elementF.margin[1] + elementF.margin[3];
+						x = x + elementF.size[1] + elementF.margin[1] + elementF.margin[3] + elementF.position[1];
 					end;
 				end;
 				
@@ -620,9 +633,9 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 						break;
 					else
 						if elementF.name == "text" then							
-							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4];
+							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
 						else
-							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
+							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
 						end;
 					end;
 				end;
@@ -641,9 +654,9 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 						break;
 					else
 						if elementF.name == "text" then							
-							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4];
+							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
 						else
-							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
+							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
 						end;
 					end;
 				end;
@@ -662,9 +675,9 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 						break;
 					else
 						if elementF.name == "text" then							
-							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4];
+							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
 						else
-							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
+							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
 						end;
 					end;
 				end;

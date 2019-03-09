@@ -197,13 +197,7 @@ function GC_PlayerTrigger:playerTriggerCallback(triggerId, otherId, onEnter, onL
 					g_currentMission:removeActivatableObject(self);
 				end;
 			end;
-
 			self:raiseActive();
 		end;
 	end;
 end;
-
-
-
-
-
