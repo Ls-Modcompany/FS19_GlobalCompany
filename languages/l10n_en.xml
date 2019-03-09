@@ -28,6 +28,9 @@
 		<e k="GC_baleShreader_toggleOnWorkLight" v="Arbeitslicht anschalten"/>
 		<e k="GC_baleShreader_toggleOffWorkLight" v="Arbeitslicht ausschalten"/>
 
+		<!-- ObjectInfo -->
+		<e k="GC_ObjectInfo_filltype" v="Filltype: "/>
+		<e k="GC_ObjectInfo_level" v="Fillevel: "/>
 
 	</elements>
 </l10n>

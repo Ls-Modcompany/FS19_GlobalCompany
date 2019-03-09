@@ -238,6 +238,9 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_BaleShreaderPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
+	
+	--|| Additionals ||--
+	source(GlobalCompany.dir .. "additionals/GC_ObjectInfo.lua");
 end;
 
 --| Add Base GC Placeables |--
