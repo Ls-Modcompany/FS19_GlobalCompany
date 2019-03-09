@@ -76,21 +76,18 @@ function GC_ObjectInfo:update(dt)
 				if (foundObjectId ~= g_currentMission.terrainDetailId) then	
 					if getRigidBodyType(foundObjectId) == "Dynamic" then
 						local object = g_currentMission:getNodeObject(foundObjectId);
-						local name = "unknown";
-						local lev = 0;
-						local perc = 0;
 						if (object~= nil) then
 							if (object.fillType ~= nil) and (object.fillLevel ~= nil) then
-								name= g_fillTypeManager.fillTypes[object.fillType].title;
+								local name= Utils.getNoNil(g_fillTypeManager.fillTypes[object.fillType].title,"unknown");
 								GC_ObjectInfo.showInfoText = g_company.languageManager:getText('GC_ObjectInfo_filltype')..tostring(name).."\n"..g_company.languageManager:getText('GC_ObjectInfo_level')..tostring(object.fillLevel);
 								GC_ObjectInfo.showInfo = true;
 							elseif (object.typeName == "pallet") then
 								if (object.getFillUnits ~= nil) then
 									local fUnit = object:getFillUnits();
 									if object:getFillUnitExists(fUnit[1].fillUnitIndex) then
-										name = g_fillTypeManager.fillTypes[fUnit[1].fillType].title;
-										lev = g_company.mathUtils.round(fUnit[1].fillLevel,0.01);
-										perc = g_company.mathUtils.round((object:getFillUnitFillLevelPercentage(fUnit[1].fillUnitIndex) * 100),0.01);
+										name = Utils.getNoNil(g_fillTypeManager.fillTypes[fUnit[1].fillType].title,"unknown");
+										local lev = Utils.getNoNil(g_company.mathUtils.round(fUnit[1].fillLevel,0.01),0);
+										local perc = Utils.getNoNil(g_company.mathUtils.round((object:getFillUnitFillLevelPercentage(fUnit[1].fillUnitIndex) * 100),0.01),0);
 										GC_ObjectInfo.showInfoText = g_company.languageManager:getText('GC_ObjectInfo_filltype')..tostring(name).."\n"..g_company.languageManager:getText('GC_ObjectInfo_level')..tostring(lev).." / "..tostring(perc).."%";
 										GC_ObjectInfo.showInfo = true;
 									end;
@@ -114,18 +111,15 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 	if (hitObjectId ~= g_currentMission.terrainDetailId) then
 		local locRigidBodyType = getRigidBodyType(hitObjectId);
 		if (getRigidBodyType(hitObjectId) ~= "NoRigidBody") then		
-			local object = g_currentMission:getNodeObject(hitObjectId);
-			local name = "unknown";
-			local lev = 0;
-			local perc = 0;			
+			local object = g_currentMission:getNodeObject(hitObjectId);		
 			if (object~= nil) then
 				if (object.typeName == "pallet") then
 					if (object.getFillUnits ~= nil) then
 						local fUnit = object:getFillUnits();
 						if object:getFillUnitExists(fUnit[1].fillUnitIndex) then
-							name = g_fillTypeManager.fillTypes[fUnit[1].fillType].title;
-							lev = g_company.mathUtils.round(fUnit[1].fillLevel,0.01);
-							perc = g_company.mathUtils.round((object:getFillUnitFillLevelPercentage(fUnit[1].fillUnitIndex) * 100),0.01);
+							local name= Utils.getNoNil(g_fillTypeManager.fillTypes[fUnit[1].fillType].title,"unknown");
+							local lev = Utils.getNoNil(g_company.mathUtils.round(fUnit[1].fillLevel,0.01),0);
+							local perc = Utils.getNoNil(g_company.mathUtils.round((object:getFillUnitFillLevelPercentage(fUnit[1].fillUnitIndex) * 100),0.01),0);
 							GC_ObjectInfo.showInfoText = g_company.languageManager:getText('GC_ObjectInfo_filltype')..tostring(name).."\n"..g_company.languageManager:getText('GC_ObjectInfo_level')..tostring(lev).." / "..tostring(perc).."%";
 							GC_ObjectInfo.showInfo = true;
 						end;
