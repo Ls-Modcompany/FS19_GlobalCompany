@@ -22,8 +22,9 @@
 <e k="GC_baler_openGui" v="Steurung öffnen"/>
 
 		<!-- ObjectInfo -->
-		<e k="GC_ObjectInfo_filltype" v="Fülltyp: "/>
-		<e k="GC_ObjectInfo_level" v="Füllstand: "/>
+		<e k="GC_ObjectInfo_filltype" v="Fülltyp: %s"/>
+		<e k="GC_ObjectInfo_level" v="Füllstand: %s"/>
+		<e k="GC_ObjectInfo_level2" v="Füllstand: %s / %s%%"/>
 
 	</elements>
 </l10n>

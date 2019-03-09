@@ -53,6 +53,7 @@ source(g_currentModDirectory .. "gui/elements/Table.lua");
 source(g_currentModDirectory .. "gui/FakeGui.lua");
 source(g_currentModDirectory .. "gui/MultiDialog.lua");
 source(g_currentModDirectory .. "gui/objects/Baler.lua");
+source(g_currentModDirectory .. "gui/objects/ObjectInfo.lua");
 
 function GlobalCompanyGui:init()	
 	for _,inAc in pairs(self.toInit_actionEvents) do
@@ -66,6 +67,7 @@ function GlobalCompanyGui:loadMap()
 	
 	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
 	g_company.gui:registerGui("gcPlaceable_baler", InputAction.ACTIVATE_OBJECT, Gc_Gui_Baler, true, true);
+	g_company.gui:registerGui("gcObjectInfo", nil, Gc_Gui_ObjectInfo, false, false);
 
 	self.activeGuiDialogs = {};
 end;
@@ -107,11 +109,11 @@ function GlobalCompanyGui:mouseEvent(posX, posY, isDown, isUp, button)
 	if self.activeGuiDialog ~= nil then
 		GlobalCompanyGui.guis[self.activeGuiDialog].gui:mouseEvent(posX, posY, isDown, isUp, button);
 	elseif self.activeGui == nil then
-		for name, open in pairs(self.smallGuis) do
-			if open then
-				self.guis[name].mouseEvent(posX, posY, isDown, isUp, button);
-			end;
-		end;
+		--for name, open in pairs(self.smallGuis) do
+		--	if open then
+		--		self.guis[name].gui:mouseEvent(posX, posY, isDown, isUp, button);
+		--	end;
+		--end;
 	else
 		self.guis[self.activeGui].gui:mouseEvent(posX, posY, isDown, isUp, button);
 	end;
@@ -167,7 +169,7 @@ function GlobalCompanyGui:registerGui(name, inputAction, class, isFullGui, canEx
 	local newGui = GC_Gui:new(name);
 	newGui:assignClass(classGui);
 	self.guis[name].gui = newGui;
-	self.guis[name].isFullGui = isFullGui or true;
+	self.guis[name].isFullGui = Utils.getNoNil(isFullGui, true);
 	self.guis[name].canExit = canExit;
 		
 	if not self.guis[name].isFullGui then
@@ -246,6 +248,7 @@ function GlobalCompanyGui:openGuiWithData(guiName, asDialog, ...)
 	local gui = self:getGuiForOpen(guiName, asDialog);
 	gui.classGui:setData(...);
 	gui:openGui();
+	return gui;
 end
 
 function GlobalCompanyGui:openMultiDialog(...)
