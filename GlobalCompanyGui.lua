@@ -65,7 +65,7 @@ function GlobalCompanyGui:loadMap()
 	g_gui:loadGui(g_company.dir .. self.fakeGui.guiInformations.guiXml, "gc_fakeGui", self.fakeGui);
 	
 	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
-	g_company.gui:registerGui("gcPlaceable_baler", InputAction.ACTIVATE_OBJECT, SRSfastMenu, true, true);
+	g_company.gui:registerGui("gcPlaceable_baler", InputAction.ACTIVATE_OBJECT, Gc_Gui_Baler, true, true);
 
 	self.activeGuiDialogs = {};
 end;
@@ -539,7 +539,11 @@ function GlobalCompanyGui:getTemplateValueBoolXML(xmlFile, name, key, default)
 end;
 
 function GlobalCompanyGui:getTemplateAnchor(templateName)
-	return GlobalCompanyGui.template.templates[templateName].anchor;
+	if GlobalCompanyGui.template.templates[templateName] ~= nil then
+		return GlobalCompanyGui.template.templates[templateName].anchor;
+	else
+		return "middleCenter";
+	end;
 end;
 
 function GlobalCompanyGui:calcDrawPos(element, index)

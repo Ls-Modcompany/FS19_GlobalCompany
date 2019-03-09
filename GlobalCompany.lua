@@ -232,6 +232,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_PlayerTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_UnloadingTrigger.lua");
+	source(GlobalCompany.dir .. "triggers/GC_BaleTrigger.lua");
 
 	--|| Placeables ||--
 	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");

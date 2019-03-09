@@ -18,6 +18,7 @@
 
 <!-- Baler -->
 <e k="GC_baler_cleaner" v="Abkippbereich säubern"/>
+<e k="GC_baler_openGui" v="Steurung öffnen"/>
 
 
 </elements></l10n>

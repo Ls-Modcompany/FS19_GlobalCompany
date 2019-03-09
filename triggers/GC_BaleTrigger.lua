@@ -1,5 +1,5 @@
 --
--- GlobalCompany - Triggers - GC_Baletrigger
+-- GlobalCompany - Triggers - GC_BaleTrigger
 --
 -- @Interface: --
 -- @Author: LS-Modcompany / kevink98 
@@ -19,17 +19,17 @@
 --
 
 
-GC_Baletrigger = {};
+GC_BaleTrigger = {};
 
-local GC_Baletrigger_mt = Class(GC_Baletrigger, Object);
-InitObjectClass(GC_Baletrigger, "GC_Baletrigger");
-GC_Baletrigger.debugIndex = g_company.debug:registerScriptName("GC_Baletrigger");
+local GC_Baletrigger_mt = Class(GC_BaleTrigger, Object);
+InitObjectClass(GC_BaleTrigger, "GC_BaleTrigger");
+GC_BaleTrigger.debugIndex = g_company.debug:registerScriptName("GC_BaleTrigger");
 
-g_company.baleTrigger = GC_Baletrigger;
+g_company.baleTrigger = GC_BaleTrigger;
 
-GC_Baletrigger.MODE_COUNTER;
+GC_BaleTrigger.MODE_COUNTER = 0;
 
-function GC_Baletrigger:new(isServer, isClient, customMt)
+function GC_BaleTrigger:new(isServer, isClient, customMt)
 	if customMt == nil then
 		customMt = GC_Baletrigger_mt;
 	end;
@@ -41,16 +41,15 @@ function GC_Baletrigger:new(isServer, isClient, customMt)
 	return self;
 end
 
-function GC_Baletrigger:load(nodeId, target, xmlFile, xmlKey, mode, triggerReference)
+function GC_BaleTrigger:load(nodeId, target, xmlFile, xmlKey, mode)
 	if nodeId == nil or target == nil then
 		return false;
 	end;
 
-	self.debugData = g_company.debug:getDebugData(GC_Baletrigger.debugIndex, target);
+	self.debugData = g_company.debug:getDebugData(GC_BaleTrigger.debugIndex, target);
 
 	self.rootNode = nodeId;
 	self.target = target;
-	self.triggerReference = triggerReference;
     self.mode = mode;
     
 
@@ -64,7 +63,7 @@ function GC_Baletrigger:load(nodeId, target, xmlFile, xmlKey, mode, triggerRefer
     return true;
 end;
 
-function GC_Baletrigger:setTriggerNode(baleTriggerNode)
+function GC_BaleTrigger:setTriggerNode(baleTriggerNode)
 	if baleTriggerNode ~= nil then
 		self.baleTriggerNode = I3DUtil.indexToObject(self.rootNode, baleTriggerNode, self.target.i3dMappings);
 		if self.baleTriggerNode ~= nil then
@@ -76,19 +75,35 @@ function GC_Baletrigger:setTriggerNode(baleTriggerNode)
 	return false;
 end;
 
-function GC_Baletrigger:delete()
+function GC_BaleTrigger:delete()
 	if self.baleTriggerNode ~= nil then
 		removeTrigger(self.baleTriggerNode);
 	end;
 end;
 
-function Baler:baleTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay, otherShapeId)
+function GC_BaleTrigger:baleTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay, otherShapeId)
 	local object = g_currentMission:getNodeObject(otherId)
 	if object ~= nil and object:isa(Bale) then
-		if onEnter  then	
-			self.baleInsideCounter = self.baleInsideCounter + 1;
+		if onEnter then	
+			if self.mode == GC_BaleTrigger.MODE_COUNTER then
+				self.baleInsideCounter = self.baleInsideCounter + 1;
+			end;
 		elseif onLeave then
-			self.baleInsideCounter = math.max(self.baleInsideCounter - 1, 0);
+			if self.mode == GC_BaleTrigger.MODE_COUNTER then
+				self.baleInsideCounter = math.max(self.baleInsideCounter - 1, 0);
+			end;
 		end;
 	end;
+end;
+
+function GC_BaleTrigger:getTriggerEmpty()
+	return self.baleInsideCounter == 0;
+end;
+
+function GC_BaleTrigger:getTriggerNotEmpty()
+	return self.baleInsideCounter ~= 0;
+end;
+
+function GC_BaleTrigger:reset()
+	self.baleInsideCounter = 0;
 end;
