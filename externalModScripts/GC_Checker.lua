@@ -12,7 +12,7 @@
 --
 -- 	v1.0.0.0 ():
 -- 		- initial fs19 (GtX)
---		- 'de' warning translation (apuehri)
+--		- 'de' warning translation (aPuehri)
 --
 -- Notes:
 --		- This script is added to individual mods or maps.
