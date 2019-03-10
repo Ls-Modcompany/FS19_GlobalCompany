@@ -93,17 +93,19 @@ function GC_DynamicHeap:load(nodeId, target, xmlFile, xmlKey, fillTypeName, fixe
 				g_densityMapHeightManager:setFixedFillTypesArea(self.heapArea, fillTypes);
 			end;
 
-			if self.isServer then
-				local vehicleDetectionTrigger = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, xmlKey .. ".vehicleDetectionTrigger#node"))
-				if vehicleDetectionTrigger ~= nil then
-					if self.target.vehicleChangedHeapLevel ~= nil then
-						self.vehiclesInRange = {};
-						self.vehicleDetectionTrigger = vehicleDetectionTrigger;
-						addTrigger(self.vehicleDetectionTrigger, "vehicleDetectionTriggerCallback", self);
+			local vehicleInteractionTrigger = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, xmlKey .. "#vehicleInteractionTrigger"))
+			if vehicleInteractionTrigger ~= nil then
+				if self.target.vehicleChangedHeapLevel ~= nil then
+					self.vehicleInteractionTrigger = vehicleInteractionTrigger;
+					
+					-- Do this now so we can still check these loaded on the client side.
+					if self.isServer then
+						self.vehiclesInRange = {};						
+						addTrigger(self.vehicleInteractionTrigger, "vehicleInteractionTriggerCallback", self);
 						g_company.addRaisedUpdateable(self);
-					else
-						g_company.debug:writeDev(self.debugData, "'vehicleDetectionTrigger' can not be loaded! Parent script does not contain function 'vehicleChangedHeapLevel(heapLevel, fillTypeIndex, extraParamater)'.");
 					end;
+				else
+					g_company.debug:writeDev(self.debugData, "'vehicleInteractionTrigger' can not be loaded! Parent script does not contain function 'vehicleChangedHeapLevel(heapLevel, fillTypeIndex, extraParamater)'.");
 				end;
 			end;
 
@@ -124,10 +126,10 @@ end;
 
 function GC_DynamicHeap:delete()
 	if self.isServer then
-		if self.vehicleDetectionTrigger ~= nil then
-			removeTrigger(self.vehicleDetectionTrigger)
+		if self.vehicleInteractionTrigger ~= nil then
+			removeTrigger(self.vehicleInteractionTrigger)
 			g_company.removeRaisedUpdateable(self);
-			self.vehicleDetectionTrigger = nil;
+			self.vehicleInteractionTrigger = nil;
 			self.vehiclesInRange = nil;
 		end;
 	end;
@@ -279,7 +281,7 @@ function GC_DynamicHeap:getIsHeapEmpty()
 	return DensityMapHeightUtil.getFillTypeAtArea(xs, zs, xw, zw, xh, zh) == FillType.UNKNOWN;
 end;
 
-function GC_DynamicHeap:vehicleDetectionTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay, otherShapeId)
+function GC_DynamicHeap:vehicleInteractionTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay, otherShapeId)
 	if onEnter or onLeave then
 		local vehicle = g_currentMission.nodeToObject[otherShapeId]
 		if vehicle ~= nil and vehicle.setBunkerSiloInteractorCallback ~= nil then

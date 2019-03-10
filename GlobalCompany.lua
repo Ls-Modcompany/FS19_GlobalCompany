@@ -217,13 +217,14 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_Animations.lua");
 	source(GlobalCompany.dir .. "objects/GC_FillVolume.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicHeap.lua");
-	source(GlobalCompany.dir .. "objects/GC_PalletSpawner.lua");
+	source(GlobalCompany.dir .. "objects/GC_PalletCreator.lua");
 	source(GlobalCompany.dir .. "objects/GC_RotationNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
 	source(GlobalCompany.dir .. "objects/GC_DigitalDisplays.lua");
 	source(GlobalCompany.dir .. "objects/GC_ActivableObject.lua");
 	source(GlobalCompany.dir .. "objects/GC_VisibilityNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
+	--source(GlobalCompany.dir .. "objects/GC_DynamicPalletAreas.lua");
 	source(GlobalCompany.dir .. "objects/GC_BaleShreader.lua");
 	source(GlobalCompany.dir .. "objects/GC_DirtyObjects.lua");
 	source(GlobalCompany.dir .. "objects/GC_Baler.lua");
