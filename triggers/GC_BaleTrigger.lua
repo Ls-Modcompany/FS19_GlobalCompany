@@ -89,6 +89,9 @@ function GC_BaleTrigger:baleTriggerCallback(triggerId, otherId, onEnter, onLeave
 		if onEnter then	
 			if self.mode == GC_BaleTrigger.MODE_COUNTER then
 				self.baleInsideCounter = self.baleInsideCounter + 1;
+				if self.target.onEnterBaleTrigger ~= nil then
+					self.target:onEnterBaleTrigger(self.reference, object);
+				end;
 			end;
 		elseif onLeave then
 			if self.mode == GC_BaleTrigger.MODE_COUNTER then

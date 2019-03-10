@@ -88,11 +88,6 @@ function Baler:new(isServer, isClient, customMt, xmlFilename, baseDirectory, cus
 	self.state_balerMove = Baler.STATE_OFF;
 
 	self.shouldTurnOff = false;
-	self.shouldUnload = false;
-
-	self.soundBalerOn = false;
-	self.soundStackerOn = false;
-	self.soundMoverOn = false;
 
 	return self;
 end;
@@ -317,12 +312,74 @@ function Baler:writeUpdateStream(streamId, connection, dirtyMask)
 end;
 
 function Baler:loadFromXMLFile(xmlFile, key)
+	
+	self.state_baler = getXMLInt(xmlFile, key..".baler#state");
+	self.shouldTurnOff = getXMLBool(xmlFile, key..".baler#shouldTurnOff");
+	self:setFillTyp(getXMLInt(xmlFile, key..".baler#fillType"));
+	self:setFillLevel(getXMLFloat(xmlFile, key..".baler#fillLevel"));
+	self:setFillLevelBunker(getXMLFloat(xmlFile, key..".baler#fillLevelBunker"), true);
+	self.baleCounter = getXMLFloat(xmlFile, key..".baler#counter");
+	self.autoOn = getXMLBool(xmlFile, key..".baler#autoOn");
+	self.baleAnimation:setAnimTime(getXMLFloat(xmlFile, key..".baler#animationTime"));
+	if self.baleAnimation:getAnimationTime() > 0 then	
+		self:setBaleObjectToAnimation();	
+		self.baleAnimation:setAnimationsState(true);
+	end;
+
+
+	self.state_stacker = getXMLInt(xmlFile, key..".stacker#state");
+	self.baleTarget = getXMLInt(xmlFile, key..".stacker#stackBalesTarget");
+	self.animationState = getXMLInt(xmlFile, key..".stacker#animationState");
+
+	local forkNodeNums = getXMLInt(xmlFile, key..".stacker#forkNodeNums");
+	for _,info in pairs (self.baleAnimationObjects) do
+		if info.fillTypeIndex == self.activeFillTypeIndex then
+			for i=1, forkNodeNums do
+				local newBale = clone(info.node, false, false, false);
+				setVisibility(newBale, true);
+				setTranslation(newBale, 0.015, 0.958 + (i-1)*0.8,-0.063);
+				link(self.forkNode, newBale);		
+			end;
+			break;
+		end;
+	end;
+
+	self.doStackAnimationEnd:setAnimTime(getXMLFloat(xmlFile, key..".stacker#doStackAnimationEndTime"));
+	if self.doStackAnimationEnd:getAnimationTime() > 0 and self.doStackAnimationEnd:getAnimationTime() < 1 then		
+		self.doStackAnimationEnd:setAnimationsState(true);
+	end;
+
+	self.doStackAnimationStart:setAnimTime(getXMLFloat(xmlFile, key..".stacker#doStackAnimationStartTime"));
+	if self.doStackAnimationStart:getAnimationTime() > 0 and self.doStackAnimationStart:getAnimationTime() < 1 then		
+		self.doStackAnimationStart:setAnimationsState(true);
+	end;
+
+
+
+	self.state_balerMove = getXMLInt(xmlFile, key..".mover#state");
 
 	return true;
 end;
 
 function Baler:saveToXMLFile(xmlFile, key, usedModNames)
-	
+
+	setXMLInt(xmlFile, key .. ".baler#state", self.state_baler);
+	setXMLBool(xmlFile, key .. ".baler#shouldTurnOff", self.shouldTurnOff);
+	setXMLFloat(xmlFile, key .. ".baler#fillLevel", self.fillLevel);
+	setXMLFloat(xmlFile, key .. ".baler#fillLevelBunker", self.fillLevelBunker);
+	setXMLInt(xmlFile, key .. ".baler#fillType", self.activeFillTypeIndex);
+	setXMLFloat(xmlFile, key .. ".baler#counter", self.baleCounter);
+	setXMLBool(xmlFile, key .. ".baler#autoOn", self.autoOn);
+	setXMLFloat(xmlFile, key .. ".baler#animationTime", self.baleAnimation:getAnimationTime());
+
+	setXMLInt(xmlFile, key .. ".stacker#state", self.state_stacker);
+	setXMLInt(xmlFile, key .. ".stacker#baleTarget", self.stackBalesTarget);
+	setXMLInt(xmlFile, key .. ".stacker#animationState", self.animationState);
+	setXMLInt(xmlFile, key .. ".stacker#forkNodeNums", getNumOfChildren(self.forkNode));	
+	setXMLFloat(xmlFile, key .. ".stacker#doStackAnimationStartTime", self.doStackAnimationStart:getAnimationTime());
+	setXMLFloat(xmlFile, key .. ".stacker#doStackAnimationEndTime", self.doStackAnimationEnd:getAnimationTime());
+
+	setXMLInt(xmlFile, key .. ".mover#state", self.state_balerMove);
 end;
 
 function Baler:update(dt)
@@ -658,8 +715,19 @@ function Baler:doTurnOff()
 	self.shouldTurnOff = true;
 end;
 
-function Baler:doUnload()
-	self.shouldUnload = true;
+function Baler:onEnterBaleTrigger(ref, bale)
+	if ref ==  Baler.BALETRIGGER_MAIN then
+		local alreadyExist = false;
+		for k,b in pairs(self.stackBales) do
+			if b == bale then
+				alreadyExist = true;
+				break;
+			end;
+		end;
+		if not alreadyExist then
+			table.insert(self.stackBales, bale);
+		end;
+	end;
 end;
 
 function Baler:onLeaveBaleTrigger(ref, bale)
