@@ -4,11 +4,15 @@
 -- @Interface: --
 -- @Author: LS-Modcompany / kevink98 / GtX
 -- @Date: 27.01.2019
--- @Version: 1.1.0.0
+-- @Version: 1.2.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+-- 	v1.2.0.0 (09.03.2019): aPuehri
+--		- added new Level "DevDebug"
+--		- for usage of Level "DevDebug" see Console Command
+--
 -- 	v1.1.0.0 (27.01.2019):
 --		- update to GC_DebugUtils for fs19.
 --
@@ -30,7 +34,7 @@ GC_DebugUtils.setDevLevelMax = true; -- Override isDev maxLevel loading to 'fals
 
 GC_DebugUtils.defaultLevel = 5; -- Default level used on load. (TEMP SET TO '5', SHOULD BE '1')
 
-GC_DebugUtils.numLevels = 5; -- This is starting at `GC_DebugUtils.INFORMATIONS` as we do not disable 'ERROR' or 'WARNING' or 'MODDING'.
+GC_DebugUtils.numLevels = 6; -- This is starting at `GC_DebugUtils.INFORMATIONS` as we do not disable 'ERROR' or 'WARNING' or 'MODDING'.
 GC_DebugUtils.maxLevels = 20;
 
 GC_DebugUtils.BLANK = -3; -- No 'PREFIX' and can not be disabled in console. (Used for main loading)
@@ -42,6 +46,7 @@ GC_DebugUtils.LOAD = 2;
 GC_DebugUtils.ONCREATE = 3;
 GC_DebugUtils.TABLET = 4;
 GC_DebugUtils.DEV = 5;
+GC_DebugUtils.DEVDEBUG = 6;
 
 function GC_DebugUtils:new(customMt)
 	if g_company.debug ~= nil then
@@ -72,7 +77,7 @@ function GC_DebugUtils:new(customMt)
 
 	-- Set print levels.
 	for i = -3, GC_DebugUtils.numLevels + 4 do
-		if i <= GC_DebugUtils.defaultLevel or setMax then
+		if i <= GC_DebugUtils.defaultLevel or (setMax and (i < GC_DebugUtils.DEVDEBUG)) then
 			self.printLevel[i] = true;
 		else
 			self.printLevel[i] = false;
@@ -91,7 +96,8 @@ function GC_DebugUtils:new(customMt)
 	self.printLevelPrefix[GC_DebugUtils.ONCREATE] = "ONCREATE: ";
 	self.printLevelPrefix[GC_DebugUtils.TABLET] = "TABLET: ";
 	self.printLevelPrefix[GC_DebugUtils.DEV] = "DEVELOPMENT: ";
-
+	self.printLevelPrefix[GC_DebugUtils.DEVDEBUG] = "DEVELOPMENT DEBUG: ";
+	
 	return self;
 end;
 
@@ -202,7 +208,8 @@ function GC_DebugUtils:getDebugData(scriptId, target, customEnvironment)
 				LOAD = 2,
 				ONCREATE = 3,
 				TABLET = 4,
-				DEV = 5};
+				DEV = 5,
+				DEVDEBUG = 6};
 	end;
 
 	return nil;
@@ -293,6 +300,10 @@ function GC_DebugUtils:writeDev(data, message, ...)
 	self:logWrite(data, 5, message, ...);
 end;
 
+function GC_DebugUtils:writeDevDebug(data, message, ...)
+	self:logWrite(data, 6, message, ...);
+end;
+
 function GC_DebugUtils:getScriptNameFromIndex(index)
 	local name = "";
 
@@ -317,7 +328,7 @@ end;
 
 function GC_DebugUtils:getIsDev()
 	local isDev = false;
-	local devNames = {"kevink98", "GtX", "LSMC", "DEV"};
+	local devNames = {"kevink98", "GtX", "LSMC", "DEV", "aPuehri"};
 	if g_mpLoadingScreen ~= nil and g_mpLoadingScreen.missionInfo ~= nil then
 		if g_mpLoadingScreen.missionInfo.playerStyle ~= nil and g_mpLoadingScreen.missionInfo.playerStyle.playerName ~= nil then
 			for i = 1, #devNames do
@@ -343,10 +354,10 @@ function GC_DebugUtils:loadConsoleCommands()
 
 	if self.isDev then
 		-- Load dev only debug commands when added.
+		addConsoleCommand("gcSetAllDebugLevelsState", "Set the state of all debug levels. [state]", "consoleCommandSetAllDebugLevels", self);
 	end;
 
 	addConsoleCommand("gcSetDebugLevelState", "Set the state of the given debug level. [level] [state]", "consoleCommandSetDebugLevel", self);
-	addConsoleCommand("gcSetAllDebugLevelsState", "Set the state of all debug levels. [state]", "consoleCommandSetAllDebugLevels", self);
 
 	self.consoleCommandsLoaded = true;
 end;
@@ -354,10 +365,10 @@ end;
 function GC_DebugUtils:deleteConsoleCommands()
 	if self.isDev then
 		-- Load dev only debug commands when added
+		removeConsoleCommand("gcSetAllDebugLevelsState");
 	end;
 
 	removeConsoleCommand("gcSetDebugLevelState");
-	removeConsoleCommand("gcSetAllDebugLevelsState");
 end;
 
 function GC_DebugUtils:consoleCommandSetDebugLevel(level, state)

@@ -3,7 +3,7 @@
 --
 -- @Interface: --
 -- @Author: LS-Modcompany / aPuehri
--- @Date: 05.03.2019
+-- @Date: 08.03.2019
 -- @Version: 1.0.0.0
 --
 -- @Support: LS-Modcompany
@@ -18,7 +18,7 @@
 --
 --
 -- ToDo:
--- optimzed Gui
+-- 
 --
 --
 
@@ -46,46 +46,48 @@ function GC_ObjectInfo:init()
 end;
 
 function GC_ObjectInfo:update(dt)
-	if self.isClient and g_currentMission.player.isControlled and not g_currentMission.player.isCarryingObject then
+	if self.isClient then
 		self.showInfo = false;
-		if g_currentMission.player.isObjectInRange then
-			if (g_currentMission.player.lastFoundObject ~= nil) then
-				local foundObjectId = g_currentMission.player.lastFoundObject;
-				if not self.debugPrintDone then
-					--g_company.debug:writeDev(self.debugData, "New foundObjectId = %s", foundObjectId);
-				end;
-				if (foundObjectId ~= g_currentMission.terrainDetailId) then	
-					if getRigidBodyType(foundObjectId) == "Dynamic" then
-						local object = g_currentMission:getNodeObject(foundObjectId);
-						if (object~= nil) then
-							if (object.fillType ~= nil) and (object.fillLevel ~= nil) then
-								self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(Utils.getNoNil(g_fillTypeManager.fillTypes[object.fillType].title,"unknown"));
-								self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level'):format(object.fillLevel);
-								self.showInfo = true;
-							elseif (object.typeName == "pallet") then
-								if (object.getFillUnits ~= nil) then
-									local fUnit = object:getFillUnits();
-									if object:getFillUnitExists(fUnit[1].fillUnitIndex) then
-										local lev = Utils.getNoNil(g_company.mathUtils.round(fUnit[1].fillLevel,0.01),0);
-										local perc = Utils.getNoNil(g_company.mathUtils.round((object:getFillUnitFillLevelPercentage(fUnit[1].fillUnitIndex) * 100),0.01),0);
-										self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(Utils.getNoNil(g_fillTypeManager.fillTypes[fUnit[1].fillType].title,"unknown"));
-										self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level2'):format(lev, perc);
-										self.showInfo = true;
+		if g_currentMission.player.isControlled and not g_currentMission.player.isCarryingObject then
+			if g_currentMission.player.isObjectInRange then
+				if (g_currentMission.player.lastFoundObject ~= nil) then
+					local foundObjectId = g_currentMission.player.lastFoundObject;
+					if not self.debugPrintDone then
+						g_company.debug:writeDevDebug(self.debugData, "New foundObjectId = %s", foundObjectId);
+					end;
+					if (foundObjectId ~= g_currentMission.terrainDetailId) then	
+						if getRigidBodyType(foundObjectId) == "Dynamic" then
+							local object = g_currentMission:getNodeObject(foundObjectId);
+							if (object~= nil) then
+								if (object.fillType ~= nil) and (object.fillLevel ~= nil) then
+									self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(Utils.getNoNil(g_fillTypeManager.fillTypes[object.fillType].title,"unknown"));
+									self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level'):format(object.fillLevel);
+									self.showInfo = true;
+								elseif (object.typeName == "pallet") then
+									if (object.getFillUnits ~= nil) then
+										local fUnit = object:getFillUnits();
+										if object:getFillUnitExists(fUnit[1].fillUnitIndex) then
+											local lev = Utils.getNoNil(g_company.mathUtils.round(fUnit[1].fillLevel,0.01),0);
+											local perc = Utils.getNoNil(g_company.mathUtils.round((object:getFillUnitFillLevelPercentage(fUnit[1].fillUnitIndex) * 100),0.01),0);
+											self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(Utils.getNoNil(g_fillTypeManager.fillTypes[fUnit[1].fillType].title,"unknown"));
+											self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level2'):format(lev, perc);
+											self.showInfo = true;
+										end;
 									end;
 								end;
-							end;
-							self.debugPrintDone = true;
-						end;			
+								self.debugPrintDone = true;
+							end;			
+						end;
 					end;
 				end;
+			else
+				self.debugPrintDone = false;
+				local x,y,z = localToWorld(g_currentMission.player.cameraNode, 0,0,1.0)
+				local dx,dy,dz = localDirectionToWorld(g_currentMission.player.cameraNode, 0,0,-1)
+				raycastAll(x,y,z, dx,dy,dz, "infoObjectRaycastCallback", Player.MAX_PICKABLE_OBJECT_DISTANCE, self)
 			end;
-		else
-			self.debugPrintDone = false;
-			local x,y,z = localToWorld(g_currentMission.player.cameraNode, 0,0,1.0)
-			local dx,dy,dz = localDirectionToWorld(g_currentMission.player.cameraNode, 0,0,-1)
-			raycastAll(x,y,z, dx,dy,dz, "infoObjectRaycastCallback", Player.MAX_PICKABLE_OBJECT_DISTANCE, self)
 		end;
-
+			
 		if self.showInfo then
 			if self.gui == nil then
 				self.gui = g_company.gui:openGuiWithData("gcObjectInfo", false, self.displayLine1, self.displayLine2);
@@ -118,7 +120,7 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 					end;
 				end;			
 				if not self.debugPrintDone then
-					--g_company.debug:writeDev(self.debugData, "hitObjectId = %s, locRigidBodyType = %s", hitObjectId, locRigidBodyType);
+					g_company.debug:writeDevDebug(self.debugData, "hitObjectId = %s, locRigidBodyType = %s", hitObjectId, locRigidBodyType);
 				end;
 				self.debugPrintDone = true;
 			end;

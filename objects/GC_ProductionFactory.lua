@@ -28,6 +28,7 @@
 --		- Finish MP Events and read / write functions.
 -- 		- add missing triggers (Pallet Spawner, Loading (Silo / liquid), Pallet-On-Demand, Fuel Station, Animal Load / Unload).
 -- 		- Finish farmID info for onCreate.
+-- 		-- Check 'userStopped' function.
 --
 --
 
@@ -85,6 +86,8 @@ function ProductionFactory:new(isServer, isClient, customMt, xmlFilename, baseDi
 
 	self.triggerIdToProduct = {};
 	self.fillTypeIndexToOutput = {};
+	
+	self.fillTypeIndexToProductLineId = {};
 
 	self.productLines = {};
 	self.inputProducts = {};
@@ -113,8 +116,9 @@ function ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		self.saveId = "ProductionFactory_" .. indexName;
 	end;
 
-	self.showInGlobalGUI = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. ".operation#showInGlobalGUI"), true);
-	self.updateDelay = math.max(Utils.getNoNil(getXMLInt(xmlFile, xmlKey .. ".operation#updateDelayMinutes"), 10), 1);
+	local operationKey = string.format("%s.operation", xmlKey);
+	self.showInGlobalGUI = Utils.getNoNil(getXMLBool(xmlFile, operationKey .. "#showInGlobalGUI"), true);
+	self.updateDelay = math.max(Utils.getNoNil(getXMLInt(xmlFile, operationKey .. "#updateDelayMinutes"), 10), 1);
 	self.updateCounter = self.updateDelay;
 
 	-------------------------------
@@ -278,10 +282,16 @@ function ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 						end;
 					end;
 
-					-- Dynamic Pallet Trigger  -- TO DO
-					local dynamicPalletTriggerKey = inputProductKey .. ".inputMethods.dynamicPalletTrigger";
-					if hasXMLProperty(xmlFile, dynamicPalletTriggerKey) then
-
+					-- Dynamic Pallet Trigger
+					local dynamicPalletAreaKey = inputProductKey .. ".inputMethods.dynamicPalletArea";
+					if hasXMLProperty(xmlFile, dynamicPalletAreaKey) then
+						-- TO DO
+					end;
+					
+					-- Livestock Trigger
+					local livestockTriggerKey = inputProductKey .. ".inputMethods.livestockTrigger";
+					if hasXMLProperty(xmlFile, livestockTriggerKey) then
+						-- TO DO
 					end;
 				end;
 
@@ -338,11 +348,11 @@ function ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 					if hasXMLProperty(xmlFile, outputMethodsKey) then
 						local triggersLoaded, invalidTriggers = {}, {};
 
-						-- OnDemand Pallet Spawner  -- TO DO
+						-- OnDemand Pallet Spawner
 						local onDemandPalletSpawnerKey = outputMethodsKey .. ".onDemandPalletSpawner";
 						if hasXMLProperty(xmlFile, onDemandPalletSpawnerKey) then
-							-- TO DO (This will allow pallets to be spawned on demand from GUI.)
-
+							-- TO DO (This will allow pallets to be spawned on demand from GUI.)							
+							g_company.debug:writeInformations(self.debugData, "[FACTORY - %s] 'onDemandPalletSpawner' support has not been added at this stage.");
 							table.insert(triggersLoaded, "onDemandPalletSpawner");
 						end;
 
@@ -365,30 +375,47 @@ function ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 						-- Dynamic Heap
 						local dynamicHeapKey = outputMethodsKey .. ".dynamicHeap";
 						if hasXMLProperty(xmlFile, dynamicHeapKey) then
-							if triggersLoaded ~= nil then
-								local trigger = self.triggerManager:loadTrigger(GC_DynamicHeap, self.nodeId , xmlFile, dynamicHeapKey, fillTypeName);
-								if trigger ~= nil then
-									trigger.extraParamater = trigger.managerId;
-									outputProduct.dynamicHeap = trigger;
-									--self.triggerIdToProduct[trigger.managerId] = outputProduct;
-
-									table.insert(triggersLoaded, "dynamicHeap");
+							if #triggersLoaded == 0 then
+								local dynamicHeap = self.triggerManager:loadTrigger(GC_DynamicHeap, self.nodeId , xmlFile, dynamicHeapKey, fillTypeName);
+								if dynamicHeap ~= nil then
+									-- These allow auto start/stop of factory and also instant update for 'GUI', 'Movers', 'VisNodes', 'Digital Displays' and FillVolume.
+									if dynamicHeap.vehicleInteractionTrigger ~= nil then	
+										dynamicHeap.extraParamater = dynamicHeap.managerId;
+										outputProduct.dynamicHeap = dynamicHeap;
+										
+										if self.dynamicHeapsFillTypeIndex == nil then
+											self.dynamicHeapsFillTypeIndex = {};
+										end;
+										table.insert(self.dynamicHeapsFillTypeIndex, fillTypeIndex);
+										table.insert(triggersLoaded, "dynamicHeap");
+									else
+										self.triggerManager:unregisterTrigger(dynamicHeap);
+										g_company.debug:writeModding(self.debugData, "[FACTORY - %s] No 'vehicleInteractionTrigger' found at '%s.dynamicHeap'", indexName, outputMethodsKey);
+									end;
 								end;
 							else
 								table.insert(invalidTriggers, "dynamicHeap");
 							end;
 						end;
-
-						-- Pallet Fill Trigger  -- TO DO
-						local palletFillAreaKey = outputMethodsKey .. ".palletFillArea";
-						if hasXMLProperty(xmlFile, palletFillAreaKey) then
-							if not triggersLoaded then
-								-- TO DO (This will fill the pallet as the factory works.)
-
-								outputProduct.palletFillArea = nil;
-								table.insert(triggersLoaded, "palletFillArea");
+						
+						-- Pallet Creators
+						if hasXMLProperty(xmlFile, outputMethodsKey .. ".palletCreators") then
+							if #triggersLoaded == 0 then
+								local palletCreator = self.triggerManager:loadTrigger(GC_PalletCreator, self.nodeId, xmlFile, outputMethodsKey, self.baseDirectory, outputProduct.fillTypeIndex);
+								if palletCreator ~= nil then
+									-- These allow auto start/stop of factory and also instant update for 'GUI', 'Movers', 'VisNodes', 'Digital Displays' and FillVolume.
+									if palletCreator.palletInteractionTriggers ~= nil then
+										palletCreator.extraParamater = palletCreator.managerId;
+										outputProduct.palletCreator = palletCreator;
+										outputProduct.capacity = palletCreator:getTotalCapacity();
+										table.insert(triggersLoaded, "palletCreator");
+									else
+										self.triggerManager:unregisterTrigger(palletCreator);
+										g_company.debug:writeModding(self.debugData, "[FACTORY - %s] No 'palletInteractionTrigger(s)' found at '%s.palletCreators'", indexName, outputMethodsKey);
+									end;
+								end;
 							else
-								table.insert(invalidTriggers, "palletFillArea");
+								table.insert(invalidTriggers, "palletCreator");
 							end;
 						end;
 
@@ -401,7 +428,7 @@ function ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 						end;
 					end;
 
-					-- Load Movers, VisNodes and FillVolume.
+					-- Load Movers, VisNodes, Digital Displays and FillVolume.
 					self:loadProductParts(xmlFile, outputProductKey, outputProduct);
 
 					-- Add to 'outputProduct' table.
@@ -431,6 +458,7 @@ function ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 			local productLineId = #self.productLines + 1;
 
 			productLine.active = false;
+			productLine.userStopped = false;
 			productLine.autoStart = Utils.getNoNil(getXMLBool(xmlFile, productLineKey .. "#autoLineStart"), false);
 			productLine.outputPerHour = Utils.getNoNil(getXMLInt(xmlFile, productLineKey .. "#outputPerHour"), 1000);
 
@@ -506,8 +534,11 @@ function ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 						productLine.outputs[outputId] = self.outputProducts[name];
 						productLine.outputs[outputId].percent = math.min(math.max(percent, 0.1), 1);
 
+						local outputFillTypeIndex = self.outputProducts[name].fillTypeIndex
+						self.fillTypeIndexToProductLineId[outputFillTypeIndex] = productLineId;
+						
 						-- Store title and image data for quick GUI access.
-						local fillType = g_fillTypeManager:getFillTypeByIndex(self.outputProducts[name].fillTypeIndex);
+						local fillType = g_fillTypeManager:getFillTypeByIndex(outputFillTypeIndex);
 						productLine.outputs[outputId].title = fillType.title;
 						productLine.outputs[outputId].imageFilename = fillType.hudOverlayFilename;
 					end;
@@ -531,6 +562,16 @@ function ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 			i = i + 1;
 		end;
 
+		---------------------------
+		-- LOAD OPERATING CLOCKS --
+		---------------------------
+		if hasXMLProperty(xmlFile, operationKey .. ".clocks") then
+			local clocks = GC_Clock:new(self.isServer, self.isClient);
+			if clocks:load(self.nodeId, self, xmlFile, operationKey) then
+				self.operationClocks = clocks;
+			end;
+		end;
+		
 		---------------------------------------------------------------------
 		-- LOAD SHARED OPERATING PARTS (ONLY WITH 2 OR MORE PRODUCT LINES) --
 		---------------------------------------------------------------------
@@ -548,7 +589,7 @@ function ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		-- LOAD SHARED PLAYER TRIGGER (This will only be for opening the Factory GUI)--
 		------------------------------------------------------------------------
 
-		local playerTriggerKey = xmlKey .. ".playerTrigger";
+		local playerTriggerKey = string.format("%s.playerTrigger", xmlKey);
 		if hasXMLProperty(xmlFile, playerTriggerKey) then
 			self.playerTrigger = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.nodeId , xmlFile, playerTriggerKey, nil, true);
 		end;
@@ -583,18 +624,23 @@ function ProductionFactory:loadProductParts(xmlFile, key, product)
 		local capacity = product.capacity;
 
 		local visibilityNodes = GC_VisibilityNodes:new(self.isServer, self.isClient);
-		if visibilityNodes:load(self.nodeId , self, xmlFile, key, self.baseDirectory, capacity, true) then
+		if visibilityNodes:load(self.nodeId, self, xmlFile, key, self.baseDirectory, capacity, true) then
 			product.visibilityNodes = visibilityNodes;
 		end;
 
 		local movers = GC_Movers:new(self.isServer, self.isClient);
-		if movers:load(self.nodeId , self, xmlFile, key, self.baseDirectory, capacity, true) then
+		if movers:load(self.nodeId, self, xmlFile, key, self.baseDirectory, capacity, true) then
 			product.movers = movers;
 		end;
 
 		local fillVolumes = GC_FillVolume:new(self.isServer, self.isClient);
-		if fillVolumes:load(self.nodeId , self, xmlFile, key, capacity, true, fillTypeName) then
+		if fillVolumes:load(self.nodeId, self, xmlFile, key, capacity, true, fillTypeName) then
 			product.fillVolumes = fillVolumes;
+		end;
+		
+		local digitalDisplays = GC_DigitalDisplays:new(self.isServer, self.isClient);
+		if digitalDisplays:load(self.nodeId, self, xmlFile, key, nil, true) then
+			product.digitalDisplays = digitalDisplays;
 		end;
 	end;
 end;
@@ -667,6 +713,10 @@ function ProductionFactory:delete()
 
 		if self.sharedOperatingParts ~= nil then
 			self:deleteOperatingParts(self.sharedOperatingParts);
+		end;
+		
+		if self.operationClocks ~= nil then
+			self.operationClocks:delete();
 		end;
 	end;
 
@@ -752,7 +802,8 @@ function ProductionFactory:loadFromXMLFile(xmlFile, key)
 
 			local fillLevel = getXMLFloat(xmlFile, inputProductKey .. "#fillLevel");
 			if fillLevel ~= nil then
-				local fillLevel = math.max(fillLevel, 0);
+				--local fillLevel = math.min(math.max(fillLevel, 0), inputProduct.capacity); -- Do not overfill.
+				local fillLevel = math.max(fillLevel, 0); -- Testing.
 				local lastFillTypeIndex = inputProduct.lastFillTypeIndex;
 				self:updateFactoryLevels(fillLevel, inputProduct, lastFillTypeIndex, false);
 			end;
@@ -764,6 +815,15 @@ function ProductionFactory:loadFromXMLFile(xmlFile, key)
 			local outputProductKey = string.format("%s.outputProducts.%s", factoryKey, name);
 
 			local fillLevel = getXMLFloat(xmlFile, outputProductKey .. "#fillLevel");
+			-- If we have a 'dynamicHeap' then set this fillLevel;
+			if outputProduct.dynamicHeap ~= nil then
+				fillLevel = outputProduct.dynamicHeap:getHeapLevel();
+			end;
+			
+			if outputProduct.palletCreator ~= nil then
+				outputProduct.palletCreator:loadFromXMLFile(xmlFile, outputProductKey);
+			end;
+
 			if fillLevel ~= nil then
 				local fillLevel = math.max(fillLevel, 0);
 				local lastFillTypeIndex = outputProduct.lastFillTypeIndex;
@@ -797,8 +857,9 @@ function ProductionFactory:loadFromXMLFile(xmlFile, key)
 
 			if productLine ~= nil and productLine.autoStart then
 				local state = Utils.getNoNil(getXMLBool(xmlFile, productLineKey .. "#state"), false);
+				local userStopped = Utils.getNoNil(getXMLBool(xmlFile, productLineKey .. "#userStopped"), false);
 
-				if state then
+				if state and not userStopped then
 					self:setFactoryState(lineId, state);
 				end;
 			else
@@ -844,6 +905,10 @@ function ProductionFactory:saveToXMLFile(xmlFile, key, usedModNames)
 		for name, outputProduct in pairs (self.outputProducts) do
 			local outputProductKey = string.format("%s.outputProducts.%s", factoryKey, name);
 			setXMLFloat(xmlFile, outputProductKey .. "#fillLevel", outputProduct.fillLevel);
+			
+			if outputProduct.palletCreator ~= nil then
+				outputProduct.palletCreator:saveToXMLFile(xmlFile, outputProductKey, usedModNames)
+			end;
 		end;
 	end;
 
@@ -859,6 +924,7 @@ function ProductionFactory:saveToXMLFile(xmlFile, key, usedModNames)
 			local productLineKey = string.format("%s.productLines.productLine(%d)", factoryKey, i - 1);
 			setXMLString(xmlFile, productLineKey .. "#name", self.productLines[i].name);
 			setXMLBool(xmlFile, productLineKey .. "#state", self.productLines[i].active);
+			setXMLBool(xmlFile, productLineKey .. "#userStopped", self.productLines[i].userStopped);
 		end;
 	end;
 end;
@@ -908,7 +974,7 @@ function ProductionFactory:minuteChanged()
 			self:updateFactoryLevels(amount, input, FillType.WATER, true);
 			self.rainWaterCollector.collected = 0;
 		end;
-	end;
+	end;	
 
 	local raiseFlags = false;
 	self.updateCounter = self.updateCounter + 1;
@@ -943,8 +1009,11 @@ function ProductionFactory:minuteChanged()
 						local newFillLevel = output.fillLevel + amount
 
 						if output.dynamicHeap ~= nil then
-							output.dynamicHeap:updateDynamicHeap(amount, false);
+							local dropped = output.dynamicHeap:updateDynamicHeap(amount, false);
 							newFillLevel = output.dynamicHeap:getHeapLevel();
+						elseif output.palletCreator ~= nil then
+							-- We allow fatory to continue even if spawner is blocked but the waiting delta is calculated as part of fill level.
+							newFillLevel = output.palletCreator:updatePalletCreators(amount, false, true);
 						end;
 
 						self:updateFactoryLevels(newFillLevel, output, output.fillTypeIndex,  false);
@@ -977,7 +1046,13 @@ function ProductionFactory:getHasOutputSpace(productLine, factor)
 		for i = 1, #productLine.outputs do
 			local output = productLine.outputs[i];
 			local outputWanted = output.percent * factor;
-			local availableSpace = output.capacity - output.fillLevel;
+			local fillLevel = output.fillLevel;
+			-- -- Need a way to sync pallets being removed.
+			if output.palletCreator ~= nil then
+				fillLevel = output.palletCreator:getTotalFillLevel(false, true);
+			end;
+			
+			local availableSpace = output.capacity - fillLevel;
 			local outputSpace = math.min(outputWanted, availableSpace);
 
 			if outputSpace > 0 then
@@ -1060,19 +1135,25 @@ function ProductionFactory:updateFactoryLevels(fillLevel, product, fillTypeIndex
 
 	product.fillLevel = fillLevel;
 
-	if product.visibilityNodes ~= nil then
-		product.visibilityNodes:updateNodes(fillLevel);
-	end;
-
-	if product.movers ~= nil then
-		product.movers:updateMovers(fillLevel)
-	end;
-
-	if product.fillVolumes ~= nil then
-		if fillTypeIndex ~= product.fillVolumes.lastFillTypeIndex then
-			product.fillVolumes:setFillType(fillTypeIndex);
+	if self.isClient then
+		if product.visibilityNodes ~= nil then
+			product.visibilityNodes:updateNodes(fillLevel);
 		end;
-		product.fillVolumes:addFillLevel(fillLevel);
+	
+		if product.movers ~= nil then
+			product.movers:updateMovers(fillLevel)
+		end;
+	
+		if product.fillVolumes ~= nil then
+			if fillTypeIndex ~= product.fillVolumes.lastFillTypeIndex then
+				product.fillVolumes:setFillType(fillTypeIndex);
+			end;
+			product.fillVolumes:addFillLevel(fillLevel);
+		end;
+		
+		if product.digitalDisplays ~= nil then
+			product.digitalDisplays:updateLevelDisplays(fillLevel, product.capacity)
+		end;
 	end;
 
 	if self.isServer and raiseFlags then
@@ -1146,7 +1227,7 @@ function ProductionFactory:getIsFactoryLineOn(lineId)
 end;
 
 function ProductionFactory:getAutoStart(lineId)
-	return self.productLines[lineId].autoStart and not self.productLines[lineId].active;
+	return self.productLines[lineId].autoStart and not self.productLines[lineId].userStopped and not self.productLines[lineId].active;
 end;
 
 function ProductionFactory:doAutoStart(fillTypeIndex)
@@ -1161,6 +1242,41 @@ function ProductionFactory:doAutoStart(fillTypeIndex)
 			end;
 
 			self:raiseActive();
+		end;
+	end;
+end;
+
+
+-----------------------------------------------------
+-- Pallet removal Trigger (Optional / Recommended) --
+-----------------------------------------------------
+
+function ProductionFactory:palletCreatorInteraction(level, blockedLevel, deltaWaiting, fillTypeIndex, extraParamater)
+	if not self.isServer then
+		return;
+	end;
+	
+	local product = self.fillTypeIndexToOutput[fillTypeIndex];
+	if product ~= nil then
+		-- Because the factory will still store product if spawner is blocked we need to add it to the total.
+		local totalLevel = level + deltaWaiting;
+		
+		if totalLevel ~= product.fillLevel then	
+			self:updateFactoryLevels(totalLevel, product, fillTypeIndex, true);
+		end;
+		
+		-- This is an output so we only want to try and start / stop it.
+		local lineId = self.fillTypeIndexToProductLineId[fillTypeIndex];
+		if lineId ~= nil then
+			if totalLevel < product.capacity then
+				if self:getAutoStart(lineId) and self:getCanOperate(lineId) then
+					self:setFactoryState(lineId, true);
+				end;
+			else
+				if self.productLines[lineId].active and not self:getCanOperate(lineId) then
+					self:setFactoryState(lineId, false);
+				end;
+			end;
 		end;
 	end;
 end;
@@ -1185,17 +1301,19 @@ function ProductionFactory:vehicleChangedHeapLevel(heapLevel, fillTypeIndex, hea
 			startFactory = product.fillLevel >= product.capacity and heapLevel < product.capacity;
 		end;
 
-		self:updateFactoryLevels(heapLevel, product, fillTypeIndex, true);
-
-		-- If the level drops from a vehicle then try and start.
-		if startFactory then
-			self.lastCheckedFillType = nil; -- reset timer to make sure we start if we can.
-			self:doAutoStart(fillTypeIndex);
-		end;
-
-		-- If someone is dumping fillType into output heap then stop if overfilled.
-		if stopFactory then
-			for lineId, _ in pairs (self.productLines) do
+		self:updateFactoryLevels(heapLevel, product, fillTypeIndex, true);		
+		
+		local lineId = self.fillTypeIndexToProductLineId[fillTypeIndex];
+		if lineId ~= nil then
+			-- If the level drops from a vehicle then try and start.
+			if startFactory then
+				if self:getAutoStart(lineId) and self:getCanOperate(lineId) then
+					self:setFactoryState(lineId, true);
+				end;
+			end;
+	
+			-- If someone is dumping fillType into output heap then stop if overfilled.
+			if stopFactory then
 				if self.productLines[lineId].active and not self:getCanOperate(lineId) then
 					self:setFactoryState(lineId, false);
 				end;
@@ -1255,6 +1373,9 @@ function ProductionFactory:playerTriggerActivated(triggerReference)
 		g_currentMission:showBlinkingWarning("THIS WILL OPEN THE GUI ONLY!");
 	else
 		local state = not self.productLines[triggerReference].active
+
+		self.productLines[triggerReference].userStopped = not state; -- Testing
+		
 		-- local canStart = state == true and self:getCanOperate(triggerReference)
 		local canStart = state -- Testing only..
 		self:setFactoryState(triggerReference, canStart)

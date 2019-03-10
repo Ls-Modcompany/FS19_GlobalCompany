@@ -12,6 +12,7 @@
 --
 -- 	v1.0.0.0 ():
 -- 		- initial fs19 (GtX)
+--		- 'de' warning translation (aPuehri)
 --
 -- Notes:
 --		- This script is added to individual mods or maps.
@@ -30,7 +31,7 @@ GC_Checker = {};
 GC_Checker.modName = g_currentModName;
 
 GC_Checker.warningTexts = {["en"] = "Global Company Version %s or greater is required for this mod / map to operate. Please visit modHub download link for the latest official version or visit '%s' for Global Company support.",
-						   ["de"] = "Global Company Version %s or greater is required for this mod / map to operate. Please visit modHub download link for the latest official version or visit '%s' for Global Company support."};
+						   ["de"] = "Für die Verwendung dieses Mods / dieser Map ist Global Company Version %s oder höher erforderlich. Bitte im ModHub die aktuelle offizielle Version downloaden, oder besuche '%s' für den Global Company Support."};
 
 addModEventListener(GC_Checker);
 

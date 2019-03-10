@@ -48,7 +48,7 @@ function GC_TriggerManager:new(parent, customMt)
 	self.storedPickNodes = {};
 	self.registeredTriggers = {};
 
-	self.debugData = g_company.debug:getDebugData(GC_FillVolume.debugIndex, parent);
+	self.debugData = g_company.debug:getDebugData(GC_TriggerManager.debugIndex, parent);
 
 	return self;
 end;
@@ -61,13 +61,17 @@ end;
 -- @param ______ ... = extra trigger paramaters if needed.
 -- @return trigger object if loaded correctly.
 function GC_TriggerManager:loadTrigger(triggerClass, rootNode, xmlFile, keyNode, ...)
-	local trigger = triggerClass:new(g_server ~= nil, g_client ~= nil);
-	if trigger:load(rootNode, self.parent, xmlFile, keyNode, ...) then
-		self:registerTrigger(trigger);
-		return trigger;
+	if triggerClass ~= nil then
+		local trigger = triggerClass:new(g_server ~= nil, g_client ~= nil);
+		if trigger:load(rootNode, self.parent, xmlFile, keyNode, ...) then
+			self:registerTrigger(trigger);
+			return trigger;
+		else
+			trigger:delete();
+			return nil;
+		end;
 	else
-		trigger:delete();
-		return nil;
+		g_company.debug:writeDev(self.debugData, "'loadTrigger' Failed! Trigger Class is a 'nil' value.");
 	end;
 end;
 
