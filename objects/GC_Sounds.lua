@@ -236,7 +236,7 @@ end;
 
 function GC_Sounds:setSoundsState(state, forceState)
 	if self.isClient then
-		local setState = state or (not self.soundsRunning);
+		local setState = Utils.getNoNil(state, not self.soundsRunning);
 
 		if self.soundsRunning ~= setState or forceState == true then
 			self.soundsRunning = setState;
