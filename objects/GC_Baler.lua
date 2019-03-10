@@ -90,6 +90,10 @@ function Baler:new(isServer, isClient, customMt, xmlFilename, baseDirectory, cus
 	self.shouldTurnOff = false;
 	self.shouldUnload = false;
 
+	self.soundBalerOn = false;
+	self.soundStackerOn = false;
+	self.soundMoverOn = false;
+
 	return self;
 end;
 
@@ -192,6 +196,9 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		i = i + 1;
 	end;
 
+    self.soundMain = g_company.sounds:new(self.isServer, self.isClient);
+    self.soundMain:load(self.nodeId, self, xmlFile, string.format("%s", mainPartKey), self.basedirectory);
+
 	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	------------------------------------------------------------------------Stacker--------------------------------------------------------------------------------------
 	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -207,12 +214,18 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		
 		self.stackerBaleTrigger = self.triggerManager:loadTrigger(GC_BaleTrigger, self.nodeId , xmlFile, string.format("%s.baleTrigger", stackPartKey), Baler.BALETRIGGER_MAIN, GC_BaleTrigger.MODE_COUNTER);
 				
+		self.conveyorStacker = GC_Conveyor:new(self.isServer, self.isClient);
+		self.conveyorStacker:load(self.nodeId, self, xmlFile, string.format("%s.conveyor", stackPartKey));
+
 		self.raisedAnimationKeys = {};
 		self.doStackAnimationEnd = GC_Animations:new(self.isServer, self.isClient)
 		self.doStackAnimationEnd:load(self.nodeId, self, true, string.format("%s.doStackAnimationEnd", stackPartKey), xmlFile);
 		self.doStackAnimationStart = GC_Animations:new(self.isServer, self.isClient)
 		self.doStackAnimationStart:load(self.nodeId, self, true, string.format("%s.doStackAnimationStart", stackPartKey), xmlFile);
 	end;
+
+    self.soundStacker = g_company.sounds:new(self.isServer, self.isClient);
+    self.soundStacker:load(self.nodeId, self, xmlFile, string.format("%s", stackPartKey), self.basedirectory);
 
 	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	-----------------------------------------------------------------------BaleMover-------------------------------------------------------------------------------------
@@ -223,6 +236,9 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	self.baleMoveCollision = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, string.format("%s.moveCollision#node", baleMoverKey)), self.i3dMappings);
 	setPairCollision(self.nodeId, self.baleMoveCollision, false);
 
+	self.conveyorMover = GC_Conveyor:new(self.isServer, self.isClient);
+	self.conveyorMover:load(self.nodeId, self, xmlFile, string.format("%s.conveyor", baleMoverKey));
+
 	self.moveCollisionAnimation = GC_Animations:new(self.isServer, self.isClient)
 	self.moveCollisionAnimation:load(self.nodeId, self, true, string.format("%s.moveCollisionAnimation", baleMoverKey), xmlFile);
 
@@ -232,6 +248,8 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		
 	self.moverBaleTrigger = self.triggerManager:loadTrigger(GC_BaleTrigger, self.nodeId , xmlFile, string.format("%s.baleTriggerMover", baleMoverKey), Baler.BALETRIGGER_MOVER, GC_BaleTrigger.MODE_COUNTER);
 	
+    self.soundMover = g_company.sounds:new(self.isServer, self.isClient);
+    self.soundMover:load(self.nodeId, self, xmlFile, string.format("%s", baleMoverKey), self.basedirectory);
 
 	self.balerDirtyFlag = self:getNextDirtyFlag();
 	return true;
@@ -250,6 +268,13 @@ function Baler:delete()
 	self.doStackAnimationStart:delete();
 	self.doStackAnimationEnd:delete();
 	self.moveCollisionAnimation:delete();
+
+	self.soundMain:delete();
+	self.soundStacker:delete();
+	self.soundMover:delete();
+
+	self.conveyorStacker:delete();
+	self.conveyorMover:delete();
 	
 	Baler:superClass().delete(self)
 end;
@@ -398,8 +423,14 @@ function Baler:update(dt)
 				end;
 			end;
 		end;
-		self:raiseActive();
 	end;
+
+	if self.isClient then
+		self.soundMain:setSoundsState(self.state_baler == Baler.STATE_ON); 
+		self.soundStacker:setSoundsState(self.animationState == Baler.ANIMATION_ISSTACKING or self.animationState == Baler.ANIMATION_ISSTACKINGEND); 
+		self.soundMover:setSoundsState(self.state_balerMove == Baler.STATE_ON); 
+	end;
+	self:raiseActive();
 end;
 
 function Baler:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, toolType, fillPositionData, triggerId)
@@ -576,6 +607,8 @@ function Baler:onTurnOnBaleMover()
 	if self.isServer then
 		self:raiseActive();
 		setFrictionVelocity(self.baleMoveCollision, 0.8);
+		self.conveyorStacker:start();
+		self.conveyorMover:start();
 	end;
 
 	if self.isClient then
@@ -589,6 +622,8 @@ function Baler:onTurnOffBaleMover()
 
 	if self.isServer then
 		setFrictionVelocity(self.baleMoveCollision, 0.0);
+		self.conveyorStacker:stop();
+		self.conveyorMover:stop();
 	end;
 
 	if self.isClient then
