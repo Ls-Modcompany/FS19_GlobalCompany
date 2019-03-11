@@ -7,7 +7,7 @@
     <GuiElement type="image" template="gcBalerContent">        
           
       <GuiElement type="flowLayout" template="gcBalerContentLayout">
-        <GuiElement type="text" template="gcBalerFillTypesText" text="Aktueller Ballentyp:" />      
+        <GuiElement type="text" template="gcBalerFillTypesText" text="$l10n_GC_baler_actualTyp" />      
         <GuiElement type="flowLayout" template="gcBalerFillTypesLayout">
           <GuiElement type="flowLayout" template="gcBalerFillTypesLayoutTyp">
             <GuiElement type="image" template="gcBalerFillTypesButtonBackground">    
@@ -29,7 +29,7 @@
           </GuiElement>
         </GuiElement>
         
-        <GuiElement type="text" template="gcBalerFillTypesText" text="Anzahl Ballen stapeln:" />
+        <GuiElement type="text" template="gcBalerFillTypesText" text="$l10n_GC_baler_canStack" />
         
         <GuiElement type="flowLayout" template="gcBalerNumLayout">
           <GuiElement type="image" template="gcBalerNumBackground">    

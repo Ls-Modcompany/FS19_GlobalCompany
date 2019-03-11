@@ -400,9 +400,9 @@ function Baler:update(dt)
 			elseif self.fillLevel + self.fillLevelBunker >= 4000 then
 				self:setFillLevelBunker(math.min(dt / 1000 * self.pressPerSecond, 4000 - self.fillLevelBunker, self.fillLevel));
 			elseif self.baleAnimation:getAnimationTime() == 0 then
-				if self.autoOn then
+				--if self.autoOn then
 					self:onTurnOffBaler();
-				end;
+				--end;
 			end;
 		end;
 		if self.baleAnimation:getAnimationTime() == 1 then
