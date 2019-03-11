@@ -244,7 +244,7 @@ end;
 
 function GC_RotationNodes:setRotationNodesState(state, forceState)
 	if self.isClient then
-		local setState = state or (not self.rotationActive);
+		local setState = Utils.getNoNil(state, not self.rotationActive);
 		
 		if self.rotationActive ~= setState or forceState == true then
 			self.rotationActive = setState;

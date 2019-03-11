@@ -186,7 +186,7 @@ end;
 
 function GC_Shaders:setShadersState(state, forceState)
 	if self.isClient then
-		local setState = state or (not self.shadersActive);
+		local setState = Utils.getNoNil(state, not self.shadersActive);
 		
 		if self.shadersActive ~= setState or forceState == true then
 			self.shadersActive = setState;

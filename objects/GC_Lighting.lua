@@ -741,7 +741,7 @@ function GC_Lighting:update(dt)
 end;
 
 function GC_Lighting:setAllLightsState(state, forceState)
-	local setState = state or (not self.syncedLightState);
+	local setState = Utils.getNoNil(state, not self.syncedLightState);
 
 	if self.syncedLightState ~= setState or forceState == true then
 		self.syncedLightState = setState;
@@ -788,7 +788,7 @@ function GC_Lighting:setAreaLightsState(state, forceState)
 	end;
 
 	if self.isClient then
-		local setState = state or (not self.areaLightsActive);
+		local setState = Utils.getNoNil(state, not self.areaLightsActive);
 
 		if self.areaLightsActive ~= setState or forceState == true then
 			self.areaLightsActive = setState;
@@ -829,7 +829,7 @@ function GC_Lighting:setStrobeLightsState(state, forceState)
 	end;
 
 	if self.isClient then
-		local setState = state or (not self.strobeLightsActive);
+		local setState = Utils.getNoNil(state, not self.strobeLightsActive);
 
 		if self.strobeLightsActive ~= setState or forceState == true then
 			self.strobeLightsActive = setState;
@@ -853,7 +853,7 @@ function GC_Lighting:setBeaconLightsState(state, forceState)
 	end;
 
 	if self.isClient then
-		local setState = state or (not self.beaconLightsActive);
+		local setState = Utils.getNoNil(state, not self.beaconLightsActive);
 
 		if self.beaconLightsActive ~= setState or forceState == true then
 			self.beaconLightsActive = setState;

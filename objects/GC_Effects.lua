@@ -475,7 +475,7 @@ end;
 
 function GC_Effects:setEffectsState(state, forceState)
 	if self.isClient then
-		local setState = state or (not self.effectsActive);
+		local setState = Utils.getNoNil(state, not self.effectsActive);
 
 		if self.effectsActive ~= setState or forceState == true then
 			self.effectsActive = setState;
