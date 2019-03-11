@@ -20,7 +20,7 @@
 -- 
 -- 
 -- ToDo:
--- 
+--  can we remove this file? its include in Effects.lua?
 
 local debugIndex = g_debug.registerMod("GlobalCompany-GC_ParticleEffects");
 
