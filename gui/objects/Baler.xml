@@ -63,7 +63,7 @@
       
 
       <GuiElement type="flowLayout" template="gcBalerButtonLayout">
-        <GuiElement type="button" template="gcBalerButtonButton" id="gui_btn_turnOnOff" onClick="onClickTurnOnOff" text="$l10n_GC_baler_turnOn" />
+        <GuiElement type="button" template="gcBalerButtonButton" id="gui_btn_turnOnOff" onClick="onClickTurnOnOff" />
         <GuiElement type="button" template="gcBalerButtonButton" position="20px 0px" onClick="onClickClose" text="$l10n_GC_baler_closeGui" />
       </GuiElement> 
 

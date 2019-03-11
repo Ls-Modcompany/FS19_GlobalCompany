@@ -741,3 +741,6 @@ function Baler:onLeaveBaleTrigger(ref, bale)
 	end;
 end;
 
+function Baler:getIsOn()
+	return self.state_baler == Baler.STATE_ON;
+end;

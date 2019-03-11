@@ -21,8 +21,8 @@
 		<e k="GC_baler_title" v="Ballenpresse"/>
 		<e k="GC_baler_title_witStack" v="Ballenpresse mit Stapler"/>
 		<e k="GC_baler_cleaner" v="Abkippbereich säubern"/>
-		<e k="GC_baler_openGui" v="Steurung öffnen"/>
-		<e k="GC_baler_closeGui" v="Steurung schließen"/>
+		<e k="GC_baler_openGui" v="Steuerung öffnen"/>
+		<e k="GC_baler_closeGui" v="Steuerung schließen"/>
 		<e k="GC_baler_makeEmpty" v="Abladen"/>
 		<e k="GC_baler_turnOn" v="Anschalten"/>
 		<e k="GC_baler_turnOff" v="Ausschalten"/>

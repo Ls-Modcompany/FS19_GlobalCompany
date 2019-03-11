@@ -47,6 +47,12 @@ function Gc_Gui_Baler:updateData()
         i = i + 1;
     end;
 
+    if self.baler:getIsOn() then
+        self.gui_btn_turnOnOff:setText(g_company.languageManager:getText("GC_baler_turnOff"));
+    else
+        self.gui_btn_turnOnOff:setText(g_company.languageManager:getText("GC_baler_turnOn"));
+    end;
+
     self:updateButtonsTurnOnOff();       
 end;
 
