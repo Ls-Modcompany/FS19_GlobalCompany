@@ -127,7 +127,7 @@ end;
 
 function GC_PlayerTrigger:update(dt)
 	if self.target.playerTriggerUpdate ~= nil then
-		self.target:playerTriggerUpdate(dt, self.triggerReference);
+		self.target:playerTriggerUpdate(dt, self.playerInTrigger, self.triggerReference);
 	end;
 
 	if self.playerInTrigger then
