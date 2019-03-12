@@ -141,7 +141,7 @@ function GC_ModManager:update(dt)
 		end;
 	end;	
 
-	if (self.modVersionErrors == nil or self.numModVersionErrors <= 0) and self.modInvalidErrors == nil or self.numInvalidModsErrors <=0) then
+	if (self.modVersionErrors == nil or self.numModVersionErrors <= 0) and (self.modInvalidErrors == nil or self.numInvalidModsErrors <=0) then
 		self:delete(); -- Remove update listener and save resources as we do not need it anymore.
 	end;
 end;
