@@ -391,7 +391,7 @@ function Baler:update(dt)
 					self:setBaleObjectToAnimation();
 					self.baleAnimation:setAnimationsState(true);
 					self.baleCounter = self.baleCounter + 1;
-					self:setFillLevelBunker(-4000, true);
+					self:setFillLevelBunker(self.fillLevelBunker, true);
 					if self.shouldTurnOff then
 						self:onTurnOffBaler();
 						self.shouldTurnOff = false;
