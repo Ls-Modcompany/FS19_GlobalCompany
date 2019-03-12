@@ -3,9 +3,21 @@
 <l10n>
 	<elements>
 
+		<!-- Warnings / Errors -->
+		<e k="GC_mapVersionWarning" v="Map '%s' von %s benötigt GlobalCompany - Version %s oder höher wird benötigt. Lade dir die aktuellste Version aus dem Modhub oder besuche '%s' für Support."/>	
+		<e k="GC_modVersionWarning" v="Mod '%s' von %s benötigt GlobalCompany - Version %s oder höher wird benötigt. Lade dir die aktuellste Version aus dem Modhub oder besuche '%s' für Support."/>	
+		<e k="GC_loadingError" v="Beim Laden von GlobalCompany ist etwas schief gelaufen! Lade dir die aktuellste Version aus dem Modhub oder besuche '%s' für support"/>	
+		<e k="GC_duplicateError" v="Es wurde versucht, GlobalCompany doppelt zu laden! Entferne '%s' aus dem Modordner und lade das Spiel neu."/>
+		<e k="GC_combinedError" v="Es wurde versucht, GlobalCompany als Teil der Modmap '%s' zu laden! Das ist nicht erlaubt und bringt Fehler. Lade dir die aktuellste Version aus dem Modhub oder besuche '%s' für support."/>
+		<e k="GC_invalidModWarning" v="Mod %s von %s wird nicht unterstützt! Um Fehler zu vermeiden, muss dieser Mod entfernt werden!"/>
+
+
+		<!-- GUI -->
 		<e k="GC_gui_buttons_ok" v="OK"/>
 		<e k="GC_gui_buttons_yes" v="Ja"/>
 		<e k="GC_gui_buttons_no" v="Nein"/>
+		<e k="GC_gui_modHubLink" v="ModHub Download Link"/>
+
 
 		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
 
