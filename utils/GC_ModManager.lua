@@ -93,7 +93,7 @@ function GC_ModManager:checkActiveModVersions()
 					end;
 				end;
 
-				if self.invalidMods[mod.modName] then
+				if self.invalidMods[mod.modName] or self.invalidMods[mod.title] then
 					if self.modInvalidErrors == nil then
 						self.modInvalidErrors = {};
 					end;
