@@ -182,7 +182,7 @@ end;
 
 function GC_ModManager:showInvalidModWarningGui(modName, author)
 	local title = string.format("GLOBAL COMPANY - VERSION %s", g_company.version);
-	local text = string.format("%s %s", self.invalidModWarning, author);
+	local text = string.format(self.invalidModWarning, modName, author);
 
 	local dialog = g_gui:showDialog("YesNoDialog");
 	if dialog ~= nil then
