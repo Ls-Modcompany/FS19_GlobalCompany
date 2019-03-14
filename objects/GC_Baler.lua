@@ -391,7 +391,7 @@ function Baler:update(dt)
 					self:setBaleObjectToAnimation();
 					self.baleAnimation:setAnimationsState(true);
 					self.baleCounter = self.baleCounter + 1;
-					self:setFillLevelBunker(self.fillLevelBunker, true);
+					self:setFillLevelBunker(self.fillLevelBunker * -1, true);
 					if self.shouldTurnOff then
 						self:onTurnOffBaler();
 						self.shouldTurnOff = false;
@@ -450,13 +450,13 @@ function Baler:update(dt)
 				if self.doStackAnimationStart:getAnimationTime() == 1 then
 					self.animationState = Baler.ANIMATION_CANSTACKEND;
 					self.raisedAnimationKeys = {};
+					self.stackerBaleTrigger:reset();
 				elseif self.doStackAnimationStart:getAnimationTime() >= 0.6 and self.raisedAnimationKeys["0.6"] == nil then
 					self:setBaleObjectToFork();
 					for _,bale in pairs(self.stackBales) do
 						bale:delete();
 					end;
 					self.stackBales = {};
-					self.stackerBaleTrigger:reset();
 					self.raisedAnimationKeys["0.6"] = true;
 				end;
 			elseif self.animationState == Baler.ANIMATION_CANSTACKEND then
@@ -588,7 +588,7 @@ end;
 function Baler:canUnloadBale()
 	local canUnloadBale = self.baleAnimation:getAnimationTime() == 0;
 	if canUnloadBale and self.hasStack then
-		canUnloadBale = not self.stackerBaleTrigger:getTriggerNotEmpty();
+		canUnloadBale = self.stackerBaleTrigger:getTriggerEmpty() and self.animationState ~= Baler.ANIMATION_ISSTACKING and self.animationState ~= Baler.ANIMATION_ISSTACKINGEND;
 	end;
 	if canUnloadBale and self.state_balerMove == Baler.STATE_ON then
 		canUnloadBale = false;
