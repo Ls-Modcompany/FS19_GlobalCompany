@@ -8,7 +8,7 @@
 		<e k="GC_loadingError" v="Something has gone wrong loading Global Company! Please visit modHub download link for the latest official version or visit '%s' for support."/>	
 		<e k="GC_duplicateError" v="Trying to load Global Company twice! Please remove '%s' from your mod folder and load your game again."/>
 		<e k="GC_combinedError" v="Trying to load Global Company as part of a mod map '%s'! This is not possible and will cause serious errors. Please visit modHub download link for the latest official version or visit '%s' for support."/>
-		<e k="GC_invalidModWarning" v="Mod %s von %s wird nicht unterstützt! Um Fehler zu vermeiden, muss dieser Mod entfernt werden!"/>
+		<e k="GC_invalidModWarning" v="Mod %s by %s is not supported! To avoid errors, this mod should be removed / disabled!"/>
 
 
 		<!-- GUI -->

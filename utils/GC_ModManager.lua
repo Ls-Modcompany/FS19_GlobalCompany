@@ -17,7 +17,7 @@
 --
 --
 -- ToDo:
--- 
+--
 --
 
 GC_ModManager = {};
@@ -44,14 +44,17 @@ function GC_ModManager:new()
 	self.modInvalidErrors = nil;
 	self.numInvalidModsErrors = 0;
 
-	self.mapWarningText = g_company.languageManager:getText("GC_mapVersionWarning");
-	self.modWarningText = g_company.languageManager:getText("GC_modVersionWarning");
-	self.loadingErrorText = g_company.languageManager:getText("GC_loadingError");
-	self.duplicateErrorText = g_company.languageManager:getText("GC_duplicateError");
-	self.combinedErrorText = g_company.languageManager:getText("GC_combinedError");
-	self.modHubLinkText = g_company.languageManager:getText("GC_gui_modHubLink");
-	self.okButtonText = g_company.languageManager:getText("GC_gui_buttons_ok");
-	self.invalidModWarning = g_company.languageManager:getText("GC_invalidModWarning");
+	self.updateableLoaded = false;
+
+	local languageManager = g_company.languageManager;
+	self.mapWarningText = languageManager:getText("GC_mapVersionWarning");
+	self.modWarningText = languageManager:getText("GC_modVersionWarning");
+	self.loadingErrorText = languageManager:getText("GC_loadingError");
+	self.duplicateErrorText = languageManager:getText("GC_duplicateError");
+	self.combinedErrorText = languageManager:getText("GC_combinedError");
+	self.modHubLinkText = languageManager:getText("GC_gui_modHubLink");
+	self.okButtonText = languageManager:getText("GC_gui_buttons_ok");
+	self.invalidModWarning = languageManager:getText("GC_invalidModWarning");
 
 	self.debugData = g_company.debug:getDebugData(GC_ModManager.debugIndex, g_company);
 
@@ -80,8 +83,10 @@ function GC_ModManager:checkActiveModVersions()
 							if self.modVersionErrors == nil then
 								self.modVersionErrors = {};
 
-								self.updateableLoaded = true;
-								g_company.addUpdateable(self, self.update);
+								if self.updateableLoaded ~= true then
+									self.updateableLoaded = true;
+									g_company.addUpdateable(self, self.update);
+								end;
 							end;
 
 							local isModMap = g_modManager:isModMap(mod.modName);
@@ -96,6 +101,11 @@ function GC_ModManager:checkActiveModVersions()
 				if self.invalidMods[mod.modName] or self.invalidMods[mod.title] then
 					if self.modInvalidErrors == nil then
 						self.modInvalidErrors = {};
+
+						if self.updateableLoaded ~= true then
+							self.updateableLoaded = true;
+							g_company.addUpdateable(self, self.update);
+						end;
 					end;
 
 					self.modInvalidErrors[mod.modName] = {author = mod.author};
@@ -110,7 +120,7 @@ end;
 
 function GC_ModManager:delete()
 	if self.isClient then
-		if self.updateableLoaded then
+		if self.updateableLoaded == true then
 			self.updateableLoaded = false;
 			g_company.removeUpdateable(self);
 
@@ -121,9 +131,21 @@ function GC_ModManager:delete()
 end;
 
 function GC_ModManager:update(dt)
-	if self.modVersionErrors ~= nil	then
+	-- Check for invalid mods first.
+	if self.modInvalidErrors ~= nil then
+		for modName, data in pairs(self.modInvalidErrors) do
+			if not g_gui:getIsGuiVisible() then
+				self:showInvalidModWarningGui(modName, data.author);
+				self.modInvalidErrors[modName] = nil;
+				self.numInvalidModsErrors = self.numInvalidModsErrors - 1;
+			end;
+		end;
+	end;
+
+	-- Check now for version errors.
+	if self.numInvalidModsErrors <= 0 and self.modVersionErrors ~= nil then
 		for modName, data in pairs (self.modVersionErrors) do
-			if g_gui.currentGui == nil then
+			if not g_gui:getIsGuiVisible() then
 				self:showModWarningGUI(modName, data.versionString, data.author, data.isModMap);
 				self.modVersionErrors[modName] = nil;
 				self.numModVersionErrors = self.numModVersionErrors - 1;
@@ -131,17 +153,7 @@ function GC_ModManager:update(dt)
 		end;
 	end;
 
-	if self.invalidMods ~= nil then
-		for modName, data in pairs(self.modInvalidErrors) do
-			if g_gui.currentGui == nil then
-				self.showInvalidModwarningGui(modName, data.author);
-				self.modInvalidErrors[modName] = nil;
-				self.numInvalidModsErrors = self.numInvalidModsErrors - 1;
-			end;
-		end;
-	end;	
-
-	if (self.modVersionErrors == nil or self.numModVersionErrors <= 0) and (self.modInvalidErrors == nil or self.numInvalidModsErrors <=0) then
+	if (self.modVersionErrors == nil or self.numModVersionErrors <= 0) and (self.modInvalidErrors == nil or self.numInvalidModsErrors <= 0) then
 		self:delete(); -- Remove update listener and save resources as we do not need it anymore.
 	end;
 end;
@@ -168,17 +180,37 @@ function GC_ModManager:showModWarningGUI(modName, version, author, isModMap)
 						   noText = self.modHubLinkText});
 end;
 
-function GC_ModManager:showInvalidModwarningGui(modName, author)
+function GC_ModManager:showInvalidModWarningGui(modName, author)
 	local title = string.format("GLOBAL COMPANY - VERSION %s", g_company.version);
-	local text = string.format(self.invalidModWarning, modName, author);
+	local text = string.format("%s %s", self.invalidModWarning, author);
 
-	--@GtX: can we show only one button in the gui? 
-	g_gui:showYesNoDialog({title = title,
-						   text = text,
-						   dialogType = DialogElement.TYPE_WARNING,
-						   target = self,
-						   yesText = self.okButtonText,
-						   noText = ""});
+	local dialog = g_gui:showDialog("YesNoDialog");
+	if dialog ~= nil then
+		dialog.target:setText(text);
+		dialog.target:setTitle(title);
+		dialog.target:setDialogType(DialogElement.TYPE_WARNING);
+		dialog.target:setCallback(self.invalidModChoiceCallback, self)
+		dialog.target:setButtonTexts(self.okButtonText, g_i18n:getText("button_cancelGame"));
+
+		-- Only this in SP or on hosting PC (server) only.
+		if self.isServer == false then
+			dialog.target.noButton:setDisabled(true);
+		end;
+
+		-- Option 2:
+		-- Hide button and do not use 'self.invalidModChoiceCallback'?
+
+		--dialog.target.noButton:setDisabled(true);
+		--dialog.target.noButton:setVisible(false);
+	end;
+end;
+
+function GC_ModManager:invalidModChoiceCallback(continue)
+	if continue == false then
+		InGameMenu:leaveCurrentGame(); -- Quit to main menu.
+	else
+		g_gui:showGui(""); -- Make sure gui is closed in-case we have more warnings.
+	end;
 end;
 
 function GC_ModManager:openModHubLink(isYes)
@@ -284,7 +316,6 @@ end;
 function GC_ModManager:initInvalidMods()
 	self.invalidMods = {};
 	self.invalidMods["PlaceAnywhere"] = true;
-
 end;
 
 
