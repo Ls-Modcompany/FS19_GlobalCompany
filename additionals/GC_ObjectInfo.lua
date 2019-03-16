@@ -62,6 +62,7 @@ function GC_ObjectInfo:update(dt)
 								if (object.fillType ~= nil) and (object.fillLevel ~= nil) then
 									self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(Utils.getNoNil(g_fillTypeManager.fillTypes[object.fillType].title,"unknown"));
 									self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level'):format(object.fillLevel);
+									self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object.ownerFarmId));
 									self.showInfo = true;
 								elseif (object.typeName == "pallet") then
 									if (object.getFillUnits ~= nil) then
@@ -71,6 +72,7 @@ function GC_ObjectInfo:update(dt)
 											local perc = Utils.getNoNil(g_company.mathUtils.round((object:getFillUnitFillLevelPercentage(fUnit[1].fillUnitIndex) * 100),0.01),0);
 											self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(Utils.getNoNil(g_fillTypeManager.fillTypes[fUnit[1].fillType].title,"unknown"));
 											self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level2'):format(lev, perc);
+											self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object.ownerFarmId));
 											self.showInfo = true;
 										end;
 									end;
@@ -84,15 +86,16 @@ function GC_ObjectInfo:update(dt)
 				self.debugPrintDone = false;
 				local x,y,z = localToWorld(g_currentMission.player.cameraNode, 0,0,1.0)
 				local dx,dy,dz = localDirectionToWorld(g_currentMission.player.cameraNode, 0,0,-1)
-				raycastAll(x,y,z, dx,dy,dz, "infoObjectRaycastCallback", Player.MAX_PICKABLE_OBJECT_DISTANCE, self)
+				local distance = Player.MAX_PICKABLE_OBJECT_DISTANCE * 1.5
+				raycastAll(x,y,z, dx,dy,dz, "infoObjectRaycastCallback", distance, self)
 			end;
 		end;
 			
 		if self.showInfo then
 			if self.gui == nil then
-				self.gui = g_company.gui:openGuiWithData("gcObjectInfo", false, self.displayLine1, self.displayLine2);
+				self.gui = g_company.gui:openGuiWithData("gcObjectInfo", false, self.displayLine1, self.displayLine2, self.displayLine3);
 			else
-				self.gui.classGui:setData(self.displayLine1, self.displayLine2);
+				self.gui.classGui:setData(self.displayLine1, self.displayLine2, self.displayLine3);
 			end;
 		elseif self.gui ~= nil then			
 			g_company.gui:closeGui("gcObjectInfo");
@@ -115,6 +118,7 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 							local perc = Utils.getNoNil(g_company.mathUtils.round((object:getFillUnitFillLevelPercentage(fUnit[1].fillUnitIndex) * 100),0.01),0);
 							self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(Utils.getNoNil(g_fillTypeManager.fillTypes[fUnit[1].fillType].title,"unknown"));
 							self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level2'):format(lev, perc);
+							self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object.ownerFarmId));
 							self.showInfo = true;
 						end;
 					end;
@@ -126,6 +130,17 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 			end;
 		end;
 	end;
+end;
+
+function GC_ObjectInfo:getFarmInfo(ownerFarmId)
+	local farmName = "unknown";
+	if (ownerFarmId ~= nil) then
+		local farm = g_farmManager:getFarmById(ownerFarmId);
+		if (farm ~= nil) then
+			farmName = farm.name;
+		end;
+	end;
+	return farmName
 end;
 
 g_company.addInit(GC_ObjectInfo, GC_ObjectInfo.init);
