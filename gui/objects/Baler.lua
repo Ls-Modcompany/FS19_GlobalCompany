@@ -73,14 +73,14 @@ end
 
 function Gc_Gui_Baler:onClickBaleNum(element, para)  
     local num = self.baler.stackBalesTarget + tonumber(para);
-    num = math.max(math.min(num, 3), 1);
+    num = math.max(math.min(num, 4), 1);
     self.baler:setStackBalesTarget(num);
     self.gui_text_num:setText(num);
     self:updateButtons();
 end
 
 function Gc_Gui_Baler:updateButtons()
-    self.gui_btn_addBale:setDisabled(self.baler.stackBalesTarget == 3);
+    self.gui_btn_addBale:setDisabled(self.baler.stackBalesTarget == 4);
     self.gui_btn_removeBale:setDisabled(self.baler.stackBalesTarget == 1);
 end
 
