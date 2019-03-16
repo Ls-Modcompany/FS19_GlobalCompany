@@ -696,6 +696,10 @@ end;
 function Baler:setAutoOn(state)
 	--event
 	self.autoOn = state;
+	if self.autoOn and self.fillLevel > 4000 and self.state_baler == Baler.STATE_OFF then
+		self:onTurnOnBaler();
+		self:onTurnOnStacker();
+	end;
 end;
 
 function Baler:getCanChangeFillType()
