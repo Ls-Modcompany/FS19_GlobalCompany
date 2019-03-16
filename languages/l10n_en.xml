@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <l10n>
-<elements>
-
+	<elements>
 		<!-- Warnings / Errors -->
 		<e k="GC_mapVersionWarning" v="Map '%s' by %s requires Global Company - Version %s or higher to operate correctly. Please visit modHub download link for the latest official version or visit '%s' for support."/>	
 		<e k="GC_modVersionWarning" v="Mod '%s' by %s requires Global Company - Version %s or higher to operate correctly. Please visit modHub download link for the latest official version or visit '%s' for support."/>	
 		<e k="GC_loadingError" v="Something has gone wrong loading Global Company! Please visit modHub download link for the latest official version or visit '%s' for support."/>	
 		<e k="GC_duplicateError" v="Trying to load Global Company twice! Please remove '%s' from your mod folder and load your game again."/>
 		<e k="GC_combinedError" v="Trying to load Global Company as part of a mod map '%s'! This is not possible and will cause serious errors. Please visit modHub download link for the latest official version or visit '%s' for support."/>
-		<e k="GC_invalidModWarning" v="Mod %s by %s is not supported! To avoid errors, this mod should be removed / disabled!"/>
-
+		<e k="GC_invalidModWarning" v="Mod %s by %s is not supported! To avoid errors, this mod should be removed!"/>
+		<e k="GC_quitToMainMenu" v="Are you sure you want to exit to the main menu?"/>
+		<e k="GC_betaVersionWarning" v="Development version has been loaded. Please report warnings or errors at %s. Visit modHub download link for the latest official release version or visit '%s' for support."/>
 
 		<!-- GUI -->
 		<e k="GC_gui_buttons_ok" v="OK"/>
-		<e k="GC_gui_buttons_yes" v="Ja"/>
-		<e k="GC_gui_buttons_no" v="Nein"/>
+		<e k="GC_gui_buttons_yes" v="Yes"/>
+		<e k="GC_gui_buttons_no" v="No"/>
 		<e k="GC_gui_modHubLink" v="ModHub Download Link"/>
+		<e k="GC_gui_buttons_nextWarning" v="Next Warning"/>
+		<e k="GC_gui_buttons_nextConflict" v="Next Conflict"/>
 
-		
+		<!-- General -->
 		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
 
 		<!-- BaleShreader -->
@@ -46,9 +48,8 @@
         <e k="GC_baler_canStack" v="Number of bales to stack:"/>
 
 		<!-- ObjectInfo -->
-		<e k="GC_ObjectInfo_filltype" v="Filltyp: %s"/>
+		<e k="GC_ObjectInfo_filltype" v="Filltype: %s"/>
 		<e k="GC_ObjectInfo_level" v="FillQty: %s Litres"/>
 		<e k="GC_ObjectInfo_level2" v="FillQty: %s Litres (%s%%)"/>
-
 	</elements>
 </l10n>
