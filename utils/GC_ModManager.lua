@@ -37,28 +37,39 @@ function GC_ModManager:new()
 	self.isServer = g_server ~= nil;
 	self.isClient = g_client ~= nil;
 
+	self:initInvalidMods();
+
+	self.startUpdateTime = 2000; -- Wait 2 sec to show any messages.
+
+	self.canShowDevelopmentGUI = false;
+
 	self.modVersionErrors = nil;
 	self.numModVersionErrors = 0;
-	self.modVersionCheck = false;
 
 	self.modInvalidErrors = nil;
 	self.numInvalidModsErrors = 0;
 
+	self.modVersionCheck = false;
 	self.updateableLoaded = false;
 
 	local languageManager = g_company.languageManager;
-	self.mapWarningText = languageManager:getText("GC_mapVersionWarning");
-	self.modWarningText = languageManager:getText("GC_modVersionWarning");
-	self.loadingErrorText = languageManager:getText("GC_loadingError");
-	self.duplicateErrorText = languageManager:getText("GC_duplicateError");
-	self.combinedErrorText = languageManager:getText("GC_combinedError");
-	self.modHubLinkText = languageManager:getText("GC_gui_modHubLink");
-	self.okButtonText = languageManager:getText("GC_gui_buttons_ok");
-	self.invalidModWarning = languageManager:getText("GC_invalidModWarning");
+	local titleText = string.format("GLOBAL COMPANY - VERSION %s", g_company.version);
+	self.texts = {["guiTitle"] = titleText,
+				  ["mapWarning"] = languageManager:getText("GC_mapVersionWarning"),
+				  ["modWarning"] = languageManager:getText("GC_modVersionWarning"),
+				  ["loadingError"] = languageManager:getText("GC_loadingError"),
+				  ["duplicateError"] = languageManager:getText("GC_duplicateError"),
+				  ["combinedError"] = languageManager:getText("GC_combinedError"),
+				  ["modHubLink"] = languageManager:getText("GC_gui_modHubLink"),
+				  ["okButton"] = languageManager:getText("GC_gui_buttons_ok"),
+				  ["invalidModWarning"] = languageManager:getText("GC_invalidModWarning"),
+				  ["quitToMainMenu"] = languageManager:getText("GC_quitToMainMenu"),
+				  ["nextWarning"] = languageManager:getText("GC_gui_buttons_nextWarning"),
+				  ["nextConflict"] = languageManager:getText("GC_gui_buttons_nextConflict"),
+				  ["betaVersionWarning"] = languageManager:getText("GC_betaVersionWarning"),
+				  ["cancelGame"] = languageManager:getText("button_cancelGame")};
 
 	self.debugData = g_company.debug:getDebugData(GC_ModManager.debugIndex, g_company);
-
-	self:initInvalidMods();
 
 	return self;
 end;
@@ -82,11 +93,7 @@ function GC_ModManager:checkActiveModVersions()
 						if modVersionId > self:getCurrentVersionId() then
 							if self.modVersionErrors == nil then
 								self.modVersionErrors = {};
-
-								if self.updateableLoaded ~= true then
-									self.updateableLoaded = true;
-									g_company.addUpdateable(self, self.update);
-								end;
+								self:doAddUpdateable(true);
 							end;
 
 							local isModMap = g_modManager:isModMap(mod.modName);
@@ -101,11 +108,7 @@ function GC_ModManager:checkActiveModVersions()
 				if self.invalidMods[mod.modName] or self.invalidMods[mod.title] then
 					if self.modInvalidErrors == nil then
 						self.modInvalidErrors = {};
-
-						if self.updateableLoaded ~= true then
-							self.updateableLoaded = true;
-							g_company.addUpdateable(self, self.update);
-						end;
+						self:doAddUpdateable(true);
 					end;
 
 					self.modInvalidErrors[mod.modName] = {author = mod.author};
@@ -131,85 +134,159 @@ function GC_ModManager:delete()
 end;
 
 function GC_ModManager:update(dt)
-	-- Check for invalid mods first.
-	if self.modInvalidErrors ~= nil then
-		for modName, data in pairs(self.modInvalidErrors) do
-			if not g_gui:getIsGuiVisible() then
-				self:showInvalidModWarningGui(modName, data.author);
-				self.modInvalidErrors[modName] = nil;
-				self.numInvalidModsErrors = self.numInvalidModsErrors - 1;
+	if self.startUpdateTime > 0 then
+		self.startUpdateTime = self.startUpdateTime - dt;
+	else
+		-- Show Development / GitHub warning.
+		if self.canShowDevelopmentGUI then
+			self.canShowDevelopmentGUI = false;
+			self:showDevelopmentGUI();
+		else
+			-- Check for invalid mods first.
+			if self.modInvalidErrors ~= nil then
+				for modName, data in pairs(self.modInvalidErrors) do
+					if not g_gui:getIsGuiVisible() then
+						self:showModConflictWarningGui(modName, data.author);
+						self.modInvalidErrors[modName] = nil;
+						self.numInvalidModsErrors = self.numInvalidModsErrors - 1;
+					end;
+				end;
+			end;
+
+			-- Check now for version errors.
+			if self.numInvalidModsErrors <= 0 and self.modVersionErrors ~= nil then
+				for modName, data in pairs (self.modVersionErrors) do
+					if not g_gui:getIsGuiVisible() then
+						self:showModWarningGUI(modName, data.versionString, data.author, data.isModMap);
+						self.modVersionErrors[modName] = nil;
+						self.numModVersionErrors = self.numModVersionErrors - 1;
+					end;
+				end;
+			end;
+
+			if self:getCanDelete() then
+				self:delete(); -- Remove update listener and save resources as we do not need it anymore.
 			end;
 		end;
-	end;
-
-	-- Check now for version errors.
-	if self.numInvalidModsErrors <= 0 and self.modVersionErrors ~= nil then
-		for modName, data in pairs (self.modVersionErrors) do
-			if not g_gui:getIsGuiVisible() then
-				self:showModWarningGUI(modName, data.versionString, data.author, data.isModMap);
-				self.modVersionErrors[modName] = nil;
-				self.numModVersionErrors = self.numModVersionErrors - 1;
-			end;
-		end;
-	end;
-
-	if (self.modVersionErrors == nil or self.numModVersionErrors <= 0) and (self.modInvalidErrors == nil or self.numInvalidModsErrors <= 0) then
-		self:delete(); -- Remove update listener and save resources as we do not need it anymore.
 	end;
 end;
 
-function GC_ModManager:showModWarningGUI(modName, version, author, isModMap)
-	local title = string.format("GLOBAL COMPANY - VERSION %s", g_company.version);
+function GC_ModManager:getCanDelete()
+	if self.canShowDevelopmentGUI then
+		return false;
+	elseif self.modInvalidErrors ~= nil and self.numInvalidModsErrors > 0 then
+		return false;
+	elseif self.modVersionErrors ~= nil and self.numModVersionErrors > 0 then
+		return false;
+	end;
 
+	return true;
+end;
+
+function GC_ModManager:showDevelopmentGUI()
 	local url = " www.ls-modcompany.com ";
 	if g_languageShort == "de" then
 		url = " www.ls-modcompany.de ";
 	end;
 
-	local text = string.format(self.modWarningText, modName, author, version, url);
-	if isModMap then
-		text = string.format(self.mapWarningText, modName, author, version, url);
+	local errorReportLink = " -- "; -- We need the public gitHub link or release link here.
+	local text = string.format(self.texts.betaVersionWarning, errorReportLink, url);
+
+	g_gui:showYesNoDialog({title = self.texts.guiTitle,
+						   text = text,
+						   dialogType = DialogElement.TYPE_INFO,
+						   callback = self.openModHubLink,
+						   target = self,
+						   yesText = self.texts.okButton,
+						   noText = self.texts.modHubLink});
+end;
+
+function GC_ModManager:showModWarningGUI(modName, version, author, isModMap)
+	local url = " www.ls-modcompany.com ";
+	if g_languageShort == "de" then
+		url = " www.ls-modcompany.de ";
 	end;
 
-	g_gui:showYesNoDialog({title = title,
+	local text = string.format(self.texts.modWarning, modName, author, version, url);
+	if isModMap then
+		text = string.format(self.texts.mapWarning, modName, author, version, url);
+	end;
+
+	local okButton = self.texts.okButton;
+	if self.numModVersionErrors > 1 then
+		okButton = self.texts.nextWarning;
+	end;
+
+	g_gui:showYesNoDialog({title = self.texts.guiTitle,
 						   text = text,
 						   dialogType = DialogElement.TYPE_WARNING,
 						   callback = self.openModHubLink,
 						   target = self,
-						   yesText = self.okButtonText,
-						   noText = self.modHubLinkText});
+						   yesText = okButton,
+						   noText = self.texts.modHubLink});
 end;
 
-function GC_ModManager:showInvalidModWarningGui(modName, author)
-	local title = string.format("GLOBAL COMPANY - VERSION %s", g_company.version);
-	local text = string.format(self.invalidModWarning, modName, author);
+function GC_ModManager:showModConflictWarningGui(modName, author)
+	local text = string.format(self.texts.invalidModWarning, modName, author);
+	local okButton = self.texts.okButton;
+	if self.numInvalidModsErrors > 1 then
+		okButton = self.texts.nextConflict;
+	end;
 
-	local dialog = g_gui:showDialog("YesNoDialog");
-	if dialog ~= nil then
-		dialog.target:setText(text);
-		dialog.target:setTitle(title);
-		dialog.target:setDialogType(DialogElement.TYPE_WARNING);
-		dialog.target:setCallback(self.invalidModChoiceCallback, self)
-		dialog.target:setButtonTexts(self.okButtonText, g_i18n:getText("button_cancelGame"));
+	g_gui:showYesNoDialog({title = self.texts.guiTitle,
+						   text = text,
+						   dialogType = DialogElement.TYPE_WARNING,
+						   callback = self.invalidModChoiceCallback,
+						   target = self,
+						   yesText = okButton,
+						   noText = self.texts.cancelGame});
+end;
 
-		-- Only this in SP or on hosting PC (server) only.
-		if self.isServer == false then
-			dialog.target.noButton:setDisabled(true);
-		end;
+function GC_ModManager:showLoadWarningGUI(strg, warningType)
+	local url = " www.ls-modcompany.com ";
+	if g_languageShort == "de" then
+		url = " www.ls-modcompany.de ";
+	end;
 
-		-- Option 2:
-		-- Hide button and do not use 'self.invalidModChoiceCallback'?
+	local text = "";
+	if warningType == "standardError" then
+		text = string.format(self.texts.loadingError, url);
+	elseif warningType == "duplicateError" then
+		text = string.format(self.texts.duplicateError, strg);
+	elseif warningType == "combinedError" then
+		text = string.format(self.texts.combinedError, strg, url);
+	end;
 
-		--dialog.target.noButton:setDisabled(true);
-		--dialog.target.noButton:setVisible(false);
+	if self.isClient then
+		g_gui:closeAllDialogs(); -- Make sure we are on top when opened.
+		g_gui:showYesNoDialog({title = self.texts.guiTitle,
+							text = text,
+							dialogType = DialogElement.TYPE_LOADING,
+							callback = self.openModHubLink,
+							target = self,
+							yesText = self.texts.okButton,
+							noText = self.texts.modHubLink});
+	else
+		print(title .. "  " .. text); -- Only print a log error to the server.
 	end;
 end;
 
 function GC_ModManager:invalidModChoiceCallback(continue)
 	if continue == false then
-		InGameMenu:leaveCurrentGame(); -- Quit to main menu.
+		g_gui:showYesNoDialog({text = self.texts.quitToMainMenu, callback = self.leaveToMenuCallback, target = self});
 	else
-		g_gui:showGui(""); -- Make sure gui is closed in-case we have more warnings.
+		g_gui:showGui("");
+	end;
+end;
+
+function GC_ModManager:leaveToMenuCallback(isYes)
+	if isYes then
+		-- Using 'OnInGameMenuMenu()' is no good, this does not reset variables that are only generated on initial game load.
+		-- As 'g_inGameMenu' has been removed in FS19 and Giants do not share 3/4 of the game scripts this is a work around. Needs MP testing. ;-)
+		local inGameMenuTarget = g_gui.guis["InGameMenu"].target;
+		InGameMenu.onYesNoEnd(inGameMenuTarget, isYes);
+	else
+		g_gui:showGui("");
 	end;
 end;
 
@@ -252,37 +329,21 @@ function GC_ModManager:doLoadCheck(strg, duplicateLoad)
 	return false;
 end;
 
-function GC_ModManager:showLoadWarningGUI(strg, warningType)
-	local title = string.format("GLOBAL COMPANY - VERSION %s", g_company.version);
-
-	local url = " www.ls-modcompany.com ";
-	if g_languageShort == "de" then
-		url = " www.ls-modcompany.de ";
-	end;
-
-	local text = "";
-	if warningType == "standardError" then
-		text = string.format(self.loadingErrorText, url);
-	elseif warningType == "duplicateError" then
-		text = string.format(self.duplicateErrorText, strg);
-	elseif warningType == "combinedError" then
-		text = string.format(self.combinedErrorText, strg, url);
-	end;
-
-	if self.isClient then
-		g_gui:showYesNoDialog({title = title,
-							text = text,
-							dialogType = DialogElement.TYPE_LOADING,
-							callback = self.openModHubLink,
-							target = self,
-							yesText = self.okButtonText,
-							noText = self.modHubLinkText});
-	else
-		print(title .. "  " .. text); -- Only print a log error to the server.
+function GC_ModManager:initDevelopmentWarning(isDevVersion)
+	if g_company.debug.isDev == false then
+		self.canShowDevelopmentGUI = isDevVersion;
+		self:doAddUpdateable(isDevVersion);
 	end;
 end;
 
-function GC_ModManager:getVersionId(versionString) -- This is faster then old function.
+function GC_ModManager:doAddUpdateable(add)
+	if add and not self.updateableLoaded then
+		self.updateableLoaded = true;
+		g_company.addUpdateable(self, self.update);
+	end;
+end;
+
+function GC_ModManager:getVersionId(versionString)
 	local versionId = "";
 
 	local length = versionString:len();

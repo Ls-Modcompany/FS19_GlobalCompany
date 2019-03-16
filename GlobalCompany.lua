@@ -28,6 +28,7 @@ GlobalCompany.dir = g_currentModDirectory;
 GlobalCompany.version = "1.0.0.0"; -- Release Version.
 GlobalCompany.versionDate = "04.05.2018"; -- Release Date ??
 GlobalCompany.currentVersionId = 1000; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.isDevelopmentVersion = true;
 
 GlobalCompany.LOADTYP_XMLFILENAME = 1;
 
@@ -76,6 +77,8 @@ function GlobalCompany.initialLoad()
 		GlobalCompany.environments = {};
 		GlobalCompany.loadParameters = {};
 		GlobalCompany.loadParametersToEnvironment = {};
+		
+		g_company.modManager:initDevelopmentWarning(GlobalCompany.isDevelopmentVersion);
 
 		GlobalCompany.loadSourceFiles();
 		GlobalCompany.loadPlaceables();
@@ -314,6 +317,8 @@ end;
 
 function GlobalCompany:deleteMap()
 	g_company.debug:deleteConsoleCommands();
+	
+	getfenv(0)["g_company"] = nil; -- Clean up so we have no conflicts.
 end;
 
 function GlobalCompany:getLoadParameterValue(name)
