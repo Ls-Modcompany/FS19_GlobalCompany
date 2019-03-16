@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <l10n>
 	<elements>
+	
 		<!-- Warnings / Errors -->
 		<e k="GC_mapVersionWarning" v="Map '%s' by %s requires Global Company - Version %s or higher to operate correctly. Please visit modHub download link for the latest official version or visit '%s' for support."/>	
 		<e k="GC_modVersionWarning" v="Mod '%s' by %s requires Global Company - Version %s or higher to operate correctly. Please visit modHub download link for the latest official version or visit '%s' for support."/>	
@@ -51,5 +52,7 @@
 		<e k="GC_ObjectInfo_filltype" v="Filltype: %s"/>
 		<e k="GC_ObjectInfo_level" v="FillQty: %s Litres"/>
 		<e k="GC_ObjectInfo_level2" v="FillQty: %s Litres (%s%%)"/>
+		<e k="GC_ObjectInfo_owner" v="Owner: %s"/>
+		
 	</elements>
 </l10n>

@@ -1,4 +1,3 @@
-
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <l10n>
 	<elements>
@@ -53,6 +52,7 @@
 		<e k="GC_ObjectInfo_filltype" v="Fülltyp: %s"/>
 		<e k="GC_ObjectInfo_level" v="Füllstand: %s Liter"/>
 		<e k="GC_ObjectInfo_level2" v="Füllstand: %s Liter (%s%%)"/>
+		<e k="GC_ObjectInfo_owner" v="Besitzer: %s"/>
 
 	</elements>
 </l10n>
