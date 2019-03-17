@@ -18,10 +18,12 @@
 
     <l10n>		
 		<text name="input_GC_BALESHREADER_TURNON_AREALIGHTS"><en>turnAreaLights</en></text>
+		<text name="input_GC_SETTINGS"><en>GlobalCompany Settings</en><de>GlobalCompany Einstellungen</de></text>
 	</l10n>		
 	
 	<actions>
         <action name="GC_BALESHREADER_TURNON_AREALIGHTS" />
+        <action name="GC_SETTINGS" />
     </actions>
 
     <inputBinding>
@@ -29,6 +31,9 @@
             <binding device="KB_MOUSE_DEFAULT" input="KEY_f" axisComponent="+" neutralInput="0" index="1"/>
             <binding device="0_XINPUT_GAMEPAD" input="BUTTON_6 BUTTON_3" axisComponent="+" neutralInput="0" index="1"/>
         </actionBinding>   
+        <actionBinding action="GC_SETTINGS">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_g" axisComponent="+" neutralInput="0" index="1"/>
+        </actionBinding>
     </inputBinding>
     
 

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI>
+  <GuiElement type="image" template="gcSettingsBackground">    
+    <GuiElement type="image" template="gcSettingsHeader">
+      <GuiElement type="text" template="gcSettingsHeaderText" text="$l10n_GC_settings_header" />
+    </GuiElement>   
+    
+    <GuiElement type="flowLayout" template="gcSettingsContentLayoutLeft">        
+        
+        <GuiElement type="flowLayout" template="gcSettingsButtonLayout">         
+          <GuiElement type="image" template="gcSettingsButtonLayoutBackground">    
+            <GuiElement type="button" template="gcSettingsButtonLayoutButton" id="gui_btn_settings_1" onClick="onClickBtnSetting" parameter="extendedPlaceable"  />
+          </GuiElement>
+          <GuiElement type="text" template="gcSettingsButtonText" text="$l10n_GC_settings1_title" />    
+        </GuiElement>
+        
+        <GuiElement type="flowLayout" template="gcSettingsButtonLayout">         
+          <GuiElement type="image" template="gcSettingsButtonLayoutBackground">    
+            <GuiElement type="button" template="gcSettingsButtonLayoutButton" id="gui_btn_settings_2" onClick="onClickBtnSetting" parameter="objectInfo" />
+          </GuiElement>
+          <GuiElement type="text" template="gcSettingsButtonText" text="$l10n_GC_settings2_title" />    
+        </GuiElement>
+        
+        
+        
+
+
+    </GuiElement>
+
+    <GuiElement type="flowLayout" template="gcSettingsContentLayoutRight">        
+        
+        
+
+    </GuiElement>
+
+  </GuiElement>
+</GUI>
+
+
+

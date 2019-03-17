@@ -195,6 +195,9 @@ function GlobalCompany.loadSourceFiles()
 		return;
 	end;
 
+	--|| Settings ||--
+	source(GlobalCompany.dir .. "GlobalCompanySettings.lua");
+
 	--|| Utils / Managers ||--
 	source(GlobalCompany.dir .. "utils/GC_mathUtils.lua");
 	source(GlobalCompany.dir .. "utils/GC_xmlUtils.lua");
@@ -245,6 +248,7 @@ function GlobalCompany.loadSourceFiles()
 	
 	--|| Additionals ||--
 	source(GlobalCompany.dir .. "additionals/GC_ObjectInfo.lua");
+	source(GlobalCompany.dir .. "additionals/GC_ExtendedPlaceable.lua");
 end;
 
 --| Add Base GC Placeables |--
@@ -293,6 +297,8 @@ function GlobalCompany:loadMap()
 
 		delete(e.xmlFile);
 	end;
+
+	g_company.settings = GlobalCompanySettings:load();
 
 	for _,loadable in pairs(GlobalCompany.loadables) do
 		loadable.loadF(loadable.target);
@@ -350,11 +356,3 @@ function GlobalCompany:addPlaceableType(name, className, filename)
 end;
 
 GlobalCompany.initialLoad();
-
---convert ExtendedPlaceable.lua from ls17
-PlacementScreenController.DISPLACEMENT_COST_PER_M3 = 1;
-PlacementUtil.hasObjectOverlap = function() return false end;
-PlacementUtil.isInsidePlacementPlaces = function() return false end;
-PlacementUtil.isInsideRestrictedZone = function() return false end;
-PlacementUtil.hasOverlapWithPoint = function() return false end;
-TerrainDeformation.setBlockedAreaMap = function() return true end;

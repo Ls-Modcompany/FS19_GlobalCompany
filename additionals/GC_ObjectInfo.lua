@@ -27,7 +27,8 @@ local GC_ObjectInfo_mt = Class(GC_ObjectInfo);
 InitObjectClass(GC_ObjectInfo, "GC_ObjectInfo");
 
 GC_ObjectInfo.debugIndex = g_company.debug:registerScriptName("Gc_ObjectInfo");
-	
+
+
 function GC_ObjectInfo:init()
 	local self = setmetatable({}, GC_ObjectInfo_mt);
 
@@ -41,12 +42,14 @@ function GC_ObjectInfo:init()
 	if self.isClient then
 		g_company.addUpdateable(self, self.update);	
 	end;
+
+	g_company.settings:initSetting(self, "objectInfo", true);
 	
 	return self;
 end;
 
 function GC_ObjectInfo:update(dt)
-	if self.isClient then
+	if self.isClient and g_company.settings:getSetting("objectInfo") then
 		self.showInfo = false;
 		if g_currentMission.player.isControlled and not g_currentMission.player.isCarryingObject then
 			if g_currentMission.player.isObjectInRange then

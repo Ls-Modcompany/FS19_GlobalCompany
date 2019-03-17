@@ -26,7 +26,7 @@ g_company.gui = GlobalCompanyGui;
 GlobalCompanyGui.DevelopementVersionTemplatesFilename = {};
 addModEventListener(GlobalCompanyGui);
 
-GlobalCompanyGui.devVersion = false;
+GlobalCompanyGui.devVersion = true;
 
 GlobalCompanyGui.guis = {};
 GlobalCompanyGui.smallGuis = {};
@@ -56,10 +56,20 @@ source(g_currentModDirectory .. "gui/FakeGui.lua");
 source(g_currentModDirectory .. "gui/MultiDialog.lua");
 source(g_currentModDirectory .. "gui/objects/Baler.lua");
 source(g_currentModDirectory .. "gui/objects/ObjectInfo.lua");
+source(g_currentModDirectory .. "gui/objects/Settings.lua");
 
 function GlobalCompanyGui:init()	
 	for _,inAc in pairs(self.toInit_actionEvents) do
 		g_gui.inputManager:registerActionEvent(inAc.inputAction, GlobalCompanyGui, inAc.func, false, true, false, true);
+	end;
+	Player.registerActionEvents = Utils.appendedFunction(Player.registerActionEvents, GlobalCompanyGui.registerActionEvents);
+end;
+
+function GlobalCompanyGui:registerActionEvents()
+	if g_company.gui.toInit_actionEvents ~= nil then
+		for _,inAc in pairs(g_company.gui.toInit_actionEvents) do
+			g_gui.inputManager:registerActionEvent(inAc.inputAction, GlobalCompanyGui, inAc.func, false, true, false, true);
+		end;
 	end;
 end;
 
@@ -71,11 +81,14 @@ function GlobalCompanyGui:loadMap()
 	self.fakeGui = GC_Gui_FakeGui:new();
 	g_gui:loadGui(g_company.dir .. self.fakeGui.guiInformations.guiXml, "gc_fakeGui", self.fakeGui);
 	
+	
 	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
-	g_company.gui:registerGui("gcPlaceable_baler", InputAction.ACTIVATE_OBJECT, Gc_Gui_Baler, true, true);
+	g_company.gui:registerGui("gc_settings", InputAction.GC_SETTINGS, Gc_Gui_Settings, true, true, true);
+	g_company.gui:registerGui("gcPlaceable_baler", nil, Gc_Gui_Baler, true, true);
 	g_company.gui:registerGui("gcObjectInfo", nil, Gc_Gui_ObjectInfo, false, false);
 
 	self.activeGuiDialogs = {};
+	self.registeredActonEvents = false;
 end;
 
 function GlobalCompanyGui:update(dt)
@@ -96,7 +109,7 @@ function GlobalCompanyGui:update(dt)
 			self.DevelopementVersionTimer = self.DevelopementVersionTimer - 1;
 		end;		
 	end;
-
+	
 	if self.activeGui == nil then
 		for name, open in pairs(self.smallGuis) do
 			if open then
@@ -163,7 +176,7 @@ function GlobalCompanyGui:delete()
 	
 end;
 
-function GlobalCompanyGui:registerGui(name, inputAction, class, isFullGui, canExit)
+function GlobalCompanyGui:registerGui(name, inputAction, class, isFullGui, canExit, onWalkActive)
 	if self.guis[name] ~= nil then
 		g_company.debug.write(debugIndex, Debug.ERROR, "Gui %s already exist.", name); --gui
 		return;
@@ -177,6 +190,7 @@ function GlobalCompanyGui:registerGui(name, inputAction, class, isFullGui, canEx
 	self.guis[name].gui = newGui;
 	self.guis[name].isFullGui = Utils.getNoNil(isFullGui, true);
 	self.guis[name].canExit = canExit;
+	self.guis[name].onWalkActive = onWalkActive;
 		
 	if not self.guis[name].isFullGui then
 		self.smallGuis[name] = false;		
@@ -821,6 +835,7 @@ end;
 g_company.gui:loadGuiTemplates(g_company.dir .. "gui/guiTemplates.xml");
 g_company.addInit(GlobalCompanyGui, GlobalCompanyGui.init);
 BaseMission.draw = Utils.appendedFunction(BaseMission.draw, GlobalCompanyGui.drawB);
+
 
 
 
