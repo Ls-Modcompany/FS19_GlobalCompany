@@ -23,20 +23,19 @@
 --		- NOTE: Correct formatting must be used for new messages to work without error.
 --
 -- ToDo:
---		- Correct 'de' text below. This is so users do not need more l10n entries.
+--
 --
 
 
 GC_Checker = {};
 GC_Checker.modName = g_currentModName;
 
-GC_Checker.warningTexts = {["en"] = "Global Company Version %s or greater is required for this mod / map to operate. Please visit modHub download link for the latest official version or visit '%s' for Global Company support.",
-						   ["de"] = "Für die Verwendung dieses Mods / dieser Map ist Global Company Version %s oder höher erforderlich. Bitte im ModHub die aktuelle offizielle Version downloaden, oder besuche '%s' für den Global Company Support."};
-
 addModEventListener(GC_Checker);
 
 function GC_Checker:loadMap(i3dFilePath)
 	self.showWarning = false;
+	self.startUpdateTime = 2000;
+	self.hasModEventListener = true;
 
 	if g_company ~= nil then
 		self:delete();
@@ -45,18 +44,12 @@ function GC_Checker:loadMap(i3dFilePath)
 		local xmlFile = loadXMLFile("TempModDesc", mod.modFile);
 		local versionString = getXMLString(xmlFile, "modDesc.globalCompany#minimumVersion");
 		if versionString ~= nil then
-			self.warningText = GC_Checker.warningTexts[g_languageShort];		
-			if self.warningText == nil then
-				if g_i18n:hasText("GC_globalCompanyMissing") then
-					self.warningText = g_i18n:getText("GC_globalCompanyMissing");
-				else
-					self.warningText = GC_Checker.warningTexts["en"];
-				end;
-			end;
-
 			self.modData = mod;
 			self.showWarning = true;
 			self.versionString = versionString;
+			self.okButtonText = g_i18n:getText("button_ok");
+			self.downloadButtonText = g_i18n:getText("button_modHubDownload");
+			self.warningText = self:getWarningText(g_languageShort);
 		else
 			g_logManager:error("Required version number was not given at 'modDesc.globalCompany#minimumVersion' in modDesc ( %s )!", mod.modFile);
 			self:delete();
@@ -67,14 +60,20 @@ function GC_Checker:loadMap(i3dFilePath)
 end;
 
 function GC_Checker:delete()
-	self.showWarning = false;
-	removeModEventListener(self);
+	if self.hasModEventListener then
+		self.hasModEventListener = false;
+		removeModEventListener(self);
+	end;
 end;
 
 function GC_Checker:update(dt)
-	if self.showWarning and g_gui.currentGui == nil then
-		self.showWarning = false;
-		self:showModWarningGUI();
+	if self.startUpdateTime > 0 then
+		self.startUpdateTime = self.startUpdateTime - dt;
+	else
+		if self.showWarning and not g_gui:getIsGuiVisible() then
+			self.showWarning = false;
+			self:showModWarningGUI();
+		end;
 	end;
 end;
 
@@ -93,8 +92,8 @@ function GC_Checker:showModWarningGUI()
 						   dialogType = DialogElement.TYPE_WARNING,
 						   callback = self.openModHubLink,
 						   target = self,
-						   yesText = g_i18n:getText("button_ok"),
-						   noText = g_i18n:getText("button_modHubDownload")}); -- button_visitWebsite
+						   yesText = self.okButtonText,
+						   noText = self.downloadButtonText});
 end;
 
 function GC_Checker:openModHubLink(isYes)
@@ -113,7 +112,17 @@ function GC_Checker:openModHubLink(isYes)
 	self:delete();
 end;
 
+function GC_Checker:getWarningText(language)
+	local warnings = {["en"] = "Global Company Version %s or greater is required for this mod / map to operate. Please visit modHub download link for the latest official version or visit '%s' for Global Company support.",
+					  ["de"] = "Für die Verwendung dieses Mods / dieser Map ist Global Company Version %s oder höher erforderlich. Bitte im ModHub die aktuelle offizielle Version downloaden, oder besuche '%s' für den Global Company Support."};
 
-
-
-
+	if warnings[language] ~= nil then
+		return warnings[language];
+	else
+		if g_i18n:hasText("GC_globalCompanyMissing") then
+			return g_i18n:getText("GC_globalCompanyMissing");
+		else
+			return warnings["en"];
+		end;
+	end;
+end;

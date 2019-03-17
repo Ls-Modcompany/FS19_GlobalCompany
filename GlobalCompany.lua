@@ -64,7 +64,7 @@ function GlobalCompany.initialLoad()
 	end;
 
 	-- Can we load?
-	if g_company.modManager:doLoadCheck(g_currentModName, duplicateLoad) then
+	if g_company.modManager:doLoadCheck(g_currentModName, duplicateLoad, GlobalCompany.isDevelopmentVersion) then
 		g_company.debug:singleLogWrite(GlobalCompany.debugIndex, GC_DebugUtils.BLANK, "Loading Version: %s (%s)", GlobalCompany.version, GlobalCompany.versionDate);
 		addModEventListener(GlobalCompany);
 

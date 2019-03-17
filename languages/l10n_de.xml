@@ -11,6 +11,7 @@
 		<e k="GC_invalidModWarning" v="Mod %s von %s wird nicht unterstützt! Um Fehler zu vermeiden, muss dieser Mod entfernt werden!"/>
 		<e k="GC_quitToMainMenu" v="Are you sure you want to exit to the main menu?"/>
 		<e k="GC_betaVersionWarning" v="Development version has been loaded. Please report warnings or errors at %s. Visit modHub download link for the latest official release version or visit '%s' for support."/>
+		<e k="GC_namingError" v="Invalid 'file / zip' name '%s' found for development release! Use 'FS19_GlobalCompany' for file / zip name. Visit modHub download link for the latest official release version or visit '%s' for support."/>
 
 		<!-- GUI -->
 		<e k="GC_gui_buttons_ok" v="OK"/>
