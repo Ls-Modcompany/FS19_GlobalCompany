@@ -113,7 +113,7 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 		if (getRigidBodyType(hitObjectId) ~= "NoRigidBody") then		
 			local object = g_currentMission:getNodeObject(hitObjectId);		
 			if (object~= nil) then
-				if (object.typeName == "pallet") then
+				if (object.typeName == "pallet") or (object.typeName == "genetix") or (object.typeName == "attachablePallet") then
 					if (object.getFillUnits ~= nil) then
 						local fUnit = object:getFillUnits();
 						if object:getFillUnitExists(fUnit[1].fillUnitIndex) then							
@@ -128,6 +128,7 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 				end;			
 				if not self.debugPrintDone then
 					g_company.debug:writeDevDebug(self.debugData, "hitObjectId = %s, locRigidBodyType = %s", hitObjectId, locRigidBodyType);
+					-- gc_debugPrint(object, nil, 1, "ObjectInfo");
 				end;
 				self.debugPrintDone = true;
 			end;
