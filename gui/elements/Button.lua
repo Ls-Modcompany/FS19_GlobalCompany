@@ -31,6 +31,9 @@ function GC_Gui_button:new(gui, custom_mt)
 	self.mouseEntered = false;
 	self.isTableTemplate = false;
 	self.isMultiSelect = false;
+
+	self.inputAction = nil;
+	self.clickSound = nil;
 	
     self.doubleClickInterval = 1000;
     self.doubleClickTime = 0;
@@ -54,6 +57,13 @@ function GC_Gui_button:loadTemplate(templateName, xmlFile, key)
 	self.isTableTemplate = g_company.gui:getTemplateValueBool(templateName, "isTableTemplate", self.isTableTemplate);
 	self.hasOverlay = g_company.gui:getTemplateValueBool(templateName, "hasOverlay", false);
 	self.hasText = g_company.gui:getTemplateValueBool(templateName, "hasText", false);
+
+	local inputAction = g_company.gui:getTemplateValue(templateName, "inputAction");
+	inputAction = g_company.gui:getTemplateValueXML(xmlFile, "inputAction", key, inputAction);
+	if inputAction ~= nil and InputAction[inputAction] ~= nil then
+		self.inputAction = InputAction[inputAction];
+		self.hasText = true;
+	end;
 	
 	if self.hasOverlay then
 		self.overlayElement = GC_Gui_overlay:new(self.gui);
@@ -72,6 +82,10 @@ function GC_Gui_button:loadTemplate(templateName, xmlFile, key)
 		self:addElement(self.textElement);
 		if id ~= nil and id ~= "" then
 			self.gui[id] = self.textElement;
+		end;
+		
+		if self.inputAction ~= nil then
+			self.textElement:setText(g_inputDisplayManager:getKeyboardInputActionKey(self.inputAction));
 		end;
 	end;
 	
@@ -259,6 +273,9 @@ end;
 
 
 function GC_Gui_button:setText(...)
+	if self.inputAction ~= nil then
+		return;
+	end;
 	for _,v in ipairs(self.elements) do
 		if v.setText ~= nil then
 			v:setText(...);
