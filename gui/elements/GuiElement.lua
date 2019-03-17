@@ -116,6 +116,11 @@ end;
 
 function GC_Gui_element:setParent(parent)
 	self.parent = parent;
+	if self.isOnlyElement then
+		self:copy(parent);
+		self.position = {0,0}; 
+		self.margin = {0,0,0,0};
+	end;
 end;
 
 function GC_Gui_element:delete()
