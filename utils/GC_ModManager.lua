@@ -60,6 +60,7 @@ function GC_ModManager:new()
 				  ["loadingError"] = languageManager:getText("GC_loadingError"),
 				  ["duplicateError"] = languageManager:getText("GC_duplicateError"),
 				  ["combinedError"] = languageManager:getText("GC_combinedError"),
+				  ["namingError"] = languageManager:getText("GC_namingError"),
 				  ["modHubLink"] = languageManager:getText("GC_gui_modHubLink"),
 				  ["okButton"] = languageManager:getText("GC_gui_buttons_ok"),
 				  ["invalidModWarning"] = languageManager:getText("GC_invalidModWarning"),
@@ -255,6 +256,8 @@ function GC_ModManager:showLoadWarningGUI(strg, warningType)
 		text = string.format(self.texts.duplicateError, strg);
 	elseif warningType == "combinedError" then
 		text = string.format(self.texts.combinedError, strg, url);
+	elseif warningType == "namingError" then
+		text = string.format(self.texts.namingError, strg, url);
 	end;
 
 	if self.isClient then
@@ -306,7 +309,7 @@ function GC_ModManager:openModHubLink(isYes)
 	end;
 end;
 
-function GC_ModManager:doLoadCheck(strg, duplicateLoad)
+function GC_ModManager:doLoadCheck(strg, duplicateLoad, isDevVersion)
 	if duplicateLoad == false then
 		local check, strgL = {["FS19_GlobalCompany"] = 18, ["FS19_GlobalCompany_update"] = 25}, strg:len();
 		if check[strg] ~= nil and check[strg] == strgL then
@@ -319,7 +322,12 @@ function GC_ModManager:doLoadCheck(strg, duplicateLoad)
 			if g_modManager:isModMap(strg) then
 				self:showLoadWarningGUI(strg, "combinedError");
 			else
-				self:showLoadWarningGUI(strg, "standardError");
+				if isDevVersion then
+					-- Make sure name is 'FS19_GlobalCompany' when using GitHub release so we have no issues with release version.
+					self:showLoadWarningGUI(strg, "namingError");
+				else
+					self:showLoadWarningGUI(strg, "standardError");
+				end;
 			end;
 		end;
 	else

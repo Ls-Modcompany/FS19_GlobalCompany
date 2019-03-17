@@ -39,7 +39,8 @@ function Gc_Gui_ObjectInfo:onOpen() end;
 function Gc_Gui_ObjectInfo:update(dt) end;
 function Gc_Gui_ObjectInfo:onClose() end;
 
-function Gc_Gui_ObjectInfo:setData(line1, line2)
+function Gc_Gui_ObjectInfo:setData(line1, line2, line3)
     self.gui_line1:setText(line1);
     self.gui_line2:setText(line2);
+	self.gui_line3:setText(line3);
 end;

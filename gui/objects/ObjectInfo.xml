@@ -5,6 +5,7 @@
     <GuiElement type="flowLayout" template="gcObjectInfoLayout">
       <GuiElement type="text" template="gcObjectInfoText" id="gui_line1" />
       <GuiElement type="text" template="gcObjectInfoText" id="gui_line2" />
+	  <GuiElement type="text" template="gcObjectInfoText" id="gui_line3" />
     </GuiElement>
   </GuiElement>
 </GUI>

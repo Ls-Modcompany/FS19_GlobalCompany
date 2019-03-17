@@ -335,7 +335,7 @@
 
 		<!-- ObjectInfo -->
 		<template name="gcObjectInfoBackground" anchor="middleCenter" extends="gcBase gcBorder">
-			<value name="size" value="230px 60px" />
+			<value name="size" value="230px 65px" />
 			<value name="imageColor" value="glass5_70" />
 			<value name="hasBorders" value="true" />
 			<value name="borderBottomSize" value="6px" />
@@ -345,7 +345,7 @@
 			<value name="orientation" value="y" />
 			<value name="alignment" value="center" />
 			<value name="position" value="0px 0px" />
-			<value name="size" value="230px 54px" />
+			<value name="size" value="230px 59px" />
 			<value name="margin" value="0px 0px 0px 0px" />
 		</template>
 		<template name="gcObjectInfoText" anchor="middleCenter" extends="gcBase_text">
