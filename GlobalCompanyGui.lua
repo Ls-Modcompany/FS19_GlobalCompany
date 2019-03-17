@@ -57,6 +57,7 @@ source(g_currentModDirectory .. "gui/MultiDialog.lua");
 source(g_currentModDirectory .. "gui/objects/Baler.lua");
 source(g_currentModDirectory .. "gui/objects/ObjectInfo.lua");
 source(g_currentModDirectory .. "gui/objects/Settings.lua");
+source(g_currentModDirectory .. "gui/objects/FactoryBig.lua");
 
 function GlobalCompanyGui:init()	
 	for _,inAc in pairs(self.toInit_actionEvents) do
@@ -83,10 +84,13 @@ function GlobalCompanyGui:loadMap()
 	
 	
 	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
+	g_company.gui:registerGui("gc_factoryBig", InputAction.GC_TEST, Gc_Gui_FactoryBig, true, true, true);
 	g_company.gui:registerGui("gc_settings", InputAction.GC_SETTINGS, Gc_Gui_Settings, true, true, true);
 	g_company.gui:registerGui("gcPlaceable_baler", nil, Gc_Gui_Baler, true, true);
 	g_company.gui:registerGui("gcObjectInfo", nil, Gc_Gui_ObjectInfo, false, false);
 
+	g_company.gui:registerUiElements("g_factoryDefault", g_company.dir .. "images/factoryDefault.dds");
+	
 	self.activeGuiDialogs = {};
 	self.registeredActonEvents = false;
 end;

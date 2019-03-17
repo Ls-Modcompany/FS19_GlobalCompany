@@ -20,6 +20,13 @@
 		<e k="GC_gui_modHubLink" v="ModHub Download Link"/>
 		<e k="GC_gui_buttons_nextWarning" v="Next Warning"/>
 		<e k="GC_gui_buttons_nextConflict" v="Next Conflict"/>
+
+		<!-- Factory -->
+		<e k="GC_gui_buttons_back" v="Zurück"/>
+		<e k="GC_gui_buttons_tagPlace" v="Marierung setzen"/>
+		<e k="GC_gui_overview" v="Übersicht"/>
+		<e k="GC_gui_productLines" v="Produktlinien"/>
+		<e k="GC_gui_description" v="Beschreibung"/>
 		
 		<!-- General -->
 		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
