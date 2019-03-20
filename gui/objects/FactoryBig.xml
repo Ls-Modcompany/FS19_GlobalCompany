@@ -39,9 +39,8 @@
         </GuiElement>
 
         <GuiElement template="gcBase" id="gui_details">
-
             
-            <GuiElement type="image" template="gcFactoryBigRightOverviewSep1" />
+            <GuiElement type="image" template="gcFactoryBigRightOverviewSep1" size="2px 780px" position="-400px 0px" />
             <GuiElement type="image" template="gcFactoryBigRightOverviewSep2" />
             
             <GuiElement type="image" template="gcFactoryBigRightOverviewImage" />

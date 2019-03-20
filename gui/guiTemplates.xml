@@ -524,8 +524,6 @@
 		</template>
 
 		<template name="gcFactoryBigRightOverviewSep1" anchor="rightCenter" extends="gcBase">
-			<value name="size" value="300px 2px" />
-			<value name="position" value="-50px 320px" />
 			<Value name="imageUVs" value="colorBg"/>
 			<Value name="imageColor" value="glass1_50"/>
 		</template>
