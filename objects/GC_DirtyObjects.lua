@@ -67,12 +67,14 @@ function DirtObjects:load(nodeId, isOnCreate)
 	self.nodeId  = nodeId;
 	self.isOnCreate = isOnCreate;
 
-	self.saveId = string.format("DirtObjects_%s", GetNextSaveId());
+	if isOnCreate then
+		self.saveId = string.format("DirtObjects_%s", GetNextSaveId());
+	end;
 	
 	self.dirtNodes = {};
 	I3DUtil.getNodesByShaderParam(nodeId, "RDT", self.dirtNodes);
 
-	self.factorPerHour = Utils.getNoNil(getUserAttribute(nodeId, "factorPerHour"), 0.01);
+	self.factorPerHour = Utils.getNoNil(getUserAttribute(nodeId, "factorPerHour"), 0.1); --0.01
 
 	self.dirtObjectsDirtyFlag = self:getNextDirtyFlag();
 	self:raiseActive();

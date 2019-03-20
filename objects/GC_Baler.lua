@@ -105,6 +105,9 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		self.saveId = "baler_" .. indexName;
 	end;
 
+	self.dirtyObject = GC_DirtyObjects:new(self.isServer, self.isClient, nil, self.baseDirectory, self.customEnvironment);
+	self.dirtyObject:load(self.nodeId);
+
 	self.title = Utils.getNoNil(getXMLString(xmlFile, xmlKey .. "#title"), true);
 	self.autoOn = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. "#autoOn"), true);
 
@@ -270,6 +273,8 @@ function Baler:delete()
 
 	self.conveyorStacker:delete();
 	self.conveyorMover:delete();
+
+	self.dirtyObject:delete();
 	
 	Baler:superClass().delete(self)
 end;
@@ -355,8 +360,10 @@ function Baler:loadFromXMLFile(xmlFile, key)
 	end;
 
 
-
 	self.state_balerMove = getXMLInt(xmlFile, key..".mover#state");
+
+	
+	self.dirtyObject:loadFromXMLFile(xmlFile, key);
 
 	return true;
 end;
@@ -380,6 +387,8 @@ function Baler:saveToXMLFile(xmlFile, key, usedModNames)
 	setXMLFloat(xmlFile, key .. ".stacker#doStackAnimationEndTime", self.doStackAnimationEnd:getAnimationTime());
 
 	setXMLInt(xmlFile, key .. ".mover#state", self.state_balerMove);
+
+	self.dirtyObject:saveToXMLFile(xmlFile, key, usedModNames);
 end;
 
 function Baler:update(dt)
