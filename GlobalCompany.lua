@@ -310,6 +310,11 @@ function GlobalCompany:update(dt)
 		updateable.update(updateable.target, dt);
 	end;
 
+	--can enable for testing!
+	--if g_currentMission.missionInfo.timeScale >= 120 then
+	--	g_currentMission.missionInfo.timeScale = 900;
+	--end;
+
 	for _, raisedUpdateable in pairs(GlobalCompany.raisedUpdateables) do
 		if raisedUpdateable.updateableCanUpdate then
 			raisedUpdateable.updateableCanUpdate = false;
