@@ -143,7 +143,6 @@ function DirtObjects:loadFromXMLFile(xmlFile, key)
 	while true do
 		local dirtNodeKey = string.format("%s.dirtNode(%d)", key, i);
 		if not hasXMLProperty(xmlFile, dirtNodeKey) then
-				print("not exist")
 			break;
 		end
 		local dirtLevel = getXMLFloat(xmlFile, string.format("%s#dirtLevel", dirtNodeKey));
@@ -157,6 +156,9 @@ function DirtObjects:loadFromXMLFile(xmlFile, key)
 
 	i = 1;
 	for _, dirtNode in pairs(self.dirtNodes) do		
+		if dirtValues[i] == nil then
+			return true;
+		end;
 		local x, _, z, w = getShaderParameter(dirtNode, "RDT");
 		setShaderParameter(dirtNode, "RDT", x, dirtValues[i], z, w, false);
 		i = i + 1;
