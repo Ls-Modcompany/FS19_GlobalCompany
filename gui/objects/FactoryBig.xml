@@ -33,23 +33,23 @@
 
     <GuiElement type="image" template="gcFactoryBigBackgroundRight">
         
-        <GuiElement template="gcBase" id="gui_overview">
-
-
+        <GuiElement template="gcBase" id="gui_overview" visible="false" >
+            <GuiElement type="image" template="gcSeperator" size="300px 2px" position="400px 320px" />
+            <GuiElement type="image" template="gcSeperator" size="2px 780px" position="200px 0px" />            
+            <GuiElement type="image" template="gcFactoryBigRightOverviewImage" />            
+            <GuiElement type="text" template="gcFactoryBigRightOverviewText1" position="-200px -100px" text="Factoryname" />  
+            <GuiElement type="text" template="gcFactoryBigRightOverviewText2" position="400px -30px" text="$l10n_GC_gui_description" />  
+            <GuiElement type="text" template="gcFactoryBigRightOverviewText3" position="400px -150px" text="eifneiocniofjweoifm jeoiwfjeiofjeoifj ief eiohfioe fhei heiofhei eoif heiofh eifheiofh eiheihfeiohrf eoghrih" />  
         </GuiElement>
 
-        <GuiElement template="gcBase" id="gui_details">
+        <GuiElement template="gcBase" id="gui_details" >
+            <GuiElement type="text" template="gcFactoryBigRightOverviewText4" position="80px -20px" text="Factoryname" />  
+            <GuiElement type="text" template="gcFactoryBigRightOverviewText5" position="-80px -20px" text="17:48" /> 
+            <GuiElement type="image" template="gcSeperator" size="1100px 2px" position="0px 350px" />    
             
-            <GuiElement type="image" template="gcFactoryBigRightOverviewSep1" size="2px 780px" position="-400px 0px" />
-            <GuiElement type="image" template="gcFactoryBigRightOverviewSep2" />
-            
-            <GuiElement type="image" template="gcFactoryBigRightOverviewImage" />
+            <GuiElement type="text" template="gcFactoryBigRightOverviewText6" position="100px -100px" text="Status:" />  
 
             
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText1" text="Factoryname" />  
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText2" text="$l10n_GC_gui_description" />  
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText3" text="eifneiocniofjweoifm jeoiwfjeiofjeoifj ief eiohfioe fhei heiofhei eoif heiofh eifheiofh eiheihfeiohrf eoghrih" />  
-
         </GuiElement>
 
     </GuiElement>

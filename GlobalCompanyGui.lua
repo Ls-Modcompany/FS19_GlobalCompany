@@ -26,7 +26,7 @@ g_company.gui = GlobalCompanyGui;
 GlobalCompanyGui.DevelopementVersionTemplatesFilename = {};
 addModEventListener(GlobalCompanyGui);
 
-GlobalCompanyGui.devVersion = true;
+GlobalCompanyGui.devVersion = false;
 
 GlobalCompanyGui.guis = {};
 GlobalCompanyGui.smallGuis = {};

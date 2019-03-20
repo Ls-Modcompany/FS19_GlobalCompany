@@ -137,6 +137,11 @@
 			<value name="borderBottomSize" value="4px" />
 			<value name="borderBottomColor" value="orange" />
 		</template>
+		
+		<template name="gcSeperator" anchor="middleCenter" extends="gcBase">
+			<Value name="imageUVs" value="colorBg"/>
+			<Value name="imageColor" value="glass1_50"/>
+		</template>
 
 		<!-- MultiDialog -->
 		<template name="gcMdMainLayerBackground" anchor="middleCenter" extends="gcBase">
@@ -523,40 +528,30 @@
 			<Value name="imageFilename" value="g_factoryDefault"/>
 		</template>
 
-		<template name="gcFactoryBigRightOverviewSep1" anchor="rightCenter" extends="gcBase">
-			<Value name="imageUVs" value="colorBg"/>
-			<Value name="imageColor" value="glass1_50"/>
-		</template>
-		<template name="gcFactoryBigRightOverviewSep2" anchor="rightCenter" extends="gcBase">
-			<value name="size" value="2px 780px" />
-			<value name="position" value="-400px 0px" />
-			<Value name="imageUVs" value="colorBg"/>
-			<Value name="imageColor" value="glass1_50"/>
-		</template>
 		<template name="gcFactoryBigRightOverviewText1" anchor="middleTop" extends="gcBase_text">
-			<value name="size" value="350px 131px" />
-			<value name="position" value="-200px -100px" />
+			<value name="size" value="0px 0px" />
 			<value name="textSize" value="40px" />
 			<value name="textAlignment" value="center" />	
-			<value name="textBold" value="false" />	
 			<value name="margin" value="0px 8px 0px 0px" />	
 		</template>	
-		<template name="gcFactoryBigRightOverviewText2" anchor="middleTop" extends="gcBase_text">
-			<value name="size" value="350px 131px" />
-			<value name="position" value="400px -30px" />
-			<value name="textAlignment" value="center" />	
-			<value name="textBold" value="false" />	
-			<value name="margin" value="0px 8px 0px 0px" />	
+		<template name="gcFactoryBigRightOverviewText2" anchor="middleTop" extends="gcFactoryBigRightOverviewText1">
+			<value name="textSize" value="25px" />
 		</template>	
-		<template name="gcFactoryBigRightOverviewText3" anchor="middleTop" extends="gcBase_text">
-			<value name="size" value="350px 131px" />
-			<value name="position" value="400px -150px" />
-			<value name="textAlignment" value="left" />	
-			<value name="margin" value="0px 8px 0px 0px" />	
+		<template name="gcFactoryBigRightOverviewText3" anchor="middleTop" extends="gcFactoryBigRightOverviewText1">
+			<value name="textAlignment" value="left" />				
 			<value name="textWrapWidth" value="350px" />	
 			<value name="textMaxNumLines" value="200" />	
 			<value name="textSize" value="20px" />
 			<value name="textLineHeightScale" value="2" />
+		</template>	
+		<template name="gcFactoryBigRightOverviewText4" anchor="leftTop" extends="gcFactoryBigRightOverviewText1">
+			<value name="textSize" value="28px" />
+		</template>	
+		<template name="gcFactoryBigRightOverviewText5" anchor="rightTop" extends="gcFactoryBigRightOverviewText1">
+			<value name="textSize" value="28px" />
+		</template>	
+		<template name="gcFactoryBigRightOverviewText6" anchor="leftTop" extends="gcFactoryBigRightOverviewText1">
+			<value name="textSize" value="22px" />
 		</template>	
 
 

@@ -53,8 +53,8 @@ function GC_Gui_element:loadTemplate(templateName, xmlFile, key)
 	self.debugEnabled = g_company.gui:getTemplateValueBool(templateName, "debugEnabled", self.debugEnabled);
 	self.newLayer = g_company.gui:getTemplateValueBool(templateName, "newLayer", self.newLayer);
 		
-	self.visible = g_company.gui:getTemplateValueNumberXML(xmlFile, "visible", key, self.visible);
-	self.disabled = g_company.gui:getTemplateValueNumberXML(xmlFile, "disabled", key, self.disabled);
+	self.visible = g_company.gui:getTemplateValueBoolXML(xmlFile, "visible", key, self.visible);
+	self.disabled = g_company.gui:getTemplateValueBoolXML(xmlFile, "disabled", key, self.disabled);
 	
 	self.position = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValueXML(xmlFile, "position", key), self.outputSize, self.position);
 	self.size = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValueXML(xmlFile, "size", key), self.outputSize, self.size);
