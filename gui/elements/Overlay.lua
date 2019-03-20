@@ -127,7 +127,7 @@ end;
 
 function GC_Gui_overlay:delete()
 	GC_Gui_overlay:superClass().delete(self);
-	if self.imageOverlay ~= nil then
+	if self.imageOverlay ~= nil and self.imageOverlay ~= 0 then
 		delete(self.imageOverlay);
 		self.imageOverlay = nil;
 	end;
