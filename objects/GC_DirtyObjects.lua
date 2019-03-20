@@ -72,7 +72,7 @@ function DirtObjects:load(nodeId, isOnCreate)
 	end;
 	
 	self.dirtNodes = {};
-	I3DUtil.getNodesByShaderParam(nodeId, "RDT", self.dirtNodes);
+	I3DUtil.getNodesByShaderParam(self.nodeId, "RDT", self.dirtNodes);
 
 	self.factorPerHour = Utils.getNoNil(getUserAttribute(nodeId, "factorPerHour"), 0.1); --0.01
 
@@ -139,31 +139,39 @@ end;
 
 function DirtObjects:loadFromXMLFile(xmlFile, key)
 	local i = 0;
+	local dirtValues = {};
 	while true do
 		local dirtNodeKey = string.format("%s.dirtNode(%d)", key, i);
 		if not hasXMLProperty(xmlFile, dirtNodeKey) then
+				print("not exist")
 			break;
 		end
 		local dirtLevel = getXMLFloat(xmlFile, string.format("%s#dirtLevel", dirtNodeKey));
-		if self.dirtNodes[i+1] == nil then
-			return true;
-		end;
+		
 		if dirtLevel == nil then
 			dirtLevel = 0;
 		end;
-		local x, _, z, w = getShaderParameter(self.dirtNodes[i+1], "RDT");
-		setShaderParameter(self.dirtNodes[i+1], "RDT", x, dirtLevel, z, w, false);
+		table.insert(dirtValues, dirtLevel);
 		i = i + 1;
 	end
+
+	i = 1;
+	for _, dirtNode in pairs(self.dirtNodes) do		
+		local x, _, z, w = getShaderParameter(dirtNode, "RDT");
+		setShaderParameter(dirtNode, "RDT", x, dirtValues[i], z, w, false);
+		i = i + 1;
+	end;
 
 	return true;
 end;
 
 function DirtObjects:saveToXMLFile(xmlFile, key, usedModNames)	
-	for i,dirtNode in pairs (self.dirtNodes) do	
-		local dirtNodeKey = string.format("%s.dirtNode(%d)", key, i-1);
+	local i = 0;
+	for _,dirtNode in pairs (self.dirtNodes) do	
+		local dirtNodeKey = string.format("%s.dirtNode(%d)", key, i);
 		local _, dirtLevel, _, _ = getShaderParameter(dirtNode, "RDT");
 		setXMLFloat(xmlFile, string.format("%s#dirtLevel", dirtNodeKey), dirtLevel);
+		i = i + 1;
 	end;
 end;
 

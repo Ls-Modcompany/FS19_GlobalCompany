@@ -363,7 +363,7 @@ function Baler:loadFromXMLFile(xmlFile, key)
 	self.state_balerMove = getXMLInt(xmlFile, key..".mover#state");
 
 	
-	self.dirtyObject:loadFromXMLFile(xmlFile, key);
+	self.dirtyObject:loadFromXMLFile(xmlFile, key..".dirtNodes");
 
 	return true;
 end;
@@ -388,7 +388,7 @@ function Baler:saveToXMLFile(xmlFile, key, usedModNames)
 
 	setXMLInt(xmlFile, key .. ".mover#state", self.state_balerMove);
 
-	self.dirtyObject:saveToXMLFile(xmlFile, key, usedModNames);
+	self.dirtyObject:saveToXMLFile(xmlFile, key..".dirtNodes", usedModNames);
 end;
 
 function Baler:update(dt)
