@@ -215,24 +215,35 @@ function GlobalCompanyUtils.getNumbersFromString(xmlFile, key, count, returnRadi
    return stringValue;
 end;
 
--- Looking for [ PREFIX GC_ or SRS_ ] e.g 'input_GC_OpenDoor' or 'gui_GC_Capacity_Shown' or 'GC_gui_Capacity_Shown' or 'GC_OpenDoor' or 'SRS_OpenDoor' --
+-- Looking for [PREFIX] 'GC_' or 'SRS_'
 function GlobalCompanyUtils.getHasPrefix(text)
-	local splitText = StringUtil.splitString("_", text)
-	if #splitText > 1 then
-		local prefix = splitText[1];
-		if "input" == prefix or "gui" == prefix then
-			prefix = splitText[2];
-			if "GC" == prefix or "SRS" == prefix then
-				return true;
-			end;
-		else
-			if "GC" == prefix or "SRS" == prefix then
-				return true;
-			end;
+	local stringStart, stringEnd = text:find("_", 1, true);
+	if stringStart ~= nil then
+		local prefix = text:sub(1, stringStart - 1);
+		if prefix == "GC" or prefix == "SRS"  then
+			return true;
 		end;
 	end;
 
 	return false;
+end;
+
+-- Remove Prefix and Suffix from the modName and return Root Mod Name only.
+-- Example: FS19_MyGreatMod_update > MyGreatMod
+function GlobalCompanyUtils.getRootModName(modName)
+	if modName:sub(1, 5) == "FS19_" then
+		if modName:sub(-7) == "_update" then
+			return modName:sub(6, modName:len() - 7);
+		else
+			return modName:sub(6);
+		end;
+	else
+		if modName:sub(-7) == "_update" then
+			return modName:sub(1, modName:len() - 7);
+		else
+			return modName:sub(1);
+		end;
+	end;
 end;
 
 function GlobalCompanyUtils.getParentBaseDirectory(parent, baseDirectory)

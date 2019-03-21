@@ -28,7 +28,7 @@ GlobalCompany.dir = g_currentModDirectory;
 GlobalCompany.version = "1.0.0.0"; -- Release Version.
 GlobalCompany.versionDate = "04.05.2018"; -- Release Date ??
 GlobalCompany.currentVersionId = 1000; -- Mod Manager ID. (Version number without periods.)
-GlobalCompany.isDevelopmentVersion = true;
+GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT. 
 
 GlobalCompany.LOADTYP_XMLFILENAME = 1;
 
@@ -54,7 +54,7 @@ function GlobalCompany.initialLoad()
 
 		--| Load Language Manager |--
 		source(GlobalCompany.dir .. "utils/GC_languageManager.lua");
-		g_company.languageManager:load(GlobalCompany.dir); -- We need to load Global Company texts first so they are not overwritten and for 'modManager' to use.
+		g_company.languageManager:load(GlobalCompany.dir); -- We need to load Global Company texts first for 'modManager' to use.
 
 		--| Load Mod Manager |--
 		source(GlobalCompany.dir .. "utils/GC_ModManager.lua");
@@ -86,7 +86,7 @@ function GlobalCompany.initialLoad()
 		local modLanguageFiles = {};
 		local selectedMods = g_modSelectionScreen.missionDynamicInfo.mods;
 		for _, mod in pairs(selectedMods) do
-			local path = nil;
+			local path;
 			local modName = mod.modName;
 
 			if mod.modDir ~= nil then
@@ -98,11 +98,13 @@ function GlobalCompany.initialLoad()
 					end;
 				end;
 
-				-- We have already loaded these so do not try and do it again.
-				if modName ~= "FS19_GlobalCompany" and modName ~= "FS19_GlobalCompany_update" then
+				-- Ignore Global Company language files.
+				if modName ~= g_currentModName then
 					local langFullPath = g_company.languageManager:getLanguagesFullPath(mod.modDir);
-					if langFullPath ~= nil then
-						modLanguageFiles[modName] = langFullPath;
+					if langFullPath ~= nil then					
+						--if g_company.languageManager:checkEnglishBackupExists(langFullPath, modName) then
+							modLanguageFiles[modName] = langFullPath;
+						--end;
 					end;
 				end;
 			end;
@@ -121,9 +123,15 @@ function GlobalCompany.initialLoad()
 		end;
 
 		for modName, values in pairs(GlobalCompany.environments) do
+			-- This needs to be done before load to add correctly.
+			if values.shopManager ~= nil and values.shopManager ~= "" then
+				g_company.shopManager:loadFromXML(modName, g_company.utils.createModPath(modName, values.shopManager));
+			end;
+			
 			if values.specializations ~= nil and values.specializations ~= "" then
 				g_company.specializations:loadFromXML(modName, g_company.utils.createModPath(modName, values.specializations));
 			end;
+			
 			if values.densityMapHeightOverwriteOrginalFunction then
 				g_densityMapHeightManager.loadMapData = function() return true; end;
 			end;
@@ -306,7 +314,7 @@ function GlobalCompany:loadMap()
 end;
 
 function GlobalCompany:update(dt)
-	for _,updateable in pairs(GlobalCompany.updateables) do
+	for _, updateable in pairs(GlobalCompany.updateables) do
 		updateable.update(updateable.target, dt);
 	end;
 
@@ -328,6 +336,7 @@ end;
 
 function GlobalCompany:deleteMap()
 	g_company.debug:deleteConsoleCommands();
+	g_company.languageManager:delete();
 	
 	getfenv(0)["g_company"] = nil; -- Clean up so we have no conflicts.
 end;
@@ -356,8 +365,6 @@ function GlobalCompany:addPlaceableType(name, className, filename)
 		print(string.format("  [LSMC - GlobalCompany] - ERROR: Failed to add placeable type using name '%s'! Incorrect / No prefix found.", name));
 		print("    Use prefix 'GC_' for ( GlobalCompany ) placeable mods.", "    Use prefix 'SRS_' for ( SkiRegionSimulator ) placeable mods.");
 	end;
-
-	--g_placeableTypeManager.placeableTypes[name] = {name=name, className=className, filename=filename};
 end;
 
 GlobalCompany.initialLoad();

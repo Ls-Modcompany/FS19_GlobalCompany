@@ -82,8 +82,13 @@ function GC_Gui_text:loadTemplate(templateName, xmlFile, key)
 	end;
 	
 	local text = getXMLString(xmlFile, string.format("%s#text", key));	
-	if text ~= nil then       
-        self:setText(g_company.languageManager:getText(text), true);
+	if text ~= nil then 
+		if text:sub(-1) == ":" then
+			text = text:sub(1, text:len() - 1);
+			self:setText(g_company.languageManager:getText(text, ":"), true);
+		else
+			self:setText(g_company.languageManager:getText(text), true);
+		end;
     end;
 	self:loadOnCreate();
 end;
