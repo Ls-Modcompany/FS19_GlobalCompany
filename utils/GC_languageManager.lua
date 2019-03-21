@@ -25,9 +25,9 @@ GC_languageManager.debugIndex = g_company.debug:registerScriptName("LanguageMana
 
 g_company.languageManager = GC_languageManager;
 
-local ignoreRootNames = {["GlobalCompany"] = true,
-						 ["GlobalCompanyTablet"] = true,
-						 ["GlobalCompanySRS"] = true};
+local baseModNameToPrefix = {["GlobalCompany"] = "GC",
+							 ["GlobalCompanyTablet"] = "GCT",
+							 ["GlobalCompanySRS"] = "SRS"};
 
 function GC_languageManager:load(loadingDirectory)
 	GC_languageManager.debugData = g_company.debug:getDebugData(GC_languageManager.debugIndex, g_company);
@@ -62,6 +62,8 @@ function GC_languageManager:loadModLanguageFiles(modLanguageFiles)
 end;
 
 function GC_languageManager:loadEntries(modName, fullPath, baseKey)
+	local globalTexts = getfenv(0).g_i18n.texts;
+	
 	local duplicateTable = {};
 	local prefixErrorTable = {};
 	local rootModName = g_company.utils.getRootModName(modName)
@@ -80,13 +82,13 @@ function GC_languageManager:loadEntries(modName, fullPath, baseKey)
 
 		if k ~= nil and v ~= nil then
 			if GC_languageManager:getCanUseText(k, rootModName) then -- Make sure the texts are mod specific.
-				if g_i18n.texts[k] == nil then -- Stop duplicates and print warning.
-					g_i18n.texts[k] = v;
+				if globalTexts[k] == nil then -- Stop duplicates and print warning.
+					globalTexts[k] = v;
 				else
 					table.insert(duplicateTable, k);
 				end;
 			else
-				table.insert(prefixErrorTable, k); -- This will only happen for mods.
+				table.insert(prefixErrorTable, k);
 			end;
 		end;
 
@@ -109,8 +111,13 @@ function GC_languageManager:loadEntries(modName, fullPath, baseKey)
 	end;
 
 	if #prefixErrorTable > 0 then
-		local text = "The following text entries loaded from '%s' do not have the required prefix '%s'! Please add this."
-		g_company.debug:writeWarning(GC_languageManager.debugData, text, fullPath, rootModName);
+		local text = "The following text entries loaded from '%s' do not have the required prefix or subPrefix '%s'! Please add this."
+		local prefix = rootModName;
+		if baseModNameToPrefix[rootModName] ~= nil then
+			prefix = baseModNameToPrefix[rootModName];
+		end;
+		
+		g_company.debug:writeWarning(GC_languageManager.debugData, text, fullPath, prefix);
 
 		for i = 1, #prefixErrorTable do
 			local name = prefixErrorTable[i];
@@ -187,26 +194,26 @@ end;
 -- Mod Name: FS19_MyGreatFactory
 -- Examples: 'MyGreatFactory_OpenGate' or 'input_MyGreatFactory_OpenGate' or 'gui_MyGreatFactory_Options'.
 function GC_languageManager:getCanUseText(text, modName)
-	if ignoreRootNames[modName] == true then
-		return true;
-	end;
-
-	local stringStart, stringEnd = text:find("_", 1, true);
-	if stringStart ~= nil then
-		local subText = text:sub(1, stringStart - 1);
-		if subText == "input" or subText == "gui"  then
-			local newStart = stringEnd + 1;
-			stringStart, stringEnd = text:find("_", newStart, true);
-			if stringStart ~= nil then
-				subText = text:sub(newStart, stringStart - 1);
-				return subText == modName;
+	if baseModNameToPrefix[modName] ~= nil then
+		local stringStart, stringEnd = text:find("_", 1, true);
+		if stringStart ~= nil then
+			local subText = text:sub(1, stringStart - 1);
+			if subText == "input" or subText == "gui"  then
+				local newStart = stringEnd + 1;
+				stringStart, stringEnd = text:find("_", newStart, true);
+				if stringStart ~= nil then
+					subText = text:sub(newStart, stringStart - 1);
+					return subText == baseModNameToPrefix[modName];
+				end;
 			else
-				subText = text:sub(newStart);
-				return subText == modName;
+				return subText == baseModNameToPrefix[modName];
 			end;
-		else
-			return subText == modName;
 		end;
+	end;
+	
+	local stringStart, stringEnd = text:find(modName, 1, true);
+	if stringStart ~= nil then
+		return true;
 	end;
 
 	return false;
