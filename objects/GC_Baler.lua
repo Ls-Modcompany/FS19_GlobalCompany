@@ -329,7 +329,7 @@ function Baler:readStream(streamId, connection)
 
 		if self.hasStack then
 			self.state_stacker = streamReadInt16(streamId);
-			self.baleTarget = streamReadInt16(streamId);
+			self.stackBalesTarget = streamReadInt16(streamId);
 			self.animationState = streamReadInt16(streamId);
 
 			local forkNodeNums = streamReadInt16(streamId);
@@ -428,7 +428,7 @@ function Baler:loadFromXMLFile(xmlFile, key)
 	end;
 
 	self.state_stacker = getXMLInt(xmlFile, key..".stacker#state");
-	self.baleTarget = getXMLInt(xmlFile, key..".stacker#stackBalesTarget");
+	self.stackBalesTarget = getXMLInt(xmlFile, key..".stacker#stackBalesTarget");
 	self.animationState = getXMLInt(xmlFile, key..".stacker#animationState");
 
 	local forkNodeNums = getXMLInt(xmlFile, key..".stacker#forkNodeNums");
@@ -472,7 +472,7 @@ function Baler:saveToXMLFile(xmlFile, key, usedModNames)
 	setXMLFloat(xmlFile, key .. ".baler#animationTime", self.baleAnimation:getAnimationTime());
 
 	setXMLInt(xmlFile, key .. ".stacker#state", self.state_stacker);
-	setXMLInt(xmlFile, key .. ".stacker#baleTarget", self.stackBalesTarget);
+	setXMLInt(xmlFile, key .. ".stacker#stackBalesTarget", self.stackBalesTarget);
 	setXMLInt(xmlFile, key .. ".stacker#animationState", self.animationState);
 	setXMLInt(xmlFile, key .. ".stacker#forkNodeNums", getNumOfChildren(self.forkNode));	
 	setXMLFloat(xmlFile, key .. ".stacker#doStackAnimationStartTime", self.doStackAnimationStart:getAnimationTime());
