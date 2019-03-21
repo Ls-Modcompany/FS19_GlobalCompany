@@ -42,7 +42,6 @@ Baler.ANIMATION_ISSTACKING = 1;
 Baler.ANIMATION_CANSTACKEND = 2;
 Baler.ANIMATION_ISSTACKINGEND = 3;
 
-
 getfenv(0)["GC_Baler"] = Baler;
 
 function Baler:onCreate(transformId)
@@ -89,6 +88,9 @@ function Baler:new(isServer, isClient, customMt, xmlFilename, baseDirectory, cus
 
 	self.shouldTurnOff = false;
 
+	self.synch_fillLevel = false;
+	self.synch_fillLevelBunker = false;
+
 	return self;
 end;
 
@@ -105,8 +107,10 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		self.saveId = "baler_" .. indexName;
 	end;
 
-	self.dirtyObject = GC_DirtyObjects:new(self.isServer, self.isClient, nil, self.baseDirectory, self.customEnvironment);
-	self.dirtyObject:load(self.nodeId);
+	if self.isServer then
+		self.dirtyObject = GC_DirtyObjects:new(self.isServer, self.isClient, nil, self.baseDirectory, self.customEnvironment);
+		self.dirtyObject:load(self.nodeId);
+	end;
 
 	self.title = Utils.getNoNil(getXMLString(xmlFile, xmlKey .. "#title"), true);
 	self.autoOn = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. "#autoOn"), true);
@@ -159,43 +163,47 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		i = i + 1;
 	end;
 	
-    self.unloadTrigger = self.triggerManager:loadTrigger(GC_UnloadingTrigger, self.nodeId , xmlFile, string.format("%s.unloadTrigger", mainPartKey), {[1] = self.fillTypes[self.activeFillTypeIndex].index}, {[1] = "DISCHARGEABLE"});
-    self.cleanHeap = self.triggerManager:loadTrigger(GC_DynamicHeap, self.nodeId , xmlFile, string.format("%s.cleanHeap", mainPartKey), self.fillTypes[self.activeFillTypeIndex].name, nil, false);
-    
-	self.playerTrigger = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.nodeId , xmlFile, string.format("%s.playerTrigger", mainPartKey), Baler.PLAYERTRIGGER_MAIN, true, g_company.languageManager:getText("GC_baler_openGui"), true);
-	self.playerTriggerClean = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.nodeId , xmlFile, string.format("%s.playerTriggerClean", mainPartKey), Baler.PLAYERTRIGGER_CLEAN, true, g_company.languageManager:getText("GC_baler_cleaner"), true);
-    
-    self.movers = GC_Movers:new(self.isServer, self.isClient);
-	self.movers:load(self.nodeId , self, xmlFile, mainPartKey, self.baseDirectory, capacities);
-	
-    self.conveyorFillType = GC_Conveyor:new(self.isServer, self.isClient);
-	self.conveyorFillType:load(self.nodeId, self, xmlFile, string.format("%s.conveyor", mainPartKey));
-    self.conveyorFillTypeEffect = GC_ConveyorEffekt:new(self.isServer, self.isClient);
-	self.conveyorFillTypeEffect:load(self.nodeId, self, xmlFile, string.format("%s.conveyor.effect", mainPartKey));
-
 	self.baleAnimation = GC_Animations:new(self.isServer, self.isClient)
 	self.baleAnimation:load(self.nodeId, self, true, nil, xmlFile, string.format("%s.baleAnimation", mainPartKey));
 
-	self.baleAnimationObjectNode = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, string.format("%s.baleAnimation.objects#node", mainPartKey)), self.i3dMappings);
-	self.baleAnimationObjects = {};
-	i = 0;
-	while true do
-		local objectKey = string.format("%s.baleAnimation.objects.object(%d)", mainPartKey, i);
-		if not hasXMLProperty(xmlFile, objectKey) then
-			break;
-        end;
+	if self.isClient then
+		self.unloadTrigger = self.triggerManager:loadTrigger(GC_UnloadingTrigger, self.nodeId , xmlFile, string.format("%s.unloadTrigger", mainPartKey), {[1] = self.fillTypes[self.activeFillTypeIndex].index}, {[1] = "DISCHARGEABLE"});
+		self.cleanHeap = self.triggerManager:loadTrigger(GC_DynamicHeap, self.nodeId , xmlFile, string.format("%s.cleanHeap", mainPartKey), self.fillTypes[self.activeFillTypeIndex].name, nil, false);
+		
+		self.playerTrigger = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.nodeId , xmlFile, string.format("%s.playerTrigger", mainPartKey), Baler.PLAYERTRIGGER_MAIN, true, g_company.languageManager:getText("GC_baler_openGui"), true);
+		self.playerTriggerClean = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.nodeId , xmlFile, string.format("%s.playerTriggerClean", mainPartKey), Baler.PLAYERTRIGGER_CLEAN, true, g_company.languageManager:getText("GC_baler_cleaner"), true);
+		
+		self.movers = GC_Movers:new(self.isServer, self.isClient);
+		self.movers:load(self.nodeId , self, xmlFile, mainPartKey, self.baseDirectory, capacities);
+		
+		self.conveyorFillType = GC_Conveyor:new(self.isServer, self.isClient);
+		self.conveyorFillType:load(self.nodeId, self, xmlFile, string.format("%s.conveyor", mainPartKey));
+		self.conveyorFillTypeEffect = GC_ConveyorEffekt:new(self.isServer, self.isClient);
+		self.conveyorFillTypeEffect:load(self.nodeId, self, xmlFile, string.format("%s.conveyor.effect", mainPartKey));
 
-		local node = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, objectKey .. "#node"), self.i3dMappings);
-		local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(getXMLString(xmlFile, objectKey .. "#fillTypeName"));
 		
-		setVisibility(node, false);
-		table.insert(self.baleAnimationObjects, {node=node, fillTypeIndex=fillTypeIndex});
+		self.baleAnimationObjectNode = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, string.format("%s.baleAnimation.objects#node", mainPartKey)), self.i3dMappings);
+		self.baleAnimationObjects = {};
 		
-		i = i + 1;
+		i = 0;
+		while true do
+			local objectKey = string.format("%s.baleAnimation.objects.object(%d)", mainPartKey, i);
+			if not hasXMLProperty(xmlFile, objectKey) then
+				break;
+			end;
+
+			local node = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, objectKey .. "#node"), self.i3dMappings);
+			local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(getXMLString(xmlFile, objectKey .. "#fillTypeName"));
+			
+			setVisibility(node, false);
+			table.insert(self.baleAnimationObjects, {node=node, fillTypeIndex=fillTypeIndex});
+			
+			i = i + 1;
+		end;
+		
+		self.soundMain = g_company.sounds:new(self.isServer, self.isClient);
+		self.soundMain:load(self.nodeId, self, xmlFile, string.format("%s", mainPartKey), self.basedirectory);
 	end;
-
-    self.soundMain = g_company.sounds:new(self.isServer, self.isClient);
-    self.soundMain:load(self.nodeId, self, xmlFile, string.format("%s", mainPartKey), self.basedirectory);
 
 	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	------------------------------------------------------------------------Stacker--------------------------------------------------------------------------------------
@@ -204,7 +212,6 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	self.hasStack = hasXMLProperty(xmlFile, stackPartKey);
 	if self.hasStack then
 		self.animationState = Baler.ANIMATION_CANSTACK;
-		--self.stackerBaleTrigger:getNum() = 0;
 		self.stackBalesTarget = 3;
 		self.stackBales = {};
 		
@@ -220,10 +227,12 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		self.doStackAnimationEnd:load(self.nodeId, self, true, string.format("%s.doStackAnimationEnd", stackPartKey), xmlFile);
 		self.doStackAnimationStart = GC_Animations:new(self.isServer, self.isClient)
 		self.doStackAnimationStart:load(self.nodeId, self, true, string.format("%s.doStackAnimationStart", stackPartKey), xmlFile);
+		
+		if self.isClient then
+			self.soundStacker = g_company.sounds:new(self.isServer, self.isClient);
+			self.soundStacker:load(self.nodeId, self, xmlFile, string.format("%s", stackPartKey), self.basedirectory);
+		end,
 	end;
-
-    self.soundStacker = g_company.sounds:new(self.isServer, self.isClient);
-    self.soundStacker:load(self.nodeId, self, xmlFile, string.format("%s", stackPartKey), self.basedirectory);
 
 	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	-----------------------------------------------------------------------BaleMover-------------------------------------------------------------------------------------
@@ -246,8 +255,10 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		
 	self.moverBaleTrigger = self.triggerManager:loadTrigger(GC_BaleTrigger, self.nodeId , xmlFile, string.format("%s.baleTriggerMover", baleMoverKey), Baler.BALETRIGGER_MOVER, GC_BaleTrigger.MODE_COUNTER);
 	
-    self.soundMover = g_company.sounds:new(self.isServer, self.isClient);
-    self.soundMover:load(self.nodeId, self, xmlFile, string.format("%s", baleMoverKey), self.basedirectory);
+	if self.isClient then
+		self.soundMover = g_company.sounds:new(self.isServer, self.isClient);
+		self.soundMover:load(self.nodeId, self, xmlFile, string.format("%s", baleMoverKey), self.basedirectory);
+	end;
 
 	self.balerDirtyFlag = self:getNextDirtyFlag();
 	return true;
@@ -259,40 +270,123 @@ function Baler:delete()
 	if self.triggerManager ~= nil then
 		self.triggerManager:unregisterAllTriggers();
 	end;
-
-	self.conveyorFillType:delete();
-	self.conveyorFillTypeEffect:delete();
-	self.baleAnimation:delete();
-	self.doStackAnimationStart:delete();
-	self.doStackAnimationEnd:delete();
-	self.moveCollisionAnimation:delete();
-
-	self.soundMain:delete();
-	self.soundStacker:delete();
-	self.soundMover:delete();
-
-	self.conveyorStacker:delete();
-	self.conveyorMover:delete();
-
-	self.dirtyObject:delete();
+	if self.conveyorFillType ~= nil then
+		self.conveyorFillType:delete();
+	end;
+	if self.conveyorFillTypeEffect ~= nil then
+		self.conveyorFillTypeEffect:delete();
+	end;
+	if self.baleAnimation ~= nil then
+		self.baleAnimation:delete();
+	end;
+	if self.doStackAnimationStart ~= nil then
+		self.doStackAnimationStart:delete();
+	end;
+	if self.doStackAnimationEnd ~= nil then
+		self.doStackAnimationEnd:delete();
+	end;
+	if self.moveCollisionAnimation ~= nil then
+		self.moveCollisionAnimation:delete();
+	end;
+	if self.soundMain ~= nil then
+		self.soundMain:delete();
+	end;
+	if self.soundStacker ~= nil then
+		self.soundStacker:delete();
+	end;
+	if self.soundMover ~= nil then
+		self.soundMover:delete();
+	end;
+	if self.conveyorStacker ~= nil then
+		self.conveyorStacker:delete();
+	end;
+	if self.conveyorMover ~= nil then
+		self.conveyorMover:delete();
+	end;
+	if self.dirtyObject ~= nil then
+		self.dirtyObject:delete();
+	end;
 	
 	Baler:superClass().delete(self)
 end;
 
-
 function Baler:readStream(streamId, connection)
 	Baler:superClass().readStream(self, streamId, connection);
 
-    if connection:getIsServer() then
-    
+    if connection:getIsServer() then		
+		self.state_baler = streamReadInt16(streamId);
+		self.shouldTurnOff = streamReadBool(streamId);
+		self:setFillTyp(streamReadInt16(streamId));
+		self:setFillLevel(streamReadFloat32(streamId););
+		self:setFillLevelBunker(streamReadFloat32(streamId), true);
+		self.baleCounter = streamReadInt16(streamId);
+		self.autoOn = streamReadBool(streamId);
+		self.baleAnimation:setAnimTime(streamReadFloat32(streamId));
+		if self.baleAnimation:getAnimationTime() > 0 then	
+			self:setBaleObjectToAnimation();	
+			self.baleAnimation:setAnimationsState(true);
+		end;
+
+		if self.hasStack then
+			self.state_stacker = streamReadInt16(streamId);
+			self.baleTarget = streamReadInt16(streamId);
+			self.animationState = streamReadInt16(streamId);
+
+			local forkNodeNums = streamReadInt16(streamId);
+			for _,info in pairs (self.baleAnimationObjects) do
+				if info.fillTypeIndex == self.activeFillTypeIndex then
+					for i=1, forkNodeNums do
+						local newBale = clone(info.node, false, false, false);
+						setVisibility(newBale, true);
+						setTranslation(newBale, 0.015, 0.958 + (i-1)*0.8,-0.063);
+						link(self.forkNode, newBale);		
+					end;
+					break;
+				end;
+			end;
+
+			self.doStackAnimationEnd:setAnimTime(streamReadFloat32(streamId););
+			if self.doStackAnimationEnd:getAnimationTime() > 0 and self.doStackAnimationEnd:getAnimationTime() < 1 then		
+				self.doStackAnimationEnd:setAnimationsState(true);
+			end;
+
+			self.doStackAnimationStart:setAnimTime(streamReadFloat32(streamId););
+			if self.doStackAnimationStart:getAnimationTime() > 0 and self.doStackAnimationStart:getAnimationTime() < 1 then		
+				self.doStackAnimationStart:setAnimationsState(true);
+			end;
+		end,
+
+		self.state_balerMove = streamReadInt16(streamId);
+		
+		self.dirtyObject:readStream(streamId, connection);		
 	end;
 end;
 
 function Baler:writeStream(streamId, connection)
 	Baler:superClass().writeStream(self, streamId, connection);
 
-    if not connection:getIsServer() then
-    
+    if not connection:getIsServer() then	
+		streamWriteInt16(streamId, self.state_baler);
+		streamWriteBool(streamId, self.shouldTurnOff);
+		streamWriteInt16(streamId, self.activeFillTypeIndex);
+		streamWriteFloat32(streamId, self.fillLevel);
+		streamWriteFloat32(streamId, self.fillLevelBunker);
+		streamWriteInt16(streamId, self.baleCounter);
+		streamWriteBool(streamId, self.autoOn);
+		streamWriteFloat32(streamId, self.baleAnimation:getAnimationTime());
+		
+		if self.hasStack then
+			streamWriteInt16(streamId, self.state_stacker);
+			streamWriteInt16(streamId, self.stackBalesTarget);
+			streamWriteInt16(streamId, self.animationState);
+			streamWriteInt16(streamId, getNumOfChildren(self.forkNode));
+			streamWriteFloat32(streamId, self.doStackAnimationStart:getAnimationTime());
+			streamWriteFloat32(streamId, self.doStackAnimationEnd:getAnimationTime());
+		end;
+
+		streamWriteInt16(streamId, self.state_balerMove);
+		
+		self.dirtyObject:writeStream(streamId, connection);
 	end;
 end;
 
@@ -300,7 +394,10 @@ function Baler:readUpdateStream(streamId, timestamp, connection)
 	Baler:superClass().readUpdateStream(self, streamId, timestamp, connection);
 
 	if connection:getIsServer() then
-        if streamReadBool(streamId) then
+		if streamReadBool(streamId) then
+			
+			
+		
         
 		end;
 	end;
@@ -316,8 +413,7 @@ function Baler:writeUpdateStream(streamId, connection, dirtyMask)
 	end;
 end;
 
-function Baler:loadFromXMLFile(xmlFile, key)
-	
+function Baler:loadFromXMLFile(xmlFile, key)	
 	self.state_baler = getXMLInt(xmlFile, key..".baler#state");
 	self.shouldTurnOff = getXMLBool(xmlFile, key..".baler#shouldTurnOff");
 	self:setFillTyp(getXMLInt(xmlFile, key..".baler#fillType"));
@@ -330,7 +426,6 @@ function Baler:loadFromXMLFile(xmlFile, key)
 		self:setBaleObjectToAnimation();	
 		self.baleAnimation:setAnimationsState(true);
 	end;
-
 
 	self.state_stacker = getXMLInt(xmlFile, key..".stacker#state");
 	self.baleTarget = getXMLInt(xmlFile, key..".stacker#stackBalesTarget");
@@ -359,9 +454,7 @@ function Baler:loadFromXMLFile(xmlFile, key)
 		self.doStackAnimationStart:setAnimationsState(true);
 	end;
 
-
 	self.state_balerMove = getXMLInt(xmlFile, key..".mover#state");
-
 	
 	self.dirtyObject:loadFromXMLFile(xmlFile, key..".dirtNodes");
 
@@ -369,7 +462,6 @@ function Baler:loadFromXMLFile(xmlFile, key)
 end;
 
 function Baler:saveToXMLFile(xmlFile, key, usedModNames)
-
 	setXMLInt(xmlFile, key .. ".baler#state", self.state_baler);
 	setXMLBool(xmlFile, key .. ".baler#shouldTurnOff", self.shouldTurnOff);
 	setXMLFloat(xmlFile, key .. ".baler#fillLevel", self.fillLevel);
@@ -409,9 +501,7 @@ function Baler:update(dt)
 			elseif self.fillLevel + self.fillLevelBunker >= 4000 then
 				self:setFillLevelBunker(math.min(dt / 1000 * self.pressPerSecond, 4000 - self.fillLevelBunker, self.fillLevel));
 			elseif self.baleAnimation:getAnimationTime() == 0 then
-				--if self.autoOn then
-					self:onTurnOffBaler();
-				--end;
+				self:onTurnOffBaler();
 			end;
 		end;
 		if self.baleAnimation:getAnimationTime() == 1 then
@@ -544,13 +634,20 @@ function Baler:setFillLevelBunker(delta, onlyBunker)
 			self:setFillLevel(self.fillLevel + (delta * -1));
 		end;
 		g_company.gui:updateGuiData("gcPlaceable_baler");
-	end;	
+	end;
 end;
 
 function Baler:setFillLevel(level)    
-    self.fillLevel = level;
-	self.movers:updateMovers(level, self.activeFillTypeIndex);    
-	g_company.gui:updateGuiData("gcPlaceable_baler");
+	self.fillLevel = level;
+	if self.isClient then
+		self.movers:updateMovers(level, self.activeFillTypeIndex);    
+		g_company.gui:updateGuiData("gcPlaceable_baler");
+	end;
+	
+	--if not self.client then
+	--	self.synch_fillLevel = true;
+	--	self:raiseDirtyFlags(self.balerDirtyFlag);
+	--end;
 end;
 
 function Baler:setFillTyp(fillTypeIndex, onFirstRun)    
