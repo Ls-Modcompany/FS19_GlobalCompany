@@ -123,7 +123,6 @@ function GlobalCompany.initialLoad()
 		end;
 
 		for modName, values in pairs(GlobalCompany.environments) do
-			-- This needs to be done before load to add correctly.
 			if values.shopManager ~= nil and values.shopManager ~= "" then
 				g_company.shopManager:loadFromXML(modName, g_company.utils.createModPath(modName, values.shopManager));
 			end;
@@ -295,9 +294,9 @@ function GlobalCompany:loadMap()
 			end;
 		end;
 
-		if e.shopManager ~= nil and e.shopManager ~= "" then
-			g_company.shopManager:loadFromXML(modName, g_company.utils.createModPath(modName, e.shopManager));
-		end;
+		-- if e.shopManager ~= nil and e.shopManager ~= "" then
+			-- g_company.shopManager:loadFromXML(modName, g_company.utils.createModPath(modName, e.shopManager));
+		-- end;
 
 		if e.densityMapHeight ~= nil and e.densityMapHeight ~= "" then
 			g_company.densityMapHeight:loadFromXML(modName, g_company.utils.createModPath(modName, e.densityMapHeight));
