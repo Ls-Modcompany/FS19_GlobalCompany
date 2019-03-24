@@ -231,7 +231,7 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		if self.isClient then
 			self.soundStacker = g_company.sounds:new(self.isServer, self.isClient);
 			self.soundStacker:load(self.nodeId, self, xmlFile, string.format("%s", stackPartKey), self.basedirectory);
-		end,
+		end;
 	end;
 
 	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -317,7 +317,7 @@ function Baler:readStream(streamId, connection)
 		self.state_baler = streamReadInt16(streamId);
 		self.shouldTurnOff = streamReadBool(streamId);
 		self:setFillTyp(streamReadInt16(streamId));
-		self:setFillLevel(streamReadFloat32(streamId););
+		self:setFillLevel(streamReadFloat32(streamId));
 		self:setFillLevelBunker(streamReadFloat32(streamId), true);
 		self.baleCounter = streamReadInt16(streamId);
 		self.autoOn = streamReadBool(streamId);
@@ -345,16 +345,16 @@ function Baler:readStream(streamId, connection)
 				end;
 			end;
 
-			self.doStackAnimationEnd:setAnimTime(streamReadFloat32(streamId););
+			self.doStackAnimationEnd:setAnimTime(streamReadFloat32(streamId));
 			if self.doStackAnimationEnd:getAnimationTime() > 0 and self.doStackAnimationEnd:getAnimationTime() < 1 then		
 				self.doStackAnimationEnd:setAnimationsState(true);
 			end;
 
-			self.doStackAnimationStart:setAnimTime(streamReadFloat32(streamId););
+			self.doStackAnimationStart:setAnimTime(streamReadFloat32(streamId));
 			if self.doStackAnimationStart:getAnimationTime() > 0 and self.doStackAnimationStart:getAnimationTime() < 1 then		
 				self.doStackAnimationStart:setAnimationsState(true);
 			end;
-		end,
+		end;
 
 		self.state_balerMove = streamReadInt16(streamId);
 		
