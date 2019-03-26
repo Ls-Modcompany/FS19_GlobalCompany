@@ -24,6 +24,13 @@
 		<!-- General -->
 		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
 
+		<!-- Settings -->
+		<e k="GC_settings_header" v="GlobalCompany - Settings"/>
+		<e k="GC_settings1_title" v="Activate placeable anywhere"/>
+		<e k="GC_settings2_title" v="Show objectinfo"/>
+		<e k="GC_settings3_title" v="Horsehelper (300€ / Horse / Day)"/>
+		<e k="GC_settings4_title" v="Activate more trees"/>
+
 		<!-- BaleShreader -->
 		<e k="GC_baleShreader_openSteer" v="Open Steer"/>
 		<e k="GC_baleShreader_closeSteer" v="Close Steer"/>
