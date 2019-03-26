@@ -23,7 +23,7 @@
 --
 --
 -- ToDo:
--- 
+-- 		fix money messages (70, 72)
 --
 --
 
@@ -49,24 +49,27 @@ end;
 
 function GC_HorseHelper:hourChanged()
 	if g_company.settings:getSetting("horseHelper", true) and g_currentMission.environment.currentHour == 23 then		
-		local moneyToOwner = {};
+		local moneyToFarmId = {};
 		for _,husbandry in pairs(g_currentMission.husbandries) do
 			for _,animal in pairs(husbandry:getAnimals()) do
 				if animal.module.animalType == "HORSE" then
-					local owner = animal.owner.ownerFarmId;
-					if moneyToOwner[owner] == nil then
-						moneyToOwner[owner] = 0;
+					local farmId = animal.owner.ownerFarmId;
+					if moneyToOwner[farmId] == nil then
+						moneyToOwner[farmId] = 0;
 					end;				
-					moneyToOwner[owner] = moneyToOwner[owner] + ((animal.DAILY_TARGET_RIDING_TIME - animal.ridingTimer) / animal.DAILY_TARGET_RIDING_TIME);
+					moneyToOwner[farmId] = moneyToOwner[farmId] + ((animal.DAILY_TARGET_RIDING_TIME - animal.ridingTimer) / animal.DAILY_TARGET_RIDING_TIME);
 
 					animal.ridingTimerSent  = animal.DAILY_TARGET_RIDING_TIME;
 					animal.ridingTimer  = animal.DAILY_TARGET_RIDING_TIME;
 				end;
 			end;	
 		end;
-		for owner, factor in pairs(moneyToOwner) do
+		for farmId, factor in pairs(moneyToOwner) do
 			if g_server ~= nil then
-				g_currentMission:addMoney(factor * GC_HorseHelper.price * -1, owner, "animalUpkeep");
+				local price = factor * GC_HorseHelper.price * -1;
+				--g_farmManager:updateFarmStats(farmId, "animalUpkeep", price)
+				g_currentMission:addMoney(price, farmId, "animalUpkeep");
+				--g_currentMission:showMoneyChange("animalUpkeep", nil, false, vehicle:getActiveFarm())
 			end;
 		end;	
 	end;
