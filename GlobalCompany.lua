@@ -60,6 +60,8 @@ function GlobalCompany.initialLoad()
 		source(GlobalCompany.dir .. "utils/GC_ModManager.lua");
 		g_company.modManager = GC_ModManager:new();
 		
+		--| Load Event Manager |--
+		source(GlobalCompany.dir .. "utils/GC_EventManager.lua");		
 		g_company.eventManager = GC_EventManager:new();		
 	else
 		duplicateLoad = true;
