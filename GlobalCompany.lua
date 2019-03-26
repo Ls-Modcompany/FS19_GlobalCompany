@@ -42,7 +42,7 @@ function GlobalCompany.initialLoad()
 	-- Load these critical source files first in case we fail.
 	local duplicateLoad = false;
 	if g_company == nil then
-		getfenv(0)["g_company"] = GlobalCompany;
+		getfenv(0)["g_company"] = GlobalCompany;	
 
 		--| Load Utils |--
 		source(GlobalCompany.dir .. "utils/GC_utils.lua");
@@ -59,6 +59,8 @@ function GlobalCompany.initialLoad()
 		--| Load Mod Manager |--
 		source(GlobalCompany.dir .. "utils/GC_ModManager.lua");
 		g_company.modManager = GC_ModManager:new();
+		
+		g_company.eventManager = GC_EventManager:new();		
 	else
 		duplicateLoad = true;
 	end;
