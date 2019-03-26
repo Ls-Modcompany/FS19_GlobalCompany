@@ -13,7 +13,7 @@
 -- 	v1.1.0.0 (26.03.2019):
 -- 		- add script to gc
 --		- this function can dis-/enabled in the gc-settings
---		- 
+--		- add prozentual pay
 --
 -- 	v1.0.0.0 (25.1.2018):
 -- 		- initial fs19 (kevink98)
