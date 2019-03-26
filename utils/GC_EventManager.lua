@@ -60,6 +60,16 @@ function GC_EventManager:registerEvent(target, func)
     return id;
 end;
 
+function GC_EventManager:createEvent(targetId, data, useOwnIndex, noEventSend)
+	if (noEventSend == nil or noEventSend == false) then
+        if self.isServer then        
+            g_server:broadcastEvent(GC_DefaultEvent:new(data, targetId))
+        else
+			g_client:getServerConnection():sendEvent(GC_DefaultEvent:new(data, targetId))
+        end;
+    end;
+end;
+
 function GC_EventManager:getTypeByValue(value)
     if value == nil or type(value) == "function"  then
         return self.TYP_NIL;
@@ -160,16 +170,6 @@ function GC_EventManager:doRead(streamId)
         return streamReadUInt16(streamId);
     elseif typ == self.TYP_STRING then
         return streamReadString(streamId);
-    end;
-end;
-
-function GC_EventManager:createEvent(targetId, data, useOwnIndex, noEventSend)
-	if (noEventSend == nil or noEventSend == false) then
-        if self.isServer then        
-            g_server:broadcastEvent(GC_DefaultEvent:new(data, targetId))
-        else
-			g_client:getServerConnection():sendEvent(GC_DefaultEvent:new(data, targetId))
-        end;
     end;
 end;
 
