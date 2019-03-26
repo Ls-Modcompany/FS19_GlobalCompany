@@ -7,6 +7,7 @@
     
     <GuiElement type="flowLayout" template="gcSettingsContentLayoutLeft">        
         
+        <!-- Setting: extendedPlaceable -->
         <GuiElement type="flowLayout" template="gcSettingsButtonLayout">         
           <GuiElement type="image" template="gcSettingsButtonLayoutBackground">    
             <GuiElement type="button" template="gcSettingsButtonLayoutButton" id="gui_btn_settings_1" onClick="onClickBtnSetting" parameter="extendedPlaceable"  />
@@ -14,11 +15,28 @@
           <GuiElement type="text" template="gcSettingsButtonText" text="$l10n_GC_settings1_title" />    
         </GuiElement>
         
+        <!-- Setting: objectInfo -->
         <GuiElement type="flowLayout" template="gcSettingsButtonLayout">         
           <GuiElement type="image" template="gcSettingsButtonLayoutBackground">    
             <GuiElement type="button" template="gcSettingsButtonLayoutButton" id="gui_btn_settings_2" onClick="onClickBtnSetting" parameter="objectInfo" />
           </GuiElement>
           <GuiElement type="text" template="gcSettingsButtonText" text="$l10n_GC_settings2_title" />    
+        </GuiElement>
+
+        <!-- Setting: horseHelper -->
+        <GuiElement type="flowLayout" template="gcSettingsButtonLayout">         
+          <GuiElement type="image" template="gcSettingsButtonLayoutBackground">    
+            <GuiElement type="button" template="gcSettingsButtonLayoutButton" id="gui_btn_settings_3" onClick="onClickBtnSetting" parameter="horseHelper" />
+          </GuiElement>
+          <GuiElement type="text" template="gcSettingsButtonText" text="$l10n_GC_settings3_title" />    
+        </GuiElement>
+
+        <!-- Setting: moreTrees -->
+        <GuiElement type="flowLayout" template="gcSettingsButtonLayout">         
+          <GuiElement type="image" template="gcSettingsButtonLayoutBackground">    
+            <GuiElement type="button" template="gcSettingsButtonLayoutButton" id="gui_btn_settings_4" onClick="onClickBtnSetting" parameter="moreTrees" />
+          </GuiElement>
+          <GuiElement type="text" template="gcSettingsButtonText" text="$l10n_GC_settings4_title" />    
         </GuiElement>
         
         

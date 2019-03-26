@@ -24,6 +24,8 @@ function Gc_Gui_Settings:onCreate() end;
 function Gc_Gui_Settings:onOpen() 
     self.gui_btn_settings_1:setActive(g_company.settings:getSetting("extendedPlaceable"));
     self.gui_btn_settings_2:setActive(g_company.settings:getSetting("objectInfo"));
+    self.gui_btn_settings_3:setActive(g_company.settings:getSetting("horseHelper"));
+    self.gui_btn_settings_4:setActive(g_company.settings:getSetting("moreTrees"));
 end;
 
 function Gc_Gui_Settings:onClickBtnSetting(btn, parameter)

@@ -35,6 +35,8 @@
 		<e k="GC_settings_header" v="GlobalCompany - Einstellungen"/>
 		<e k="GC_settings1_title" v="Überall platzieren aktivieren"/>
 		<e k="GC_settings2_title" v="Objektinformation anzeigen"/>
+		<e k="GC_settings3_title" v="Pferdehelfer aktivieren"/>
+		<e k="GC_settings4_title" v="Mehr Bäume aktivieren"/>
 		
 		<!-- BaleShreader -->
 		<e k="GC_baleShreader_openSteer" v="Steuerung öffnen"/>

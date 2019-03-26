@@ -254,8 +254,10 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
 	
 	--|| Additionals ||--
-	source(GlobalCompany.dir .. "additionals/GC_ObjectInfo.lua");
 	source(GlobalCompany.dir .. "additionals/GC_ExtendedPlaceable.lua");
+	source(GlobalCompany.dir .. "additionals/GC_HorseHelper.lua");
+	source(GlobalCompany.dir .. "additionals/GC_MoreTrees.lua");
+	source(GlobalCompany.dir .. "additionals/GC_ObjectInfo.lua");
 end;
 
 --| Add Base GC Placeables |--
