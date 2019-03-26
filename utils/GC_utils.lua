@@ -261,7 +261,21 @@ function GlobalCompanyUtils.getParentBaseDirectory(parent, baseDirectory)
 	return baseDirectory;
 end;
 
+-- This is acts like 'Utils.getNoNil' except you can set your own ignore value.
+-- 'nil' is ignored by default but this can be changed by setting 'ignoreNil' FALSE.
+function GlobalCompanyUtils.getCorrectValue(value, newValue, ignoreValue, ignoreNil)
+	if ignoreNil ~= false then
+		if value == nil or value == ignoreValue then
+			return newValue;
+		end;		
+	else
+		if value == ignoreValue then
+			return newValue;
+		end;		
+	end;
 
+	return value;
+end;
 
 
 

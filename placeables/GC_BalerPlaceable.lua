@@ -15,8 +15,8 @@
 --
 --
 -- Notes:
---	
---	
+--
+--
 --
 -- ToDo:
 --
@@ -33,11 +33,11 @@ getfenv(0)["GC_BalerPlaceable"] = GC_BalerPlaceable;
 
 function GC_BalerPlaceable:new(isServer, isClient, customMt)
 	local self = Placeable:new(isServer, isClient, customMt or GC_BalerPlaceable_mt);
-	
+
 	self.debugData = nil;
 	self.balers = {};
 
-	registerObjectClassName(self, "GC_BalerPlaceable");	
+	registerObjectClassName(self, "GC_BalerPlaceable");
 	return self;
 end;
 
@@ -51,7 +51,7 @@ function GC_BalerPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRandom)
 	local filenameToUse = xmlFilename;
 	local xmlFile = loadXMLFile("TempPlaceableXML", xmlFilename);
 	local canLoad = xmlFile ~= nil and xmlFile ~= 0;
-	
+
 	if canLoad then
 		local placeableKey = "placeable.globalCompany.balers";
 		local externalXML = getXMLString(xmlFile, placeableKey .. "#xmlFilename");
@@ -60,7 +60,7 @@ function GC_BalerPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRandom)
 			filenameToUse = externalXML;
 			if fileExists(filenameToUse) then
 				delete(xmlFile);
-				
+
 				placeableKey = "globalCompany.balers";
 				xmlFile = loadXMLFile("TempExternalXML", filenameToUse);
 				canLoad = xmlFile ~= nil and xmlFile ~= 0;
@@ -80,6 +80,7 @@ function GC_BalerPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRandom)
 				local indexName = getXMLString(xmlFile, key .. "#indexName");
 				if indexName ~= nil then
 					local baler = GC_Baler:new(self.isServer, self.isClient, nil, filenameToUse, self.baseDirectory, self.customEnvironment);
+					baler:setOwnerFarmId(self:getOwnerFarmId(), false); -- Set the ownership here. All other updates will use 'setOwnerFarmId' function.
 					if baler:load(self.nodeId, xmlFile, key, indexName, true) then
 						table.insert(self.balers, baler);
 					else
@@ -110,13 +111,13 @@ function GC_BalerPlaceable:finalizePlacement()
 	GC_BalerPlaceable:superClass().finalizePlacement(self)
 
 	for _, baler in ipairs(self.balers) do
-        baler:register(true);
+		baler:register(true);
 	end;
 end;
 
 function GC_BalerPlaceable:delete()
 	for id, baler in ipairs(self.balers) do
-        baler:delete();
+		baler:delete();
 	end;
 
 	unregisterObjectClassName(self);
@@ -124,27 +125,27 @@ function GC_BalerPlaceable:delete()
 end;
 
 function GC_BalerPlaceable:readStream(streamId, connection)
-    GC_BalerPlaceable:superClass().readStream(self, streamId, connection);
-    
+	GC_BalerPlaceable:superClass().readStream(self, streamId, connection);
+
 	if connection:getIsServer() then
-        for _, baler in ipairs(self.balers) do
-            local balerId = NetworkUtil.readNodeObjectId(streamId);
-            baler:readStream(streamId, connection);
-            g_client:finishRegisterObject(baler, balerId);
-        end;
-    end;
+		for _, baler in ipairs(self.balers) do
+			local balerId = NetworkUtil.readNodeObjectId(streamId);
+			baler:readStream(streamId, connection);
+			g_client:finishRegisterObject(baler, balerId);
+		end;
+	end;
 end;
 
 function GC_BalerPlaceable:writeStream(streamId, connection)
-    GC_BalerPlaceable:superClass().writeStream(self, streamId, connection);
-    
+	GC_BalerPlaceable:superClass().writeStream(self, streamId, connection);
+
 	if not connection:getIsServer() then
-        for _, baler in ipairs(self.balers) do
-            NetworkUtil.writeNodeObjectId(streamId, NetworkUtil.getObjectId(baler));
-            baler:writeStream(streamId, connection);
-            g_server:registerObjectInStream(connection, baler);
-        end;
-    end;
+		for _, baler in ipairs(self.balers) do
+			NetworkUtil.writeNodeObjectId(streamId, NetworkUtil.getObjectId(baler));
+			baler:writeStream(streamId, connection);
+			g_server:registerObjectInStream(connection, baler);
+		end;
+	end;
 end;
 
 function GC_BalerPlaceable:collectPickObjects(node)
@@ -176,7 +177,7 @@ function GC_BalerPlaceable:loadFromXMLFile(xmlFile, key, resetVehicles)
 				g_company.debug:writeWarning(self.debugData, "Could not load baler. Given 'index' '%d' for '%s' is not defined!", index, indexName);
 			end;
 		end;
-		
+
 		i = i + 1;
 	end;
 
@@ -195,7 +196,14 @@ function GC_BalerPlaceable:saveToXMLFile(xmlFile, key, usedModNames)
 	end;
 end;
 
+-- We need to update the 'OwnerFarmId' here so that sub-objects can also be updated on saveGame load, and for land sales if 'boughtWithFarmland'.
+function GC_BalerPlaceable:setOwnerFarmId(ownerFarmId, noEventSend)
+	GC_BalerPlaceable:superClass().setOwnerFarmId(self, ownerFarmId, noEventSend);
 
+	for _, baler in ipairs(self.balers) do
+		baler:setOwnerFarmId(ownerFarmId, noEventSend);
+	end;
+end;
 
 
 
