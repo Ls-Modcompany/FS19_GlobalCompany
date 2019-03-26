@@ -316,9 +316,9 @@ function Baler:readStream(streamId, connection)
     if connection:getIsServer() then		
 		self.state_baler = streamReadInt16(streamId);
 		self.shouldTurnOff = streamReadBool(streamId);
-		self:setFillTyp(streamReadInt16(streamId));
-		self:setFillLevel(streamReadFloat32(streamId));
-		self:setFillLevelBunker(streamReadFloat32(streamId), true);
+		self:setFillTyp(streamReadInt16(streamId), true);
+		self:setFillLevel(streamReadFloat32(streamId), true);
+		self:setFillLevelBunker(streamReadFloat32(streamId), true, true);
 		self.baleCounter = streamReadInt16(streamId);
 		self.autoOn = streamReadBool(streamId);
 		self.baleAnimation:setAnimTime(streamReadFloat32(streamId));
@@ -416,9 +416,9 @@ end;
 function Baler:loadFromXMLFile(xmlFile, key)	
 	self.state_baler = getXMLInt(xmlFile, key..".baler#state");
 	self.shouldTurnOff = getXMLBool(xmlFile, key..".baler#shouldTurnOff");
-	self:setFillTyp(getXMLInt(xmlFile, key..".baler#fillType"));
-	self:setFillLevel(getXMLFloat(xmlFile, key..".baler#fillLevel"));
-	self:setFillLevelBunker(getXMLFloat(xmlFile, key..".baler#fillLevelBunker"), true);
+	self:setFillTyp(getXMLInt(xmlFile, key..".baler#fillType"), true);
+	self:setFillLevel(getXMLFloat(xmlFile, key..".baler#fillLevel"), true);
+	self:setFillLevelBunker(getXMLFloat(xmlFile, key..".baler#fillLevelBunker"), true, true);
 	self.baleCounter = getXMLFloat(xmlFile, key..".baler#counter");
 	self.autoOn = getXMLBool(xmlFile, key..".baler#autoOn");
 	self.baleAnimation:setAnimTime(getXMLFloat(xmlFile, key..".baler#animationTime"));
@@ -627,7 +627,8 @@ function Baler:playerTriggerActivated(ref)
     end;
 end;
 
-function Baler:setFillLevelBunker(delta, onlyBunker)    
+function Baler:setFillLevelBunker(delta, onlyBunker, noEventSend)    
+	--event
 	if delta ~= nil then
 		self.fillLevelBunker = self.fillLevelBunker + delta;
 		if onlyBunker == nil or not onlyBunker then
@@ -637,7 +638,8 @@ function Baler:setFillLevelBunker(delta, onlyBunker)
 	end;
 end;
 
-function Baler:setFillLevel(level)    
+function Baler:setFillLevel(level, noEventSend)      
+	--event
 	self.fillLevel = level;
 	if self.isClient then
 		self.movers:updateMovers(level, self.activeFillTypeIndex);    
@@ -650,7 +652,8 @@ function Baler:setFillLevel(level)
 	--end;
 end;
 
-function Baler:setFillTyp(fillTypeIndex, onFirstRun)    
+function Baler:setFillTyp(fillTypeIndex, onFirstRun, noEventSend)    
+	--event
 	if onFirstRun == nil or not onFirstRun then
 		self.unloadTrigger.fillTypes = nil;
 		self.unloadTrigger:setAcceptedFillTypeState(fillTypeIndex, true);
@@ -802,7 +805,7 @@ end;
 function Baler:setAutoOn(state)
 	--event
 	self.autoOn = state;
-	if self.autoOn and self.fillLevel > 4000 and self.state_baler == Baler.STATE_OFF then
+	if self.isServer and self.autoOn and self.fillLevel > 4000 and self.state_baler == Baler.STATE_OFF then --add self.isServer
 		self:onTurnOnBaler();
 		self:onTurnOnStacker();
 	end;
