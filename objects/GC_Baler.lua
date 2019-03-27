@@ -107,13 +107,15 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		self.saveId = "baler_" .. indexName;
 	end;
 
-	if self.isServer then
+	--if self.isServer then
 		self.dirtyObject = GC_DirtyObjects:new(self.isServer, self.isClient, nil, self.baseDirectory, self.customEnvironment);
 		self.dirtyObject:load(self.nodeId);
-	end;
+	--end;
 
 	self.title = Utils.getNoNil(getXMLString(xmlFile, xmlKey .. "#title"), true);
 	self.autoOn = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. "#autoOn"), true);
+
+	self.eventId_baleTarget = g_company.eventManager:registerEvent(self, self.setStackBalesTargetEvent);
 
 	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	-----------------------------------------------------------------------MainPart--------------------------------------------------------------------------------------
@@ -798,8 +800,12 @@ function Baler:onTurnOffBaleMover()
 end
 
 function Baler:setStackBalesTarget(num)
-	--event
-	self.stackBalesTarget = num;
+	self:setStackBalesTargetEvent({num});
+end;
+function Baler:setStackBalesTargetEvent(data, noEventSend)
+	g_company.eventManager:createEvent(self.eventId_baleTarget, data, false, noEventSend);
+	print(string.format("setStackBalesTargetEvent %s", data[1]));
+	self.stackBalesTarget = data[1];
 end;
 
 function Baler:setAutoOn(state)
