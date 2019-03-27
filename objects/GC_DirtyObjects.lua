@@ -96,8 +96,8 @@ function DirtObjects:readStream(streamId, connection)
 	if connection:getIsServer() then
 		for i,dirtNode in pairs (self.dirtNodes) do	
 			local dirtLevel = streamReadFloat32(streamId)
-			local x, _, z, w = getShaderParameter(self.dirtNodes[i+1], "RDT");
-			setShaderParameter(self.dirtNodes[i+1], "RDT", x, dirtLevel, z, w, false);
+			local x, _, z, w = getShaderParameter(dirtNode, "RDT");
+			setShaderParameter(dirtNode, "RDT", x, dirtLevel, z, w, false);
 		end;
 	end;
 end;
@@ -118,8 +118,8 @@ function DirtObjects:readUpdateStream(streamId, timestamp, connection)
 		if streamReadBool(streamId) then
 			for i,dirtNode in pairs (self.dirtNodes) do	
 				local dirtLevel = streamReadFloat32(streamId)
-				local x, _, z, w = getShaderParameter(self.dirtNodes[i+1], "RDT");
-				setShaderParameter(self.dirtNodes[i+1], "RDT", x, dirtLevel, z, w, false);
+				local x, _, z, w = getShaderParameter(dirtNode, "RDT");
+				setShaderParameter(dirtNode, "RDT", x, dirtLevel, z, w, false);
 			end;
 		end;
 	end;
