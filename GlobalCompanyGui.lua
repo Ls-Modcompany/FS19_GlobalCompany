@@ -82,6 +82,7 @@ function GlobalCompanyGui:loadMap()
 	self.fakeGui = GC_Gui_FakeGui:new();
 	g_gui:loadGui(g_company.dir .. self.fakeGui.guiInformations.guiXml, "gc_fakeGui", self.fakeGui);
 	
+	g_company.gui:registerUiElements("g_factoryDefault", g_company.dir .. "images/factoryDefault.dds");
 	
 	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
 	g_company.gui:registerGui("gc_factoryBig", InputAction.GC_TEST, Gc_Gui_FactoryBig, true, true, true);
@@ -89,7 +90,7 @@ function GlobalCompanyGui:loadMap()
 	g_company.gui:registerGui("gcPlaceable_baler", nil, Gc_Gui_Baler, true, true);
 	g_company.gui:registerGui("gcObjectInfo", nil, Gc_Gui_ObjectInfo, false, false);
 
-	g_company.gui:registerUiElements("g_factoryDefault", g_company.dir .. "images/factoryDefault.dds");
+	
 	
 	self.activeGuiDialogs = {};
 	self.registeredActonEvents = false;
