@@ -39,7 +39,7 @@ GC_EventManager.BIT_32 = 0;
 
 function GC_EventManager:new()
     local self = setmetatable({}, GC_EventManager_mt);	
-
+    
 	self.isServer = g_server ~= nil;
     self.isClient = g_client ~= nil;
 
@@ -57,15 +57,16 @@ end;
 function GC_EventManager:registerEvent(target, func)
     local id = self:getNextEventId();
     self.events[id] = {target=target, func=func};
+    print(string.format("registerEvent %s", id));
     return id;
 end;
 
 function GC_EventManager:createEvent(targetId, data, useOwnIndex, noEventSend)
 	if (noEventSend == nil or noEventSend == false) then
         if self.isServer then        
-            g_server:broadcastEvent(GC_DefaultEvent:new(data, targetId))
+            g_server:broadcastEvent(GC_DefaultEvent:new(targetId, data, useOwnIndex))
         else
-			g_client:getServerConnection():sendEvent(GC_DefaultEvent:new(data, targetId))
+			g_client:getServerConnection():sendEvent(GC_DefaultEvent:new(targetId, data, useOwnIndex))
         end;
     end;
 end;
@@ -120,7 +121,7 @@ function GC_EventManager:getBitNumber(value, unsigned)
             return self.BIT_32;
         end;
     else    
-        if value >= −128 and value <= 127 then
+        if value >= -128 and value <= 127 then
             return self.BIT_8;
         elseif value >= -32768 and value <= 32767 then
             return self.BIT_16;
@@ -174,8 +175,8 @@ function GC_EventManager:doRead(streamId)
 end;
 
 function GC_EventManager:raiseSynch(targetId, data)        
-    local target = self.events[targetid];
-    target.func(target.target, data);
+    local target = self.events[targetId];
+    target.func(target.target, data, true);
 end;
 
 
@@ -183,8 +184,14 @@ GC_DefaultEvent = {};
 GC_DefaultEvent_mt = Class(GC_DefaultEvent, Event);
 InitEventClass(GC_DefaultEvent, "GC_DefaultEvent");
 
-function GC_DefaultEvent:new(targetId, data, useOwnIndex)
+function GC_DefaultEvent:emptyNew()
     local self = Event:new(GC_DefaultEvent_mt);
+    return self;
+end
+
+function GC_DefaultEvent:new(targetId, data, useOwnIndex)
+    print(string.format("new %s %s %s", targetId, data, useOwnIndex));
+    local self = GC_DefaultEvent:emptyNew();
     self.targetId = targetId;
     self.data = data;
     self.useOwnIndex = Utils.getNoNil(useOwnIndex, true);
@@ -192,7 +199,7 @@ function GC_DefaultEvent:new(targetId, data, useOwnIndex)
 end;
 
 function GC_DefaultEvent:writeStream(streamId, connection)
-    streamWriteUInt16(streamId, table.getn(self.targetId));
+    streamWriteUInt16(streamId, self.targetId);
     streamWriteBool(streamId, self.useOwnIndex);
     streamWriteUInt16(streamId, table.getn(self.data));
 
@@ -200,6 +207,7 @@ function GC_DefaultEvent:writeStream(streamId, connection)
         if self.useOwnIndex then
             g_company.eventManager:doWrite(streamId, k);
         end;
+        print(string.format("writeStream %s", v));
         g_company.eventManager:doWrite(streamId, v);
     end;
 end;
@@ -215,10 +223,12 @@ function GC_DefaultEvent:readStream(streamId, connection)
         if self.useOwnIndex then   
             local k = g_company.eventManager:doRead(streamId);
             local v = g_company.eventManager:doRead(streamId);
-            data[k] = v;
+            table.insert(self.data, v);
+            print(string.format("readStream %s", v));
         else
             local v = g_company.eventManager:doRead(streamId);
             table.insert(self.data, v);
+            print(string.format("readStream %s", v));
         end;
     end;
 
