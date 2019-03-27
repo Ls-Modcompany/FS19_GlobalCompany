@@ -88,7 +88,14 @@ function GlobalCompany.initialLoad()
 		GlobalCompany.loadPlaceables();
 
 		local modLanguageFiles = {};
-		local selectedMods = g_modSelectionScreen.missionDynamicInfo.mods;
+
+		local selectedMods = {};
+		if g_server == nil then			
+			selectedMods = g_mpLoadingScreen.missionDynamicInfo.mods;
+		else
+			selectedMods = g_modSelectionScreen.missionDynamicInfo.mods;
+		end;
+
 		for _, mod in pairs(selectedMods) do
 			local path;
 			local modName = mod.modName;
