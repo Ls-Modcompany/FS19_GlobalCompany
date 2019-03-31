@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+
+<!--
+GlobalCompany - Gui - GcMain
+
+@Interface: 1.3.0.1 b4009
+@Author: LS-Modcompany / kevink98
+@Date: 31.03.2019
+@Version: 1.0.0.0
+
+Changelog:
+		
+ 	v1.0.0.0 (31.03.2019):
+  	- initial fs19
+-->
+
+<GUI>  
+  <GuiElement type="image" template="gcMainBackground">  
+    <GuiElement type="image" template="gcMainMenu">  
+        <GuiElement type="button" template="gcBaseGuiButton" anchor="leftCenter" position="20px 0px" inputAction="MENU_PAGE_PREV" />
+        <GuiElement type="button" template="gcBaseGuiButton" anchor="rightCenter" position="-20px 0px" inputAction="MENU_PAGE_NEXT" />
+        <GuiElement type="flowLayout" template="gcMainMenuLayout" id="gui_menu">				
+          <GuiElement type="button" template="gcMainMenuItem" id="gui_menuItem" onClick="onClickMainMenu">
+            <GuiElement type="image" template="gcMainMenuItemIcon" />  
+          </GuiElement>	              
+        </GuiElement>
+    </GuiElement>
+    <GuiElement type="image" template="gcMainContent" id="gui_content" />
+  </GuiElement>
+</GUI>
