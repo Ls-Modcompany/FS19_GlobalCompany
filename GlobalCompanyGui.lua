@@ -26,7 +26,7 @@ g_company.gui = GlobalCompanyGui;
 GlobalCompanyGui.DevelopementVersionTemplatesFilename = {};
 addModEventListener(GlobalCompanyGui);
 
-GlobalCompanyGui.devVersion = false;
+GlobalCompanyGui.devVersion = true;
 
 GlobalCompanyGui.guis = {};
 GlobalCompanyGui.smallGuis = {};
@@ -56,7 +56,7 @@ source(g_currentModDirectory .. "gui/FakeGui.lua");
 source(g_currentModDirectory .. "gui/MultiDialog.lua");
 source(g_currentModDirectory .. "gui/objects/Baler.lua");
 source(g_currentModDirectory .. "gui/objects/ObjectInfo.lua");
-source(g_currentModDirectory .. "gui/objects/Settings.lua");
+source(g_currentModDirectory .. "gui/objects/GcMain.lua");
 source(g_currentModDirectory .. "gui/objects/FactoryBig.lua");
 
 function GlobalCompanyGui:init()	
@@ -82,14 +82,15 @@ function GlobalCompanyGui:loadMap()
 	self.fakeGui = GC_Gui_FakeGui:new();
 	g_gui:loadGui(g_company.dir .. self.fakeGui.guiInformations.guiXml, "gc_fakeGui", self.fakeGui);
 	
+	g_company.gui:registerUiElements("g_factoryDefault", g_company.dir .. "images/factoryDefault.dds");
+	g_company.gui:registerUiElements("g_gcUi2", g_company.dir .. "images/ui_elements_2.dds");
 	
+	self.mainGui = g_company.gui:registerGui("gc_main", InputAction.GC_MAIN, Gc_Gui_MainGui, true, true, true).classGui;
 	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
 	g_company.gui:registerGui("gc_factoryBig", InputAction.GC_TEST, Gc_Gui_FactoryBig, true, true, true);
-	g_company.gui:registerGui("gc_settings", InputAction.GC_SETTINGS, Gc_Gui_Settings, true, true, true);
 	g_company.gui:registerGui("gcPlaceable_baler", nil, Gc_Gui_Baler, true, true);
 	g_company.gui:registerGui("gcObjectInfo", nil, Gc_Gui_ObjectInfo, false, false);
 
-	g_company.gui:registerUiElements("g_factoryDefault", g_company.dir .. "images/factoryDefault.dds");
 	
 	self.activeGuiDialogs = {};
 	self.registeredActonEvents = false;
@@ -178,6 +179,14 @@ end;
 
 function GlobalCompanyGui:delete()
 	
+end;
+
+function GlobalCompanyGui:loadGui(class, name)
+	local classGui = class:new();
+	local newGui = GC_Gui:new(name);
+	newGui:assignClass(classGui);
+	newGui:loadFromXML();
+	return newGui;
 end;
 
 function GlobalCompanyGui:registerGui(name, inputAction, class, isFullGui, canExit, onWalkActive)
