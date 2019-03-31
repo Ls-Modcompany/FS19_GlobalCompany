@@ -57,12 +57,11 @@ end;
 function GC_EventManager:registerEvent(target, func)
     local id = self:getNextEventId();
     self.events[id] = {target=target, func=func};
-    print(string.format("registerEvent %s", id));
     return id;
 end;
 
-function GC_EventManager:createEvent(targetId, data, useOwnIndex, noEventSend)
-	if (noEventSend == nil or noEventSend == false) then
+function GC_EventManager:createEvent(targetId, data, useOwnIndex, noEventSend)    
+	if targetId ~= nil and (noEventSend == nil or noEventSend == false) then
         if self.isServer then        
             g_server:broadcastEvent(GC_DefaultEvent:new(targetId, data, useOwnIndex))
         else
@@ -76,7 +75,7 @@ function GC_EventManager:getTypeByValue(value)
         return self.TYP_NIL;
     elseif type(value) == "table" then
         --should we synch recursive?
-    elseif type(value) == "bool" then
+    elseif type(value) == "boolean" then
         return self.TYP_BOOL;
     elseif type(value) == "string" then
         return self.TYP_STRING;
@@ -190,7 +189,6 @@ function GC_DefaultEvent:emptyNew()
 end
 
 function GC_DefaultEvent:new(targetId, data, useOwnIndex)
-    print(string.format("new %s %s %s", targetId, data, useOwnIndex));
     local self = GC_DefaultEvent:emptyNew();
     self.targetId = targetId;
     self.data = data;
@@ -207,7 +205,6 @@ function GC_DefaultEvent:writeStream(streamId, connection)
         if self.useOwnIndex then
             g_company.eventManager:doWrite(streamId, k);
         end;
-        print(string.format("writeStream %s", v));
         g_company.eventManager:doWrite(streamId, v);
     end;
 end;
@@ -224,11 +221,9 @@ function GC_DefaultEvent:readStream(streamId, connection)
             local k = g_company.eventManager:doRead(streamId);
             local v = g_company.eventManager:doRead(streamId);
             table.insert(self.data, v);
-            print(string.format("readStream %s", v));
         else
             local v = g_company.eventManager:doRead(streamId);
             table.insert(self.data, v);
-            print(string.format("readStream %s", v));
         end;
     end;
 
