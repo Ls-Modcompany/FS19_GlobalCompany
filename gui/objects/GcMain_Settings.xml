@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+
+<!--
+GlobalCompany - Gui - GcMain - Settings
+
+@Interface: 1.3.0.1 b4009
+@Author: LS-Modcompany / kevink98
+@Date: 31.03.2019
+@Version: 1.0.0.0
+
+Changelog:
+		
+ 	v1.0.0.0 (31.03.2019):
+  	- initial fs19
+-->
+
+<GUI>      
+  <GuiElement type="flowLayout" template="gcMenuSettingsLayout1">      
+          
+    <!-- Setting: extendedPlaceable -->
+    <GuiElement type="flowLayout" template="gcMenuSettingsButtonLayout">         
+      <GuiElement type="image" template="gcMenuSettingsButtonLayoutBackground">    
+        <GuiElement type="button" template="gcMenuSettingsButtonLayoutButton" id="gui_btn_settings_1" onClick="onClickBtnSetting" parameter="extendedPlaceable"  />
+      </GuiElement>
+      <GuiElement type="text" template="gcMenuSettingsButtonLayoutText" text="$l10n_GC_settings1_title" />    
+    </GuiElement>
+          
+    <!-- Setting: objectInfo -->
+    <GuiElement type="flowLayout" template="gcMenuSettingsButtonLayout">         
+      <GuiElement type="image" template="gcMenuSettingsButtonLayoutBackground">    
+        <GuiElement type="button" template="gcMenuSettingsButtonLayoutButton" id="gui_btn_settings_2" onClick="onClickBtnSetting" parameter="objectInfo" />
+      </GuiElement>
+      <GuiElement type="text" template="gcMenuSettingsButtonLayoutText" text="$l10n_GC_settings2_title" />    
+    </GuiElement>
+
+    <!-- Setting: horseHelper -->
+    <GuiElement type="flowLayout" template="gcMenuSettingsButtonLayout">         
+      <GuiElement type="image" template="gcMenuSettingsButtonLayoutBackground">    
+        <GuiElement type="button" template="gcMenuSettingsButtonLayoutButton" id="gui_btn_settings_3" onClick="onClickBtnSetting" parameter="horseHelper" />
+      </GuiElement>
+      <GuiElement type="text" template="gcMenuSettingsButtonLayoutText" text="$l10n_GC_settings3_title" />    
+    </GuiElement>
+
+    <!-- Setting: moreTrees -->
+    <GuiElement type="flowLayout" template="gcMenuSettingsButtonLayout">         
+      <GuiElement type="image" template="gcMenuSettingsButtonLayoutBackground">    
+        <GuiElement type="button" template="gcMenuSettingsButtonLayoutButton" id="gui_btn_settings_4" onClick="onClickBtnSetting" parameter="moreTrees" />
+      </GuiElement>
+      <GuiElement type="text" template="gcMenuSettingsButtonLayoutText" text="$l10n_GC_settings4_title" />    
+    </GuiElement>  
+
+  </GuiElement>
+</GUI>
