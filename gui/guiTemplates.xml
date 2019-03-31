@@ -9,6 +9,8 @@
 		<color name="gray1" value="0.6 0.6 0.6 1" />
 		<color name="gray2" value="0.3 0.3 0.3 1" />
 		<color name="gray3" value="0.1 0.1 0.1 1" />
+
+        <color name="glass1" value="0.018 0.016 0.015 0.6"/>
 		
 
         <color name="glass0_1" value="0.018 0.016 0.015 0.65"/>
@@ -47,6 +49,8 @@
 		<uv name="icon_settings" value="160px 0px 80px 80px" />
 		
         <uv name="keyBordKey" value="96px 96px 48px 48px"/>
+
+        <uv name="icon_settings2" value="0px 0px 128px 128px"/>
 	</uvs>
 	
 	<templates>
@@ -395,67 +399,6 @@
 			<value name="margin" value="0px 5px 0px 5px" />	
 		</template>		
 
-		<!-- Settings -->
-		<template name="gcSettingsBackground" anchor="middleCenter" extends="gcBase gcBorder">
-			<value name="size" value="1600px 800px" />
-			<value name="imageColor" value="glass1_50" />
-			<value name="hasBorders" value="true" />
-			<value name="borderBottomSize" value="6px" />
-			<value name="borderBottomColor" value="orange" />
-		</template>
-		<template name="gcSettingsHeader" anchor="middleTop" extends="gcBase gcBorder">
-			<value name="size" value="1600px 50px" />
-			<value name="imageColor" value="transparent" />
-			<value name="hasBorders" value="true" />
-			<value name="borderBottomSize" value="4px" />
-			<value name="borderBottomColor" value="gray2" />
-		</template>
-		<template name="gcSettingsHeaderText" anchor="middleCenter" extends="gcBase_text">
-			<value name="textSize" value="25px" />
-			<value name="textAlignment" value="center" />	
-		</template>	
-		<template name="gcSettingsContentLayoutLeft" anchor="leftTop" extends="">
-			<value name="orientation" value="y" />
-			<value name="alignment" value="top" />
-			<value name="size" value="800px 746px" />
-			<value name="position" value="0px -50px" />
-			<value name="margin" value="0px 0px 0px 0px" />
-		</template>	
-		<template name="gcSettingsContentLayoutRight" anchor="leftTop" extends="">
-			<value name="orientation" value="y" />
-			<value name="alignment" value="top" />
-			<value name="size" value="800px 746px" />
-			<value name="position" value="800px -50px" />
-			<value name="margin" value="0px 0px 0px 0px" />
-		</template>	
-		
-
-		<template name="gcSettingsButtonLayout" anchor="leftTop" extends="gcBase">
-			<value name="orientation" value="x" />
-			<value name="alignment" value="left" />
-			<value name="position" value="0px 0px" />
-			<value name="size" value="280px 100px" />
-			<value name="margin" value="20px 0px 0px 0px" />
-		</template>
-		<template name="gcSettingsButtonLayoutBackground" anchor="middleCenter" extends="gcBase">
-			<value name="size" value="50px 50px" />
-			<value name="imageColor" value="gray3" />
-		</template>
-		<template name="gcSettingsButtonLayoutButton" anchor="middleCenter" extends="gcBase">
-			<value name="size" value="30px 30px" />
-			<value name="position" value="0px 0px" />
-			<value name="imageColor" value="transparent" />
-			<value name="imageColor_selected" value="orange" />
-			<value name="imageColor_disabled" value="transparent" />
-			<value name="imageColor_disabledSelected" value="image_disabled" />
-			<value name="hasOverlay" value="true" />
-			<value name="isActivable" value="true" />
-		</template>	
-		<template name="gcSettingsButtonText" anchor="leftCenter" extends="gcBase_text">
-			<value name="textSize" value="22px" />
-			<value name="textAlignment" value="center" />	
-			<value name="margin" value="20px 0px 0px 0px" />
-		</template>	
 
 		<!-- FactoryBig -->
 
@@ -644,8 +587,89 @@
 		</template>	
 		
 
+		<!-- GcMainScreen -->
+		<template name="gcMainBackground" anchor="middleCenter" extends="gcBase">
+			<Value name="imageUVs" value="colorBg"/>
+			<value name="imageColor" value="0.018 0.016 0.015 0.6" />
+		</template>
+		<template name="gcMainMenu" anchor="middleTop" extends="gcBase gcBorder">
+			<Value name="size" value="1920px 100px"/>
+			<Value name="imageUVs" value="colorBg"/>
+			<value name="imageColor" value="glass1" />
+			<value name="hasBorders" value="true" />
+			<value name="borderBottomSize" value="1px" />	
+			<value name="borderBottomColor" value="gray2" />
+		</template>
+		<template name="gcMainMenuLayout" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="1500px 100px" />
+			<value name="position" value="0px 0px" />
+			<value name="orientation" value="x" />
+			<value name="alignment" value="middle" />				
+		</template>	
+		<template name="gcMainMenuItem" anchor="middleCenter" extends="gcBase gcBorder">
+			<value name="size" value="100px 100px" />
+			<value name="margin" value="0px 0px 0px 0px" />	
+			<value name="hasOverlay" value="true" />
+			<value name="isActivable" value="true" />
+			<value name="canDeactivable" value="false" />
 
+			<value name="hasBorders" value="true" />
+			<value name="borderLeftSize" value="1px" />
+			<value name="borderRightSize" value="1px" />
+			<value name="borderBottomSize" value="1px" />
+			<value name="borderLeftSize_selected" value="1px" />
+			<value name="borderRightSize_selected" value="1px" />
+			<value name="borderBottomSize_selected" value="5px" />
 
+			<value name="borderLeftColor" value="gray2" />
+			<value name="borderRightColor" value="gray2" />
+			<value name="borderBottomColor" value="gray2" />
+			<value name="borderBottomColor_selected" value="orange" />
+		</template>	
+		<template name="gcMainMenuItemIcon" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="100px 100px" />
+		</template>
+		<template name="gcMainContent" anchor="middleTop" extends="gcBase">
+			<value name="size" value="1920px 980px" />
+			<value name="position" value="0px -100px" />
+			<value name="imageColor" value="transparent" />
+		</template>
+		
+		<!-- GcMainScreen - Settings -->		
+		<template name="gcMenuSettingsLayout1" anchor="leftTop" extends="">
+			<value name="orientation" value="y" />
+			<value name="alignment" value="top" />
+			<value name="size" value="800px 746px" />
+			<value name="position" value="50px -150px" />
+			<value name="margin" value="0px 0px 0px 0px" />
+		</template>	
+		<template name="gcMenuSettingsButtonLayout" anchor="leftTop" extends="gcBase">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="left" />
+			<value name="position" value="0px 0px" />
+			<value name="size" value="280px 100px" />
+			<value name="margin" value="20px 0px 0px 0px" />
+		</template>
+		<template name="gcMenuSettingsButtonLayoutBackground" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="50px 50px" />
+			<value name="imageColor" value="gray3" />
+		</template>
+		<template name="gcMenuSettingsButtonLayoutButton" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="30px 30px" />
+			<value name="position" value="0px 0px" />
+			<value name="imageColor" value="transparent" />
+			<value name="imageColor_selected" value="orange" />
+			<value name="imageColor_disabled" value="transparent" />
+			<value name="imageColor_disabledSelected" value="image_disabled" />
+			<value name="hasOverlay" value="true" />
+			<value name="isActivable" value="true" />
+		</template>	
+		<template name="gcMenuSettingsButtonLayoutText" anchor="leftCenter" extends="gcBase_text">
+			<value name="textSize" value="22px" />
+			<value name="textAlignment" value="center" />	
+			<value name="margin" value="20px 0px 0px 0px" />
+			<value name="textBold" value="false" />
+		</template>	
 
 
 	</templates>	
