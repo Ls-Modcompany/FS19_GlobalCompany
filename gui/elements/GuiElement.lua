@@ -60,6 +60,7 @@ function GC_Gui_element:loadTemplate(templateName, xmlFile, key)
 	self.size = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValueXML(xmlFile, "size", key), self.outputSize, self.size);
 	self.margin = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValueXML(xmlFile, "margin", key), self.outputSize, self.margin);
 	
+	self.anchor = g_company.gui:getTemplateValueXML(xmlFile, "anchor", key, self.anchor);
 	self.parameter = g_company.gui:getTemplateValueXML(xmlFile, "parameter", key);
 	
 	self.callback_onOpen = g_company.gui:getTemplateValueXML(xmlFile, "onOpen", key);
@@ -193,6 +194,14 @@ function GC_Gui_element:removeElement(element)
 			element.parent = nil;
 			break;
 		end;
+	end;
+end;
+
+function GC_Gui_element:removeElements()
+	for k,e in pairs(self.elements) do
+		table.remove(self.elements, k);
+		e.parent = nil;
+		break;
 	end;
 end;
 

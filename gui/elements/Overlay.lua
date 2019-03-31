@@ -117,6 +117,10 @@ function GC_Gui_overlay:copy(src)
 end;
 
 function GC_Gui_overlay:setImageFilename(filename)
+	local uiElement = g_company.gui:getUiElement(filename)
+	if uiElement ~= nil then
+		filename = uiElement;
+	end;
 	self.imageFilename = filename;
 	self.imageOverlay = createImageOverlay(self.imageFilename);
 end;
@@ -201,9 +205,13 @@ function GC_Gui_overlay:onOpen()
 	GC_Gui_overlay:superClass().onOpen(self);
 end;
 
-function GC_Gui_overlay:setImageUv(uv)
+function GC_Gui_overlay:setImageUv(uv, all)
 	if g_company.gui.template.uvs[uv] ~= nil then
 		self.uvs = GuiUtils.getUVs(g_company.gui.template.uvs[uv], self.imageSize, self.default);
+		if all then
+			self.uvs_selected = self.uvs;
+			self.uvs_disabled = self.uvs;
+		end;
 	end;
 end;
 

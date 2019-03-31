@@ -26,6 +26,7 @@ function GC_Gui_button:new(gui, custom_mt)
 	self.data = {};
 	self.isRoundButton = false;	
 	self.isActivable = false;
+	self.isActivable = true;
 	self.isActive = false;
 	self.mouseDown = false;
 	self.mouseEntered = false;
@@ -45,6 +46,7 @@ function GC_Gui_button:loadTemplate(templateName, xmlFile, key)
 	GC_Gui_button:superClass().loadTemplate(self, templateName, xmlFile, key);
 	
 	self.isActivable = g_company.gui:getTemplateValueBool(templateName, "isActivable", self.isActivable);
+	self.canDeactivable = g_company.gui:getTemplateValueBool(templateName, "canDeactivable", self.canDeactivable);
 	self.isRoundButton = g_company.gui:getTemplateValueBool(templateName, "isRoundButton", self.isRoundButton);		
 	self.isMultiSelect = g_company.gui:getTemplateValueBool(templateName, "isMultiSelect", self.isMultiSelect);		
 	self.clickZone = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValue(templateName, "clickZone"), self.outputSize, nil);
@@ -161,7 +163,13 @@ function GC_Gui_button:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
 				if isUp and button == Input.MOUSE_BUTTON_LEFT and self.mouseDown then
 					self.mouseDown = false;
 					if self.isActivable then
-						self:setActive(not self.isActive);
+						if not self.canDeactivable then
+							if not self.isActive then
+								self:setActive(not self.isActive);
+							end;
+						else
+							self:setActive(not self.isActive);
+						end;
 					end;
 					if self.doubleClickTime <= 0 then
 						self.doubleClickTime = self.doubleClickInterval;
