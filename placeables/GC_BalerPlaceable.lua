@@ -112,6 +112,7 @@ function GC_BalerPlaceable:finalizePlacement()
 
 	for _, baler in ipairs(self.balers) do
 		baler:register(true);
+		baler:finalizePlacement();
 	end;
 end;
 

@@ -115,8 +115,6 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	self.title = Utils.getNoNil(getXMLString(xmlFile, xmlKey .. "#title"), true);
 	self.autoOn = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. "#autoOn"), true);
 
-	self.eventId_baleTarget = g_company.eventManager:registerEvent(self, self.setStackBalesTargetEvent);
-
 	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	-----------------------------------------------------------------------MainPart--------------------------------------------------------------------------------------
 	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -154,7 +152,7 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 				capacities[fillType.index] = self.capacity;
 				self.fillTypeToBaleType[fillType.index] = g_baleTypeManager.nameToBaleType[baleTypeName];
                 if self.activeFillTypeIndex == nil then
-                    self:setFillTyp(fillType.index, true);
+                    self:setFillTyp(fillType.index, true, true);
                 end;
 			else
 				if fillType == nil then
@@ -266,6 +264,23 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	return true;
 end;
 
+function Baler:finalizePlacement()
+	self.eventId_setFillLevelBunker = g_company.eventManager:registerEvent(self, self.setFillLevelBunkerEvent);
+	self.eventId_setFillLevel = g_company.eventManager:registerEvent(self, self.setFillLevelEvent);
+	self.eventId_setFillTyp = g_company.eventManager:registerEvent(self, self.setFillTypEvent);
+	self.eventId_onTurnOnBaler = g_company.eventManager:registerEvent(self, self.onTurnOnBalerEvent);
+	self.eventId_onTurnOffBaler = g_company.eventManager:registerEvent(self, self.onTurnOffBalerEvent);
+	self.eventId_onTurnOnStacker = g_company.eventManager:registerEvent(self, self.onTurnOnStackerEvent);
+	self.eventId_onTurnOffStacker = g_company.eventManager:registerEvent(self, self.onTurnOffStackerEvent);
+	self.eventId_onTurnOnBaleMover = g_company.eventManager:registerEvent(self, self.onTurnOnBaleMoverEvent);
+	self.eventId_onTurnOffBaleMover = g_company.eventManager:registerEvent(self, self.onTurnOffBaleMoverEvent);
+	self.eventId_baleTarget = g_company.eventManager:registerEvent(self, self.setStackBalesTargetEvent);
+	self.eventId_setAutoOn = g_company.eventManager:registerEvent(self, self.setAutoOnEvent);
+	self.eventId_setBaleObjectToAnimation = g_company.eventManager:registerEvent(self, self.setBaleObjectToAnimationEvent);
+	self.eventId_setBaleObjectToFork = g_company.eventManager:registerEvent(self, self.setBaleObjectToForkEvent);
+	self.eventId_removeBaleObjectFromForkEvent = g_company.eventManager:registerEvent(self, self.removeBaleObjectFromForkEvent);
+end
+
 function Baler:delete()
 	g_currentMission:removeOnCreateLoadedObjectToSave(self)
 
@@ -325,7 +340,7 @@ function Baler:readStream(streamId, connection)
 		self.autoOn = streamReadBool(streamId);
 		self.baleAnimation:setAnimTime(streamReadFloat32(streamId));
 		if self.baleAnimation:getAnimationTime() > 0 then	
-			self:setBaleObjectToAnimation();	
+			self:setBaleObjectToAnimation(true);	
 			self.baleAnimation:setAnimationsState(true);
 		end;
 
@@ -425,7 +440,7 @@ function Baler:loadFromXMLFile(xmlFile, key)
 	self.autoOn = getXMLBool(xmlFile, key..".baler#autoOn");
 	self.baleAnimation:setAnimTime(getXMLFloat(xmlFile, key..".baler#animationTime"));
 	if self.baleAnimation:getAnimationTime() > 0 then	
-		self:setBaleObjectToAnimation();	
+		self:setBaleObjectToAnimation(true);	
 		self.baleAnimation:setAnimationsState(true);
 	end;
 
@@ -572,11 +587,7 @@ function Baler:update(dt)
 					self.doStackAnimationEnd:setAnimTime(0);	
 					self.doStackAnimationStart:setAnimTime(0);	
 				elseif self.doStackAnimationEnd:getAnimationTime() >= 0.3 and self.raisedAnimationKeys["0.3"] == nil then
-					for i=1, getNumOfChildren(self.forkNode) do
-						local child = getChildAt(self.forkNode, 0);
-						self:createBale(child);
-						delete(child);
-					end;
+					self:removeBaleObjectFromFork();
 					self.raisedAnimationKeys["0.3"] = true;
 				end;
 			end;
@@ -629,36 +640,49 @@ function Baler:playerTriggerActivated(ref)
     end;
 end;
 
-function Baler:setFillLevelBunker(delta, onlyBunker, noEventSend)    
-	--event
-	if delta ~= nil then
-		self.fillLevelBunker = self.fillLevelBunker + delta;
-		if onlyBunker == nil or not onlyBunker then
-			self:setFillLevel(self.fillLevel + (delta * -1));
+
+function Baler:setFillLevelBunker(delta, onlyBunker, noEventSend)  
+	self:setFillLevelBunkerEvent({delta, onlyBunker}, noEventSend);
+end;
+
+-- 1: delta
+-- 2: onlyBunker
+function Baler:setFillLevelBunkerEvent(data, noEventSend)    
+	g_company.eventManager:createEvent(self.eventId_setFillLevelBunker, data, false, noEventSend);
+	if data[1] ~= nil then
+		self.fillLevelBunker = self.fillLevelBunker + data[1];
+		if data[2] == nil or not data[2] then
+			self:setFillLevel(self.fillLevel + (data[1] * -1), true);
 		end;
 		g_company.gui:updateGuiData("gcPlaceable_baler");
 	end;
 end;
 
-function Baler:setFillLevel(level, noEventSend)      
-	--event
-	self.fillLevel = level;
-	if self.isClient then
-		self.movers:updateMovers(level, self.activeFillTypeIndex);    
-		g_company.gui:updateGuiData("gcPlaceable_baler");
-	end;
-	
-	--if not self.client then
-	--	self.synch_fillLevel = true;
-	--	self:raiseDirtyFlags(self.balerDirtyFlag);
-	--end;
+function Baler:setFillLevel(level, noEventSend)   
+	self:setFillLevelEvent({level}, noEventSend);  
 end;
 
-function Baler:setFillTyp(fillTypeIndex, onFirstRun, noEventSend)    
-	--event
-	if onFirstRun == nil or not onFirstRun then
+-- 1: level
+function Baler:setFillLevelEvent(data, noEventSend)     
+	g_company.eventManager:createEvent(self.eventId_setFillLevel, data, false, noEventSend);
+	self.fillLevel = data[1];
+	if self.isClient then
+		self.movers:updateMovers(data[1], self.activeFillTypeIndex);    
+		g_company.gui:updateGuiData("gcPlaceable_baler");
+	end;	
+end;
+
+function Baler:setFillTyp(fillTypeIndex, onFirstRun, noEventSend)   
+	self:setFillTypEvent({fillTypeIndex, onFirstRun}, noEventSend);   	
+end;
+
+-- 1: fillTypeIndex
+-- 2: onFirstRun
+function Baler:setFillTypEvent(data, noEventSend)    
+	g_company.eventManager:createEvent(self.eventId_setFillTyp, data, false, noEventSend);
+	if data[2] == nil or not data[2] then
 		self.unloadTrigger.fillTypes = nil;
-		self.unloadTrigger:setAcceptedFillTypeState(fillTypeIndex, true);
+		self.unloadTrigger:setAcceptedFillTypeState(data[1], true);
 		
 		if self.stackerBaleTrigger:getNum() > 0 and self.state_balerMove == Baler.STATE_OFF and self.moverBaleTrigger:getTriggerEmpty() then
 			self:onTurnOnBaleMover();
@@ -667,22 +691,49 @@ function Baler:setFillTyp(fillTypeIndex, onFirstRun, noEventSend)
 			self.moveCollisionAnimation:setAnimationsState(true);
 		end;
 	end;
-
-	self.activeFillTypeIndex = fillTypeIndex; 
+	self.activeFillTypeIndex = data[1]; 
 end;
 
-function Baler:setBaleObjectToAnimation()
-	for _,info in pairs (self.baleAnimationObjects) do
-		if info.fillTypeIndex == self.activeFillTypeIndex then
-			local newBale = clone(info.node, false, false, false);
-			setVisibility(newBale, true);
-			link(self.baleAnimationObjectNode, newBale);		
-			break;
+function Baler:setBaleObjectToAnimation(noEventSend)
+	self:setBaleObjectToAnimationEvent({}, noEventSend);   
+end;
+
+-- data is empty table
+function Baler:setBaleObjectToAnimationEvent(data, noEventSend)
+	g_company.eventManager:createEvent(self.eventId_setBaleObjectToAnimation, data, false, noEventSend);
+	--if self.isClient then
+		for _,info in pairs (self.baleAnimationObjects) do
+			if info.fillTypeIndex == self.activeFillTypeIndex then
+				local newBale = clone(info.node, false, false, false);
+				setVisibility(newBale, true);
+				link(self.baleAnimationObjectNode, newBale);		
+				break;
+			end;
 		end;
+	--end;
+end;
+
+function Baler:removeBaleObjectFromFork(noEventSend)
+	self:setBaleObjectToForkEvent({}, noEventSend);   
+end;
+
+-- data is empty table
+function Baler:removeBaleObjectFromForkEvent(data, noEventSend)
+	g_company.eventManager:createEvent(self.eventId_removeBaleObjectFromForkEvent, data, false, noEventSend);
+	for i=1, getNumOfChildren(self.forkNode) do
+		local child = getChildAt(self.forkNode, 0);
+		self:createBale(child);
+		delete(child);
 	end;
 end;
 
-function Baler:setBaleObjectToFork()
+function Baler:setBaleObjectToFork(noEventSend)
+	self:setBaleObjectToForkEvent({}, noEventSend);   
+end;
+
+-- data is empty table
+function Baler:setBaleObjectToForkEvent(data, noEventSend)
+	g_company.eventManager:createEvent(self.eventId_setBaleObjectToFork, data, false, noEventSend);
 	for _,info in pairs (self.baleAnimationObjects) do
 		if info.fillTypeIndex == self.activeFillTypeIndex then
 			for i=1, self.stackerBaleTrigger:getNum() do
@@ -721,10 +772,15 @@ function Baler:createBale(ref)
 	table.insert(self.stackBales, baleObject);
 end;
 
-function Baler:onTurnOnBaler()	
-	--event
+function Baler:onTurnOnBaler(noEventSend)		
+	self:onTurnOnBalerEvent({}, noEventSend);   
+end
+
+-- data is empty table
+function Baler:onTurnOnBalerEvent(data, noEventSend)			
+	g_company.eventManager:createEvent(self.eventId_onTurnOnBaler, data, false, noEventSend);
 	self.state_baler = Baler.STATE_ON;
-	
+
 	if self.isServer then
 		self:raiseActive();
 	end;
@@ -736,8 +792,13 @@ function Baler:onTurnOnBaler()
 	end;
 end
 
-function Baler:onTurnOffBaler()	
-	--event
+function Baler:onTurnOffBaler(noEventSend)	
+	self:onTurnOffBalerEvent({}, noEventSend);   
+end
+
+-- data is empty table
+function Baler:onTurnOffBalerEvent(data, noEventSend)	
+	g_company.eventManager:createEvent(self.eventId_onTurnOffBaler, data, false, noEventSend);
 	self.state_baler = Baler.STATE_OFF;
 
 	if self.isClient then
@@ -746,30 +807,37 @@ function Baler:onTurnOffBaler()
 	end;
 end
 
-function Baler:onTurnOnStacker()	
-	--event
+function Baler:onTurnOnStacker(noEventSend)
+	self:onTurnOnStackerEvent({}, noEventSend);  	
+end
+
+-- data is empty table
+function Baler:onTurnOnStackerEvent(data, noEventSend)	
+	g_company.eventManager:createEvent(self.eventId_onTurnOnStacker, data, false, noEventSend);
 	self.state_stacker = Baler.STATE_ON;
 	
 	if self.isServer then
 		self:raiseActive();
 	end;
-
-	if self.isClient then
-	
-	end;
 end
 
-function Baler:onTurnOffStacker()	
-	--event
+function Baler:onTurnOffStacker(noEventSend)	
+	self:onTurnOffStackerEvent({}, noEventSend);  	
+end
+
+-- data is empty table
+function Baler:onTurnOffStackerEvent(data, noEventSend)	
+	g_company.eventManager:createEvent(self.eventId_onTurnOffStacker, data, false, noEventSend);
 	self.state_stacker = Baler.STATE_OFF;
-
-	if self.isClient then
-	
-	end;
 end
 
-function Baler:onTurnOnBaleMover()	
-	--event
+function Baler:onTurnOnBaleMover(noEventSend)	
+	self:onTurnOnBaleMoverEvent({}, noEventSend);  	
+end
+
+-- data is empty table
+function Baler:onTurnOnBaleMoverEvent(data, noEventSend)	
+	g_company.eventManager:createEvent(self.eventId_onTurnOnBaleMover, data, false, noEventSend);
 	self.state_balerMove = Baler.STATE_ON;
 	
 	if self.isServer then
@@ -778,14 +846,15 @@ function Baler:onTurnOnBaleMover()
 		self.conveyorStacker:start();
 		self.conveyorMover:start();
 	end;
-
-	if self.isClient then
-	
-	end;
 end
 
-function Baler:onTurnOffBaleMover()	
-	--event
+function Baler:onTurnOffBaleMover(noEventSend)	
+	self:onTurnOffBaleMoverEvent({}, noEventSend);  	
+end
+
+-- data is empty table
+function Baler:onTurnOffBaleMoverEvent(data, noEventSend)	
+	g_company.eventManager:createEvent(self.eventId_onTurnOffBaleMover, data, false, noEventSend);
 	self.state_balerMove = Baler.STATE_OFF;
 
 	if self.isServer then
@@ -793,24 +862,27 @@ function Baler:onTurnOffBaleMover()
 		self.conveyorStacker:stop();
 		self.conveyorMover:stop();
 	end;
-
-	if self.isClient then
-	
-	end;
 end
 
-function Baler:setStackBalesTarget(num)
-	self:setStackBalesTargetEvent({num});
+function Baler:setStackBalesTarget(num, noEventSend)
+	self:setStackBalesTargetEvent({num}, noEventSend);
 end;
+
+-- 1: num
 function Baler:setStackBalesTargetEvent(data, noEventSend)
 	g_company.eventManager:createEvent(self.eventId_baleTarget, data, false, noEventSend);
 	print(string.format("setStackBalesTargetEvent %s", data[1]));
 	self.stackBalesTarget = data[1];
 end;
 
-function Baler:setAutoOn(state)
-	--event
-	self.autoOn = state;
+function Baler:setAutoOn(state, noEventSend)
+	self:setAutoOnEvent({state}, noEventSend);
+end;
+
+-- 1: state
+function Baler:setAutoOnEvent(data, noEventSend)
+	g_company.eventManager:createEvent(self.eventId_setAutoOn, data, false, noEventSend);
+	self.autoOn = data[1];
 	if self.isServer and self.autoOn and self.fillLevel > 4000 and self.state_baler == Baler.STATE_OFF then --add self.isServer
 		self:onTurnOnBaler();
 		self:onTurnOnStacker();
