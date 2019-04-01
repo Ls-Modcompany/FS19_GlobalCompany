@@ -32,6 +32,7 @@ function GC_Gui_button:new(gui, custom_mt)
 	self.mouseEntered = false;
 	self.isTableTemplate = false;
 	self.isMultiSelect = false;
+	self.checkParent = false;
 
 	self.inputAction = nil;
 	self.clickSound = nil;
@@ -49,6 +50,7 @@ function GC_Gui_button:loadTemplate(templateName, xmlFile, key)
 	self.canDeactivable = g_company.gui:getTemplateValueBool(templateName, "canDeactivable", self.canDeactivable);
 	self.isRoundButton = g_company.gui:getTemplateValueBool(templateName, "isRoundButton", self.isRoundButton);		
 	self.isMultiSelect = g_company.gui:getTemplateValueBool(templateName, "isMultiSelect", self.isMultiSelect);		
+	self.checkParent = g_company.gui:getTemplateValueBool(templateName, "checkParent", self.checkParent);		
 	self.clickZone = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValue(templateName, "clickZone"), self.outputSize, nil);
 		
 	self.callback_onClick = g_company.gui:getTemplateValueXML(xmlFile, "onClick", key, nil);
@@ -103,6 +105,8 @@ function GC_Gui_button:copy(src)
 	self.isActivable = src.isActivable;
 	self.isRoundButton = src.isRoundButton;
 	self.isMultiSelect = src.isMultiSelect;
+	self.canDeactivable = src.canDeactivable;
+	self.checkParent = src.checkParent;
 	self.clickZone = src.clickZone;
 	
 	self.callback_onClick = src.callback_onClick;
@@ -261,8 +265,9 @@ function GC_Gui_button:setActive(state, checkNotParent)
 	if state == nil then
 		state = false;
 	end;
-	if not checkNotParent and not self.isMultiSelect and state and self.parent.name == "table" then
-		self.parent:setActive(false, self);
+
+	if not checkNotParent and not self.isMultiSelect and state and (self.parent.name == "table" or self.checkParent) then
+		self.parent:setActive(false, true);
 	end;
 	self.isActive = state;
 	self:setSelected(state, true);

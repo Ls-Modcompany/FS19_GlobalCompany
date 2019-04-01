@@ -106,6 +106,14 @@ function GC_Gui_flowLayout:onOpen()
 	GC_Gui_flowLayout:superClass().onOpen(self);
 end;
 
+function GC_Gui_flowLayout:setActive(state, e)
+	for _,element in pairs(self.elements) do
+		if e ~= element then
+			element:setActive(state);
+		end;
+	end;
+end;
+
 
 
 
