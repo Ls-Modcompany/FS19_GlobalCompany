@@ -612,6 +612,7 @@
 			<value name="hasOverlay" value="true" />
 			<value name="isActivable" value="true" />
 			<value name="canDeactivable" value="false" />
+			<value name="checkParent" value="true" />
 
 			<value name="hasBorders" value="true" />
 			<value name="borderLeftSize" value="1px" />
