@@ -69,6 +69,7 @@ function GC_HorseHelper:hourChanged()
 				local price = factor * GC_HorseHelper.price * -1;
 				--g_farmManager:updateFarmStats(farmId, "animalUpkeep", price)
 				g_currentMission:addMoney(price, farmId, "animalUpkeep");
+				--MoneyType.ANIMAL_UPKEEP
 				--g_currentMission:showMoneyChange("animalUpkeep", nil, false, vehicle:getActiveFarm())
 			end;
 		end;	
