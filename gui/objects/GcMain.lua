@@ -32,23 +32,29 @@ function Gc_Gui_MainGui:new(target, custom_mt)
     if custom_mt == nil then
         custom_mt = Gc_Gui_MainGui_mt;
     end;
-	local self = setmetatable({}, Gc_Gui_MainGui_mt);
+    local self = setmetatable({}, Gc_Gui_MainGui_mt);
+    
+    self.backupItems = {};
+    self.loadSettings = false;
             
-    self.addSettingsItem = false;
 	return self;
 end;
 
 function Gc_Gui_MainGui:onCreate() 
     self.gui_menu:removeElement(self.gui_menuItem);
+    
+    for gui, d in pairs(self.backupItems) do
+        self:addMenuItem(d.imageFilename, d.imageUVs, gui, true);
+    end;
+    self.loadSettings = false;
 end;
 
 function Gc_Gui_MainGui:onOpen() 
     g_depthOfFieldManager:setBlurState(true)
 
-    if not self.addSettingsItem then
-        --make sure, that settings load at the end
-        local settings = g_company.gui:loadGui(Gc_Gui_MainSettings, "gcMainSettings");
-        self:addMenuItem("g_gcUi2", "icon_settings2", settings);
+    if not self.loadSettings then
+        self:addMenuItem("g_gcUi2", "icon_settings2", g_company.gui:loadGui(Gc_Gui_MainSettings, "gcMainSettings"), true);
+        self.loadSettings = true;
     end;
     
     if table.getn(self.gui_menu.elements) == 0 then
@@ -63,7 +69,7 @@ function Gc_Gui_MainGui:onClose()
     g_depthOfFieldManager:setBlurState(false)
 end;
 
-function Gc_Gui_MainGui:addMenuItem(imageFilename, imageUVs, gui)    
+function Gc_Gui_MainGui:addMenuItem(imageFilename, imageUVs, gui, ignoreBackup)    
     local menuItem = GC_Gui_button:new(self.gui_menuItem.gui);
     menuItem:copy(self.gui_menuItem);   
     for _,element in pairs(self.gui_menuItem.elements) do
@@ -75,6 +81,10 @@ function Gc_Gui_MainGui:addMenuItem(imageFilename, imageUVs, gui)
     end;    
     menuItem.mainMenuGui = gui;
     self.gui_menu:addElement(menuItem);
+    
+    if not ignoreBackup then
+        self.backupItems[gui] = {imageFilename=imageFilename, imageUVs=imageUVs};
+    end;
 end;
 
 function Gc_Gui_MainGui:onClickMainMenu(item)
@@ -108,5 +118,5 @@ end;
 function Gc_Gui_MainGui:draw()
 	if self.activeGui ~= nil and self.activeGui.draw ~= nil then
         self.activeGui:draw();
-	end;
+    end;
 end;
