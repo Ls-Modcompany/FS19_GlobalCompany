@@ -295,6 +295,7 @@ function GlobalCompany:loadMap()
 	g_company.debug:loadConsoleCommands();
 
 	g_company.modManager:checkActiveModVersions(); -- Check active mods for version ID
+	g_company.gui:load();
 
 	for modName, e in pairs(GlobalCompany.environments) do
 		for name, v in pairs(GlobalCompany.loadParameters) do

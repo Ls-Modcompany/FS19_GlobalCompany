@@ -26,7 +26,7 @@ g_company.gui = GlobalCompanyGui;
 GlobalCompanyGui.DevelopementVersionTemplatesFilename = {};
 addModEventListener(GlobalCompanyGui);
 
-GlobalCompanyGui.devVersion = true;
+GlobalCompanyGui.devVersion = false;
 
 GlobalCompanyGui.guis = {};
 GlobalCompanyGui.smallGuis = {};
@@ -79,6 +79,10 @@ function GlobalCompanyGui:getIsDev()
 end;
 
 function GlobalCompanyGui:loadMap()
+
+end;
+
+function GlobalCompanyGui:load()
 	self.fakeGui = GC_Gui_FakeGui:new();
 	g_gui:loadGui(g_company.dir .. self.fakeGui.guiInformations.guiXml, "gc_fakeGui", self.fakeGui);
 	
