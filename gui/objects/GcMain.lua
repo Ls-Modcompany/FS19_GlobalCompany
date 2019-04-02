@@ -41,8 +41,8 @@ end;
 function Gc_Gui_MainGui:onCreate() 
     self.gui_menu:removeElement(self.gui_menuItem);
     
-    for gui, d in pairs(self.backupItems) do
-        self:addMenuItem(d.imageFilename, d.imageUVs, gui, true);
+    for _, d in pairs(self.backupItems) do
+        self:addMenuItem(d.imageFilename, d.imageUVs, d.gui, true);
     end;
     self.loadSettings = false;
 end;
@@ -83,7 +83,7 @@ function Gc_Gui_MainGui:addMenuItem(imageFilename, imageUVs, gui, ignoreBackup)
     self.gui_menu:addElement(menuItem);
     
     if not ignoreBackup then
-        self.backupItems[gui] = {imageFilename=imageFilename, imageUVs=imageUVs};
+        table.insert(self.backupItems, {gui=gui, imageFilename=imageFilename, imageUVs=imageUVs});
     end;
 end;
 
