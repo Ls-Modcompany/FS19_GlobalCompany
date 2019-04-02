@@ -28,7 +28,7 @@ GlobalCompany.dir = g_currentModDirectory;
 GlobalCompany.version = "1.0.0.0"; -- Release Version.
 GlobalCompany.versionDate = "04.05.2018"; -- Release Date ??
 GlobalCompany.currentVersionId = 1000; -- Mod Manager ID. (Version number without periods.)
-GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT. 
+GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
 
 GlobalCompany.LOADTYP_XMLFILENAME = 1;
 
@@ -42,7 +42,7 @@ function GlobalCompany.initialLoad()
 	-- Load these critical source files first in case we fail.
 	local duplicateLoad = false;
 	if g_company == nil then
-		getfenv(0)["g_company"] = GlobalCompany;	
+		getfenv(0)["g_company"] = GlobalCompany;
 
 		--| Load Utils |--
 		source(GlobalCompany.dir .. "utils/GC_utils.lua");
@@ -59,10 +59,10 @@ function GlobalCompany.initialLoad()
 		--| Load Mod Manager |--
 		source(GlobalCompany.dir .. "utils/GC_ModManager.lua");
 		g_company.modManager = GC_ModManager:new();
-		
+
 		--| Load Event Manager |--
-		source(GlobalCompany.dir .. "utils/GC_EventManager.lua");		
-		g_company.eventManager = GC_EventManager:new();		
+		source(GlobalCompany.dir .. "utils/GC_EventManager.lua");
+		g_company.eventManager = GC_EventManager:new();
 	else
 		duplicateLoad = true;
 	end;
@@ -81,16 +81,18 @@ function GlobalCompany.initialLoad()
 		GlobalCompany.environments = {};
 		GlobalCompany.loadParameters = {};
 		GlobalCompany.loadParametersToEnvironment = {};
-		
+
 		g_company.modManager:initDevelopmentWarning(GlobalCompany.isDevelopmentVersion);
 
 		GlobalCompany.loadSourceFiles();
 		GlobalCompany.loadPlaceables();
 
+		g_company.farmlandOwnerListener = GC_FarmlandOwnerListener:new();
+
 		local modLanguageFiles = {};
 
 		local selectedMods = {};
-		if g_server == nil then			
+		if g_server == nil then
 			selectedMods = g_mpLoadingScreen.missionDynamicInfo.mods;
 		else
 			selectedMods = g_modSelectionScreen.missionDynamicInfo.mods;
@@ -112,7 +114,7 @@ function GlobalCompany.initialLoad()
 				-- Ignore Global Company language files.
 				if modName ~= g_currentModName then
 					local langFullPath = g_company.languageManager:getLanguagesFullPath(mod.modDir);
-					if langFullPath ~= nil then					
+					if langFullPath ~= nil then
 						--if g_company.languageManager:checkEnglishBackupExists(langFullPath, modName) then
 							modLanguageFiles[modName] = langFullPath;
 						--end;
@@ -137,11 +139,11 @@ function GlobalCompany.initialLoad()
 			if values.shopManager ~= nil and values.shopManager ~= "" then
 				g_company.shopManager:loadFromXML(modName, g_company.utils.createModPath(modName, values.shopManager));
 			end;
-			
+
 			if values.specializations ~= nil and values.specializations ~= "" then
 				g_company.specializations:loadFromXML(modName, g_company.utils.createModPath(modName, values.specializations));
 			end;
-			
+
 			if values.densityMapHeightOverwriteOrginalFunction then
 				g_densityMapHeightManager.loadMapData = function() return true; end;
 			end;
@@ -225,6 +227,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "utils/GC_TriggerManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_specializations.lua");
 	source(GlobalCompany.dir .. "utils/GC_densityMapHeight.lua");
+	source(GlobalCompany.dir .. "utils/GC_FarmlandOwnerListener.lua");
 
 	--|| Gui ||--
 	source(GlobalCompany.dir .. "GlobalCompanyGui.lua");
@@ -242,16 +245,18 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_FillVolume.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicHeap.lua");
 	source(GlobalCompany.dir .. "objects/GC_PalletCreator.lua");
+	-- source(GlobalCompany.dir .. "objects/GC_ObjectSpawner.lua");
 	source(GlobalCompany.dir .. "objects/GC_RotationNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
 	source(GlobalCompany.dir .. "objects/GC_DigitalDisplays.lua");
 	source(GlobalCompany.dir .. "objects/GC_ActivableObject.lua");
 	source(GlobalCompany.dir .. "objects/GC_VisibilityNodes.lua");
+	source(GlobalCompany.dir .. "objects/GC_AnimationManager.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
 	--source(GlobalCompany.dir .. "objects/GC_DynamicPalletAreas.lua");
 	source(GlobalCompany.dir .. "objects/GC_BaleShreader.lua");
 	source(GlobalCompany.dir .. "objects/GC_DirtyObjects.lua");
-	source(GlobalCompany.dir .. "objects/GC_Baler.lua");
+	source(GlobalCompany.dir .. "objects/GC_Baler.lua");	
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
@@ -263,12 +268,18 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_BaleShreaderPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
-	
+
 	--|| Additionals ||--
 	source(GlobalCompany.dir .. "additionals/GC_ExtendedPlaceable.lua");
 	source(GlobalCompany.dir .. "additionals/GC_HorseHelper.lua");
 	source(GlobalCompany.dir .. "additionals/GC_MoreTrees.lua");
 	source(GlobalCompany.dir .. "additionals/GC_ObjectInfo.lua");
+
+	--|| Events ||--
+	source(GlobalCompany.dir .. "events/GC_PalletCreatorWarningEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_AnimationManagerStartEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_AnimationManagerStopEvent.lua");
+
 end;
 
 --| Add Base GC Placeables |--
@@ -295,6 +306,7 @@ function GlobalCompany:loadMap()
 	g_company.debug:loadConsoleCommands();
 
 	g_company.modManager:checkActiveModVersions(); -- Check active mods for version ID
+	
 	g_company.gui:load();
 
 	for modName, e in pairs(GlobalCompany.environments) do
@@ -331,28 +343,31 @@ function GlobalCompany:update(dt)
 		updateable.update(updateable.target, dt);
 	end;
 
-	--can enable for testing!
-	--if g_currentMission.missionInfo.timeScale >= 120 then
-	--	g_currentMission.missionInfo.timeScale = 900;
-	--end;
-
 	for _, raisedUpdateable in pairs(GlobalCompany.raisedUpdateables) do
 		if raisedUpdateable.updateableCanUpdate then
 			raisedUpdateable.updateableCanUpdate = false;
 			raisedUpdateable:update(dt);
 		end;
 	end;
+
+	--can enable for testing!
+	--if g_currentMission.missionInfo.timeScale >= 120 then
+	--	g_currentMission.missionInfo.timeScale = 900;
+	--end;
 end;
 
 function GlobalCompany:delete()
-end;
-
-function GlobalCompany:deleteMap()
 	g_company.debug:deleteConsoleCommands();
 	g_company.languageManager:delete();
-	
-	getfenv(0)["g_company"] = nil; -- Clean up so we have no conflicts.
+
+	local environment = getfenv(0);
+	if environment.g_company ~= nil then
+		environment.g_company = nil;
+	end;
 end;
+
+-- function GlobalCompany:deleteMap()
+-- end;
 
 function GlobalCompany:getLoadParameterValue(name)
 	if GlobalCompany.loadParameters[name] == nil or GlobalCompany.loadParameters[name].value == nil then

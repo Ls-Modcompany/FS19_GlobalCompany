@@ -61,7 +61,7 @@ end;
 
 function GC_UnloadingTrigger:load(nodeId, target, xmlFile, xmlKey, forcedFillTypes, forcedToolTypes)
 	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
-		local text = "Loading failed! 'nodeId' paramater = %s, 'target' paramater = %s 'xmlFile' paramater = %s, 'xmlKey' paramater = %s";
+		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s";
 		g_company.debug:logWrite(GC_UnloadingTrigger.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil);
 		return false;
 	end;
@@ -323,7 +323,10 @@ function GC_UnloadingTrigger:setCustomDischargeNotAllowedWarning(text)
 	end;
 end
 
-
+function GC_UnloadingTrigger:getIsFillAllowedFromFarm(farmId)
+	--GC_UnloadingTrigger:superClass().getIsFillAllowedFromFarm(self, farmId);
+	return g_currentMission.accessHandler:canFarmAccessOtherId(farmId, self.ownerFarmId); -- Need MP Testing
+end;
 
 
 

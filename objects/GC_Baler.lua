@@ -615,7 +615,7 @@ function Baler:getFreeCapacity(dt)
 	return self.capacity - self.fillLevel;
 end;
 
-function Baler:playerTriggerCanActivable(ref)
+function Baler:playerTriggerCanAddActivatable(ref)
     if ref == Baler.PLAYERTRIGGER_CLEAN then
         if self.fillLevel >= 4000 or self.fillLevel == 0 then
             return false;

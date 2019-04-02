@@ -65,13 +65,14 @@ function GlobalCompanyUtils.getTableLength(t)
 	return count
 end
 
-function GlobalCompanyUtils.getFileExt(filename)
-	local extensionType = nil
+function GlobalCompanyUtils.getFileExtension(filename)
+	local extensionType;
 
-	if filename ~= nil then
-		local splitFilename = StringUtil.splitString(".", filename)
-		-- Make sure we only take the final table item in case the file path has '.' in it.
-		extensionType = splitFilename[#splitFilename]
+	if filename ~= nil and type(filename) == "string" then
+		local lastPeriod, _ = filename:find(".[^.]*$");
+		if lastPeriod ~= nil then
+			extensionType = filename:sub(lastPeriod + 1);
+		end;
 	end
 
 	return extensionType
@@ -144,13 +145,16 @@ function GlobalCompanyUtils.stringToTable(strg, sep, toKey, val)
 end;
 
 function GlobalCompanyUtils.removeModEventListener(listener)
-	local deleteKey = 0;
-	for k,list in pairs(g_modEventListeners) do
-		if list == listener then
-			deleteKey = k;
-		end;
-	end;
-	table.remove(g_modEventListeners, deleteKey);
+	print("DEV WARNING: 'GlobalCompanyUtils.removeModEventListener' is a depreciated function in GC FS19. Use GIANTS builtIn 'removeModEventListener(self)' instead.");
+	return removeModEventListener(listener);
+	
+	-- local deleteKey = 0;
+	-- for k,list in pairs(g_modEventListeners) do
+		-- if list == listener then
+			-- deleteKey = k;
+		-- end;
+	-- end;
+	-- table.remove(g_modEventListeners, deleteKey);
 end;
 
 function GlobalCompanyUtils.splitString(s, delimiter)
@@ -277,7 +281,17 @@ function GlobalCompanyUtils.getCorrectValue(value, newValue, ignoreValue, ignore
 	return value;
 end;
 
+function GlobalCompanyUtils.getCorrectNumberValue(value, newValue, minValue, maxValue)
+	if maxValue == nil then
+		maxValue = math.huge;
+	end;
 
+	if value == nil or value < minValue or value > maxValue then
+		return newValue;
+	end;
+
+	return value;
+end;
 
 
 
