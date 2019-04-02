@@ -52,7 +52,7 @@ function GC_AnimationManager:new(isServer, isClient, customMt)
 	return self;
 end;
 
-function GC_AnimationManager:load(nodeId, target, xmlFile, xmlKey, allowLooping)
+function GC_AnimationManager:load(nodeId, target, xmlFile, xmlKey, allowLooping, baseDirectory)
 	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
 		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s";
 		g_company.debug:logWrite(GC_AnimationManager.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil);
@@ -64,6 +64,8 @@ function GC_AnimationManager:load(nodeId, target, xmlFile, xmlKey, allowLooping)
 
 	self.debugData = g_company.debug:getDebugData(GC_AnimationManager.debugIndex, target);
 
+	self.baseDirectory = GlobalCompanyUtils.getParentBaseDirectory(target, baseDirectory);
+	
 	if allowLooping == nil then
 		allowLooping = true;
 	end;
