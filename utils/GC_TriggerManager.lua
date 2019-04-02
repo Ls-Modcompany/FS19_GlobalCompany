@@ -24,7 +24,6 @@
 
 GC_TriggerManager = {};
 local GC_TriggerManager_mt = Class(GC_TriggerManager);
-InitObjectClass(GC_TriggerManager, "GC_TriggerManager");
 
 GC_TriggerManager.debugIndex = g_company.debug:registerScriptName("TriggerManager");
 
@@ -163,6 +162,32 @@ function GC_TriggerManager:getTriggerById(id)
 
 	return trigger;
 end;
+
+function GC_TriggerManager:setTriggerOwnerFarmId(trigger, ownerFarmId, noEventSend)
+	if self:getNumberTriggers() > 0 then
+		for key, registeredTrigger in pairs(self.registeredTriggers) do
+			if registeredTrigger == trigger and trigger.setOwnerFarmId ~= nil then
+				trigger:setOwnerFarmId(ownerFarmId, noEventSend);
+				break;
+			end;
+		end;
+	end;
+end;
+
+function GC_TriggerManager:setAllOwnerFarmIds(ownerFarmId, noEventSend)
+	if self.registeredTriggers ~= nil then
+		for _, trigger in pairs(self.registeredTriggers) do
+			if trigger.setOwnerFarmId ~= nil then
+				trigger:setOwnerFarmId(ownerFarmId, noEventSend);
+			end;
+		end;
+	end;
+end;
+
+
+
+
+
 
 
 

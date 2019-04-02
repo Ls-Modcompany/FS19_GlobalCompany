@@ -323,7 +323,10 @@ function GC_UnloadingTrigger:setCustomDischargeNotAllowedWarning(text)
 	end;
 end
 
-
+function GC_UnloadingTrigger:getIsFillAllowedFromFarm(farmId)
+	--GC_UnloadingTrigger:superClass().getIsFillAllowedFromFarm(self, farmId);
+	return g_currentMission.accessHandler:canFarmAccessOtherId(farmId, self.ownerFarmId); -- Need MP Testing
+end;
 
 
 

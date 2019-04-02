@@ -38,19 +38,13 @@ GC_PlayerTrigger = {};
 
 local GC_PlayerTrigger_mt = Class(GC_PlayerTrigger, Object);
 InitObjectClass(GC_PlayerTrigger, "GC_PlayerTrigger");
+
 GC_PlayerTrigger.debugIndex = g_company.debug:registerScriptName("GC_PlayerTrigger");
 
 g_company.playerTrigger = GC_PlayerTrigger;
 
 function GC_PlayerTrigger:new(isServer, isClient, customMt)
-	if customMt == nil then
-		customMt = GC_PlayerTrigger_mt;
-	end;
-
-	local self = Object:new(isServer, isClient, customMt);
-
-	--self.isServer = isServer;
-	--self.isClient = isClient;
+	local self = Object:new(isServer, isClient, customMt or GC_PlayerTrigger_mt);
 
 	self.triggerManagerRegister = true; -- 'GC_TriggerManager' Requirement.
 
@@ -123,6 +117,8 @@ function GC_PlayerTrigger:delete()
 	if self.playerTriggerNode ~= nil then
 		removeTrigger(self.playerTriggerNode);
 	end;
+	
+	GC_PlayerTrigger:superClass().delete(self);
 end;
 
 function GC_PlayerTrigger:update(dt)
@@ -132,7 +128,7 @@ function GC_PlayerTrigger:update(dt)
 
 	if self.playerInTrigger then
 		if self:getIsActivatable() then
-			if self.target.playerTriggerGetActivateText ~= nil then
+			if self.isActivatable and self.target.playerTriggerGetActivateText ~= nil then
 				local text = self.target:playerTriggerGetActivateText(self.triggerReference);
 				self:setActivateText(text);
 			end;
@@ -174,30 +170,45 @@ function GC_PlayerTrigger:drawActivate()
 	end;
 end;
 
+function GC_PlayerTrigger:canAddActivatable()
+	if self.isActivatable then
+		if self.target.playerTriggerCanAddActivatable ~= nil then
+			return self.target:playerTriggerCanAddActivatable(self.triggerReference);
+		end;
+	
+		return true;
+	end;
+	
+	return false;
+end;
+
 function GC_PlayerTrigger:playerTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay)
-	if (g_currentMission.controlPlayer and g_currentMission.player ~= nil and otherId == g_currentMission.player.rootNode) then
+	if g_currentMission.controlPlayer and (g_currentMission.player ~= nil and otherId == g_currentMission.player.rootNode) then		
 		if onEnter or onLeave then
 			if onEnter then
-				self.playerInTrigger = true;
-				if self.target.playerTriggerCanActivable ~= nil then
-					if self.target:playerTriggerCanActivable(self.triggerReference) then
-						if self.isActivatable then
+				if not self.playerInTrigger and self.ownerFarmId ~= nil then
+					if g_currentMission.accessHandler:canFarmAccessOtherId(g_currentMission:getFarmId(), self.ownerFarmId) then					
+						self.playerInTrigger = true;
+						if self:canAddActivatable() then
 							g_currentMission:addActivatableObject(self);
 						end;
 					end;
-				else
+				end;
+			else
+				if self.playerInTrigger then
+					self.playerInTrigger = false;
+	
 					if self.isActivatable then
-						g_currentMission:addActivatableObject(self);
+						g_currentMission:removeActivatableObject(self);
 					end;
-				end;				
-			elseif onLeave then
-				self.playerInTrigger = false;
-
-				if self.isActivatable then
-					g_currentMission:removeActivatableObject(self);
 				end;
 			end;
 			self:raiseActive();
 		end;
 	end;
 end;
+
+
+
+
+
