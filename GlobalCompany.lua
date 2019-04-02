@@ -274,6 +274,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "additionals/GC_HorseHelper.lua");
 	source(GlobalCompany.dir .. "additionals/GC_MoreTrees.lua");
 	source(GlobalCompany.dir .. "additionals/GC_ObjectInfo.lua");
+	source(GlobalCompany.dir .. "additionals/GC_BaleAddon.lua");
 
 	--|| Events ||--
 	source(GlobalCompany.dir .. "events/GC_PalletCreatorWarningEvent.lua");
