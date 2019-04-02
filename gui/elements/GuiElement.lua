@@ -154,9 +154,9 @@ function GC_Gui_element:update(dt)
 	end;
 end;
 
-function GC_Gui_element:draw(index)
+function GC_Gui_element:draw(index, gui)
 	if self.isOnlyElement then
-		self.drawPosition[1], self.drawPosition[2] = g_company.gui:calcDrawPos(self, index);
+		self.drawPosition[1], self.drawPosition[2] = g_company.gui:calcDrawPos(self, index, gui);
 	end;
 	if self.newLayer then
 		new2DLayer()

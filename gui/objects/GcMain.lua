@@ -34,9 +34,7 @@ function Gc_Gui_MainGui:new(target, custom_mt)
     end;
     local self = setmetatable({}, Gc_Gui_MainGui_mt);
     
-    self.backupItems = {};
-    self.loadSettings = false;
-            
+    self.backupItems = {};            
 	return self;
 end;
 
@@ -60,13 +58,15 @@ function Gc_Gui_MainGui:onOpen()
     if table.getn(self.gui_menu.elements) == 0 then
         g_company.gui:closeActiveGui();
     else
-        self:onClickMainMenu(self.gui_menu.elements[1]);
-        self.gui_menu.elements[1]:setActive(true)
+        local toOpen = Utils.getNoNil(self.activePage, 1);
+        self:onClickMainMenu(self.gui_menu.elements[toOpen]);
+        self.gui_menu.elements[toOpen]:setActive(true);
+        
     end;
 end;
 
 function Gc_Gui_MainGui:onClose() 
-    g_depthOfFieldManager:setBlurState(false)
+    g_depthOfFieldManager:setBlurState(false);
 end;
 
 function Gc_Gui_MainGui:addMenuItem(imageFilename, imageUVs, gui, ignoreBackup)    
@@ -95,6 +95,12 @@ function Gc_Gui_MainGui:onClickMainMenu(item)
     self.gui_content:addElement(item.mainMenuGui.rootElement);
     self.activeGui = item.mainMenuGui;
     self.activeGui:openGui();   
+    for i,e in pairs(self.gui_menu.elements) do
+        if e == item then
+            self.activePage = i;
+            break;
+        end;
+    end;
 end;
 
 function Gc_Gui_MainGui:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)

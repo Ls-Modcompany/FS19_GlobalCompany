@@ -16,7 +16,7 @@ function Gc_Gui_MainSettings:new(target, custom_mt)
         custom_mt = Gc_Gui_MainSettings_mt;
     end;
 	local self = setmetatable({}, Gc_Gui_MainSettings_mt);
-            
+        self.name = "settings"
 	return self;
 end;
 

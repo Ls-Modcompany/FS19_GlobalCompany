@@ -33,6 +33,7 @@ function GC_Gui_button:new(gui, custom_mt)
 	self.isTableTemplate = false;
 	self.isMultiSelect = false;
 	self.checkParent = false;
+	self.canDeactivable = true;
 
 	self.inputAction = nil;
 	self.clickSound = nil;
