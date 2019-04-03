@@ -28,9 +28,7 @@
 --
 
 GC_AnimationClips = {};
-
 local GC_AnimationClips_mt = Class(GC_AnimationClips);
-InitObjectClass(GC_AnimationClips, "GC_AnimationClips");
 
 GC_AnimationClips.debugIndex = g_company.debug:registerScriptName("GC_AnimationClips");
 

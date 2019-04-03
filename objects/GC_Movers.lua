@@ -22,15 +22,14 @@
 --
 --
 -- ToDo:
+--		- 'linearInterpolator' option or complete change.
 --
 --
 
 GC_Movers = {};
-
 local GC_Movers_mt = Class(GC_Movers);
-InitObjectClass(GC_Movers, "GC_Movers");
 
-GC_Movers.debugIndex = g_company.debug:registerScriptName("Movers");
+GC_Movers.debugIndex = g_company.debug:registerScriptName("GC_Movers");
 
 g_company.movers = GC_Movers;
 
@@ -110,9 +109,9 @@ function GC_Movers:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capaciti
 					mover.node = node;
 					mover.capacity = capacity;
 
-					local transMax = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. ".translation#maximum", 3, false, self.debugData);
+					local transMax = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. ".translation#maximum", 3, false, self.debugData);
 					if transMax ~= nil then
-						mover.transMin = Utils.getNoNil(GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. ".translation#minimum", 3, false, self.debugData), {getTranslation(mover.node)});
+						mover.transMin = Utils.getNoNil(GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. ".translation#minimum", 3, false, self.debugData), {getTranslation(mover.node)});
 						mover.transMax = transMax;
 						setTranslation(mover.node, mover.transMin[1], mover.transMin[2], mover.transMin[3]);
 
@@ -126,9 +125,9 @@ function GC_Movers:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capaciti
 						mover.useTranslation = false;
 					end;
 
-					local rotMax = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. ".rotation#maximum", 3, true, self.debugData);
+					local rotMax = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. ".rotation#maximum", 3, true, self.debugData);
 					if rotMax ~= nil then
-						mover.rotMin = Utils.getNoNil(GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. ".rotation#minimum", 3, true, self.debugData), {getRotation(mover.node)});
+						mover.rotMin = Utils.getNoNil(GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. ".rotation#minimum", 3, true, self.debugData), {getRotation(mover.node)});
 						mover.rotMax = rotMax;
 						setRotation(mover.node, mover.rotMin[1], mover.rotMin[2], mover.rotMin[3]);
 
@@ -142,9 +141,9 @@ function GC_Movers:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capaciti
 						mover.useRotation = false;
 					end;
 
-					local scaleMax = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. ".scale#maximum", 3, false, self.debugData);
+					local scaleMax = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. ".scale#maximum", 3, false, self.debugData);
 					if scaleMax ~= nil then
-						mover.scaleMin = Utils.getNoNil(GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. ".scale#minimum", 3, false, self.debugData), {getScale(mover.node)});
+						mover.scaleMin = Utils.getNoNil(GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. ".scale#minimum", 3, false, self.debugData), {getScale(mover.node)});
 						mover.scaleMax = scaleMax;
 						setScale(mover.node, mover.scaleMin[1], mover.scaleMin[2], mover.scaleMin[3]);
 
@@ -158,8 +157,8 @@ function GC_Movers:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capaciti
 						mover.useScale = false;
 					end;
 
-					local colourMin = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. ".shaderColor#minimum", 3, false, self.debugData);
-					local colourMax = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. ".shaderColor#maximum", 3, false, self.debugData);
+					local colourMin = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. ".shaderColor#minimum", 3, false, self.debugData);
+					local colourMax = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. ".shaderColor#maximum", 3, false, self.debugData);
 					if colourMin ~= nil and colourMax ~= nil then
 						-- Only with (bunkerSiloSilageShader.xml)
 						if getHasShaderParameter(mover.node, "colorScale") then

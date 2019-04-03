@@ -193,8 +193,7 @@ function GlobalCompanyUtils.getSplitClassName(object, backupString)
 	return splitClassName;
 end;
 
-function GlobalCompanyUtils.getNumbersFromString(xmlFile, key, count, returnRadians, debugData)
-	local stringValue = getXMLString(xmlFile, key);
+function GlobalCompanyUtils.getNumbersFromString(stringValue, count, returnRadians, debugData)
 	if stringValue ~= nil and count ~= nil then
 		local stringTable = StringUtil.splitString(" ", stringValue);
 		if #stringTable >= count then
@@ -208,17 +207,20 @@ function GlobalCompanyUtils.getNumbersFromString(xmlFile, key, count, returnRadi
 					table.insert(stringValue, number);
 				end;
 			end;
+			
+			return stringValue;
 		else
 			if debugData ~= nil then
-				g_company.debug:writeModding(debugData, "%d-vector given, %d-vector required at %s", #stringTable, count, key);
+				g_company.debug:writeModding(debugData, "%d-vector given, %d-vector required.", #stringTable, count);
 			else
-				print(string.format("    ERROR: %d-vector given, %d-vector required at %s", #stringTable, count, key));
+				print(string.format("    ERROR: %d-vector given, %d-vector required.", #stringTable, count));
 			end;
-			stringValue = nil;
+			
+			return;
 		end;
 	end;
 
-   return stringValue;
+	return;
 end;
 
 -- Uses 'modulo operation' to return a table with an EVEN key value based on the given 'moduloValue'.
@@ -245,9 +247,9 @@ function GlobalCompanyUtils.getEvenTableFromString(stringValue, moduloValue, ret
 			end;
 		else
 			if debugData ~= nil then
-				g_company.debug:writeModding(debugData, "Odd number of values '%d' given at %s", tableLength, key);
+				g_company.debug:writeModding(debugData, "Odd number of values '%d' given.", tableLength);
 			else
-				print(string.format("    ERROR: Odd number of values '%d' given at %s", tableLength, key));
+				print(string.format("    ERROR: Odd number of values '%d' given.", tableLength));
 			end;
 			stringValue = nil;
 		end;

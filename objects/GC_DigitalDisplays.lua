@@ -34,9 +34,7 @@
 --
 
 GC_DigitalDisplays = {};
-
 local GC_DigitalDisplays_mt = Class(GC_DigitalDisplays);
-InitObjectClass(GC_DigitalDisplays, "GC_DigitalDisplays");
 
 GC_DigitalDisplays.TYPES = {["LEVEL"] = 1,
 							["PERCENT"] = 2,
@@ -45,7 +43,7 @@ GC_DigitalDisplays.TYPES = {["LEVEL"] = 1,
 							["CAPACITY"] = 5,
 							["TEXT"] = 6};
 
-GC_DigitalDisplays.debugIndex = g_company.debug:registerScriptName("DigitalDisplays");
+GC_DigitalDisplays.debugIndex = g_company.debug:registerScriptName("GC_DigitalDisplays");
 
 g_company.digitalDisplays = GC_DigitalDisplays;
 
@@ -106,15 +104,15 @@ function GC_DigitalDisplays:load(nodeId, target, xmlFile, xmlKey, groupKey, disa
 							if numMeshes > 0 then
 								display.numbers = numbers;
 								display.lastvalue = -1;
-								display.numberColour = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. "#numberColor", 4, false, self.debugData);
+								display.numberColour = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. "#numberColor", 4, false, self.debugData);
 								display.currentColourIndex = 1;
 								colourToSet = display.numberColour;
 
 								display.showOnEmpty = Utils.getNoNil(getXMLBool(xmlFile, key .. "#showOnEmpty"), true);
 
 								if display.numberColour ~= nil and typeIndex ~= GC_DigitalDisplays.TYPES.CAPACITY then
-									display.emptyNumberColour = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. "#emptyNumberColor", 4, false, self.debugData);
-									display.fullNumberColour = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. "#fullNumberColor", 4, false, self.debugData);
+									display.emptyNumberColour = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. "#emptyNumberColor", 4, false, self.debugData);
+									display.fullNumberColour = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. "#fullNumberColor", 4, false, self.debugData);
 
 									if display.emptyNumberColour ~= nil then
 										colourToSet = display.emptyNumberColour;

@@ -24,15 +24,13 @@
 --
 
 GC_Clock = {};
-
 local GC_Clock_mt = Class(GC_Clock);
-InitObjectClass(GC_Clock, "GC_Clock");
 
 GC_Clock.AXIS = {["X"] = {1, 0, 0},
 				 ["Y"] = {1, 0, 0},
 				 ["Z"] = {1, 0, 0}};
 
-GC_Clock.debugIndex = g_company.debug:registerScriptName("Clock");
+GC_Clock.debugIndex = g_company.debug:registerScriptName("GC_Clock");
 
 g_company.clock = GC_Clock;
 
@@ -92,7 +90,7 @@ function GC_Clock:load(nodeId, target, xmlFile, xmlKey)
 						self.convertTwelveHour = true;
 					end;
 
-					local numberColour = GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. "#numberColor", 4, false, self.debugData);
+					local numberColour = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. "#numberColor", 4, false, self.debugData);
 					self:setNumberColour(display, numberColour);
 
 					table.insert(self.digitalClocks, display);

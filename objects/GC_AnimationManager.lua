@@ -63,9 +63,9 @@ function GC_AnimationManager:load(nodeId, target, xmlFile, xmlKey, allowLooping,
 	self.target = target;
 
 	self.debugData = g_company.debug:getDebugData(GC_AnimationManager.debugIndex, target);
-
-	self.baseDirectory = GlobalCompanyUtils.getParentBaseDirectory(target, baseDirectory);
 	
+	self.baseDirectory = GlobalCompanyUtils.getParentBaseDirectory(target, baseDirectory);
+
 	if allowLooping == nil then
 		allowLooping = true;
 	end;
@@ -183,16 +183,16 @@ function GC_AnimationManager:loadAnimationPart(xmlFile, partKey, part)
 	if node ~= nil and (startTime ~= nil and (duration ~= nil or endTime ~= nil)) then
 		local direction = MathUtil.sign(Utils.getNoNil(getXMLInt(xmlFile, partKey .. "#direction"), 0));
 		
-		local startRot = g_company.utils.getNumbersFromString(xmlFile, partKey .. "#startRot", 3, true, self.debugData);
-		local endRot = g_company.utils.getNumbersFromString(xmlFile, partKey .. "#endRot", 3, true, self.debugData);
-		local startTrans = g_company.utils.getNumbersFromString(xmlFile, partKey .. "#startTrans", 3, false, self.debugData);
-		local endTrans = g_company.utils.getNumbersFromString(xmlFile, partKey .. "#endTrans", 3, false, self.debugData);
-		local startScale = g_company.utils.getNumbersFromString(xmlFile, partKey .. "#startScale", 3, false, self.debugData);
-		local endScale = g_company.utils.getNumbersFromString(xmlFile, partKey .. "#endScale", 3, false, self.debugData);		
+		local startRot = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, partKey .. "#startRot", 3, true, self.debugData);
+		local endRot = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, partKey .. "#endRot", 3, true, self.debugData);
+		local startTrans = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, partKey .. "#startTrans", 3, false, self.debugData);
+		local endTrans = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, partKey .. "#endTrans", 3, false, self.debugData);
+		local startScale = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, partKey .. "#startScale", 3, false, self.debugData);
+		local endScale = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, partKey .. "#endScale", 3, false, self.debugData);		
 		local visibility = getXMLBool(xmlFile, partKey .. "#visibility");
 		local shaderParameter = getXMLString(xmlFile, partKey .. "#shaderParameter");		
-		local shaderStartValues = g_company.utils.getNumbersFromString(xmlFile, partKey .. "#shaderStartValues", 4, false, self.debugData);
-		local shaderEndValues = g_company.utils.getNumbersFromString(xmlFile, partKey .. "#shaderEndValues", 4, false, self.debugData);
+		local shaderStartValues = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, partKey .. "#shaderStartValues", 4, false, self.debugData);
+		local shaderEndValues = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, partKey .. "#shaderEndValues", 4, false, self.debugData);
 		local animationClip = getXMLString(xmlFile, partKey .. "#animationClip");
 		local clipStartTime = getXMLFloat(xmlFile, partKey .. "#clipStartTime");
 		local clipEndTime = getXMLFloat(xmlFile, partKey .. "#clipEndTime");
