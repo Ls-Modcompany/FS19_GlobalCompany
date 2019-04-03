@@ -326,13 +326,14 @@ function GC_DebugUtils:getPrintLevelFromParamater(level) -- another option we co
 	end;
 end;
 
-function GC_DebugUtils:getIsDev()
-	local isDev = false;
+function GC_DebugUtils:getIsDev(getName)
+	local isDev, name = false, "";
 	local devNames = {"kevink98", "GtX", "LSMC", "DEV", "aPuehri"};
 	if g_mpLoadingScreen ~= nil and g_mpLoadingScreen.missionInfo ~= nil then
 		if g_mpLoadingScreen.missionInfo.playerStyle ~= nil and g_mpLoadingScreen.missionInfo.playerStyle.playerName ~= nil then
 			for i = 1, #devNames do
 				if g_mpLoadingScreen.missionInfo.playerStyle.playerName == devNames[i] then
+					name = devNames[i];
 					isDev = true;
 					break;
 				end;
@@ -340,6 +341,10 @@ function GC_DebugUtils:getIsDev()
 		end;
 	end;
 
+	if getName == true then
+		return isDev, name;
+	end;
+	
 	return isDev;
 end;
 
