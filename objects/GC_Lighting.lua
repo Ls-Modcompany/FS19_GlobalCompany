@@ -33,11 +33,9 @@
 --
 
 GC_Lighting = {};
-
 local GC_Lighting_mt = Class(GC_Lighting);
-InitObjectClass(GC_Lighting, "GC_Lighting");
 
-GC_Lighting.debugIndex = g_company.debug:registerScriptName("Lighting");
+GC_Lighting.debugIndex = g_company.debug:registerScriptName("GC_Lighting");
 
 GC_Lighting.TYPES = {["BEACON"] = 1,
 					 ["STROBE"] = 2,
@@ -250,9 +248,13 @@ function GC_Lighting:loadAreaLights(xmlFile, xmlKey, areaKey, loadedXmlFiles)
 									-- Load 'realLights' that are part of the main.i3d
 									local realLightNode = I3DUtil.indexToObject(self.rootNode, getXMLString(xmlFile, key .. "#realLightNode"), self.target.i3dMappings);
 									if realLightNode ~= nil then
-										light.defaultColor = {getLightColor(realLightNode)};
-										setVisibility(realLightNode, false);
-										light.realLightNode = realLightNode;
+										if getHasClassId(realLightNode, ClassIds.LIGHT_SOURCE) then
+											light.defaultColor = {getLightColor(realLightNode)};
+											setVisibility(realLightNode, false);
+											light.realLightNode = realLightNode;
+										else
+											g_company.debug:writeModding(self.debugData, "'%s' is not a real lightSource at %s", getName(realLightNode), key);
+										end;
 									end;
 
 									-- Check and update light rotation nodes (spotlights brackets and mounting part adjustment).
@@ -264,7 +266,7 @@ function GC_Lighting:loadAreaLights(xmlFile, xmlKey, areaKey, loadedXmlFiles)
 										end;
 
 										local name = getXMLString(xmlFile, rotateNodesKey .. "#name");
-										local rotation = Utils.getNoNil(GlobalCompanyUtils.getNumbersFromString(xmlFile, rotateNodesKey .. "#rotation", 3, true, self.debugData), {0, 0, 0});
+										local rotation = Utils.getNoNil(GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, rotateNodesKey .. "#rotation", 3, true, self.debugData), {0, 0, 0});
 										if name ~= nil then
 											local keyToFind = areaLightKey .. "." .. name;
 											if hasXMLProperty(areaLightXmlFile, keyToFind) then
@@ -323,11 +325,16 @@ function GC_Lighting:loadAreaLights(xmlFile, xmlKey, areaKey, loadedXmlFiles)
 				end;
 
 				local realLightNode = I3DUtil.indexToObject(self.rootNode, getXMLString(xmlFile, key .. "#realLightNode"), self.target.i3dMappings);
-				if realLightNode ~= nil then
-					light.defaultColor = {getLightColor(realLightNode)};
-					setVisibility(realLightNode, false);
-					light.realLightNode = realLightNode;
+				if realLightNode ~= nil then					
+					if getHasClassId(realLightNode, ClassIds.LIGHT_SOURCE) then
+						light.defaultColor = {getLightColor(realLightNode)};
+						setVisibility(realLightNode, false);
+						light.realLightNode = realLightNode;
+					else
+						g_company.debug:writeModding(self.debugData, "'%s' is not a real lightSource at %s", getName(realLightNode), key);
+					end;
 				end;
+
 
 				if areaLights == nil then
 					areaLights = {};
@@ -451,9 +458,13 @@ function GC_Lighting:loadStrobeLights(xmlFile, xmlKey, strobeKey, loadedXmlFiles
 									-- Load 'realLights' that are part of the main.i3d
 									local realLightNode = I3DUtil.indexToObject(self.rootNode, getXMLString(xmlFile, key .. "#realLightNode"), self.target.i3dMappings);
 									if realLightNode ~= nil then
-										light.defaultColor = {getLightColor(realLightNode)};
-										setVisibility(realLightNode, false);
-										light.realLightNode = realLightNode;
+										if getHasClassId(realLightNode, ClassIds.LIGHT_SOURCE) then
+											light.defaultColor = {getLightColor(realLightNode)};
+											setVisibility(realLightNode, false);
+											light.realLightNode = realLightNode;
+										else
+											g_company.debug:writeModding(self.debugData, "'%s' is not a real lightSource at %s", getName(realLightNode), key);
+										end;										
 									end;
 
 									-- Adjust shader dirt
@@ -496,9 +507,13 @@ function GC_Lighting:loadStrobeLights(xmlFile, xmlKey, strobeKey, loadedXmlFiles
 
 				local realLightNode = I3DUtil.indexToObject(self.rootNode, getXMLString(xmlFile, key .. "#realLightNode"), self.target.i3dMappings);
 				if realLightNode ~= nil then
-					light.defaultColor = {getLightColor(realLightNode)};
-					setVisibility(realLightNode, false);
-					light.realLightNode = realLightNode;
+					if getHasClassId(realLightNode, ClassIds.LIGHT_SOURCE) then
+						light.defaultColor = {getLightColor(realLightNode)};
+						setVisibility(realLightNode, false);
+						light.realLightNode = realLightNode;
+					else
+						g_company.debug:writeModding(self.debugData, "'%s' is not a real lightSource at %s", getName(realLightNode), key);
+					end;
 				end;
 
 				if strobeLights == nil then
@@ -571,8 +586,12 @@ function GC_Lighting:loadBeaconLights(xmlFile, xmlKey, beaconKey, loadedXmlFiles
 								light.realLightNode = I3DUtil.indexToObject(i3dNode, getXMLString(lightXmlFile, "beaconLight.realLight#node"));
 
 								if light.realLightNode ~= nil then
-									light.defaultColor = {getLightColor(light.realLightNode)};
-									setVisibility(light.realLightNode, false);
+									if getHasClassId(light.realLightNode, ClassIds.LIGHT_SOURCE) then
+										light.defaultColor = {getLightColor(light.realLightNode)};
+										setVisibility(light.realLightNode, false);
+									else
+										g_company.debug:writeModding(self.debugData, "'%s' is not a real lightSource at %s (%s)", getName(light.realLightNode), key, lightXmlFilename);
+									end;
 								end
 
 								if light.lightNode ~= nil then
@@ -631,8 +650,12 @@ function GC_Lighting:loadBeaconLights(xmlFile, xmlKey, beaconKey, loadedXmlFiles
 				light.realLightNode = I3DUtil.indexToObject(i3dNode, getXMLString(xmlFile, key .. "#realLightNode"), self.target.i3dMappings);
 
 				if light.realLightNode ~= nil then
-					light.defaultColor = {getLightColor(light.realLightNode)};
-					setVisibility(light.realLightNode, false);
+					if getHasClassId(light.realLightNode, ClassIds.LIGHT_SOURCE) then
+						light.defaultColor = {getLightColor(light.realLightNode)};
+						setVisibility(light.realLightNode, false);
+					else
+						g_company.debug:writeModding(self.debugData, "'%s' is not a real lightSource at %s", getName(light.realLightNode), key);
+					end;
 				end
 
 				if light.lightNode ~= nil then

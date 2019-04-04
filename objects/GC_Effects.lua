@@ -31,11 +31,9 @@
 
 
 GC_Effects = {};
-
 local GC_Effects_mt = Class(GC_Effects);
-InitObjectClass(GC_Effects, "GC_Effects");
 
-GC_Effects.debugIndex = g_company.debug:registerScriptName("Effects");
+GC_Effects.debugIndex = g_company.debug:registerScriptName("GC_Effects");
 
 g_company.effects = GC_Effects;
 
@@ -61,6 +59,9 @@ function GC_Effects:new(isServer, isClient, customMt)
 	self.customMaterialsFilename = nil;
 
 	self.effectsActive = false;
+	
+	self.numIntervalParticleSystems = 0;
+	self.numIntervalEffects = 0;
 
 	return self;
 end;
@@ -106,7 +107,7 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 							local node = getChildAt(i3dNode, 0);
 							if getHasShaderParameter(node, "exhaustColor") then
 								local baseParam = {0.2, 0.2, 0.2, 0.8};
-								local particleColor = Utils.getNoNil(GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. "#particleColor", 4, false, self.debugData), baseParam);
+								local particleColor = Utils.getNoNil(GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. "#particleColor", 4, false, self.debugData), baseParam);
 
 								link(linkNode, node);
 								setVisibility(node, false);
@@ -148,22 +149,25 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 
 					local data = {};
 					ParticleUtil.loadParticleSystemData(xmlFile, data, key)
-					data.nodeStr = nil; -- Send 'nil' so we use the 'defaultLinkNode' paramater.
+					data.nodeStr = nil; -- Send 'nil' so we use the 'defaultLinkNode' parameter.
 					ParticleUtil.loadParticleSystemFromData(data, particleSystem, nil, false, nil, self.baseDirectory, node)
 
-					local operatingInterval = Utils.getNoNil(getXMLFloat(xmlFile, key .. "#operatingIntervalSeconds"), 0);
-					if operatingInterval > 0 then
-						local stoppedInterval = Utils.getNoNil(getXMLFloat(xmlFile, key .. "#stoppedIntervalSeconds"), operatingInterval);
-						local delayStart = Utils.getNoNil(getXMLBool(xmlFile, key .. "#delayedStart"), false);
+					-- Operating sequence must be multiplies of two. These numbers will then loop.  6 8 4 4 = on(6 sec) off(8 sec) on(4 sec) off(4 sec)
+					local intervals = g_company.xmlUtils.getEvenTableFromXMLString(xmlFile, key .. "#operatingSequence", 2, true, false, 1000, self.debugData);
+					if intervals ~= nil then
+						-- This is the number of 'seconds' before the operation will start each time particle systems is requested to start.
+						local startDelay = Utils.getNoNil(getXMLInt(xmlFile, key .. "#startDelay"), 0);
+						startDelay = math.max(startDelay, 0);
 						local operatingTime = 0;
-						if delayStart then
-							operatingTime = stoppedInterval * 1000;
+						if startDelay > 0 then
+							operatingTime = startDelay * 1000;
 						end;
 
+						particleSystem.intervalId = 0;
+						particleSystem.intervals = intervals;
+						particleSystem.numIntervals = #intervals;
+						particleSystem.intervalActive = false;
 						particleSystem.delayTime = operatingTime;
-						particleSystem.operatingInterval = operatingInterval * 1000;
-						particleSystem.stoppedInterval = stoppedInterval * 1000;
-						particleSystem.interval = operatingTime;
 						particleSystem.operatingTime = operatingTime;
 
 						if self.intervalParticleSystems == nil then
@@ -215,8 +219,24 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 						end;
 					end;
 
-					local operatingInterval = Utils.getNoNil(getXMLFloat(xmlFile, key.."#operatingIntervalSeconds"), 0);
-					if operatingInterval > 0 then
+					-- Operating sequence must be multiplies of two. These numbers will then loop.  6 8 4 4 = on(6 sec) off(8 sec) on(4 sec) off(4 sec)
+					local intervals = g_company.xmlUtils.getEvenTableFromXMLString(xmlFile, key .. "#operatingSequence", 2, true, false, 1000, self.debugData);
+					if intervals ~= nil then
+						-- This is the number of 'seconds' before the operation will start each time effect is requested to start.
+						local startDelay = Utils.getNoNil(getXMLInt(xmlFile, key .. "#startDelay"), 0);
+						startDelay = math.max(startDelay, 0);
+						local operatingTime = 0;
+						if startDelay > 0 then
+							operatingTime = startDelay * 1000;
+						end;
+
+						effects.intervalId = 0;
+						effects.intervals = intervals;
+						effects.numIntervals = #intervals;
+						effects.intervalActive = false;
+						effects.delayTime = operatingTime;
+						effects.operatingTime = operatingTime;
+					
 						if fillTypeNames ~= nil then
 							effects.fillTypes = {};
 							local splitFillTypeNames = StringUtil.splitString(" ", fillTypeNames);
@@ -244,20 +264,6 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 								effects.fillTypes = nil;
 							end;
 						end;
-
-						local stoppedInterval = Utils.getNoNil(getXMLFloat(xmlFile, key .. "#stoppedIntervalSeconds"), operatingInterval);
-						local delayStart = Utils.getNoNil(getXMLBool(xmlFile, key .. "#delayedStart"), false);
-						local operatingTime = 0;
-						if delayStart then
-							operatingTime = stoppedInterval * 1000;
-						end;
-
-						effects.active = false;
-						effects.delayTime = operatingTime;
-						effects.operatingInterval = operatingInterval * 1000;
-						effects.stoppedInterval = stoppedInterval * 1000;
-						effects.interval = operatingTime;
-						effects.operatingTime = operatingTime;
 
 						if self.intervalEffects == nil then
 							self.intervalEffects = {};
@@ -322,6 +328,8 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 		end;
 
 		if self.intervalParticleSystems ~= nil or self.intervalEffects ~= nil then
+			self.numIntervalParticleSystems = #self.intervalParticleSystems;
+			self.numIntervalEffects = #self.intervalEffects;
 			g_company.addRaisedUpdateable(self);
 		end;
 	else
@@ -385,17 +393,17 @@ function GC_Effects:update(dt)
 	if self.isClient then
 		if self.effectsActive then
 			if self.intervalParticleSystems ~= nil then
-				for _, particleSystem in pairs (self.intervalParticleSystems) do
+				for i = 1, self.numIntervalParticleSystems do
+				local particleSystem = self.intervalParticleSystems[i];
 					particleSystem.operatingTime = particleSystem.operatingTime - dt;
 					if particleSystem.operatingTime <= 0 then
-						if particleSystem.isEmitting then
-							ParticleUtil.setEmittingState(particleSystem, false);
-							particleSystem.interval = particleSystem.stoppedInterval;
-						else
-							ParticleUtil.setEmittingState(particleSystem, true);
-							particleSystem.interval = particleSystem.operatingInterval;
+						particleSystem.intervalId = particleSystem.intervalId + 1;
+						if particleSystem.intervalId > particleSystem.numIntervals then
+							particleSystem.intervalId = 1;
 						end;
-						particleSystem.operatingTime = particleSystem.operatingTime + particleSystem.interval;
+
+						particleSystem.operatingTime = particleSystem.operatingTime + particleSystem.intervals[particleSystem.intervalId];
+						ParticleUtil.setEmittingState(particleSystem, not particleSystem.isEmitting);
 					end;
 				end;
 
@@ -405,15 +413,22 @@ function GC_Effects:update(dt)
 			end;
 
 			if self.intervalEffects ~= nil then
-				for _, effects in pairs (self.intervalEffects) do
+				for i = 1, self.numIntervalEffects do
+					local effects = self.intervalEffects[i];
 					effects.operatingTime = effects.operatingTime - dt;
 					if effects.operatingTime <= 0 then
-						if effects.active then
-							effects.active = false;
+						effects.intervalId = effects.intervalId + 1;
+						if effects.intervalId > effects.numIntervals then
+							effects.intervalId = 1;
+						end;
+
+						effects.operatingTime = effects.operatingTime + effects.intervals[effects.intervalId];
+					
+						if effects.intervalActive then
+							effects.intervalActive = false;
 							g_effectManager:stopEffects(effects.effects);
-							effects.interval = effects.stoppedInterval;
 						else
-							effects.active = true;
+							effects.intervalActive = true;
 							if effects.fillTypes ~= nil then
 								local nextFillTypeIndex = effects.fillTypes[effects.nextFillType];
 								g_effectManager:setFillType(effects.effects, nextFillTypeIndex);
@@ -428,11 +443,7 @@ function GC_Effects:update(dt)
 								g_effectManager:setFillType(effects.effects, effects.fillTypeIndex);
 								g_effectManager:startEffects(effects.effects);
 							end;
-
-							effects.interval = effects.operatingInterval;
 						end;
-
-						effects.operatingTime = effects.operatingTime + effects.interval;
 					end;
 				end;
 
@@ -446,10 +457,12 @@ function GC_Effects:update(dt)
 			if self.intervalParticleSystems ~= nil then
 				if self.disableParticleSystems then
 					self.disableParticleSystems = false;
-					for _, particleSystem in pairs (self.intervalParticleSystems) do
+					for i = 1, self.numIntervalParticleSystems do
+						local particleSystem = self.intervalParticleSystems[i];
 						if particleSystem.isEmitting then
 							ParticleUtil.setEmittingState(particleSystem, false);
 							particleSystem.operatingTime = particleSystem.delayTime;
+							particleSystem.intervalId = 0;
 						end;
 					end;
 				end;
@@ -458,10 +471,12 @@ function GC_Effects:update(dt)
 			if self.intervalEffects ~= nil then
 				if self.disableEffects then
 					self.disableEffects = false;
-					for _, effects in pairs (self.intervalEffects) do
+					for i = 1, self.numIntervalEffects do
+						local effects = self.intervalEffects[i];
 						g_effectManager:stopEffects(effects.effects);
 						effects.operatingTime = effects.delayTime;
-						effects.active = false;
+						effects.intervalActive = false;
+						effects.intervalId = 0;
 
 						if effects.resetOnStart then
 							effects.nextFillType = 1;

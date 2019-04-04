@@ -28,11 +28,9 @@
 --
 
 GC_RotationNodes = {};
-
 local GC_RotationNodes_mt = Class(GC_RotationNodes);
-InitObjectClass(GC_RotationNodes, "GC_RotationNodes");
 
-GC_RotationNodes.debugIndex = g_company.debug:registerScriptName("RotationNodes");
+GC_RotationNodes.debugIndex = g_company.debug:registerScriptName("GC_RotationNodes");
 
 g_company.rotationNodes = GC_RotationNodes;
 
@@ -51,6 +49,8 @@ function GC_RotationNodes:new(isServer, isClient, customMt)
 	self.rotationAxes["X"] = 1;
 	self.rotationAxes["Y"] = 2;
 	self.rotationAxes["Z"] = 3;
+	
+	self.numRotationNodes = 0;
 
 	return self;
 end;
@@ -93,22 +93,25 @@ function GC_RotationNodes:load(nodeId, target, xmlFile, xmlKey, groupKey, rotati
 						rotationNode.rotationSpeed = getXMLFloat(xmlFile, key.."#rotationSpeed");
 						rotationNode.fadeOnTime = getXMLFloat(xmlFile, key.."#fadeOnTime");
 						rotationNode.fadeOffTime = getXMLFloat(xmlFile, key.."#fadeOffTime");
-						rotationNode.operatingInterval = getXMLFloat(xmlFile, key.."#operatingIntervalSeconds");
-						rotationNode.stoppedInterval = getXMLFloat(xmlFile, key.."#stoppedIntervalSeconds");
-						rotationNode.delayStart = getXMLBool(xmlFile, key.."#delayedStart");
+						
+						-- Operating sequence must be multiplies of two. These numbers will then loop.  6 8 4 4 = on(6 sec) off(8 sec) on(4 sec) off(4 sec)
+						rotationNode.intervals = g_company.xmlUtils.getEvenTableFromXMLString(xmlFile, key .. "#operatingSequence", 2, true, false, 1000, self.debugData);
+						-- This is the number of 'seconds' before the operation will start each time Rotation node is requested to start.
+						rotationNode.startDelay = getXMLInt(xmlFile, key .. "#startDelay");
 	
 						table.insert(rotationNodes, rotationNode);
 					end;
 					i = i + 1;
 				end;
 			else
-				local text = "Loading failed! 'xmlFile' paramater = %s, 'xmlKey' paramater = %s";
+				local text = "Loading failed! 'xmlFile' parameter = %s, 'xmlKey' parameter = %s";
 				g_company.debug:logWrite(GC_RotationNodes.debugIndex, GC_DebugUtils.DEV, text, xmlFile ~= nil, xmlKey ~= nil);
 				returnValue = false;
 			end;
 		end;
 	
 		if self:loadRotationNodes(rotationNodes) then
+			self.numRotationNodes = #self.rotationNodes;
 			g_company.addRaisedUpdateable(self);
 			returnValue = true;
 		end;
@@ -147,23 +150,21 @@ function GC_RotationNodes:loadRotationNodes(rotationNodes)
 				node.fadeOnTime = Utils.getNoNil(rotationNode.fadeOnTime, 3) * 1000;
 				node.fadeOffTime = Utils.getNoNil(rotationNode.fadeOffTime, 3) * 1000;
 				node.currentRotation = 0;
-
-				local operatingInterval = Utils.getNoNil(rotationNode.operatingInterval, 0);
-				if operatingInterval > 0 then
-					local stoppedInterval = Utils.getNoNil(rotationNode.stoppedInterval, operatingInterval);
-					
-					local delayStart = Utils.getNoNil(rotationNode.delayStart, false);
+				
+				if rotationNode.intervals ~= nil then					
+					local startDelay = Utils.getNoNil(rotationNode.startDelay, 0);
+					startDelay = math.max(startDelay, 0);
 					local operatingTime = 0;
-					if delayStart then
-						operatingTime = operatingInterval * 1000;
+					if startDelay > 0 then
+						operatingTime = startDelay * 1000;
 					end;
 
+					node.intervalId = 0;
+					node.intervals = rotationNode.intervals;
+					node.numIntervals = #rotationNode.intervals;
+					node.intervalActive = false;
 					node.delayTime = operatingTime;
 					node.operatingTime = operatingTime;
-					node.operatingInterval = operatingInterval * 1000;
-					node.stoppedInterval = stoppedInterval * 1000;
-					node.interval = operatingTime;
-					node.active = false;
 				end;
 
 				table.insert(self.rotationNodes, node);
@@ -179,34 +180,33 @@ end;
 function GC_RotationNodes:update(dt)
 	if self.isClient and self:getCanUpdateRotation() then
 		local rotatingNodes = 0;
-		for _, node in pairs(self.rotationNodes) do
-			if node.interval ~= nil then
+		for i = 1, self.numRotationNodes do
+			local node = self.rotationNodes[i];
+			if node.intervals ~= nil then
 				if self.rotationActive then
 					node.operatingTime = node.operatingTime - dt;
 					if node.operatingTime <= 0 then
-						if node.active then
-							node.active = false;
-							node.interval = node.stoppedInterval;
-						else
-							node.active = true;
-							node.interval = node.operatingInterval;
+						node.intervalId = node.intervalId + 1;
+						if node.intervalId > node.numIntervals then
+							node.intervalId = 1;
 						end;
-						
-						node.operatingTime = node.operatingTime + node.interval;
+
+						node.operatingTime = node.operatingTime + node.intervals[node.intervalId];
+						node.intervalActive = not node.intervalActive;
 					end;
-					if node.active then
+					
+					if node.intervalActive then
 						node.currentRotation = math.min(1, node.currentRotation + dt / node.fadeOnTime);
 					else
 						node.currentRotation = math.max(0, node.currentRotation - dt / node.fadeOffTime);
 					end;
 				else
 					node.currentRotation = math.max(0, node.currentRotation - dt / node.fadeOffTime);
-					if node.active then
-						node.active = not node.active;
-						node.operatingTime = node.delayTime;
-					else
-						node.operatingTime = node.delayTime;
+					if node.intervalActive then
+						node.intervalActive = false;
 					end;
+					node.operatingTime = node.delayTime;
+					node.intervalId = 0;
 				end;
 			else
 				if self.rotationActive then

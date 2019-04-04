@@ -29,11 +29,9 @@
 --
 
 GC_Sounds = {};
-
 local GC_Sounds_mt = Class(GC_Sounds);
-InitObjectClass(GC_Sounds, "GC_Sounds");
 
-GC_Sounds.debugIndex = g_company.debug:registerScriptName("Sounds");
+GC_Sounds.debugIndex = g_company.debug:registerScriptName("GC_Sounds");
 
 g_company.sounds = GC_Sounds;
 
@@ -46,6 +44,8 @@ function GC_Sounds:new(isServer, isClient, customMt)
 
 	self.soundsRunning = false;
 	self.disableSoundEffects = false;
+	
+	self.numIntervalSounds = 0;
 
 	return self;
 end;
@@ -90,20 +90,22 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
 				end;
 
 				if sound.sample ~= nil or sound.node ~= nil then
-					local operatingInterval = Utils.getNoNil(getXMLFloat(xmlFile, key.."#operatingIntervalSeconds"), 0);
-					if operatingInterval > 0 then
-						local stoppedInterval = Utils.getNoNil(getXMLFloat(xmlFile, key.."#stoppedIntervalSeconds"), operatingInterval);
-						local delayStart = Utils.getNoNil(getXMLBool(xmlFile, key.."#delayedStart"), false);
+					-- Operating sequence must be multiplies of two. These numbers will then loop.  6 8 4 4 = on(6 sec) off(8 sec) on(4 sec) off(4 sec)
+					local intervals = g_company.xmlUtils.getEvenTableFromXMLString(xmlFile, key .. "#operatingSequence", 2, true, false, 1000, self.debugData);
+					if intervals ~= nil then
+						-- This is the number of 'seconds' before the operation will start each time sound is requested to start.
+						local startDelay = Utils.getNoNil(getXMLInt(xmlFile, key .. "#startDelay"), 0);
+						startDelay = math.max(startDelay, 0);
 						local operatingTime = 0;
-						if delayStart then
-							operatingTime = stoppedInterval * 1000;
+						if startDelay > 0 then
+							operatingTime = startDelay * 1000;
 						end;
 
-						sound.active = false;
+						sound.intervalId = 0;
+						sound.intervals = intervals;
+						sound.numIntervals = #intervals;
+						sound.intervalActive = false;
 						sound.delayTime = operatingTime;
-						sound.operatingInterval = operatingInterval * 1000;
-						sound.stoppedInterval = stoppedInterval * 1000;
-						sound.interval = operatingTime;
 						sound.operatingTime = operatingTime;
 
 						if self.intervalSounds == nil then
@@ -111,7 +113,7 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
 							returnValue = true;
 						end;
 
-						table.insert(self.intervalSounds, sound);
+						table.insert(self.intervalSounds, sound);						
 					else
 						if self.standardSounds == nil then
 							self.standardSounds = {};
@@ -139,6 +141,7 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
 		end;
 
 		if self.intervalSounds ~= nil then
+			self.numIntervalSounds = #self.intervalSounds;
 			g_company.addRaisedUpdateable(self);
 		end;
 	else
@@ -157,7 +160,7 @@ function GC_Sounds:delete()
 		end;
 
 		if self.intervalSounds ~= nil then
-			for i = 1, #self.intervalSounds do
+			for i = 1, self.numIntervalSounds do
 				if self.intervalSounds[i].sample ~= nil then
 					g_soundManager:deleteSample(self.intervalSounds[i].sample);
 				end;
@@ -182,31 +185,34 @@ function GC_Sounds:update(dt)
 	if self.isClient then
 		if self.intervalSounds ~= nil then
 			if self.soundsRunning then
-				for _, sound in pairs (self.intervalSounds) do
+				for i = 1, self.numIntervalSounds do
+					local sound = self.intervalSounds[i];
 					sound.operatingTime = sound.operatingTime - dt;
 					if sound.operatingTime <= 0 then
+						sound.intervalId = sound.intervalId + 1;
+						if sound.intervalId > sound.numIntervals then
+							sound.intervalId = 1;
+						end;
+
+						sound.operatingTime = sound.operatingTime + sound.intervals[sound.intervalId];
+						
 						if sound.sample ~= nil then
-							if sound.active then
-								sound.active = false;
+							if sound.intervalActive then
+								sound.intervalActive = false;
 								g_soundManager:stopSample(sound.sample);
-								sound.interval = sound.stoppedInterval;
 							else
-								sound.active = true;
+								sound.intervalActive = true;
 								g_soundManager:playSample(sound.sample);
-								sound.interval = sound.operatingInterval;
 							end;
 						elseif sound.node ~= nil then
-							if sound.active then
-								sound.active = false;
+							if sound.intervalActive then
+								sound.intervalActive = false;
 								setVisibility(sound.node, false);
-								sound.interval = sound.stoppedInterval;
 							else
-								sound.active = true;
+								sound.intervalActive = true;
 								setVisibility(sound.node, true);
-								sound.interval = sound.operatingInterval;
 							end;
 						end;
-						sound.operatingTime = sound.operatingTime + sound.interval;
 					end;
 				end;
 				if not self.disableSoundEffects  then
@@ -217,15 +223,17 @@ function GC_Sounds:update(dt)
 			else
 				if self.disableSoundEffects then
 					self.disableSoundEffects = false;
-					for _, sound in pairs (self.intervalSounds) do
+					for i = 1, self.numIntervalSounds do
+						local sound = self.intervalSounds[i];
 						if sound.sample ~= nil then
-							sound.active = false;
+							sound.intervalActive = false;
 							g_soundManager:stopSample(sound.sample);
 							sound.operatingTime = sound.delayTime;
 						elseif sound.node ~= nil then
-							sound.active = false;
+							sound.intervalActive = false;
 							setVisibility(sound.node, false);
 							sound.operatingTime = sound.delayTime;
+							shader.intervalId = 0;
 						end;
 					end;
 				end;
@@ -255,14 +263,15 @@ function GC_Sounds:setSoundsState(state, forceState)
 
 			if self.standardSounds ~= nil then
 				for i = 1, #self.standardSounds do
-					if self.standardSounds[i].sample ~= nil then
+					local sound = self.standardSounds[i];
+					if sound.sample ~= nil then
 						if self.soundsRunning then
-							g_soundManager:playSample(self.standardSounds[i].sample);
+							g_soundManager:playSample(sound.sample);
 						else
-							g_soundManager:stopSample(self.standardSounds[i].sample);
+							g_soundManager:stopSample(sound.sample);
 						end;
-					elseif self.standardSounds[i].node ~= nil then
-						setVisibility(self.standardSounds[i].node, self.soundsRunning);
+					elseif sound.node ~= nil then
+						setVisibility(sound.node, self.soundsRunning);
 					end;
 				end;
 			end;

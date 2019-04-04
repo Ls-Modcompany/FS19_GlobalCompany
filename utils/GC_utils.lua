@@ -147,7 +147,7 @@ end;
 function GlobalCompanyUtils.removeModEventListener(listener)
 	print("DEV WARNING: 'GlobalCompanyUtils.removeModEventListener' is a depreciated function in GC FS19. Use GIANTS builtIn 'removeModEventListener(self)' instead.");
 	return removeModEventListener(listener);
-	
+
 	-- local deleteKey = 0;
 	-- for k,list in pairs(g_modEventListeners) do
 		-- if list == listener then
@@ -193,24 +193,63 @@ function GlobalCompanyUtils.getSplitClassName(object, backupString)
 	return splitClassName;
 end;
 
-function GlobalCompanyUtils.getNumbersFromString(xmlFile, key, count, returnRadians, debugData)
-	local stringValue = getXMLString(xmlFile, key);
+function GlobalCompanyUtils.getNumbersFromString(stringValue, count, returnRadians, debugData)
 	if stringValue ~= nil and count ~= nil then
 		local stringTable = StringUtil.splitString(" ", stringValue);
 		if #stringTable >= count then
 			stringValue = {};
 			for i = 1, count do
+				local number = tonumber(stringTable[i])
 				if returnRadians == true then
-					table.insert(stringValue, math.rad(tonumber(stringTable[i])));
+					local radNumber = math.rad(number);
+					table.insert(stringValue, radNumber);
 				else
-					table.insert(stringValue, tonumber(stringTable[i]));
+					table.insert(stringValue, number);
 				end;
+			end;
+			
+			return stringValue;
+		else
+			if debugData ~= nil then
+				g_company.debug:writeModding(debugData, "%d-vector given, %d-vector required.", #stringTable, count);
+			else
+				print(string.format("    ERROR: %d-vector given, %d-vector required.", #stringTable, count));
+			end;
+			
+			return;
+		end;
+	end;
+
+	return;
+end;
+
+-- Uses 'modulo operation' to return a table with an EVEN key value based on the given 'moduloValue'.
+-- 'multiplier' can't be used with 'returnRadians' and will be ignored.
+function GlobalCompanyUtils.getEvenTableFromString(stringValue, moduloValue, returnNumbers, returnRadians, multiplier, debugData)
+	if stringValue ~= nil then
+		local stringTable = StringUtil.splitString(" ", stringValue);
+		local tableLength = #stringTable;
+		moduloValue = GlobalCompanyUtils.getGreater(1, moduloValue, 0);
+		if (tableLength % moduloValue) == 0 then
+			if returnNumbers == true then
+				multiplier = GlobalCompanyUtils.getGreater(1, multiplier, 0);
+				stringValue = {};
+				for i = 1, tableLength do
+					local number = tonumber(stringTable[i]);
+					if returnRadians == true then
+						stringValue[i] = math.rad(number);
+					else
+						stringValue[i] = number * multiplier;
+					end;
+				end;
+			else
+				return stringTable;
 			end;
 		else
 			if debugData ~= nil then
-				g_company.debug:writeModding(debugData, "%d-vector given, %d-vector required at %s", #stringTable, count, key);
+				g_company.debug:writeModding(debugData, "Odd number of values '%d' given.", tableLength);
 			else
-				print(string.format("    ERROR: %d-vector given, %d-vector required at %s", #stringTable, count, key));
+				print(string.format("    ERROR: Odd number of values '%d' given.", tableLength));
 			end;
 			stringValue = nil;
 		end;
@@ -253,10 +292,7 @@ end;
 function GlobalCompanyUtils.getParentBaseDirectory(parent, baseDirectory)
 	if baseDirectory == nil then
 		if parent ~= nil then
-			baseDirectory = parent.baseDirectory;
-			if baseDirectory == nil or baseDirectory == "" then
-				baseDirectory = g_currentMission.baseDirectory;
-			end;
+			baseDirectory = GlobalCompanyUtils.getCorrectValue(parent.baseDirectory, g_currentMission.baseDirectory, "");
 		else
 			baseDirectory = g_currentMission.baseDirectory;
 		end;
@@ -266,16 +302,9 @@ function GlobalCompanyUtils.getParentBaseDirectory(parent, baseDirectory)
 end;
 
 -- This is acts like 'Utils.getNoNil' except you can set your own ignore value.
--- 'nil' is ignored by default but this can be changed by setting 'ignoreNil' FALSE.
-function GlobalCompanyUtils.getCorrectValue(value, newValue, ignoreValue, ignoreNil)
-	if ignoreNil ~= false then
-		if value == nil or value == ignoreValue then
-			return newValue;
-		end;		
-	else
-		if value == ignoreValue then
-			return newValue;
-		end;		
+function GlobalCompanyUtils.getCorrectValue(value, newValue, ignoreValue)
+	if value == nil or value == ignoreValue then
+		return newValue;
 	end;
 
 	return value;

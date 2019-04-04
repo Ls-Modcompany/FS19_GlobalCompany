@@ -248,6 +248,7 @@ function GlobalCompany.loadSourceFiles()
 	-- source(GlobalCompany.dir .. "objects/GC_ObjectSpawner.lua");
 	source(GlobalCompany.dir .. "objects/GC_RotationNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
+	source(GlobalCompany.dir .. "objects/GC_AnimationClips.lua");
 	source(GlobalCompany.dir .. "objects/GC_DigitalDisplays.lua");
 	source(GlobalCompany.dir .. "objects/GC_ActivableObject.lua");
 	source(GlobalCompany.dir .. "objects/GC_VisibilityNodes.lua");
@@ -274,6 +275,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "additionals/GC_HorseHelper.lua");
 	source(GlobalCompany.dir .. "additionals/GC_MoreTrees.lua");
 	source(GlobalCompany.dir .. "additionals/GC_ObjectInfo.lua");
+	source(GlobalCompany.dir .. "additionals/GC_BaleAddon.lua");
 
 	--|| Events ||--
 	source(GlobalCompany.dir .. "events/GC_PalletCreatorWarningEvent.lua");

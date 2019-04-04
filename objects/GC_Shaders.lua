@@ -27,11 +27,9 @@
 --
 
 GC_Shaders = {};
-
 local GC_Shaders_mt = Class(GC_Shaders);
-InitObjectClass(GC_Shaders, "GC_Shaders");
 
-GC_Shaders.debugIndex = g_company.debug:registerScriptName("Shaders");
+GC_Shaders.debugIndex = g_company.debug:registerScriptName("GC_Shaders");
 
 g_company.shaders = GC_Shaders;
 
@@ -44,6 +42,8 @@ function GC_Shaders:new(isServer, isClient, customMt)
 
 	self.shadersActive = false;
 	self.disableShaders = false;
+	
+	self.numIntervalShaders = 0;
 
 	return self;
 end;
@@ -82,24 +82,26 @@ function GC_Shaders:load(nodeId, target, xmlFile, xmlKey, groupKey)
 					shader.shaderParameter = shaderParameter;
 
 					local values = {getShaderParameter(node, shaderParameter)};
-					shader.offValues = Utils.getNoNil(GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. "#offValues", 4, false, self.debugData), values);
-					shader.onValues = Utils.getNoNil(GlobalCompanyUtils.getNumbersFromString(xmlFile, key .. "#onValue", 4, false, self.debugData), values);
+					shader.offValues = Utils.getNoNil(GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. "#offValues", 4, false, self.debugData), values);
+					shader.onValues = Utils.getNoNil(GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. "#onValue", 4, false, self.debugData), values);
 					shader.shared = Utils.getNoNil(getXMLBool(xmlFile, key .. "#shared"), false);
 
-					local operatingInterval = Utils.getNoNil(getXMLFloat(xmlFile, key .. "#operatingIntervalSeconds"), 0);
-					if operatingInterval > 0 then
-						local stoppedInterval = Utils.getNoNil(getXMLFloat(xmlFile, key .. "#stoppedIntervalSeconds"), operatingInterval);
-						local delayStart = Utils.getNoNil(getXMLBool(xmlFile, key .. "#delayedStart"), false);
+					-- Operating sequence must be multiplies of two. These numbers will then loop.  6 8 4 4 = on(6 sec) off(8 sec) on(4 sec) off(4 sec)
+					local intervals = g_company.xmlUtils.getEvenTableFromXMLString(xmlFile, key .. "#operatingSequence", 2, true, false, 1000, self.debugData);
+					if intervals ~= nil then
+						-- This is the number of 'seconds' before the operation will start each time shader is requested to start.
+						local startDelay = Utils.getNoNil(getXMLInt(xmlFile, key .. "#startDelay"), 0);
+						startDelay = math.max(startDelay, 0);
 						local operatingTime = 0;
-						if delayStart then
-							operatingTime = stoppedInterval * 1000;
+						if startDelay > 0 then
+							operatingTime = startDelay * 1000;
 						end;
 
-						shader.active = false;
+						shader.intervalId = 0;
+						shader.intervals = intervals;
+						shader.numIntervals = #intervals;
+						shader.intervalActive = false;
 						shader.delayTime = operatingTime;
-						shader.operatingInterval = operatingInterval * 1000;
-						shader.stoppedInterval = stoppedInterval * 1000;
-						shader.interval = operatingTime;
 						shader.operatingTime = operatingTime;
 
 						if self.intervalShaders == nil then
@@ -125,6 +127,7 @@ function GC_Shaders:load(nodeId, target, xmlFile, xmlKey, groupKey)
 		end;
 
 		if self.intervalShaders ~= nil then
+			self.numIntervalShaders = #self.intervalShaders;
 			g_company.addRaisedUpdateable(self);
 		end;
 	else
@@ -147,19 +150,24 @@ function GC_Shaders:update(dt)
 	if self.isClient then
 		if self.intervalShaders ~= nil then
 			if self.shadersActive then
-				for _, shader in pairs (self.intervalShaders) do
+				for i = 1, self.numIntervalShaders do
+					local shader = self.intervalShaders[i];
 					shader.operatingTime = shader.operatingTime - dt;
 					if shader.operatingTime <= 0 then
-						if shader.active then
-							shader.active = false;
-							setShaderParameter(shader.node, shader.shaderParameter, shader.offValues[1], shader.offValues[2], shader.offValues[3], shader.offValues[4], shader.shared);
-							shader.interval = shader.stoppedInterval;
-						else
-							shader.active = true;
-							setShaderParameter(shader.node, shader.shaderParameter, shader.onValues[1], shader.onValues[2], shader.onValues[3], shader.onValues[4], shader.shared);
-							shader.interval = shader.operatingInterval;
+						shader.intervalId = shader.intervalId + 1;
+						if shader.intervalId > shader.numIntervals then
+							shader.intervalId = 1;
 						end;
-						shader.operatingTime = shader.operatingTime + shader.interval;
+
+						shader.operatingTime = shader.operatingTime + shader.intervals[shader.intervalId];
+					
+						if shader.intervalActive then
+							shader.intervalActive = false;
+							setShaderParameter(shader.node, shader.shaderParameter, shader.offValues[1], shader.offValues[2], shader.offValues[3], shader.offValues[4], shader.shared);
+						else
+							shader.intervalActive = true;
+							setShaderParameter(shader.node, shader.shaderParameter, shader.onValues[1], shader.onValues[2], shader.onValues[3], shader.onValues[4], shader.shared);
+						end;
 					end;
 				end;
 
@@ -171,11 +179,13 @@ function GC_Shaders:update(dt)
 			else
 				if self.disableShaders then
 					self.disableShaders = false;
-					for _, shader in pairs (self.intervalShaders) do
-						if shader.active then
-							shader.active = false;
+					for i = 1, self.numIntervalShaders do
+						local shader = self.intervalShaders[i];
+						if shader.intervalActive then
+							shader.intervalActive = false;
 							setShaderParameter(shader.node, shader.shaderParameter, shader.offValues[1], shader.offValues[2], shader.offValues[3], shader.offValues[4], shader.shared);
 							shader.operatingTime = shader.delayTime;
+							shader.intervalId = 0;
 						end;
 					end;
 				end;
@@ -192,7 +202,7 @@ function GC_Shaders:setShadersState(state, forceState)
 			self.shadersActive = setState;
 		
 			if self.standardShaders ~= nil then
-				for _, shader in pairs (self.standardShaders) do
+				for _, shader in pairs (self.standardShaders) do				
 					if self.shadersActive then
 						setShaderParameter(shader.node, shader.shaderParameter, shader.onValues[1], shader.onValues[2], shader.onValues[3], shader.onValues[4], shader.shared);
 					else
