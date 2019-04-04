@@ -33,6 +33,8 @@ function Gc_Gui_MainGui:new(target, custom_mt)
         custom_mt = Gc_Gui_MainGui_mt;
     end;
     local self = setmetatable({}, Gc_Gui_MainGui_mt);
+
+    g_company.gui:loadGui(Gc_Gui_MainSettings, "gcMainSettings");
     
     self.backupItems = {};            
 	return self;
@@ -51,7 +53,7 @@ function Gc_Gui_MainGui:onOpen()
     g_depthOfFieldManager:setBlurState(true)
 
     if not self.loadSettings then
-        self:addMenuItem("g_gcUi2", "icon_settings2", g_company.gui:loadGui(Gc_Gui_MainSettings, "gcMainSettings"), true);
+        self:addMenuItem("g_gcUi2", "icon_settings2", g_company.gui:getGui("gcMainSettings"), true);
         self.loadSettings = true;
     end;
     
@@ -91,8 +93,6 @@ function Gc_Gui_MainGui:onClickMainMenu(item)
     if  self.activeGui ~= nil then
         self.activeGui:closeGui();   
     end;
-    self.gui_content:removeElements();
-    self.gui_content:addElement(item.mainMenuGui.rootElement);
     self.activeGui = item.mainMenuGui;
     self.activeGui:openGui();   
     for i,e in pairs(self.gui_menu.elements) do

@@ -18,6 +18,7 @@
 -- 
 -- ToDo:
 -- 		xmlIinformations at fakegui (kevin)
+--		debug is wrong
 -- 
 local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui");
 
@@ -105,7 +106,7 @@ function GlobalCompanyGui:update(dt)
 			for _, fileName in pairs(GlobalCompanyGui.DevelopementVersionTemplatesFilename) do				
 				self:loadGuiTemplates(fileName);
 			end;
-			for name,gui in pairs(self.guis) do				
+			for name,gui in pairs(self.guis) do		
 				gui.gui:deleteElements();
 				gui.gui:loadFromXML();
 			end;
@@ -185,16 +186,24 @@ function GlobalCompanyGui:delete()
 end;
 
 function GlobalCompanyGui:loadGui(class, name)
+	if self.guis[name] ~= nil then
+		g_company.debug.write(debugIndex, Debug.ERROR, "Gui %s already exist.", name);
+		return;
+	else 
+		self.guis[name] = {};
+	end;
+
 	local classGui = class:new();
 	local newGui = GC_Gui:new(name);
 	newGui:assignClass(classGui);
+	self.guis[name].gui = newGui;
 	newGui:loadFromXML();
 	return newGui;
 end;
 
 function GlobalCompanyGui:registerGui(name, inputAction, class, isFullGui, canExit, onWalkActive)
 	if self.guis[name] ~= nil then
-		g_company.debug.write(debugIndex, Debug.ERROR, "Gui %s already exist.", name); --gui
+		g_company.debug.write(debugIndex, Debug.ERROR, "Gui %s already exist.", name);
 		return;
 	else 
 		self.guis[name] = {};
@@ -277,6 +286,10 @@ function GlobalCompanyGui:getGuiForOpen(name, asDialog)
 	else
 		self.smallGuis[name] = true;
 	end;
+	return self.guis[name].gui;
+end;
+
+function GlobalCompanyGui:getGui(name)
 	return self.guis[name].gui;
 end;
 
