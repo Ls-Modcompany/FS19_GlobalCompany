@@ -199,10 +199,9 @@ end;
 
 function GC_Gui_element:removeElements()
 	for k,e in pairs(self.elements) do
-		table.remove(self.elements, k);
 		e.parent = nil;
-		break;
 	end;
+	self.elements = {};
 end;
 
 function GC_Gui_element:setDisabled(state)

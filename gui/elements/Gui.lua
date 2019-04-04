@@ -120,10 +120,10 @@ function GC_Gui:update(dt)
 end;
 
 function GC_Gui:draw()
+	self.rootElement:draw();
 	if self.classGui.draw ~= nil then
 		self.classGui:draw();
 	end;
-	self.rootElement:draw();
 end;
 
 function GC_Gui:openGui()

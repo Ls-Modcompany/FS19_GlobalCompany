@@ -92,7 +92,7 @@ end;
 function GC_Gui_overlay:copy(src)
 	GC_Gui_overlay:superClass().copy(self, src);
 	
-	self.imageFilename = src.imageFilename;
+	self:setImageFilename(src.imageFilename);
 	self.uvs = src.uvs;
 	self.uvs_selected = src.uvs_selected;
 	self.uvs_disabled = src.uvs_disabled;
@@ -112,7 +112,7 @@ function GC_Gui_overlay:copy(src)
 		self:addElement(self.borders);
 	end;
 	
-	self.imageOverlay = createImageOverlay(self.imageFilename);
+	--self.imageOverlay = createImageOverlay(self.imageFilename);
 	self:copyOnCreate();
 end;
 
