@@ -25,6 +25,5 @@ Changelog:
           </GuiElement>	              
         </GuiElement>
     </GuiElement>
-    <GuiElement type="image" template="gcMainContent" id="gui_content" />
   </GuiElement>
 </GUI>
