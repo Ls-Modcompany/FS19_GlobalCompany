@@ -27,7 +27,13 @@ local GC_BaleAddon_mt = Class(GC_BaleAddon);
 InitObjectClass(GC_BaleAddon, "GC_BaleAddon");
 
 GC_BaleAddon.debugIndex = g_company.debug:registerScriptName("GC_BaleAddon");
+GC_BaleAddon.eventName = {};
+GC_BaleAddon.enableCutBale = false;
+GC_BaleAddon.object = nil;
 
+function GC_BaleAddon:load()
+	Player.registerActionEvents = Utils.appendedFunction(Player.registerActionEvents, GC_BaleAddon.registerActionEvents);
+end;
 
 function GC_BaleAddon:init()
 	local self = setmetatable({}, GC_BaleAddon_mt);
@@ -36,9 +42,9 @@ function GC_BaleAddon:init()
 	self.isClient = g_client ~= nil;
 	
 	self.debugData = g_company.debug:getDebugData(GC_BaleAddon.debugIndex, g_company);
-
+	
 	if self.isClient then
-		g_company.addUpdateable(self, self.update);	
+		g_company.addUpdateable(self, self.update);			
 	end;
 
 	-- g_company.settings:initSetting(self, "objectInfo", true);
@@ -46,47 +52,73 @@ function GC_BaleAddon:init()
 	return self;
 end;
 
+function GC_BaleAddon:registerActionEvents()
+	local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'GC_BALEADDON_CUT',self, GC_BaleAddon.actionCut ,false ,true ,false ,true);
+	if result then
+        table.insert(GC_BaleAddon.eventName, eventName);
+		g_inputBinding.events[eventName].displayIsVisible = false;
+    end	
+end;
+
 function GC_BaleAddon:update(dt)
 	if self.isClient then
+		GC_BaleAddon.enableCutBale = false;
 		if g_currentMission.player.isControlled and not g_currentMission.player.isCarryingObject then
 			if g_currentMission.player.isObjectInRange then
 				if (g_currentMission.player.lastFoundObject ~= nil) then
 					local foundObjectId = g_currentMission.player.lastFoundObject;
 					if (foundObjectId ~= g_currentMission.terrainDetailId) then	
 						if getRigidBodyType(foundObjectId) == "Dynamic" then
-							local object = g_currentMission:getNodeObject(foundObjectId);
-							if (object~= nil) then
-								-- gc_debugPrint(object, nil, 2, "GC_BaleAddon");
-								-- GC_BaleAddon:shredderBale(object, self.isServer, self.isClient);
+							GC_BaleAddon.object = g_currentMission:getNodeObject(foundObjectId);
+							if (GC_BaleAddon.object~= nil) then
+								if (GC_BaleAddon.object.typeName == nil) and (GC_BaleAddon.object.fillType ~= nil) and (GC_BaleAddon.object.fillLevel ~= nil) then
+								-- gc_debugPrint(GC_BaleAddon.object.typeName, nil, nil, "GC_BaleAddon - GC_BaleAddon.object");
+									GC_BaleAddon.enableCutBale = true;
+								end;
 							end;
 						end;
 					end;
 				end;
 			end;	
 		end;
+		GC_BaleAddon:displayHelp(GC_BaleAddon.enableCutBale);
 	end;
 end;
 
-function GC_BaleAddon:shredderBale(foundObject, isServer, isClient)
--- Arguments
--- table	vehicle	vehicle that is tipping
--- float	delta	delta to tip
--- integer	filltype	fill type to tip
--- float	sx	start x position
--- float	sy	start y position
--- float	sz	start z position
--- float	ex	end x position
--- float	ey	end y position
--- float	ez	end z position
--- float	innerRadius	inner radius
--- float	radius	radius
--- float	lineOffset	line offset
--- boolean	limitToLineHeight	limit to line height
--- table	occlusionAreas	occlusion areas
--- boolean	useOcclusionAreas	use occlusion areas
--- Return Values
--- float	dropped	real fill level dropped
--- float	lineOffset	line offset
+function GC_BaleAddon:actionCut(actionName, keyStatus, arg3, arg4, arg5)
+	if GC_BaleAddon.enableCutBale and (GC_BaleAddon.object ~= nil) then
+		GC_BaleAddon:cutBale(GC_BaleAddon.object, self.isServer, self.isClient);
+	end;
+end;
+
+function GC_BaleAddon:displayHelp(state)
+	for i=1, #self.eventName, 1 do
+		if (g_inputBinding.events[self.eventName[i]] ~= nil) then
+			g_inputBinding.events[self.eventName[i]].displayIsVisible = state;
+		end;	
+	end;	
+end;
+
+function GC_BaleAddon:cutBale(foundObject, isServer, isClient)
+	-- Arguments
+	-- table	vehicle	vehicle that is tipping
+	-- float	delta	delta to tip
+	-- integer	filltype	fill type to tip
+	-- float	sx	start x position
+	-- float	sy	start y position
+	-- float	sz	start z position
+	-- float	ex	end x position
+	-- float	ey	end y position
+	-- float	ez	end z position
+	-- float	innerRadius	inner radius
+	-- float	radius	radius
+	-- float	lineOffset	line offset
+	-- boolean	limitToLineHeight	limit to line height
+	-- table	occlusionAreas	occlusion areas
+	-- boolean	useOcclusionAreas	use occlusion areas
+	-- Return Values
+	-- float	dropped	real fill level dropped
+	-- float	lineOffset	line offset
     
 	if (foundObject.fillLevel ~= nil) and (foundObject.fillType ~= nil) then
 		local sx,sy,sz = getWorldTranslation(foundObject.nodeId);
@@ -94,8 +126,6 @@ function GC_BaleAddon:shredderBale(foundObject, isServer, isClient)
 		local minLevel = math.random(20, 150);
 		
 		local dropped, lineOffset = DensityMapHeightUtil.tipToGroundAroundLine(nil, foundObject.fillLevel, foundObject.fillType, sx, sy, sz, (sx + 0.1), (sy - 0.1), (sz + 0.1), 0, radius, 3, false, nil, false);
-		gc_debugPrint(dropped, nil, nil, "GC_BaleAddon - dropped");
-		gc_debugPrint(lineOffset, nil, nil, "GC_BaleAddon - lineOffset");
 		foundObject:setFillLevel(foundObject:getFillLevel() - dropped);
 		
 		if isServer then
@@ -107,3 +137,4 @@ function GC_BaleAddon:shredderBale(foundObject, isServer, isClient)
 end
 
 g_company.addInit(GC_BaleAddon, GC_BaleAddon.init);
+g_company.addLoadable(GC_BaleAddon, GC_BaleAddon.load);

@@ -20,12 +20,14 @@
 		<text name="input_GC_BALESHREADER_TURNON_AREALIGHTS"><en>turnAreaLights</en></text>
 		<text name="input_GC_MAIN"><en>GlobalCompany</en><de>GlobalCompany</de></text>
 		<text name="input_GC_TEST"><en>test</en></text>
+		<text name="input_GC_BALEADDON_CUT"><en>Ballen aufschneiden</en></text>
 	</l10n>		
 	
 	<actions>
         <action name="GC_BALESHREADER_TURNON_AREALIGHTS" />
         <action name="GC_MAIN" />
         <action name="GC_TEST" />
+		<action name="GC_BALEADDON_CUT" />
     </actions>
 
     <inputBinding>
@@ -39,6 +41,9 @@
         <actionBinding action="GC_TEST">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_r" axisComponent="+" neutralInput="0" index="1"/>
         </actionBinding>
+        <actionBinding action="GC_BALEADDON_CUT">
+            <binding device="KB_MOUSE_DEFAULT" input="MOUSE_BUTTON_RIGHT" axisComponent="+" neutralInput="0" index="3"/>
+        </actionBinding>		
     </inputBinding>
     
 
