@@ -47,7 +47,7 @@ function GC_BaleAddon:init()
 		g_company.addUpdateable(self, self.update);			
 	end;
 
-	-- g_company.settings:initSetting(self, "objectInfo", true);
+	-- g_company.settings:initSetting(self, "baleCut", true);
 	
 	return self;
 end;
@@ -72,8 +72,8 @@ function GC_BaleAddon:update(dt)
 							GC_BaleAddon.object = g_currentMission:getNodeObject(foundObjectId);
 							if (GC_BaleAddon.object~= nil) then
 								if (GC_BaleAddon.object.typeName == nil) and (GC_BaleAddon.object.fillType ~= nil) and (GC_BaleAddon.object.fillLevel ~= nil) then
-								-- gc_debugPrint(GC_BaleAddon.object.typeName, nil, nil, "GC_BaleAddon - GC_BaleAddon.object");
-									GC_BaleAddon.enableCutBale = true;
+								-- gc_debugPrint(GC_BaleAddon.object.typeName, nil, nil, "GC_BaleAddon - GC_BaleAddon.object.typename");
+									GC_BaleAddon.enableCutBale = GC_BaleAddon:getCanCutBale(GC_BaleAddon.object);
 								end;
 							end;
 						end;
@@ -97,6 +97,20 @@ function GC_BaleAddon:displayHelp(state)
 			g_inputBinding.events[self.eventName[i]].displayIsVisible = state;
 		end;	
 	end;	
+end;
+
+function GC_BaleAddon:getCanCutBale(foundObject)
+	if (foundObject.fillLevel ~= nil) and (foundObject.fillType ~= nil) then
+		local testDrop = g_densityMapHeightManager:getMinValidLiterValue(foundObject.fillType);
+		local sx,sy,sz = getWorldTranslation(foundObject.nodeId);
+		local radius = (DensityMapHeightUtil.getDefaultMaxRadius(foundObject.fillType) / 2);
+		
+		if DensityMapHeightUtil.getCanTipToGroundAroundLine(nil, testDrop, foundObject.fillType, sx, sy, sz, (sx + 0.1), (sy - 0.1), (sz + 0.1), radius, nil, 3, true, nil, true) then
+			return true;
+		end;
+	end;
+	
+	return false;
 end;
 
 function GC_BaleAddon:cutBale(foundObject, isServer, isClient)
