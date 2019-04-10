@@ -69,7 +69,7 @@ function GlobalCompany.initialLoad()
 
 	-- Can we load?
 	if g_company.modManager:doLoadCheck(g_currentModName, duplicateLoad, GlobalCompany.isDevelopmentVersion) then
-		g_company.debug:singleLogWrite(GlobalCompany.debugIndex, GC_DebugUtils.BLANK, "Loading Version: %s (%s)", GlobalCompany.version, GlobalCompany.versionDate);
+		g_company.debug:singleLogWrite(GC_DebugUtils.BLANK, "Loading Version: %s (%s)", GlobalCompany.version, GlobalCompany.versionDate);
 		addModEventListener(GlobalCompany);
 
 		Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, GlobalCompany.init);
@@ -245,7 +245,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_FillVolume.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicHeap.lua");
 	source(GlobalCompany.dir .. "objects/GC_PalletCreator.lua");
-	-- source(GlobalCompany.dir .. "objects/GC_ObjectSpawner.lua");
+	source(GlobalCompany.dir .. "objects/GC_ObjectSpawner.lua");
 	source(GlobalCompany.dir .. "objects/GC_RotationNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
 	source(GlobalCompany.dir .. "objects/GC_AnimationClips.lua");
@@ -261,9 +261,10 @@ function GlobalCompany.loadSourceFiles()
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
-	source(GlobalCompany.dir .. "triggers/GC_PlayerTrigger.lua");
-	source(GlobalCompany.dir .. "triggers/GC_UnloadingTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_BaleTrigger.lua");
+	source(GlobalCompany.dir .. "triggers/GC_PlayerTrigger.lua");
+	source(GlobalCompany.dir .. "triggers/GC_LoadingTrigger.lua");
+	source(GlobalCompany.dir .. "triggers/GC_UnloadingTrigger.lua");
 
 	--|| Placeables ||--
 	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");

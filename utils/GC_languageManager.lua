@@ -240,7 +240,7 @@ function GC_languageManager:compareLanguageFiles(modName, folder)
 			end;
 			path = g_modNameToDirectory[modName] .. folder
 		else
-			g_company.debug:singleLogWrite(GC_languageManager.debugIndex, GC_DebugUtils.WARNING, "Unable to find an active mode with a filename '%s'.", modName);
+			g_company.debug:singleLogWrite(GC_DebugUtils.WARNING, "Unable to find an active mode with a filename '%s'.", modName);
 		end;
 	end;
 
@@ -280,12 +280,12 @@ function GC_languageManager:compareLanguageFiles(modName, folder)
 		for textName, _ in pairs(setNames) do
 			for fileName, texts in pairs(languages) do
 				if texts[textName] == nil then
-					g_company.debug:singleLogWrite(GC_languageManager.debugIndex, GC_DebugUtils.WARNING, "Text '%s' is missing in %s", textName, fileName);
+					g_company.debug:singleLogWrite(GC_DebugUtils.WARNING, "Text '%s' is missing in %s", textName, fileName);
 				end;
 			end;
 		end;
 	else
-		g_company.debug:singleLogWrite(GC_languageManager.debugIndex, GC_DebugUtils.WARNING, "Invalid file path '%s' given! No language files found.", path);
+		g_company.debug:singleLogWrite(GC_DebugUtils.WARNING, "Invalid file path '%s' given! No language files found.", path);
 	end;
 end;
 
