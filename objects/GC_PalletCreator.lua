@@ -105,7 +105,7 @@ function GC_PalletCreator:load(nodeId, target, xmlFile, xmlKey, baseDirectory, p
 						self.palletSizeWidthExtent = sizeWidth * 0.5;
 						self.palletSizeLengthExtent = sizeLength * 0.5;
 
-						local startFill = Utils.getNoNil(getXMLFloat(xmlFile, palletCreatorsKey .. "#startFillThreshold"), 1);
+						local startFill = Utils.getNoNil(getXMLFloat(xmlFile, palletCreatorsKey .. "#startFillThreshold"), 0.75);
 						self.startFillThreshold = math.max(startFill, 0.75); -- Minimum we will accept is 0.75 litres.
 
 						self.showWarnings = Utils.getNoNil(getXMLBool(xmlFile, palletCreatorsKey .. "#showWarnings"), true);
@@ -237,33 +237,47 @@ function GC_PalletCreator:debugDraw(dt)
 	-- end;
 end;
 
-function GC_PalletCreator:updatePalletCreators(delta, getBlockedLevel, includeDeltaToAdd)
+function GC_PalletCreator:updatePalletCreators(delta)
 	if self.isServer then
 		self.deltaToAdd = self.deltaToAdd + delta;
 
 		if self.deltaToAdd > 0 then
+			local totalFillLevel = self:getTotalFillLevel(false, false);
+			
+			local addDelta = false;
 			if self.selectedPallet ~= nil then
 				if self:checkPalletIsValid() then
 					local appliedDelta = self.selectedPallet:addFillUnitFillLevel(self:getOwnerFarmId(), self.palletFillUnitIndex, self.deltaToAdd, self.palletFillTypeIndex, ToolType.UNDEFINED);
 					self.deltaToAdd = self.deltaToAdd - appliedDelta;
 
+					totalFillLevel = totalFillLevel + appliedDelta;
+					
 					-- If we have 'deltaToAdd' then we must have finished filling last pallet?
 					if self.deltaToAdd > 0 and self.deltaToAdd > self.startFillThreshold then
-						self:findNextPallet();
+						addDelta = self:findNextPallet();
 					end;
 				else
 					if self.deltaToAdd > self.startFillThreshold then
-						self:findNextPallet();
+						addDelta = self:findNextPallet();
 					end;
 				end;
 			else
 				if self.deltaToAdd > self.startFillThreshold then
-					self:findNextPallet();
+					addDelta = self:findNextPallet();
 				end;
 			end;
+			
+			if addDelta then
+				local appliedDelta = self.selectedPallet:addFillUnitFillLevel(self:getOwnerFarmId(), self.palletFillUnitIndex, self.deltaToAdd, self.palletFillTypeIndex, ToolType.UNDEFINED);
+				self.deltaToAdd = self.deltaToAdd - appliedDelta;
+				
+				totalFillLevel = totalFillLevel + appliedDelta;
+			else
+				totalFillLevel = totalFillLevel + self.deltaToAdd;
+			end;
+			
+			return totalFillLevel;
 		end;
-
-		return self:getTotalFillLevel(getBlockedLevel, includeDeltaToAdd);
 	else
 		g_company.debug:writeDev(self.debugData, "'updatePalletCreators' is a client only function!");
 	end;
@@ -318,23 +332,26 @@ function GC_PalletCreator:findNextPallet()
 
 	-- If no pallets to fill then find a free node to create a new one at.
 	if self.selectedPallet ~= nil then
-		local appliedDelta = self.selectedPallet:addFillUnitFillLevel(self:getOwnerFarmId(), self.palletFillUnitIndex, self.deltaToAdd, self.palletFillTypeIndex, ToolType.UNDEFINED);
-		self.deltaToAdd = self.deltaToAdd - appliedDelta;
+		return true;
 	else
 		if nextSpawnerToUse ~= nil then
 			self.spawnerInUse = nextSpawnerToUse.spawner;
 			local x, _, z = getWorldTranslation(self.spawnerInUse);
 			local _, ry, _ = getWorldRotation(self.spawnerInUse);
-			self.selectedPallet = g_currentMission:loadVehicle(self.palletFilename, x, nil, z, 1.2, ry, true, 0, Vehicle.PROPERTY_STATE_OWNED, self:getOwnerFarmId(), nil, nil);
-
+			self.selectedPallet = g_currentMission:loadVehicle(self.palletFilename, x, nil, z, 0.5, ry, true, 0, Vehicle.PROPERTY_STATE_OWNED, self:getOwnerFarmId(), nil, nil);
+			
 			-- We do not want to update 'target:palletCreatorInteraction()' when creating a new pallet.
 			self.spawnedPallet = self.palletInteractionTriggers[nextSpawnerToUse.spawnerId] ~= nil;
+			
+			return true;
 		else
 			if self:canShowWarning() then
 				self:showWarningMessage();
 			end;
 		end;
 	end;
+	
+	return false;
 end;
 
 function GC_PalletCreator:checkSpawner(spawner)
@@ -421,10 +438,6 @@ end;
 function GC_PalletCreator:getTotalFillLevel(getBlockedLevel, includeDeltaToAdd)
 	local pallets, totalLevel, blockedLevel = {}, 0, 0;
 
-	if includeDeltaToAdd == true then
-		totalLevel = totalLevel + self.deltaToAdd;
-	end;
-
 	for i = 1, self.numberOfSpawners do
 		self.palletInSpawner = nil;
 		self.otherObject = nil;
@@ -444,6 +457,10 @@ function GC_PalletCreator:getTotalFillLevel(getBlockedLevel, includeDeltaToAdd)
 				blockedLevel = blockedLevel + self.palletCapacity;
 			end;
 		end;
+	end;
+	
+	if includeDeltaToAdd == true then
+		totalLevel = totalLevel + self.deltaToAdd;
 	end;
 
 	if getBlockedLevel == true then
@@ -553,7 +570,7 @@ end;
 
 function GC_PalletCreator:levelCheckTimerCallback()
 	if self.spawnedPallet ~= true then
-		local level, blockedLevel = self:getTotalFillLevel(true);
+		local level, blockedLevel = self:getTotalFillLevel(true, false);
 		self.target:palletCreatorInteraction(level, blockedLevel, self.deltaToAdd, self.palletFillTypeIndex, self.extraParamater);
 	end;
 

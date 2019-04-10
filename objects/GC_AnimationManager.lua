@@ -72,7 +72,7 @@ function GC_AnimationManager:load(nodeId, target, xmlFile, xmlKey, allowLooping,
 
 	local i = 0;
 	while true do
-		local key = string.format("%s.animations.animation(%d)", xmlKey, i);
+		local key = string.format("%s.registerAnimations.animation(%d)", xmlKey, i);
 		if not hasXMLProperty(xmlFile, key) then
 			break;
 		end;
