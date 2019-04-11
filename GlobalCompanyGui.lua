@@ -30,7 +30,7 @@ GlobalCompanyGui.debugData = g_company.debug:getDebugData(GlobalCompanyGui.debug
 GlobalCompanyGui.DevelopementVersionTemplatesFilename = {};
 addModEventListener(GlobalCompanyGui);
 
-GlobalCompanyGui.devVersion = false;
+GlobalCompanyGui.devVersion = true;
 
 GlobalCompanyGui.guis = {};
 GlobalCompanyGui.smallGuis = {};
@@ -55,6 +55,7 @@ source(g_currentModDirectory .. "gui/elements/FlowLayout.lua");
 source(g_currentModDirectory .. "gui/elements/Button.lua");
 source(g_currentModDirectory .. "gui/elements/Borders.lua");
 source(g_currentModDirectory .. "gui/elements/Table.lua");
+source(g_currentModDirectory .. "gui/elements/Slider.lua");
 
 source(g_currentModDirectory .. "gui/FakeGui.lua");
 source(g_currentModDirectory .. "gui/MultiDialog.lua");

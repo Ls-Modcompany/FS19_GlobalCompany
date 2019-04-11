@@ -55,6 +55,8 @@ function GC_Gui_table:loadTemplate(templateName, xmlFile, key, overlayName)
 	
 	self.maxItemsX = g_company.gui:getTemplateValueNumber(templateName, "maxItemsX", self.maxItemsX);
 	self.maxItemsY = g_company.gui:getTemplateValueNumber(templateName, "maxItemsY", self.maxItemsY);
+
+	self.hasSlider = g_company.gui:getTemplateValueBool(templateName, "hasBorders", false);	
 	
 	local orientation = g_company.gui:getTemplateValue(templateName, "orientation");	
 
@@ -68,6 +70,16 @@ function GC_Gui_table:loadTemplate(templateName, xmlFile, key, overlayName)
 	else
 		self.typ = GC_Gui_table.TYP_LIST;
 	end;
+
+	if self.hasSlider then
+		self.slider = GC_Gui_slider:new();
+		self.slider:loadTemplate(templateName, xmlFile, key);
+		self:addElement(self.slider);
+		if self.id ~= nil then
+			self.gui[string.format("%s_slider",self.id)] = self.slider;
+		end;
+	end;
+
 	self:loadOnCreate();
 end;
 
@@ -80,6 +92,8 @@ function GC_Gui_table:copy(src)
 	
 	self.maxItemsX = src.maxItemsX;
 	self.maxItemsY = src.maxItemsY;
+
+	self.hasSlider = src.hasSlider;
 	
 	self.orientation = src.orientation;
 	self:copyOnCreate();

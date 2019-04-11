@@ -11,6 +11,10 @@
 		<color name="gray3" value="0.1 0.1 0.1 1" />
 
         <color name="glass1" value="0.018 0.016 0.015 0.6"/>
+
+		
+        <color name="buttonMain" value="0.118 0.116 0.115 0.6"/>
+        <color name="buttonMainSelected" value="0.9910 0.3865 0.0100 1"/>
 		
 
         <color name="glass0_1" value="0.018 0.016 0.015 0.65"/>

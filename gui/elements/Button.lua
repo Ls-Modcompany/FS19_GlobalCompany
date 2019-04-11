@@ -75,9 +75,9 @@ function GC_Gui_button:loadTemplate(templateName, xmlFile, key)
 		self.overlayElement:loadTemplate(templateName, xmlFile, key);
 		self.overlayElement.position = { 0,0 };
 		self:addElement(self.overlayElement);
-		if id ~= nil and id ~= "" then
-			self.gui[id] = self.overlayElement;
-		end;
+		--if id ~= nil and id ~= "" then
+		--	self.gui[id] = self.overlayElement;
+		--end;
 	end;
 
 	if self.hasText then
@@ -85,9 +85,9 @@ function GC_Gui_button:loadTemplate(templateName, xmlFile, key)
 		self.textElement:loadTemplate(templateName, xmlFile, key);
 		self.textElement.position = { 0,0 };
 		self:addElement(self.textElement);
-		if id ~= nil and id ~= "" then
-			self.gui[id] = self.textElement;
-		end;
+		--if id ~= nil and id ~= "" then
+		--	self.gui[id] = self.textElement;
+		--end;
 		
 		if self.inputAction ~= nil then
 			self.textElement:setText(g_inputDisplayManager:getKeyboardInputActionKey(self.inputAction));

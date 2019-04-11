@@ -71,6 +71,7 @@ function GC_Gui:loadFromXMLRec(xmlFile, key, actGui)
 		else
 			guiElement = GC_Gui_element:new(self.classGui, nil, true);
 		end;
+		guiElement.id = id;
 		
 		guiElement:setParent(actGui);
 		guiElement:loadTemplate(templateName, xmlFile, k);
