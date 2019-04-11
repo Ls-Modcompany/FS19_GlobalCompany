@@ -70,6 +70,8 @@ function GC_BaleShreaderPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRandom)
 		end;
 
 		if canLoad then
+			local usedIndexNames = {};
+		
 			local i = 0;
 			while true do
 				local key = string.format("%s.baleShreader(%d)", placeableKey, i);
@@ -78,7 +80,8 @@ function GC_BaleShreaderPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRandom)
 				end;
 
 				local indexName = getXMLString(xmlFile, key .. "#indexName");
-				if indexName ~= nil then
+				if indexName ~= nil and usedIndexNames[indexName] == nil then
+					usedIndexNames[indexName] = key;
 					local baleShreader = BaleShreader:new(self.isServer, self.isClient, nil, filenameToUse, self.baseDirectory, self.customEnvironment);
 					if baleShreader:load(self.nodeId, xmlFile, key, indexName, true) then
 						table.insert(self.baleShreaders, baleShreader);
@@ -91,7 +94,12 @@ function GC_BaleShreaderPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRandom)
 						break;
 					end;
 				else
-					g_company.debug:writeError(self.debugData, "Can not load baleshreader. 'indexName' is missing. From XML file '%s'!", filenameToUse);
+					if indexName == nil then
+						g_company.debug:writeError(self.debugData, "Can not load baleshreader. 'indexName' is missing. From XML file '%s'!", filenameToUse);
+					else
+						local usedKey = usedIndexNames[indexName];
+						g_company.debug:writeError(self.debugData, "Duplicate indexName '%s' found! indexName is used at '%s' in XML file '%s'!", indexName, usedKey, filenameToUse);
+					end;
 				end;
 
 				i = i + 1;

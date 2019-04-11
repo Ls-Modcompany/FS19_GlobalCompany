@@ -280,8 +280,10 @@ function GlobalCompany.loadSourceFiles()
 
 	--|| Events ||--
 	source(GlobalCompany.dir .. "events/GC_PalletCreatorWarningEvent.lua");
-	source(GlobalCompany.dir .. "events/GC_AnimationManagerStartEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_AnimationManagerStopEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_AnimationManagerStartEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_ProductionFactoryStateEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_ProductionFactoryProductPurchaseEvent.lua");
 
 end;
 

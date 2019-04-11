@@ -237,7 +237,7 @@ function GC_PalletCreator:debugDraw(dt)
 	-- end;
 end;
 
-function GC_PalletCreator:updatePalletCreators(delta)
+function GC_PalletCreator:updatePalletCreators(delta, includeDeltaToAdd)
 	if self.isServer then
 		self.deltaToAdd = self.deltaToAdd + delta;
 
@@ -247,6 +247,7 @@ function GC_PalletCreator:updatePalletCreators(delta)
 			local addDelta = false;
 			if self.selectedPallet ~= nil then
 				if self:checkPalletIsValid() then
+					addDelta = true;
 					local appliedDelta = self.selectedPallet:addFillUnitFillLevel(self:getOwnerFarmId(), self.palletFillUnitIndex, self.deltaToAdd, self.palletFillTypeIndex, ToolType.UNDEFINED);
 					self.deltaToAdd = self.deltaToAdd - appliedDelta;
 
@@ -273,10 +274,12 @@ function GC_PalletCreator:updatePalletCreators(delta)
 				
 				totalFillLevel = totalFillLevel + appliedDelta;
 			else
-				totalFillLevel = totalFillLevel + self.deltaToAdd;
+				if includeDeltaToAdd then
+					totalFillLevel = totalFillLevel + self.deltaToAdd;
+				end;
 			end;
 			
-			return totalFillLevel;
+			return totalFillLevel, addDelta;
 		end;
 	else
 		g_company.debug:writeDev(self.debugData, "'updatePalletCreators' is a client only function!");
@@ -396,6 +399,8 @@ end;
 
 function GC_PalletCreator:loadFromXMLFile(xmlFile, key)
 	self.deltaToAdd = Utils.getNoNil(getXMLFloat(xmlFile, key .. ".palletCreator#deltaToAdd"), self.deltaToAdd);
+	
+	return true
 end;
 
 function GC_PalletCreator:saveToXMLFile(xmlFile, key, usedModNames)
