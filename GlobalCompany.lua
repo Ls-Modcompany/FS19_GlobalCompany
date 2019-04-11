@@ -245,7 +245,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_FillVolume.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicHeap.lua");
 	source(GlobalCompany.dir .. "objects/GC_PalletCreator.lua");
-	source(GlobalCompany.dir .. "objects/GC_ObjectSpawner.lua");
+	-- source(GlobalCompany.dir .. "objects/GC_ObjectSpawner.lua");
 	source(GlobalCompany.dir .. "objects/GC_RotationNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
 	source(GlobalCompany.dir .. "objects/GC_AnimationClips.lua");
