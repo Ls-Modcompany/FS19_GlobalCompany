@@ -93,7 +93,7 @@ function GC_DynamicHeap:load(nodeId, target, xmlFile, xmlKey, fillTypeName, fixe
 				g_densityMapHeightManager:setFixedFillTypesArea(self.heapArea, fillTypes);
 			end;
 
-			local vehicleInteractionTrigger = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, xmlKey .. "#vehicleInteractionTrigger"))
+			local vehicleInteractionTrigger = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, xmlKey .. "#vehicleInteractionTrigger"), target.i3dMappings);
 			if vehicleInteractionTrigger ~= nil then
 				if self.target.vehicleChangedHeapLevel ~= nil then
 					self.vehicleInteractionTrigger = vehicleInteractionTrigger;
