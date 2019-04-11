@@ -70,6 +70,8 @@ function GC_BalerPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRandom)
 		end;
 
 		if canLoad then
+			local usedIndexNames = {};
+		
 			local i = 0;
 			while true do
 				local key = string.format("%s.baler(%d)", placeableKey, i);
@@ -78,7 +80,8 @@ function GC_BalerPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRandom)
 				end;
 
 				local indexName = getXMLString(xmlFile, key .. "#indexName");
-				if indexName ~= nil then
+				if indexName ~= nil and usedIndexNames[indexName] == nil then
+					usedIndexNames[indexName] = key;
 					local baler = GC_Baler:new(self.isServer, self.isClient, nil, filenameToUse, self.baseDirectory, self.customEnvironment);
 					baler:setOwnerFarmId(self:getOwnerFarmId(), false); -- Set the ownership here. All other updates will use 'setOwnerFarmId' function.
 					if baler:load(self.nodeId, xmlFile, key, indexName, true) then
@@ -92,7 +95,12 @@ function GC_BalerPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRandom)
 						break;
 					end;
 				else
-					g_company.debug:writeError(self.debugData, "Can not load baler. 'indexName' is missing. From XML file '%s'!", filenameToUse);
+					if indexName == nil then
+						g_company.debug:writeError(self.debugData, "Can not load baler. 'indexName' is missing. From XML file '%s'!", filenameToUse);
+					else
+						local usedKey = usedIndexNames[indexName];
+						g_company.debug:writeError(self.debugData, "Duplicate indexName '%s' found! indexName is used at '%s' in XML file '%s'!", indexName, usedKey, filenameToUse);
+					end;
 				end;
 
 				i = i + 1;

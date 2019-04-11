@@ -74,6 +74,8 @@ function GC_ProductionFactoryPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRa
 		end;
 
 		if canLoad then
+			local usedIndexNames = {};
+			
 			local i = 0;
 			while true do
 				local key = string.format("%s.productionFactory(%d)", placeableKey, i);
@@ -82,8 +84,9 @@ function GC_ProductionFactoryPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRa
 				end;
 
 				local indexName = getXMLString(xmlFile, key .. "#indexName");
-				if indexName ~= nil then
-					local factory = ProductionFactory:new(self.isServer, self.isClient, nil, filenameToUse, self.baseDirectory, self.customEnvironment);
+				if indexName ~= nil and usedIndexNames[indexName] == nil then
+					usedIndexNames[indexName] = key;
+					local factory = GC_ProductionFactory:new(self.isServer, self.isClient, nil, filenameToUse, self.baseDirectory, self.customEnvironment);
 					if factory:load(self.nodeId, xmlFile, key, indexName, true) then
 						table.insert(self.productionFactories, factory);
 					else
@@ -95,7 +98,12 @@ function GC_ProductionFactoryPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRa
 						break;
 					end;
 				else
-					g_company.debug:writeError(self.debugData, "Can not load factory. 'indexName' is missing. From XML file '%s'!", filenameToUse);
+					if indexName == nil then
+						g_company.debug:writeError(self.debugData, "Can not load factory. 'indexName' is missing. From XML file '%s'!", filenameToUse);
+					else
+						local usedKey = usedIndexNames[indexName];
+						g_company.debug:writeError(self.debugData, "Duplicate indexName '%s' found! indexName is used at '%s' in XML file '%s'!", indexName, usedKey, filenameToUse);
+					end;
 				end;
 
 				i = i + 1;
@@ -115,7 +123,6 @@ end;
 function GC_ProductionFactoryPlaceable:finalizePlacement()
 	GC_ProductionFactoryPlaceable:superClass().finalizePlacement(self)
 
-	-- Only register each factory if they have all loaded correctly.
 	for _, factory in ipairs(self.productionFactories) do
 		factory:register(true);
 	end;

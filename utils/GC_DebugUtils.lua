@@ -28,7 +28,6 @@
 
 GC_DebugUtils = {};
 local GC_DebugUtils_mt = Class(GC_DebugUtils);
-InitObjectClass(GC_DebugUtils, "GC_DebugUtils");
 
 GC_DebugUtils.setDevLevelMax = true; -- Override isDev maxLevel loading to 'false' if needed. (LSMC DEV ONLY)
 

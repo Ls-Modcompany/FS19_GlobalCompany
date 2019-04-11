@@ -245,7 +245,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_FillVolume.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicHeap.lua");
 	source(GlobalCompany.dir .. "objects/GC_PalletCreator.lua");
-	source(GlobalCompany.dir .. "objects/GC_ObjectSpawner.lua");
+	-- source(GlobalCompany.dir .. "objects/GC_ObjectSpawner.lua");
 	source(GlobalCompany.dir .. "objects/GC_RotationNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
 	source(GlobalCompany.dir .. "objects/GC_AnimationClips.lua");
@@ -280,8 +280,10 @@ function GlobalCompany.loadSourceFiles()
 
 	--|| Events ||--
 	source(GlobalCompany.dir .. "events/GC_PalletCreatorWarningEvent.lua");
-	source(GlobalCompany.dir .. "events/GC_AnimationManagerStartEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_AnimationManagerStopEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_AnimationManagerStartEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_ProductionFactoryStateEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_ProductionFactoryProductPurchaseEvent.lua");
 
 end;
 
