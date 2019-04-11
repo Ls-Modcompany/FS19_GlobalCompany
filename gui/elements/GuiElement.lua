@@ -232,13 +232,19 @@ function GC_Gui_element:getVisible()
 	return self.visible;
 end;
 
-function GC_Gui_element:setSelected(state)
+function GC_Gui_element:setSelected(state, noCheckButton)
 	if state == nil then
 		state = false;
 	end;
 	self.selected = state;
 	for _,element in pairs(self.elements) do
-		element:setSelected(state);
+		if noCheckButton then
+			if element.name ~= "button" then
+				element:setSelected(state);
+			end;
+		else
+			element:setSelected(state);
+		end;
 	end;
 end;
 

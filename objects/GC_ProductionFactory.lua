@@ -1574,9 +1574,9 @@ function ProductionFactory:playerTriggerActivated(lineId)
 	-- If 'lineId' is == nil (Global Player Trigger) This will open to factory overview (Home Page).
 
 	
-	--g_company.gui:openGuiWithData("gc_factoryBig", false, self, lineId);
+	g_company.gui:openGuiWithData("gc_factoryBig", false, self, lineId);
 
-	g_currentMission:showBlinkingWarning("@kevink98 - THIS INPUT OPENS THE GUI");
+	--g_currentMission:showBlinkingWarning("@kevink98 - THIS INPUT OPENS THE GUI");
 end;
 
 function ProductionFactory:playerTriggerUpdate(dt, playerInTrigger, lineId)

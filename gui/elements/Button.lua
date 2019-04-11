@@ -26,7 +26,6 @@ function GC_Gui_button:new(gui, custom_mt)
 	self.data = {};
 	self.isRoundButton = false;	
 	self.isActivable = false;
-	self.isActivable = true;
 	self.isActive = false;
 	self.mouseDown = false;
 	self.mouseEntered = false;
@@ -155,7 +154,7 @@ function GC_Gui_button:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
 			if g_company.gui:checkClickZone(posX, posY, clickZone, self.isRoundButton) then
 				if not self.mouseEntered then
 					self.mouseEntered = true;
-					self:setSelected(true);
+					self:setSelected(true, self.parent.name == "table");
 					if self.callback_onEnter ~= nil then
 						self.gui[self.callback_onEnter](self.gui, self, self.parameter);
 					end;
@@ -271,7 +270,7 @@ function GC_Gui_button:setActive(state, checkNotParent)
 		self.parent:setActive(false, true);
 	end;
 	self.isActive = state;
-	self:setSelected(state, true);
+	self:setSelected(state, self.parent.name == "table");
 end;
 
 function GC_Gui_button:getActive()

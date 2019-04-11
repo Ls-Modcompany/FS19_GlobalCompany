@@ -15,17 +15,35 @@ function Gc_Gui_FactoryBig:new(target, custom_mt)
         custom_mt = Gc_Gui_FactoryBig_mt;
     end;
 	local self = setmetatable({}, Gc_Gui_FactoryBig_mt);
-			
+            
+
+
 	return self;
 end;
+
+function Gc_Gui_FactoryBig:setData(fabric, lineId)
+    self.currentFactory = fabric;
+    self.onOpenLineId = lineId;
+
+
+end
 
 function Gc_Gui_FactoryBig:onCreate() end;
 
 function Gc_Gui_FactoryBig:onOpen() 
     g_depthOfFieldManager:setBlurState(true)
+
+    self:openLineId(self.openLineId);
+    self.openLineId = nil;
+
 end;
 
 function Gc_Gui_FactoryBig:onClose() 
     g_depthOfFieldManager:setBlurState(false)
+    self.currentFactory = nil;
 end;
+
+function Gc_Gui_FactoryBig:openLineId(lineId)
+    
+end
 
