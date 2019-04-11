@@ -34,8 +34,12 @@
 		<!-- Factory -->
 		<e k="GC_gui_buttons_back" v="Back"/>
 		<e k="GC_gui_overview" v="Overview"/>
-		<e k="GC_gui_productLines" v="Productlines"/>
+		<e k="GC_gui_productLines" v="Product Lines"/>
 		<e k="GC_gui_description" v="Description"/>
+		
+		<e k="GC_Productline_Title_Backup" v="Production Line %d"/>
+		<e k="GC_Input_Title_Backup" v="Input %d"/>
+		<e k="GC_Output_Title_Backup" v="Output %d"/>
 
 		<!-- BaleShreader -->
 		<e k="GC_baleShreader_openSteer" v="Open Steer"/>

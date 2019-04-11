@@ -328,8 +328,14 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 		end;
 
 		if self.intervalParticleSystems ~= nil or self.intervalEffects ~= nil then
-			self.numIntervalParticleSystems = #self.intervalParticleSystems;
-			self.numIntervalEffects = #self.intervalEffects;
+			if self.intervalParticleSystems ~= nil then
+				self.numIntervalParticleSystems = #self.intervalParticleSystems;
+			end;
+			
+			if self.intervalEffects ~= nil then
+				self.numIntervalEffects = #self.intervalEffects;
+			end;
+
 			g_company.addRaisedUpdateable(self);
 		end;
 	else

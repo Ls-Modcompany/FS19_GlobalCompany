@@ -101,6 +101,10 @@ function GC_DebugUtils:new(customMt)
 	return self;
 end;
 
+-------------------
+-- Print Options --
+-------------------
+
 -- Standard formatted printing for 'unregistered' scripts. This has no 'level' or 'data' requirement.
 function GC_DebugUtils:printToLog(prefix, message, ...)
 	if prefix ~= nil then
@@ -111,6 +115,105 @@ function GC_DebugUtils:printToLog(prefix, message, ...)
 
 	print("  [LSMC - GlobalCompany] - " .. prefix .. string.format(message, ...));
 end;
+
+-- Print only the 'mods' header.
+function GC_DebugUtils:printHeader(data)
+	local header = "  [LSMC - GlobalCompany]";
+	
+	if data ~= nil then
+		if type(data) == "table" then
+			if data.header ~= nil then
+				header = data.header;
+			end;
+		else
+			registeredScriptName = self.registeredScripts[data];
+			header = "  [LSMC - GlobalCompany] - [" .. registeredScriptName .. "]";
+		end;
+	end;
+	
+	print(header);
+end;
+
+-- Print to log without header.
+function GC_DebugUtils:singleLogWrite(level, message, ...)
+	if self.printLevel[level] == true then
+		print("  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[level] .. string.format(message, ...));
+	else
+		print("  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[GC_DebugUtils.ERROR] .. string.format(message, ...));
+	end;
+end;
+
+-- Print to log with header.
+function GC_DebugUtils:logWrite(data, level, message, ...)
+	if self.printLevel[level] == true then
+		if data ~= nil then
+			local registeredScriptName, header;
+
+			if type(data) == "table" then
+				registeredScriptName = self.registeredScripts[data.scriptId];
+				header = data.header;
+			else
+				registeredScriptName = self.registeredScripts[data];
+				header = "  [LSMC - GlobalCompany] - [" .. registeredScriptName .. "]";
+			end;
+
+			if registeredScriptName ~= nil then
+				if header ~= nil then
+					print(header, "    " .. self.printLevelPrefix[level] .. string.format(message, ...));
+				else
+					print("  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[level] .. string.format(message, ...));
+				end;
+			else
+				print("  [LSMC - GlobalCompany > GC_DebugUtils] - Illegal mod!");
+			end;
+		end;
+	end;
+end;
+
+-- Direct print functions (With Header Only).
+function GC_DebugUtils:writeBlank(data, message, ...)
+	self:logWrite(data, -3, message, ...);
+end;
+
+function GC_DebugUtils:writeModding(data, message, ...)
+	self:logWrite(data, -2, message, ...);
+end;
+
+function GC_DebugUtils:writeError(data, message, ...)
+	self:logWrite(data, -1, message, ...);
+end;
+
+function GC_DebugUtils:writeWarning(data, message, ...)
+	self:logWrite(data, 0, message, ...);
+end;
+
+function GC_DebugUtils:writeInformations(data, message, ...)
+	self:logWrite(data, 1, message, ...);
+end;
+
+function GC_DebugUtils:writeLoad(data, message, ...)
+	self:logWrite(data, 2, message, ...);
+end;
+
+function GC_DebugUtils:writeOnCreate(data, message, ...)
+	self:logWrite(data, 3, message, ...);
+end;
+
+function GC_DebugUtils:writeTablet(data, message, ...)
+	self:logWrite(data, 4, message, ...);
+end;
+
+function GC_DebugUtils:writeDev(data, message, ...)
+	self:logWrite(data, 5, message, ...);
+end;
+
+function GC_DebugUtils:writeDevDebug(data, message, ...)
+	self:logWrite(data, 6, message, ...);
+end;
+
+---------------------
+-- Other Functions --
+---------------------
 
 function GC_DebugUtils:getLevelFromName(levelName, printError)
 	local level = GC_DebugUtils[levelName:upper()];
@@ -213,95 +316,6 @@ function GC_DebugUtils:getDebugData(scriptId, target, customEnvironment)
 	end;
 
 	return nil;
-end;
-
--- Print to log without header.
-function GC_DebugUtils:singleLogWrite(data, level, message, ...)
-	if self.printLevel[level] == true then
-		if data ~= nil then
-			local registeredScriptName, header;
-
-			if type(data) == "table" then
-				registeredScriptName = self.registeredScripts[data.scriptId];
-			else
-				registeredScriptName = self.registeredScripts[data];
-			end;
-
-			if registeredScriptName ~= nil then
-				print("  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[level] .. string.format(message, ...));
-			else
-				print("  [LSMC - GlobalCompany > GC_DebugUtils] - Illegal mod!");
-			end;
-		end;
-	end;
-end;
-
--- Print to log with header.
-function GC_DebugUtils:logWrite(data, level, message, ...)
-	if self.printLevel[level] == true then
-		if data ~= nil then
-			local registeredScriptName, header;
-
-			if type(data) == "table" then
-				registeredScriptName = self.registeredScripts[data.scriptId];
-				header = data.header;
-			else
-				registeredScriptName = self.registeredScripts[data];
-				header = "  [LSMC - GlobalCompany] - [" .. registeredScriptName .. "]";
-			end;
-
-			if registeredScriptName ~= nil then
-				if header ~= nil then
-					print(header, "    " .. self.printLevelPrefix[level] .. string.format(message, ...));
-				else
-					print("  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[level] .. string.format(message, ...));
-				end;
-			else
-				print("  [LSMC - GlobalCompany > GC_DebugUtils] - Illegal mod!");
-			end;
-		end;
-	end;
-end;
-
--- Direct print functions (With Header Only).
-function GC_DebugUtils:writeBlank(data, message, ...)
-	self:logWrite(data, -3, message, ...);
-end;
-
-function GC_DebugUtils:writeModding(data, message, ...)
-	self:logWrite(data, -2, message, ...);
-end;
-
-function GC_DebugUtils:writeError(data, message, ...)
-	self:logWrite(data, -1, message, ...);
-end;
-
-function GC_DebugUtils:writeWarning(data, message, ...)
-	self:logWrite(data, 0, message, ...);
-end;
-
-function GC_DebugUtils:writeInformations(data, message, ...)
-	self:logWrite(data, 1, message, ...);
-end;
-
-function GC_DebugUtils:writeLoad(data, message, ...)
-	self:logWrite(data, 2, message, ...);
-end;
-
-function GC_DebugUtils:writeOnCreate(data, message, ...)
-	self:logWrite(data, 3, message, ...);
-end;
-
-function GC_DebugUtils:writeTablet(data, message, ...)
-	self:logWrite(data, 4, message, ...);
-end;
-
-function GC_DebugUtils:writeDev(data, message, ...)
-	self:logWrite(data, 5, message, ...);
-end;
-
-function GC_DebugUtils:writeDevDebug(data, message, ...)
-	self:logWrite(data, 6, message, ...);
 end;
 
 function GC_DebugUtils:getScriptNameFromIndex(index)
@@ -408,38 +422,46 @@ end;
 ------------------------------------
 -- Print Debug (For Testing Only) --
 ------------------------------------
-function debugPrint(name, text, depth, referenceText)
-	local refName = "debugPrint";
-	if referenceText ~= nil then
-		refName = tostring(referenceText);
-	end;
-
-	if name ~= nil then
-		if text == nil then
-			if type(name) == "table" then
-				print("", "(" .. refName .. ")")
-				if depth == nil then
-					depth = 2;
-				end;
-				DebugUtil.printTableRecursively(name, ":", 1, depth);
-				print("");
-			else
-				print("    " .. refName .. " = " .. tostring(name));
-			end;
-		else
-			if type(text) == "table" then
-				print("", "(" .. refName .. ")")
-				if depth == nil then
-					depth = 2;
-				end;
-				DebugUtil.printTableRecursively(text, name .. " ", 1, depth);
-				print("");
-			else
-				print("    (" .. refName .. ") " .. tostring(name) .. " = " .. tostring(text));
-			end;
+function debugPrint(name, text, depth, referenceText, isExtraPrintText)
+	if isExtraPrintText == true then
+		if text ~= nil then	
+			g_currentMission:addExtraPrintText(tostring(name) .. " = " .. tostring(text));
+		else	
+			g_currentMission:addExtraPrintText(tostring(name));
 		end;
 	else
-		print("    " .. refName .. " = " .. tostring(name));
+		local refName = "debugPrint";
+		if referenceText ~= nil then
+			refName = tostring(referenceText);
+		end;
+	
+		if name ~= nil then
+			if text == nil then
+				if type(name) == "table" then
+					print("", "(" .. refName .. ")")
+					if depth == nil then
+						depth = 2;
+					end;
+					DebugUtil.printTableRecursively(name, ":", 1, depth);
+					print("");
+				else
+					print("    " .. refName .. " = " .. tostring(name));
+				end;
+			else
+				if type(text) == "table" then
+					print("", "(" .. refName .. ")")
+					if depth == nil then
+						depth = 2;
+					end;
+					DebugUtil.printTableRecursively(text, name .. " ", 1, depth);
+					print("");
+				else
+					print("    (" .. refName .. ") " .. tostring(name) .. " = " .. tostring(text));
+				end;
+			end;
+		else
+			print("    " .. refName .. " = " .. tostring(name));
+		end;
 	end;
 end;
 getfenv(0)["gc_debugPrint"] = debugPrint; -- Maybe to make global?

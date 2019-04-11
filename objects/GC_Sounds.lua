@@ -233,7 +233,7 @@ function GC_Sounds:update(dt)
 							sound.intervalActive = false;
 							setVisibility(sound.node, false);
 							sound.operatingTime = sound.delayTime;
-							shader.intervalId = 0;
+							sound.intervalId = 0;
 						end;
 					end;
 				end;

@@ -186,8 +186,8 @@ function GC_PlayerTrigger:playerTriggerCallback(triggerId, otherId, onEnter, onL
 	if g_currentMission.controlPlayer and (g_currentMission.player ~= nil and otherId == g_currentMission.player.rootNode) then		
 		if onEnter or onLeave then
 			if onEnter then
-				if not self.playerInTrigger and self.ownerFarmId ~= nil then
-					if g_currentMission.accessHandler:canFarmAccessOtherId(g_currentMission:getFarmId(), self.ownerFarmId) then					
+				if not self.playerInTrigger then
+					if g_currentMission.accessHandler:canFarmAccess(g_currentMission:getFarmId(), self.target) then				
 						self.playerInTrigger = true;
 						if self:canAddActivatable() then
 							g_currentMission:addActivatableObject(self);

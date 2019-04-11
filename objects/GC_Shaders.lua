@@ -83,9 +83,11 @@ function GC_Shaders:load(nodeId, target, xmlFile, xmlKey, groupKey)
 
 					local values = {getShaderParameter(node, shaderParameter)};
 					shader.offValues = Utils.getNoNil(GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. "#offValues", 4, false, self.debugData), values);
-					shader.onValues = Utils.getNoNil(GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. "#onValue", 4, false, self.debugData), values);
+					shader.onValues = Utils.getNoNil(GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. "#onValues", 4, false, self.debugData), values);
 					shader.shared = Utils.getNoNil(getXMLBool(xmlFile, key .. "#shared"), false);
 
+					setShaderParameter(shader.node, shader.shaderParameter, shader.offValues[1], shader.offValues[2], shader.offValues[3], shader.offValues[4], shader.shared);
+					
 					-- Operating sequence must be multiplies of two. These numbers will then loop.  6 8 4 4 = on(6 sec) off(8 sec) on(4 sec) off(4 sec)
 					local intervals = g_company.xmlUtils.getEvenTableFromXMLString(xmlFile, key .. "#operatingSequence", 2, true, false, 1000, self.debugData);
 					if intervals ~= nil then

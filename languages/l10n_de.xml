@@ -36,6 +36,10 @@
 		<e k="GC_gui_overview" v="Übersicht"/>
 		<e k="GC_gui_productLines" v="Produktlinien"/>
 		<e k="GC_gui_description" v="Beschreibung"/>
+		
+		<e k="GC_Productline_Title_Backup" v="Produktlinien %d"/>
+		<e k="GC_Input_Title_Backup" v="Rohstoffe %d"/>
+		<e k="GC_Output_Title_Backup" v="Produkte %d"/>
 
 		<!-- BaleShreader -->
 		<e k="GC_baleShreader_openSteer" v="Steuerung öffnen"/>
