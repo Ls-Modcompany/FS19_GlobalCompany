@@ -178,20 +178,22 @@ function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes
 				if fallOffShaderNode ~= nil then
 					local fallOffKey = xmlKey .. ".triggerStatus.fallOffShader";
 					self.triggerStatus.fallOffShader = {node = fallOffShaderNode};
-
-					local noObjectRGB = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, fallOffKey .. "#noObjectRGB", 3, false, self.debugData, {0.2122, 0.5271, 0.0307});
-					self.triggerStatus.fallOffShader.noObject = noObjectRGB;
-
-					local foundObjectRGB = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, fallOffKey .. "#foundObjectRGB", 3, false, self.debugData, {0.9301, 0.2874, 0.0130});
-					self.triggerStatus.fallOffShader.foundObject = foundObjectRGB;
-
-					if Utils.getNoNil(getXMLBool(xmlFile, fallOffKey .. "#showOnFilling"), false) then
-						local fillingActiveRGB =  GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, fallOffKey .. "#fillingActiveRGB", 3, false, self.debugData, {0.8069, 0.0097, 0.0097});
-						self.triggerStatus.fallOffShader.fillingActive = fillingActiveRGB;
-					end;
-					
 					setVisibility(fallOffShaderNode, true);
-					setShaderParameter(fallOffShaderNode, "colorScale", noObjectRGB[1], noObjectRGB[2], noObjectRGB[3], 1, false);
+
+					local isActive = Utils.getNoNil(getXMLBool(xmlFile, fallOffKey .. ".noObject#isActive"), false);
+					local rgb = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, fallOffKey .. ".noObject#rgb", 3, false, self.debugData, {0.2122, 0.5271, 0.0307});
+					self.triggerStatus.fallOffShader.noObject = {isActive = isActive, rgb = rgb};
+					setShaderParameter(fallOffShaderNode, "colorScale", rgb[1], rgb[2], rgb[3], 1, false);
+
+					isActive = Utils.getNoNil(getXMLBool(xmlFile, fallOffKey .. ".foundObject#isActive"), false);
+					rgb = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, fallOffKey .. ".foundObject#rgb", 3, false, self.debugData, {0.9301, 0.2874, 0.0130});
+					self.triggerStatus.fallOffShader.foundObject = {isActive = isActive, rgb = rgb};
+
+					isActive = Utils.getNoNil(getXMLBool(xmlFile, fallOffKey .. ".fillingActive#isActive"), false);
+					rgb = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, fallOffKey .. ".fillingActive#rgb", 3, false, self.debugData, {0.8069, 0.0097, 0.0097});
+					self.triggerStatus.fallOffShader.fillingActive = {isActive = isActive, rgb = rgb};
+
+					g_currentMission:addTriggerMarker(fallOffShaderNode);
 				end;
 
 				if hasXMLProperty(xmlFile, xmlKey..".triggerStatus.visNodes") then
@@ -275,6 +277,11 @@ function GC_LoadingTrigger:delete()
 		self.playerTriggerNode = nil;
 	end;
 
+	if self.triggerStatus ~= nil and self.triggerStatus.fallOffShader ~= nil then
+		local node = self.triggerStatus.fallOffShader.node;
+		g_currentMission:removeTriggerMarker(node)
+	end;
+
 	GC_LoadingTrigger:superClass().delete(self);
 end;
 
@@ -317,18 +324,16 @@ function GC_LoadingTrigger:update(dt)
 	end;
 end;
 
-function GC_LoadingTrigger:updateTriggerStatus(stateId)
-	self.triggerStatusState = stateId;
-	local name = GC_LoadingTrigger.statusNames[stateId];
+function GC_LoadingTrigger:updateTriggerStatus(name)
+	self.triggerStatusState = name;
 
 	if self.triggerStatus.fallOffShader ~= nil then
 		local node = self.triggerStatus.fallOffShader.node;
-		local rgb = self.triggerStatus.fallOffShader[name];
-		if rgb ~= nil then
-			setVisibility(node, true);
-			setShaderParameter(node, "colorScale", rgb[1], rgb[2], rgb[3], 1, false);
-		else
-			setVisibility(node, false);
+		local typ = self.triggerStatus.fallOffShader[name];
+		if typ ~= nil then
+			local state = typ.isActive and (g_gameSettings ~= nil and g_gameSettings.showTriggerMarker);
+			setShaderParameter(node, "colorScale", typ.rgb[1], typ.rgb[2], typ.rgb[3], 1, false);
+			setVisibility(node, state);
 		end;
 	end;
 
@@ -500,10 +505,10 @@ function GC_LoadingTrigger:setIsLoading(isLoading, targetObject, fillUnitIndex, 
 	if self.isClient then
 		if self.triggerStatus ~= nil then
 			if isLoading then
-				self:updateTriggerStatus(3); -- fillingActive
+				self:updateTriggerStatus("fillingActive");
 			else
-				if self.triggerStatusState ~= 1 and self.triggerStatusState ~= 2 then
-					self:updateTriggerStatus(2); -- foundObject
+				if self.triggerStatusState ~= "noObject" and self.triggerStatusState ~= "foundObject" then
+					self:updateTriggerStatus("foundObject");
 				end;
 			end;
 		end;
@@ -579,16 +584,16 @@ function GC_LoadingTrigger:loadTriggerCallback(triggerId, otherId, onEnter, onLe
 						g_currentMission:addActivatableObject(self);
 
 						if self.isClient and self.triggerStatus ~= nil then
-							if self.triggerStatusState ~= 2 then
-								self:updateTriggerStatus(2); -- foundObject
+							if self.triggerStatusState ~= "foundObject" then
+								self:updateTriggerStatus("foundObject");
 							end;
 						end;
 					else
 						g_currentMission:removeActivatableObject(self);
 
 						if self.isClient and self.triggerStatus ~= nil then
-							if self.triggerStatusState ~= 1 then
-								self:updateTriggerStatus(1); -- noObject
+							if self.triggerStatusState ~= "noObject" then
+								self:updateTriggerStatus("noObject");
 							end;
 						end;
 					end;
