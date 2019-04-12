@@ -189,6 +189,9 @@ function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes
 						local fillingActiveRGB =  GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, fallOffKey .. "#fillingActiveRGB", 3, false, self.debugData, {0.8069, 0.0097, 0.0097});
 						self.triggerStatus.fallOffShader.fillingActive = fillingActiveRGB;
 					end;
+					
+					setVisibility(fallOffShaderNode, true);
+					setShaderParameter(fallOffShaderNode, "colorScale", noObjectRGB[1], noObjectRGB[2], noObjectRGB[3], 1, false);
 				end;
 
 				if hasXMLProperty(xmlFile, xmlKey..".triggerStatus.visNodes") then
@@ -196,7 +199,7 @@ function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes
 
 					local noObjectNode = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, visNodesKey .. "#noObjectNode"), source.i3dMappings);
 					if noObjectNode ~= nil then
-						setVisibility(noObjectNode, false);
+						setVisibility(noObjectNode, true);
 						self.triggerStatus.visNodes = {noObject = noObjectNode};
 					end;
 
