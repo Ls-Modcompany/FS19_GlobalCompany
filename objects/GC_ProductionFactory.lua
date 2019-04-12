@@ -160,11 +160,11 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 
 	self.canPurchaseInputs = Utils.getNoNil(getXMLBool(xmlFile, operationKey .. "#canPurchaseInputProducts"), true)
 
-	----------------------------
-	-- LOAD ANIMATION MANAGER --
-	----------------------------
+	------------------------------------------------------------------------
+	-- LOAD ANIMATION MANAGER (Only when we have animations to register!) --
+	------------------------------------------------------------------------
 
-	if hasXMLProperty(xmlFile, xmlKey .. ".animations") then
+	if hasXMLProperty(xmlFile, xmlKey .. ".registerAnimations") then
 		local animationManager = GC_AnimationManager:new(self.isServer, self.isClient);
 		if animationManager:load(nodeId, self, xmlFile, xmlKey, true) then
 			animationManager:register(true);
