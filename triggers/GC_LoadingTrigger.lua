@@ -3,13 +3,15 @@
 --
 -- @Interface: --
 -- @Author: LS-Modcompany / GtX
--- @Date: 12.02.2019
--- @Version: 1.0.0.0
+-- @Date: 11.03.2019
+-- @Version: 1.1.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
 --
+-- 	v1.0.0.0 (11.03.2019):
+-- 		- fix i3dMappings support for effects
 --
 -- 	v1.0.0.0 (12.02.2019):
 -- 		- initial fs19 (GtX)
@@ -156,7 +158,7 @@ function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes
 				setShaderParameter(self.scroller, self.scrollerShaderParameterName, 0, 0, 0, 0, false);
 			end;
 
-			self.effects = g_effectManager:loadEffect(xmlFile, xmlKey, nodeId, self);
+			self.effects = g_effectManager:loadEffect(xmlFile, xmlKey, nodeId, self, source.i3dMappings);
 
 			-- Animations that are activated when filling is started and stopped when filling is ended. (Source script must have active 'animationManager'! See ProductionFactory.lua)
 			-- Example: Handle and lights for a real look. (Only operates 'Client Side').
