@@ -466,6 +466,8 @@
 			<value name="margin" value="0px 0px 0px 5px" />	
 			<value name="imageColor" value="glass0_1" />
 			<value name="imageColor_selected" value="glass0_2" />
+			<value name="isActivable" value="true" />
+			<value name="canDeactivable" value="false" />
 			<value name="hasOverlay" value="true" />
 		</template>	
 		<template name="gcFactoryBigLeftPLTableItemText" anchor="middleTop" extends="gcBase_text">
@@ -475,13 +477,29 @@
 			<value name="textBold" value="false" />	
 			<value name="margin" value="0px 8px 0px 0px" />	
 		</template>	
+		<template name="gcFactoryBigLeftPLTableItemTextActive" anchor="middleTop" extends="gcFactoryBigLeftPLTableItemText">
+			<value name="position" value="0px 0px" />
+			<value name="textAlignment" value="right" />	
+		</template>	
+		<template name="gcFactoryBigLeftPLTableItemTextOutput" anchor="middleTop" extends="gcFactoryBigLeftPLTableItemText">
+			<value name="position" value="20px -50px" />
+			<value name="textSize" value="18px" />
+		</template>	
 
 
 		<template name="gcFactoryBigRightOverviewImage" anchor="middleCenter" extends="gcBase">
 			<value name="size" value="400px 400px" />
-			<value name="position" value="-200px -100px" />
+			<value name="position" value="0px 0px" />
 			<Value name="imageUVs" value="0 0 1 1"/>
 			<Value name="imageFilename" value="g_factoryDefault"/>
+		</template>
+		<template name="gcFactoryBigRightOverviewImageBackground" anchor="middleCenter" extends="gcBase gcBorder">
+			<value name="size" value="450px 450px" />
+			<value name="position" value="-200px -100px" />
+			<value name="imageColor" value="glass1_50" />
+			<value name="hasBorders" value="true" />
+			<value name="borderBottomSize" value="6px" />
+			<value name="borderBottomColor" value="orange" />
 		</template>
 
 		<template name="gcFactoryBigRightOverviewText1" anchor="middleTop" extends="gcBase_text">
@@ -518,6 +536,7 @@
 		</template>	
 		<template name="gcFactoryBigRightOverviewText9" anchor="leftTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="19px" />
+			<value name="textAlignment" value="left" />
 		</template>	
 		<template name="gcFactoryBigRightOverviewText10" anchor="leftTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="16px" />
@@ -525,10 +544,12 @@
 		<template name="gcFactoryBigRightOverviewText11" anchor="leftTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="16px" />
 			<value name="textColor" value="orange" />
+			<value name="textAlignment" value="left" />
 		</template>	
 		<template name="gcFactoryBigRightOverviewText12" anchor="leftTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="19px" />
 			<value name="textColor" value="orange" />
+			<value name="textAlignment" value="left" />
 		</template>	
 
 		<template name="gcFactoryBigRightInput" anchor="middleCenter" extends="gcBase gcBorder">

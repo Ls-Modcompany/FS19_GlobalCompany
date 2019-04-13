@@ -41,6 +41,9 @@ function GC_Gui_overlay:new(gui, custom_mt)
 	self.borderRightColor = 0;
 	self.borderTopColor = 0;
 	self.borderBottomColor = 0;
+
+	self.scaleX = 1;
+	self.scaleY = 1;
 	
 	self.rotation = 0;
 	
@@ -159,11 +162,16 @@ function GC_Gui_overlay:draw(index)
 			setOverlayRotation(self.imageOverlay, self.rotation, self.size[1] * 0.5, self.size[2] * 0.5);
 			setOverlayUVs(self.imageOverlay, unpack(self:getUVs()));
 			setOverlayColor(self.imageOverlay, unpack(self:getImageColor()));
-			renderOverlay(self.imageOverlay, self.drawPosition[1], self.drawPosition[2], self.size[1], self.size[2]);
+			renderOverlay(self.imageOverlay, self.drawPosition[1], self.drawPosition[2], self.size[1] * self.scaleX, self.size[2] * self.scaleY);
 		end;
 	end;
 
 	GC_Gui_overlay:superClass().draw(self);
+end;
+
+function GC_Gui_overlay:setScale(x,y)
+	self.scaleX = x;
+	self.scaleY = Utils.getNoNil(y,self.scaleY);
 end;
 
 function GC_Gui_overlay:setUV(str)

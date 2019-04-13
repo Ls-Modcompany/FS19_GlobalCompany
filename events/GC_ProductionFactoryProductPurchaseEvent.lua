@@ -61,7 +61,8 @@ end;
 function GC_ProductionFactoryProductPurchaseEvent:run(connection)
 	if not connection:getIsServer() then	
 		local input = self:getInput(self.lineId, self.inputId);
-		self.factory:doProductPurchase(input, self.litres, true)
+		input.buyLiters = self.litres;
+		self.factory:doProductPurchase(input, true) -- need the "true" here?? 
 	else
 		print("  [LSMC - GlobalCompany > GC_ProductionFactory] ERROR: ProductPurchaseEvent is a client to server only event!");
 	end;

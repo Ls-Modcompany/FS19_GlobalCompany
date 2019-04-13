@@ -31,10 +31,22 @@ function GC_cameraUtil:loadFromXml(xmlFile, key)
     return cam;
 end;
 
-function GC_cameraUtil:loadCameraNode(nodeId, camera)	
-    camera.node = I3DUtil.indexToObject(nodeId, camera.camNode);
+function GC_cameraUtil:loadCameraNode(nodeId, camera, i3dMappings)	
+    camera.node = I3DUtil.indexToObject(nodeId, camera.camNode, i3dMappings);
     return camera;
 end;
+
+function GC_cameraUtil:loadCamera(nodeId, xmlFile, key, i3dMappings)	
+    local cam = {};
+    cam.node = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, key), i3dMappings);
+    if cam.node == nil then
+        return;
+        --debug?
+    end;
+    cam.camFovY = Utils.getNoNil(getXMLFloat(xmlFile, key .. "#camFovY"), 60);
+    return cam;
+end;
+
 
 function GC_cameraUtil:getRenderOverlayId(camera, x, y)	
     setFovY(camera.node, math.rad(camera.camFovY));

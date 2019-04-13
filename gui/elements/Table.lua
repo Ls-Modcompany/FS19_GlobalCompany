@@ -153,8 +153,9 @@ function GC_Gui_table:addElement(element)
 end;
 
 function GC_Gui_table:removeElements()
-	for _,element in pairs(self.items) do
+	for _,element in pairs(self.elements) do
 		element.parent = nil;
+		element:delete();
 	end;
 	self.items = {};
 	self.elements = {};
@@ -227,13 +228,12 @@ end;
 function GC_Gui_table:createItem()
 	if self.itemTemplate ~= nil then
 		local item = GC_Gui_button:new(self.gui);
+		self:addElement(item);
 		item:copy(self.itemTemplate);
-		
 		for _,element in pairs(self.itemTemplate.elements) do		
 			self:createItemRec(self, element, item);
 		end;
 		
-		self:addElement(item);
 		return item;
 	end;
 	return nil;
@@ -241,8 +241,8 @@ end;
 
 function GC_Gui_table:createItemRec(t, element, parent)
 	local item = element:new(t.gui);
-	item:copy(element);
 	parent:addElement(item);
+	item:copy(element);
 	for _,e in pairs(element.elements) do		
 		t:createItemRec(t, e, item);
 	end;

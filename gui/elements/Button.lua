@@ -59,6 +59,7 @@ function GC_Gui_button:loadTemplate(templateName, xmlFile, key)
 	self.callback_onLeave = g_company.gui:getTemplateValueXML(xmlFile, "onLeave", key, nil);
 	
 	self.isTableTemplate = g_company.gui:getTemplateValueBool(templateName, "isTableTemplate", self.isTableTemplate);
+	self.isTableTemplate = g_company.gui:getTemplateValueBoolXML(xmlFile, "isTableTemplate", key, self.isTableTemplate);
 	self.hasOverlay = g_company.gui:getTemplateValueBool(templateName, "hasOverlay", false);
 	self.hasText = g_company.gui:getTemplateValueBool(templateName, "hasText", false);
 

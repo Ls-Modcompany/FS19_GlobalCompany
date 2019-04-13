@@ -99,7 +99,7 @@ function GlobalCompanyGui:load()
 	
 	self.mainGui = g_company.gui:registerGui("gc_main", InputAction.GC_MAIN, Gc_Gui_MainGui, true, true, true).classGui;
 	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
-	g_company.gui:registerGui("gc_factoryBig", InputAction.GC_TEST, Gc_Gui_FactoryBig, true, true, true);
+	g_company.gui:registerGui("gc_factoryBig", nil, Gc_Gui_FactoryBig, true, true, true);
 	g_company.gui:registerGui("gcPlaceable_baler", nil, Gc_Gui_Baler, true, true);
 	g_company.gui:registerGui("gcObjectInfo", nil, Gc_Gui_ObjectInfo, false, false);
 	

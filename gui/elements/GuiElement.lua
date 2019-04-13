@@ -111,7 +111,7 @@ end;
 
 function GC_Gui_element:copyOnCreate()
 	if self.callback_onCreate ~= nil then
-		self.gui[self.callback_onCreate](self.gui, self);
+		self.gui[self.callback_onCreate](self.gui, self, self.parameter);
 	end;
 end;
 

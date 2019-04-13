@@ -140,9 +140,12 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 	end;
 
 	local factoryImage; -- BACKUP IS STORED WITH GUI
-	local factoryCamera = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, xmlKey .. ".guiInformation#cameraFeed"), self.i3dMappings);
+	local factoryCamera = g_company.cameraUtil:loadCamera(nodeId, xmlFile, xmlKey .. ".guiInformation#cameraFeed", self.i3dMappings);
 	if factoryCamera == nil then
 		factoryImage = getXMLString(xmlFile, xmlKey .. ".guiInformation#imageFilename");
+		if factoryImage ~= nil then
+			factoryImage = self.baseDirectory .. factoryImage;
+		end;
 	end;
 
 	local factoryDescription = Utils.getNoNil(getXMLString(xmlFile, xmlKey .. ".guiInformation#description"), "");
@@ -270,6 +273,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				inputProduct.fillLevel = 0;
 				inputProduct.concatedFillTypeTitles = table.concat(concatTitles, " | "); -- Maybe gui can use this.
 				inputProduct.capacity = Utils.getNoNil(getXMLInt(xmlFile, inputProductKey .. "#capacity"), 1000);
+				inputProduct.buyLiters = 0;
 
 				-- Only if modder allows product purchasing.
 				if self.canPurchaseInputs then					
@@ -1707,10 +1711,30 @@ end;
 ---------------------------------
 
 function GC_ProductionFactory:getGuiData(lineId)
-	local data = self.guiData;
-	return data.factoryTitle, data.factoryImage, data.factoryCamera, data.factoryDescription;
+	--local data = self.guiData;
+	--return data.factoryTitle, data.factoryImage, data.factoryCamera, data.factoryDescription;
+	return self.guiData;
 end;
 
+function GC_ProductionFactory:getInputs(lineId)
+	if lineId ~= nil then
+		local productLine = self.productLines[lineId];
+		if productLine ~= nil and productLine.inputs ~= nil then
+			return productLine.inputs;
+		end;
+	end;
+end;
+
+function GC_ProductionFactory:getOutputs(lineId)
+	if lineId ~= nil then
+		local productLine = self.productLines[lineId];
+		if productLine ~= nil and productLine.outputs ~= nil then
+			return productLine.outputs;
+		end;
+	end;
+end;
+
+--unused
 function GC_ProductionFactory:getInput(lineId, inputId)
 	if lineId ~= nil and inputId ~= nil then
 		local productLine = self.productLines[lineId];
@@ -1718,10 +1742,9 @@ function GC_ProductionFactory:getInput(lineId, inputId)
 			return productLine.inputs[inputId];
 		end;
 	end;
-
-	return;
 end;
 
+--unused
 function GC_ProductionFactory:getOutput(lineId, outputId)
 	if lineId ~= nil and outputId ~= nil then
 		local productLine = self.productLines[lineId];
@@ -1729,10 +1752,10 @@ function GC_ProductionFactory:getOutput(lineId, outputId)
 			return productLine.outputs[outputId];
 		end;
 	end;
-
-	return;
 end;
 
+
+--[[
 function GC_ProductionFactory:getProductBuyPrice(input, litres)
 	local validLitres, price = 0, 0;
 
@@ -1743,21 +1766,45 @@ function GC_ProductionFactory:getProductBuyPrice(input, litres)
 		end;
 	end;
 
-	return validLitres, price
+	return validLitres, price;
+end; ]]--
+
+function GC_ProductionFactory:changeBuyLiters(input, delta)
+	local newLiters = input.buyLiters + delta;
+	if newLiters < 0 then
+		delta = input.fillLevel;
+	elseif newLiters > input.capacity then
+		delta =  input.capacity - input.fillLevel;
+	end;
+	input.buyLiters = input.buyLiters + delta;
 end;
 
-function GC_ProductionFactory:doProductPurchase(input, litres)	
-	if input ~= nil and litres > 0 then		
+function GC_ProductionFactory:getProductBuyPrice(input)
+	local validLitres, price = 0, 0;
+
+	if input ~= nil then
+		validLitres = math.min(input.buyLiters, math.floor(input.capacity - input.fillLevel));
+		if validLitres > 0 then
+			price = input.pricePerLiter * validLitres;
+		end;
+	end;
+
+	return validLitres, price;
+end;
+
+function GC_ProductionFactory:doProductPurchase(input)	
+	if input ~= nil and input.buyLiters > 0 then		
 		if g_currentMission:getIsServer() then
-			local validLitres = math.min(litres, math.floor(input.capacity - input.fillLevel));
+			local validLitres = math.min(input.buyLiters, math.floor(input.capacity - input.fillLevel));
 			local price = input.pricePerLiter * Utils.getNoNil(validLitres, 0);
 			if price > 0 then
 				local newFillLevel = input.fillLevel + validLitres;
-				g_currentMission:addMoney(-price, self:getOwnerFarmId(), MoneyType.BOUGHT_MATERIALS, true, true);
+				--g_currentMission:addMoney(-price, self:getOwnerFarmId(), MoneyType.BOUGHT_MATERIALS, true, true); @gtx dont run! I get this in my log: Error: Can't change money of spectator farm
 				self:updateFactoryLevels(newFillLevel, input, nil, true);
+				input.buyLiters = 0;
 			end;
 		else		
-			g_client:getServerConnection():sendEvent(GC_ProductionFactoryProductPurchaseEvent:new(self, input.lineId, input.id, litres));
+			g_client:getServerConnection():sendEvent(GC_ProductionFactoryProductPurchaseEvent:new(self, input.lineId, input.id, input.buyLiters));
 		end;
 	end;
 end;
