@@ -354,12 +354,14 @@ end
 
 function Gc_Gui_FactoryBig:onCreateDetailOutputPalletButtonMinusPlus(element)
     if self.tmp_output ~= nil then
+        element:setVisible(self.tmp_output.palletCreator ~= nil);
         element.output = self.tmp_output;
     end;
 end
 
 function Gc_Gui_FactoryBig:onCreateDetailOutputPalletText(element)
     if self.tmp_output ~= nil then
+        element:setVisible(self.tmp_output.palletCreator ~= nil);
         element.parent.palletTextElement = element;
         if self.tmp_output.numberToSpawn > 1 then
             element:setText(string.format(g_company.languageManager:getText("GC_gui_pallet2"), g_i18n:formatNumber(self.tmp_output.numberToSpawn, 0)));
@@ -371,6 +373,7 @@ end
 
 function Gc_Gui_FactoryBig:onCreateDetailOutputPalletButton(element)
     if self.tmp_output ~= nil then
+        element:setVisible(self.tmp_output.palletCreator ~= nil);
         if element.name == "button" then
             element.output = self.tmp_output;
         end;
@@ -418,7 +421,8 @@ function Gc_Gui_FactoryBig:onClickDetailPalletPlus(element)
 end
 
 function Gc_Gui_FactoryBig:onClickDetailSpawnPallet(element)   
-    
+    self.currentFactory:spawnPalletFromOutput(element.output);
+    self:setDetails();
 end
 
 
