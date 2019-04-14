@@ -211,7 +211,14 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 	-----------------------------
 	-- REGISTER INPUT PRODUCTS --
 	-----------------------------
-
+	
+	local inputTitle = getXMLString(xmlFile, xmlKey .. ".registerInputProducts#headerTitle");
+	if inputTitle ~= nil then		
+		self.guiData.inputTitle = g_company.languageManager:getText(inputTitle);
+	else
+		self.guiData.inputTitle = g_company.languageManager:getText("GC_Input_Header_Backup");
+	end;
+	
 	local i = 0;
 	while true do
 		local inputProductKey = string.format("%s.registerInputProducts.inputProduct(%d)", xmlKey, i);
@@ -278,7 +285,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				-- Only if modder allows product purchasing.
 				if self.canPurchaseInputs then					
 					local pricePerLiter = getXMLFloat(xmlFile, inputProductKey .. "#pricePerLiter");
-					local deliveryCostMultiplier = Utils.getNoNil(getXMLInt(xmlFile, inputProductKey .. "#deliveryCostMultiplier"), 2);
+					local deliveryCostMultiplier = Utils.getNoNil(getXMLFloat(xmlFile, inputProductKey .. "#deliveryCostMultiplier"), 2.0);
 					
 					-- If no 'pricePerLiter' then take the most expensive product price.
 					if pricePerLiter == nil or pricePerLiter <= 0.0 then
@@ -397,6 +404,13 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 	------------------------------
 	-- REGISTER OUTPUT PRODUCTS --
 	------------------------------
+	
+	local outputTitle = getXMLString(xmlFile, xmlKey .. ".registerOutputProducts#headerTitle");
+	if outputTitle ~= nil then		
+		self.guiData.outputTitle = g_company.languageManager:getText(outputTitle);
+	else
+		self.guiData.outputTitle = g_company.languageManager:getText("GC_Output_Header_Backup");
+	end;
 
 	i = 0;
 	while true do
