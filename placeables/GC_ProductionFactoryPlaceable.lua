@@ -88,6 +88,7 @@ function GC_ProductionFactoryPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRa
 					usedIndexNames[indexName] = key;
 					local factory = GC_ProductionFactory:new(self.isServer, self.isClient, nil, filenameToUse, self.baseDirectory, self.customEnvironment);
 					if factory:load(self.nodeId, xmlFile, key, indexName, true) then
+						factory:setOwnerFarmId(self:getOwnerFarmId(), false);
 						table.insert(self.productionFactories, factory);
 					else
 						factory:delete();
@@ -210,6 +211,14 @@ function GC_ProductionFactoryPlaceable:saveToXMLFile(xmlFile, key, usedModNames)
 	end;
 end;
 
+-- We need to update the 'OwnerFarmId' here so that sub-objects can also be updated and for land sales.
+function GC_ProductionFactoryPlaceable:setOwnerFarmId(ownerFarmId, noEventSend)
+    GC_ProductionFactoryPlaceable:superClass().setOwnerFarmId(self, ownerFarmId, noEventSend);
+
+	for index, factory in ipairs(self.productionFactories) do
+		factory:setOwnerFarmId(ownerFarmId, noEventSend);
+	end;
+end;
 
 
 
