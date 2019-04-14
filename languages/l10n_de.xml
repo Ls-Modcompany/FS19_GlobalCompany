@@ -48,6 +48,10 @@
 		<e k="GC_gui_automatic" v="Automatik:"/>
 		<e k="GC_gui_state_on" v="läuft"/>
 		<e k="GC_gui_state_off" v="gestoppt"/>
+		<e k="GC_gui_pallet1" v="%s Palette"/>
+		<e k="GC_gui_pallet2" v="%s Paletten"/>
+		<e k="GC_gui_spawnText1" v="%s Palette erzeugen"/>
+		<e k="GC_gui_spawnText2" v="%s Paletten erzeugen"/>
 		
 		
 		<e k="GC_Productline_Title_Backup" v="Produktlinie %d"/>

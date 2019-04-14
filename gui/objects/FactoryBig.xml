@@ -80,7 +80,11 @@
                   <GuiElement type="image" template="gcFactoryRightTableItemBar" size="200px 23px" position="210px -10px" onCreate="onCreateDetailOutputBar" />
                   <GuiElement type="text" template="gcFactoryBigRightOverviewText11" position="430px -5px" onCreate="onCreateDetailOutputPercent" />
                   
-                  <!--GuiElement type="button" template="gcFactoryRightTableItemBtnSml" size="200px 40px" position="90px -50px" text="Kaufen (3.500€)" /-->
+                  
+                  <GuiElement type="text" template="gcFactoryBigRightOverviewText12" position="20px -110px" onCreate="onCreateDetailOutputPalletText" />
+                  <GuiElement type="button" template="gcButton" size="40px 40px" position="-90px -50px" text="-" onCreate="onCreateDetailOutputPalletButtonMinusPlus" onClick="onClickDetailPalletMinus" />
+                  <GuiElement type="button" template="gcButton" size="40px 40px" position="-40px -50px" text="+" onCreate="onCreateDetailOutputPalletButtonMinusPlus" onClick="onClickDetailPalletPlus" />
+                  <GuiElement type="button" template="gcFactoryRightTableItemBtnSml" size="200px 40px" position="90px -50px" onCreate="onCreateDetailOutputPalletButton" onClick="onClickDetailSpawnPallet" />
                 </GuiElement>	              
               </GuiElement>
                 

@@ -433,6 +433,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 					outputProduct.fillTypeIndex = fillTypeIndex;
 					outputProduct.lastFillTypeIndex = fillTypeIndex;
 					outputProduct.capacity = Utils.getNoNil(getXMLInt(xmlFile, outputProductKey .. "#capacity"), 1000);
+					outputProduct.numberToSpawn = 0;
 
 					local productTitle = getXMLString(xmlFile, outputProductKey .. "#title");
 					if productTitle ~= nil then
@@ -1825,15 +1826,22 @@ function GC_ProductionFactory:doProductPurchase(input)
 	end;
 end;
 
-function GC_ProductionFactory:spawnPalletFromOutput(output, numberToSpawn)
+function GC_ProductionFactory:changeNumberToSpawn(output, delta)
+	local newNumberToSpawn = output.numberToSpawn + delta;
+	if newNumberToSpawn >= 0 and self:getFreePalletSpawnAreas(output) >= newNumberToSpawn then
+		output.numberToSpawn = newNumberToSpawn;
+	end;
+end;
+
+function GC_ProductionFactory:spawnPalletFromOutput(output)
 	local numberSpawned = 0;
 	
-	if output ~= nil and numberToSpawn > 0 then
+	if output ~= nil and output.numberToSpawn > 0 then
 		if output.objectSpawner ~= nil then		
 			local autoStart = output.fillLevel >= output.capacity;
 			local object = output.objectSpawner.object;
-			numberSpawned = output.objectSpawner:spawnByObjectInfo(object, numberToSpawn);
-		
+			numberSpawned = output.objectSpawner:spawnByObjectInfo(object, output.numberToSpawn);
+			output.numberSpawn = output.numberSpawn - numberSpawned;
 			if autoStart then
 				self:doAutoStart(nil, nil, true);
 			end;

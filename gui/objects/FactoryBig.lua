@@ -36,8 +36,6 @@ end
 function Gc_Gui_FactoryBig:onCreate() end;
 
 function Gc_Gui_FactoryBig:onOpen()
-	
-    
     g_depthOfFieldManager:setBlurState(true);
     
     self.lastMoney = nil;
@@ -47,17 +45,14 @@ function Gc_Gui_FactoryBig:onOpen()
     self:setProductLines();
 
     self:openLineId(self.currentLineId);
-    self.canRegisterInputs = true;
-    
+   -- self.canRegisterInputs = true;    
 end;
 
-function Gc_Gui_FactoryBig:update(dt)
-    
-    if self.canRegisterInputs then
-        g_gui.inputManager:registerActionEvent(InputAction.MENU_ACCEPT, self, self.onClickActivate, false, true, false, true);
-        
-        self.canRegisterInputs = false;
-    end;
+function Gc_Gui_FactoryBig:update(dt)    
+    --if self.canRegisterInputs then
+    --    g_gui.inputManager:registerActionEvent(InputAction.MENU_ACCEPT, self, self.onClickActivate, false, true, false, true);       
+    --    self.canRegisterInputs = false;
+    --end;
     
 	if g_currentMission ~= nil and g_currentMission.player ~= nil then
         local farm = g_farmManager:getFarmById(g_currentMission.player.farmId)
@@ -67,11 +62,9 @@ function Gc_Gui_FactoryBig:update(dt)
 		end;
     end;	
 	
-	if self.liveCamera ~= nil then
+	--if self.liveCamera ~= nil then
 		--updateRenderOverlay(self.liveCamera);
-    end;
-    
-
+    --end;
 end;
 
 function Gc_Gui_FactoryBig:keyEvent(unicode, sym, modifier, isDown, eventUsed)
@@ -151,8 +144,6 @@ function Gc_Gui_FactoryBig:onClickActivate()
     end;
 end
 
-
-
 function Gc_Gui_FactoryBig:setButtons()
     if self.currentLineId ~= nil and self.currentLineId > 0 then
         self.gui_button_activate:setVisible(true);
@@ -176,12 +167,12 @@ function Gc_Gui_FactoryBig:setOverview()
     self.gui_details_input:setText(data.inputHeader);
     self.gui_details_output:setText(data.outputHeader);
 
-
-    if data.factoryCamera ~= nil then
-        self.liveCamera = g_company.cameraUtil:getRenderOverlayId(data.factoryCamera, self.gui_overview_image.size[1], self.gui_overview_image.size[2]);
-        updateRenderOverlay(self.liveCamera);
-        self.gui_overview_image:setImageOverlay(self.liveCamera);
-    elseif data.factoryImage ~= nil then
+    --if data.factoryCamera ~= nil then
+    --    self.liveCamera = g_company.cameraUtil:getRenderOverlayId(data.factoryCamera, self.gui_overview_image.size[1], self.gui_overview_image.size[2]);
+    --    updateRenderOverlay(self.liveCamera);
+    --    self.gui_overview_image:setImageOverlay(self.liveCamera);
+    --elseif data.factoryImage ~= nil then
+    if data.factoryImage ~= nil then
         self.gui_overview_image:setImageFilename(data.factoryImage);
     end;
 end
@@ -252,10 +243,6 @@ function Gc_Gui_FactoryBig:setDetails()
     end;
 
 end
-
--- function Gc_Gui_FactoryBig:minuteChanged()
-    -- self.gui_details_currentTime:setText(string.format("%s:%s", g_currentMission.environment.currentHour, g_currentMission.environment.currentMinute));
--- end
 
 function Gc_Gui_FactoryBig:onCreateDetailInputTitle(element)
     if self.tmp_input ~= nil then
@@ -359,6 +346,79 @@ function Gc_Gui_FactoryBig:onCreateDetailOutputPercent(element)
     if self.tmp_output ~= nil then
         element:setText(string.format("%s%%", g_i18n:formatNumber(self.tmp_output.fillLevel / self.tmp_output.capacity * 100, 0)));
     end;
+end
+
+
+
+
+
+function Gc_Gui_FactoryBig:onCreateDetailOutputPalletButtonMinusPlus(element)
+    if self.tmp_output ~= nil then
+        element.output = self.tmp_output;
+    end;
+end
+
+function Gc_Gui_FactoryBig:onCreateDetailOutputPalletText(element)
+    if self.tmp_output ~= nil then
+        element.parent.palletTextElement = element;
+        if self.tmp_output.numberToSpawn > 1 then
+            element:setText(string.format(g_company.languageManager:getText("GC_gui_pallet2"), g_i18n:formatNumber(self.tmp_output.numberToSpawn, 0)));
+        else
+            element:setText(string.format(g_company.languageManager:getText("GC_gui_pallet1"), g_i18n:formatNumber(self.tmp_output.numberToSpawn, 0)));
+        end;
+    end;
+end
+
+function Gc_Gui_FactoryBig:onCreateDetailOutputPalletButton(element)
+    if self.tmp_output ~= nil then
+        if element.name == "button" then
+            element.output = self.tmp_output;
+        end;
+        if element.name == "text" then
+            element.parent.parent.palletTextElement = element;
+            if self.tmp_output.numberToSpawn > 1 then
+                element:setText(string.format(g_company.languageManager:getText("GC_gui_spawnText2"), g_i18n:formatNumber(self.tmp_output.numberToSpawn, 0)));
+            else
+                element:setText(string.format(g_company.languageManager:getText("GC_gui_spawnText1"), g_i18n:formatNumber(self.tmp_output.numberToSpawn, 0)));
+            end;
+        end;
+    end;
+end
+
+function Gc_Gui_FactoryBig:onClickDetailPalletMinus(element)
+    self.currentFactory:changeNumberToSpawn(element.output, -1);
+    
+    if element.output.numberToSpawn > 1 then
+        element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_pallet2"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
+    else
+        element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_pallet1"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
+    end;
+    
+    if element.output.numberToSpawn > 1 then
+        element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_spawnText2"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
+    else
+        element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_spawnText1"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
+    end;
+end
+
+function Gc_Gui_FactoryBig:onClickDetailPalletPlus(element)   
+    self.currentFactory:changeNumberToSpawn(element.output, 1);
+    
+    if element.output.numberToSpawn > 1 then
+        element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_pallet2"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
+    else
+        element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_pallet1"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
+    end;
+    
+    if element.output.numberToSpawn > 1 then
+        element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_spawnText2"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
+    else
+        element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_spawnText1"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
+    end;
+end
+
+function Gc_Gui_FactoryBig:onClickDetailSpawnPallet(element)   
+    
 end
 
 
