@@ -40,6 +40,7 @@ function Gc_Gui_FactoryBig:onOpen()
     
     g_depthOfFieldManager:setBlurState(true);
     
+    self.lastMoney = nil;
     
 	self:setButtons();
 	self:setOverview();
@@ -155,6 +156,7 @@ end
 function Gc_Gui_FactoryBig:setButtons()
     if self.currentLineId > 0 then
         self.gui_button_activate:setVisible(true);
+        self.gui_button_activate_btn:setVisible(true);
         if self.currentFactory:getIsFactoryLineOn(self.currentLineId) then
             self.gui_button_activate:setText(g_company.languageManager:getText("GC_gui_deactivate"));
         else
@@ -162,6 +164,7 @@ function Gc_Gui_FactoryBig:setButtons()
         end;
     else
         self.gui_button_activate:setVisible(false);
+        self.gui_button_activate_btn:setVisible(false);
     end;
 end;
 
@@ -170,6 +173,9 @@ function Gc_Gui_FactoryBig:setOverview()
     self.gui_overview_factoryName:setText(data.factoryTitle);
     self.gui_details_factoryName:setText(data.factoryTitle);
     self.gui_overview_description:setText(data.factoryDescription);
+    self.gui_details_input:setText(data.inputHeader);
+    self.gui_details_output:setText(data.outputHeader);
+
 
     if data.factoryCamera ~= nil then
         self.liveCamera = g_company.cameraUtil:getRenderOverlayId(data.factoryCamera, self.gui_overview_image.size[1], self.gui_overview_image.size[2]);
@@ -232,6 +238,19 @@ function Gc_Gui_FactoryBig:setDetails()
         self.gui_outputTable:createItem();
     end;
     self.tmp_output = nil;  
+
+    if self.currentFactory:getIsFactoryLineOn(self.currentLineId) then
+        self.gui_details_state:setText(g_company.languageManager:getText("GC_gui_state_on"));
+    else
+        self.gui_details_state:setText(g_company.languageManager:getText("GC_gui_state_off"));
+    end;
+
+    if self.currentFactory:getAutoStart(self.currentLineId) then
+        self.gui_details_automatic:setText(g_company.languageManager:getText("GC_gui_buttons_yes"));
+    else
+        self.gui_details_automatic:setText(g_company.languageManager:getText("GC_gui_buttons_no"));
+    end;
+
 end
 
 -- function Gc_Gui_FactoryBig:minuteChanged()
@@ -308,7 +327,6 @@ function Gc_Gui_FactoryBig:onClickDetailPlus(element)
 end
 
 function Gc_Gui_FactoryBig:onClickDetailBuy(element)   
-    print(element.input.title)
     self.currentFactory:doProductPurchase(element.input);
     self:setDetails();
 end

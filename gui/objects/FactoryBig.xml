@@ -34,15 +34,15 @@
             <GuiElement type="text" template="gcFactoryBigRightOverviewText5" position="-80px -20px" id="gui_details_currentTime" /> 
             <GuiElement type="image" template="gcSeperator" size="1100px 2px" position="0px 350px" />    
             
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText6" position="100px -100px" text="Status:" />  
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText6" position="100px -130px" text="Automatik??" />  
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText7" position="300px -100px" text="Aktiv" />  
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText7" position="300px -130px" text="Ja" /> 
+            <GuiElement type="text" template="gcFactoryBigRightOverviewText6" position="100px -100px" text="$l10n_GC_gui_state" />  
+            <GuiElement type="text" template="gcFactoryBigRightOverviewText6" position="100px -130px" text="$l10n_GC_gui_automatic" />  
+            <GuiElement type="text" template="gcFactoryBigRightOverviewText7" position="300px -100px" id="gui_details_state" />  
+            <GuiElement type="text" template="gcFactoryBigRightOverviewText7" position="300px -130px" id="gui_details_automatic" /> 
 
             <GuiElement type="image" template="gcSeperator" size="2px 600px" position="0px -80px" />  
 
             <GuiElement type="image" template="gcFactoryBigRightInput" >
-              <GuiElement type="text" template="gcFactoryBigRightOverviewText8" position="0px -5px" text="Rohstoffe" />                  
+              <GuiElement type="text" template="gcFactoryBigRightOverviewText8" position="0px -5px" id="gui_details_input" />                  
 
               <GuiElement type="table" template="gcFactoryRightTable" id="gui_inputTable">		
                 <GuiElement type="button" template="gcFactoryRightTableItem" isTableTemplate="true">
@@ -65,7 +65,7 @@
             </GuiElement>
 
             <GuiElement type="image" template="gcFactoryBigRightOutput" >
-              <GuiElement type="text" template="gcFactoryBigRightOverviewText8" position="0px -5px" text="Produkte" />                  
+              <GuiElement type="text" template="gcFactoryBigRightOverviewText8" position="0px -5px" id="gui_details_output" />                  
 
               <GuiElement type="table" template="gcFactoryRightTable" id="gui_outputTable">				
                 <GuiElement type="button" template="gcFactoryRightTableItem" isTableTemplate="true">
@@ -94,7 +94,7 @@
     <GuiElement type="flowLayout" template="gcFactoryBigButtonsLayout">
         <GuiElement type="button" template="gcBaseGuiButton" inputAction="MENU_BACK" onClick="onClickClose" />
         <GuiElement type="text" template="gcBaseGuiButtonText" text="$l10n_GC_gui_buttons_back" />    
-        <GuiElement type="button" template="gcBaseGuiButtonNext" inputAction="MENU_ACCEPT" onClick="onClickActivate" />
+        <GuiElement type="button" position="350px 0px" template="gcBaseGuiButtonNext" inputAction="MENU_ACCEPT" onClick="onClickActivate" id="gui_button_activate_btn" />
         <GuiElement type="text" template="gcBaseGuiButtonText" id="gui_button_activate" />    
     </GuiElement>
   </GuiElement>

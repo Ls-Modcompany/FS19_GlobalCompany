@@ -44,11 +44,17 @@
 		<e k="GC_gui_buyText" v="Kaufen (%s)"/>
 		<e k="GC_gui_activate" v="Anschalten"/>
 		<e k="GC_gui_deactivate" v="Ausschalten"/>
+		<e k="GC_gui_state" v="Status:"/>
+		<e k="GC_gui_automatic" v="Automatik:"/>
+		<e k="GC_gui_state_on" v="läuft"/>
+		<e k="GC_gui_state_off" v="gestoppt"/>
 		
 		
-		<e k="GC_Productline_Title_Backup" v="Produktlinien %d"/>
-		<e k="GC_Input_Title_Backup" v="Rohstoffe %d"/>
-		<e k="GC_Output_Title_Backup" v="Produkte %d"/>
+		<e k="GC_Productline_Title_Backup" v="Produktlinie %d"/>
+		<e k="GC_Input_Title_Backup" v="Rohstoff %d"/>
+		<e k="GC_Output_Title_Backup" v="Produkt %d"/>
+		<e k="GC_Input_Header_Backup" v="Rohstoffe"/>
+		<e k="GC_Output_Header_Backup" v="Produkte"/>
 
 		<!-- BaleShreader -->
 		<e k="GC_baleShreader_openSteer" v="Steuerung öffnen"/>

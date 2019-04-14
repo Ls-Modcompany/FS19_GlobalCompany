@@ -30,7 +30,7 @@ GlobalCompanyGui.debugData = g_company.debug:getDebugData(GlobalCompanyGui.debug
 GlobalCompanyGui.DevelopementVersionTemplatesFilename = {};
 addModEventListener(GlobalCompanyGui);
 
-GlobalCompanyGui.devVersion = false;
+GlobalCompanyGui.devVersion = true;
 
 GlobalCompanyGui.guis = {};
 GlobalCompanyGui.smallGuis = {};

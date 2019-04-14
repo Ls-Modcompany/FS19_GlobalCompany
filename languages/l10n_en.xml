@@ -42,10 +42,18 @@
 		<e k="GC_gui_filllevel" v="Fill Level:"/>
 		<e k="GC_gui_liter" v="%s Litres"/>
 		<e k="GC_gui_buyText" v="Purchase (%s)"/>
+		<e k="GC_gui_activate" v="Turn on"/>
+		<e k="GC_gui_deactivate" v="Turn off"/>
+		<e k="GC_gui_state" v="State:"/>
+		<e k="GC_gui_automatic" v="Automatic:"/>
+		<e k="GC_gui_state_on" v="running"/>
+		<e k="GC_gui_state_off" v="stopped"/>
 		
 		<e k="GC_Productline_Title_Backup" v="Production Line %d"/>
 		<e k="GC_Input_Title_Backup" v="Input %d"/>
 		<e k="GC_Output_Title_Backup" v="Output %d"/>
+		<e k="GC_Input_Header_Backup" v="Input"/>
+		<e k="GC_Output_Header_Backup" v="Output"/>
 
 		<!-- BaleShreader -->
 		<e k="GC_baleShreader_openSteer" v="Open Steer"/>
