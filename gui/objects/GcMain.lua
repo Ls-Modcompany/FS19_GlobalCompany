@@ -24,6 +24,7 @@ Gc_Gui_MainGui = {};
 Gc_Gui_MainGui.xmlFilename = g_company.dir .. "gui/objects/GcMain.xml";
 Gc_Gui_MainGui.debugIndex = g_company.debug:registerScriptName("Gc_Gui_MainGui");
 
+source(g_company.dir .. "gui/objects/GcMain_Errors.lua");
 source(g_company.dir .. "gui/objects/GcMain_Settings.lua");
 
 local Gc_Gui_MainGui_mt = Class(Gc_Gui_MainGui);
@@ -35,6 +36,7 @@ function Gc_Gui_MainGui:new(target, custom_mt)
     local self = setmetatable({}, Gc_Gui_MainGui_mt);
 
     g_company.gui:loadGui(Gc_Gui_MainSettings, "gcMainSettings");
+    g_company.gui:loadGui(Gc_Gui_Errors, "gcMainErrors");
     
     self.backupItems = {};            
 	return self;
@@ -46,15 +48,16 @@ function Gc_Gui_MainGui:onCreate()
     for _, d in pairs(self.backupItems) do
         self:addMenuItem(d.imageFilename, d.imageUVs, d.gui, true);
     end;
-    self.loadSettings = false;
+    self.loadSpecial = true;
 end;
 
 function Gc_Gui_MainGui:onOpen() 
     g_depthOfFieldManager:setBlurState(true)
 
-    if not self.loadSettings then
-        self:addMenuItem("g_gcUi2", "icon_settings2", g_company.gui:getGui("gcMainSettings"), true);
-        self.loadSettings = true;
+    if self.loadSpecial then
+        self:addMenuItem("g_gcUi2", "icon_errors", g_company.gui:getGui("gcMainErrors"), true);
+        self:addMenuItem("g_gcUi2", "icon_settings", g_company.gui:getGui("gcMainSettings"), true);
+        self.loadSpecial = false;
     end;
     
     if table.getn(self.gui_menu.elements) == 0 then

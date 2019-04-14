@@ -104,7 +104,7 @@ function GC_languageManager:loadEntries(modName, fullPath, baseKey)
 
 		for i = 1, #duplicateTable do
 			local name = duplicateTable[i];
-			print(string.format("      %d: %s", i, name));
+			g_company.debug:print("      %d: %s", i, name);
 		end;
 
 		duplicateTable = nil;
@@ -121,7 +121,7 @@ function GC_languageManager:loadEntries(modName, fullPath, baseKey)
 
 		for i = 1, #prefixErrorTable do
 			local name = prefixErrorTable[i];
-			print(string.format("      %d: %s", i, name));
+			g_company.debug:print("      %d: %s", i, name);
 		end;
 
 		prefixErrorTable = nil;

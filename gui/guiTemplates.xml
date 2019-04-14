@@ -51,11 +51,12 @@
 		<uv name="icon_notification" value="0px 0px 80px 80px" />
 		<uv name="icon_notificationNumber" value="80px 0px 80px 80px" />
 		<uv name="icon_apps" value="240px 0px 80px 80px" />
-		<uv name="icon_settings" value="160px 0px 80px 80px" />
+		<uv name="icon_settings3" value="160px 0px 80px 80px" />
 		
         <uv name="keyBordKey" value="96px 96px 48px 48px"/>
 
-        <uv name="icon_settings2" value="0px 0px 128px 128px"/>
+        <uv name="icon_errors" value="128px 0px 128px 128px"/>
+        <uv name="icon_settings" value="0px 0px 128px 128px"/>
 	</uvs>
 	
 	<templates>
@@ -725,6 +726,28 @@
 			<value name="textAlignment" value="center" />	
 			<value name="margin" value="20px 0px 0px 0px" />
 			<value name="textBold" value="false" />
+		</template>	
+
+
+		<template name="gcMenuErrorsTable" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="1800px 900px" />
+			<value name="position" value="0px 0px" />
+			<value name="orientation" value="y" />
+			<value name="maxItemsX" value="1" />
+			<value name="maxItemsY" value="29" />								
+		</template>	
+		<template name="gcMenuErrorsTableItem" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="1800px 30px" />
+			<value name="imageColor" value="glass0_1" />
+			<value name="imageColor_selected" value="glass0_2" />
+			<value name="hasOverlay" value="true" />
+		</template>	
+	
+		<template name="gcMenuErrorsTableItemText" anchor="leftTop" extends="gcBase_text">
+			<value name="size" value="0px 0px" />
+			<value name="textSize" value="18px" />
+			<value name="textAlignment" value="left" />	
+			<value name="margin" value="10px 5px 0px 0px" />	
 		</template>	
 
 

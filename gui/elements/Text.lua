@@ -230,7 +230,10 @@ function GC_Gui_text:setTextColor(r,g,b,a)
     self.textColor = {r,g,b,a};
 end;
 
-function GC_Gui_text:getTextWidth()
+function GC_Gui_text:getTextWidth(text)
+	if text == nil then
+		text = self.text;
+	end;
     setTextBold(self.textBold);
     local width = getTextWidth(self.textSize, self.text);
     setTextBold(false);

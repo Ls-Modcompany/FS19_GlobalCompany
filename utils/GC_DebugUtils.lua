@@ -49,7 +49,9 @@ GC_DebugUtils.DEVDEBUG = 6;
 
 function GC_DebugUtils:new(customMt)
 	if g_company.debug ~= nil then
-		print("  [LSMC - GlobalCompany > GC_DebugUtils] - Class already registered! Use 'g_company.debug' to access debug manager.");
+		local text = "  [LSMC - GlobalCompany > GC_DebugUtils] - Class already registered! Use 'g_company.debug' to access debug manager.";
+		print(text);
+		table.insert(self.savedErrors, text);
 		return;
 	end;
 
@@ -97,12 +99,20 @@ function GC_DebugUtils:new(customMt)
 	self.printLevelPrefix[GC_DebugUtils.DEV] = "DEVELOPMENT: ";
 	self.printLevelPrefix[GC_DebugUtils.DEVDEBUG] = "DEVELOPMENT DEBUG: ";
 	
+	self.savedErrors = {};
+
 	return self;
 end;
 
 -------------------
 -- Print Options --
 -------------------
+
+function GC_DebugUtils:print(message, ...)
+	local text = string.format(message, ...);
+	print(text);
+	table.insert(self.savedErrors, text);
+end;
 
 -- Standard formatted printing for 'unregistered' scripts. This has no 'level' or 'data' requirement.
 function GC_DebugUtils:printToLog(prefix, message, ...)
@@ -112,7 +122,9 @@ function GC_DebugUtils:printToLog(prefix, message, ...)
 		prefix = "WARNING:  ";
 	end;
 
-	print("  [LSMC - GlobalCompany] - " .. prefix .. string.format(message, ...));
+	local text = "  [LSMC - GlobalCompany] - " .. prefix .. string.format(message, ...);
+	print(text);
+	table.insert(self.savedErrors, text);
 end;
 
 -- Print only the 'mods' header.
@@ -129,17 +141,22 @@ function GC_DebugUtils:printHeader(data)
 			header = "  [LSMC - GlobalCompany] - [" .. registeredScriptName .. "]";
 		end;
 	end;
-	
+
 	print(header);
+	table.insert(self.savedErrors, header);
 end;
 
 -- Print to log without header.
 function GC_DebugUtils:singleLogWrite(level, message, ...)
+	local text = "";
 	if self.printLevel[level] == true then
-		print("  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[level] .. string.format(message, ...));
+		text = "  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[level] .. string.format(message, ...);
 	else
-		print("  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[GC_DebugUtils.ERROR] .. string.format(message, ...));
+		text = "  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[GC_DebugUtils.ERROR] .. string.format(message, ...);
 	end;
+
+	print(text);
+	table.insert(self.savedErrors, text);
 end;
 
 -- Print to log with header.
@@ -156,15 +173,21 @@ function GC_DebugUtils:logWrite(data, level, message, ...)
 				header = "  [LSMC - GlobalCompany] - [" .. registeredScriptName .. "]";
 			end;
 
+			local text = "";
 			if registeredScriptName ~= nil then
 				if header ~= nil then
-					print(header, "    " .. self.printLevelPrefix[level] .. string.format(message, ...));
+					print(header);
+					table.insert(self.savedErrors, header);
+					text = "    " .. self.printLevelPrefix[level] .. string.format(message, ...);
 				else
-					print("  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[level] .. string.format(message, ...));
+					text = "  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[level] .. string.format(message, ...);
 				end;
 			else
-				print("  [LSMC - GlobalCompany > GC_DebugUtils] - Illegal mod!");
+				text = "  [LSMC - GlobalCompany > GC_DebugUtils] - Illegal mod!";
 			end;
+			
+			print(text);
+			table.insert(self.savedErrors, text);
 		end;
 	end;
 end;
@@ -218,7 +241,9 @@ function GC_DebugUtils:getLevelFromName(levelName, printError)
 	local level = GC_DebugUtils[levelName:upper()];
 
 	if printError == true and level == nil then
-		print("  [LSMC - GlobalCompany > GC_DebugUtils] - 'printLevel' with name '" .. levelName:upper() .. "' does not exist!");
+		local text = "  [LSMC - GlobalCompany > GC_DebugUtils] - 'printLevel' with name '" .. levelName:upper() .. "' does not exist!";
+		print(text);
+		table.insert(self.savedErrors, text);
 	end;
 
 	return level;
@@ -255,7 +280,9 @@ end;
 
 function GC_DebugUtils:registerScriptName(scriptName)
 	if type(scriptName) ~= "string" then
-		print("  [LSMC - GlobalCompany > GC_DebugUtils] - 'registerScriptName' failed! '" .. tostring(scriptName) .. "' is not a string value.");
+		local text = "  [LSMC - GlobalCompany > GC_DebugUtils] - 'registerScriptName' failed! '" .. tostring(scriptName) .. "' is not a string value.";
+		print(text);
+		table.insert(self.savedErrors, text);
 		return;
 	end;
 
@@ -267,7 +294,9 @@ function GC_DebugUtils:registerScriptName(scriptName)
 
 		return self.registeredScriptsCount;
 	else
-		print(string.format("  [LSMC - GlobalCompany > GC_DebugUtils] - Script name %s is already registered! Registered Script Id = %d", scriptName, self.registeredScriptNames[scriptName]));
+		local text = string.format("  [LSMC - GlobalCompany > GC_DebugUtils] - Script name %s is already registered! Registered Script Id = %d", scriptName, self.registeredScriptNames[scriptName]);
+		print(text);
+		table.insert(self.savedErrors, text);
 	end;
 end;
 
