@@ -22,7 +22,7 @@ function Gc_Gui_FactoryBig:new(target, custom_mt)
 
     
 		
-    g_currentMission.environment:addMinuteChangeListener(self)
+    -- g_currentMission.environment:addMinuteChangeListener(self)
 
 	return self;
 end;
@@ -30,18 +30,50 @@ end;
 function Gc_Gui_FactoryBig:setData(fabric, lineId)
     self.currentFactory = fabric;
     self.currentLineId = lineId;
+	
+	g_depthOfFieldManager:setBlurState(true)
 end
 
 function Gc_Gui_FactoryBig:onCreate() end;
 
-function Gc_Gui_FactoryBig:onOpen() 
-    g_depthOfFieldManager:setBlurState(true)
-
-
-    self:setOverview();
+function Gc_Gui_FactoryBig:onOpen()
+	-- debugPrint(g_depthOfFieldManager.blurIsActive)
+	
+	g_depthOfFieldManager:setBlurState(true)
+    
+	-- debugPrint(g_depthOfFieldManager.blurIsActive)
+	
+	self:setOverview();
     self:setProductLines();
 
     self:openLineId(self.currentLineId);
+	
+end;
+
+function Gc_Gui_FactoryBig:update(dt)
+	if g_currentMission ~= nil and g_currentMission.player ~= nil then
+        local farm = g_farmManager:getFarmById(g_currentMission.player.farmId)
+		if self.lastMoney ~= farm.money then
+			local moneyText = g_i18n:formatMoney(farm.money, 0, false, true);   
+			self:updateBalanceText(farm.money);
+		end;
+    end;	
+	
+	if self.liveCamera ~= nil then
+		updateRenderOverlay(self.liveCamera);
+	end;
+end;
+
+function Gc_Gui_FactoryBig:updateBalanceText(money)
+    self.lastMoney = money;	
+	self.gui_details_currentTime:setText(g_i18n:formatMoney(money, 0, true, true));
+    if money > 0 then
+		-- self.gui_details_currentTime:applyProfile("gcFactoryBigRightOverviewText5")
+        self.gui_details_currentTime:setTextColor(1, 1, 1, 1)
+    else
+		-- self.gui_details_currentTime:applyProfile("gcFactoryBigRightOverviewText5_Red")
+        self.gui_details_currentTime:setTextColor(0.2832, 0.0091, 0.0091, 1)
+    end;
 end;
 
 function Gc_Gui_FactoryBig:onClose() 
@@ -58,7 +90,6 @@ function Gc_Gui_FactoryBig:openLineId(lineId)
         self.currentLineId = lineId;
         self:setDetails();
     end;
-    self:updateLineIdTable();
 end
 
 function Gc_Gui_FactoryBig:onClickToOverview()
@@ -92,9 +123,9 @@ function Gc_Gui_FactoryBig:setOverview()
     self.gui_overview_description:setText(data.factoryDescription);
 
     if data.factoryCamera ~= nil then
-        local id = g_company.cameraUtil:getRenderOverlayId(data.factoryCamera, self.gui_overview_image.size[1], self.gui_overview_image.size[2]);
-        updateRenderOverlay(id);
-        self.gui_overview_image:setImageOverlay(id);
+        self.liveCamera = g_company.cameraUtil:getRenderOverlayId(data.factoryCamera, self.gui_overview_image.size[1], self.gui_overview_image.size[2]);
+        updateRenderOverlay(self.liveCamera);
+        self.gui_overview_image:setImageOverlay(self.liveCamera);
     elseif data.factoryImage ~= nil then
         self.gui_overview_image:setImageFilename(data.factoryImage);
     end;
@@ -138,7 +169,7 @@ end
 --------------------------------------Detail------------------------------------------------
 --------------------------------------------------------------------------------------------
 function Gc_Gui_FactoryBig:setDetails()
-    self:minuteChanged(); -- set current time
+    --self:minuteChanged(); -- set current time
     self.gui_inputTable:removeElements();
     self.gui_outputTable:removeElements();
 
@@ -155,9 +186,9 @@ function Gc_Gui_FactoryBig:setDetails()
     self.tmp_output = nil;  
 end
 
-function Gc_Gui_FactoryBig:minuteChanged()
-    self.gui_details_currentTime:setText(string.format("%s:%s", g_currentMission.environment.currentHour, g_currentMission.environment.currentMinute));
-end
+-- function Gc_Gui_FactoryBig:minuteChanged()
+    -- self.gui_details_currentTime:setText(string.format("%s:%s", g_currentMission.environment.currentHour, g_currentMission.environment.currentMinute));
+-- end
 
 function Gc_Gui_FactoryBig:onCreateDetailInputTitle(element)
     if self.tmp_input ~= nil then
