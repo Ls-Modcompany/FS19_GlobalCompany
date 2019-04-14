@@ -273,7 +273,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				inputProduct.fillLevel = 0;
 				inputProduct.concatedFillTypeTitles = table.concat(concatTitles, " | "); -- Maybe gui can use this.
 				inputProduct.capacity = Utils.getNoNil(getXMLInt(xmlFile, inputProductKey .. "#capacity"), 1000);
-				inputProduct.buyLiters = 0;
+				inputProduct.buyLiters = 0;				
 
 				-- Only if modder allows product purchasing.
 				if self.canPurchaseInputs then					
@@ -1493,10 +1493,10 @@ function GC_ProductionFactory:getAutoStart(lineId)
 	return self.productLines[lineId].autoStart and not self.productLines[lineId].userStopped and not self.productLines[lineId].active;
 end;
 
-function GC_ProductionFactory:doAutoStart(fillTypeIndex, triggerId)
+function GC_ProductionFactory:doAutoStart(fillTypeIndex, triggerId, forceCheck)
 	if self.isServer then
 		self.levelChangeTimer = 1000;
-		if self.lastCheckedFillType ~= fillTypeIndex or self.lastCheckedTrigger ~= triggerId then
+		if (self.lastCheckedFillType ~= fillTypeIndex) or (self.lastCheckedTrigger ~= triggerId) or forceCheck == true then
 			self.lastCheckedFillType = fillTypeIndex;
 			self.lastCheckedTrigger = triggerId;
 			for lineId, _ in pairs (self.productLines) do
@@ -1678,14 +1678,10 @@ end;
 function GC_ProductionFactory:playerTriggerActivated(lineId)
 	-- NOTES:
 	
-	-- If 'lineId' is ~= nil we will open the gui directly to this page. (ProductLine).
-	
+	-- If 'lineId' is ~= nil we will open the gui directly to this page. (ProductLine).	
 	-- If 'lineId' is == nil (Global Player Trigger) This will open to factory overview (Home Page).
-
 	
 	g_company.gui:openGuiWithData("gc_factoryBig", false, self, lineId);
-
-	--g_currentMission:showBlinkingWarning("@kevink98 - THIS INPUT OPENS THE GUI");
 end;
 
 function GC_ProductionFactory:playerTriggerUpdate(dt, playerInTrigger, lineId)
@@ -1796,33 +1792,53 @@ function GC_ProductionFactory:doProductPurchase(input)
 	if input ~= nil and input.buyLiters > 0 then		
 		if g_currentMission:getIsServer() then
 			local validLitres = math.min(input.buyLiters, math.floor(input.capacity - input.fillLevel));
+			input.buyLiters = 0;
 			local price = input.pricePerLiter * Utils.getNoNil(validLitres, 0);
 			if price > 0 then
-				local newFillLevel = input.fillLevel + validLitres;
-				--g_currentMission:addMoney(-price, self:getOwnerFarmId(), MoneyType.BOUGHT_MATERIALS, true, true); @gtx dont run! I get this in my log: Error: Can't change money of spectator farm
-				self:updateFactoryLevels(newFillLevel, input, nil, true);
-				input.buyLiters = 0;
+				local newFillLevel = input.fillLevel + validLitres;        
+				g_currentMission:addMoney(-price, self:getOwnerFarmId(), MoneyType.OTHER, true, true);
+				self:updateFactoryLevels(newFillLevel, input, nil, true);				
+				self:doAutoStart(nil, nil, true);
 			end;
 		else		
 			g_client:getServerConnection():sendEvent(GC_ProductionFactoryProductPurchaseEvent:new(self, input.lineId, input.id, input.buyLiters));
+			input.buyLiters = 0;
 		end;
 	end;
 end;
 
-function GC_ProductionFactory:spawnPalletFromOutput(output, numPallets)
-	if output ~= nil and numPallets > 0 then
+function GC_ProductionFactory:spawnPalletFromOutput(output, numberToSpawn)
+	local numberSpawned = 0;
 	
+	if output ~= nil and numberToSpawn > 0 then
+		if output.objectSpawner ~= nil then		
+			local autoStart = output.fillLevel >= output.capacity;
+			local object = output.objectSpawner.object;
+			numberSpawned = output.objectSpawner:spawnByObjectInfo(object, numberToSpawn);
+		
+			if autoStart then
+				self:doAutoStart(nil, nil, true);
+			end;
+		end;
 	end;
 	
-	return 0;
+	return numberSpawned;
 end;
 
 function GC_ProductionFactory:getFreePalletSpawnAreas(output)
-	if output ~= nil then
+	local availableAreas = 0;
 	
+	if output ~= nil then
+		if output.objectSpawner ~= nil then
+			local object = output.objectSpawner.object;
+			local maxAvailable = math.floor(output.fillLevel / object.fillLevel);
+			if maxAvailable > 0 then
+				availableAreas = output.objectSpawner:getSpaceByObjectInfo(object, maxAvailable);
+			end;
+		end;
 	end;
 	
-	return 0;
+	return availableAreas;
 end;
 
 --------------------
