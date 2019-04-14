@@ -34,12 +34,13 @@
             <GuiElement type="text" template="gcFactoryBigRightOverviewText5" position="-80px -20px" id="gui_details_currentTime" /> 
             <GuiElement type="image" template="gcSeperator" size="1100px 2px" position="0px 350px" />    
             
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText6" position="100px -100px" text="$l10n_GC_gui_state" />  
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText6" position="100px -130px" text="$l10n_GC_gui_automatic" />  
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText7" position="300px -100px" id="gui_details_state" />  
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText7" position="300px -130px" id="gui_details_automatic" /> 
+            <GuiElement type="text" template="gcFactoryBigRightOverviewText6" position="100px -90px" text="$l10n_GC_gui_state" />  
+            <GuiElement type="text" template="gcFactoryBigRightOverviewText6" position="100px -120px" text="$l10n_GC_gui_automatic" />  
+            <GuiElement type="text" template="gcFactoryBigRightOverviewText7" position="300px -90px" id="gui_details_state" />  
+            <GuiElement type="text" template="gcFactoryBigRightOverviewText7" position="300px -120px" id="gui_details_automatic" /> 
 
             <GuiElement type="image" template="gcSeperator" size="2px 600px" position="0px -80px" />  
+            <GuiElement type="image" template="gcSeperator" size="1000px 2px" position="0px 260px" />  
 
             <GuiElement type="image" template="gcFactoryBigRightInput" >
               <GuiElement type="text" template="gcFactoryBigRightOverviewText8" position="0px -5px" id="gui_details_input" />                  

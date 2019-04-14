@@ -154,7 +154,7 @@ end
 
 
 function Gc_Gui_FactoryBig:setButtons()
-    if self.currentLineId > 0 then
+    if self.currentLineId ~= nil and self.currentLineId > 0 then
         self.gui_button_activate:setVisible(true);
         self.gui_button_activate_btn:setVisible(true);
         if self.currentFactory:getIsFactoryLineOn(self.currentLineId) then

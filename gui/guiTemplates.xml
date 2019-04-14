@@ -470,6 +470,19 @@
 			<value name="isActivable" value="true" />
 			<value name="canDeactivable" value="false" />
 			<value name="hasOverlay" value="true" />
+			<value name="hasBorders" value="true" />
+			<value name="borderLeftSize" value="1px" />
+			<value name="borderRightSize" value="1px" />
+			<value name="borderTopSize" value="1px" />
+			<value name="borderBottomSize" value="1px" />
+			<value name="borderLeftSize_selected" value="1px" />
+			<value name="borderRightSize_selected" value="1px" />
+			<value name="borderTopSize_selected" value="1px" />
+			<value name="borderBottomSize_selected" value="1px" />
+			<value name="borderLeftColor" value="gray2" />
+			<value name="borderRightColor" value="gray2" />
+			<value name="borderTopColor" value="gray2" />
+			<value name="borderBottomColor" value="gray2" />
 		</template>	
 		<template name="gcFactoryBigLeftPLTableItemText" anchor="middleTop" extends="gcBase_text">
 			<value name="size" value="350px 131px" />
@@ -581,12 +594,25 @@
 			<value name="maxItemsX" value="1" />
 			<value name="maxItemsY" value="4" />							
 		</template>	
-		<template name="gcFactoryRightTableItem" anchor="middleCenter" extends="gcBase">
+		<template name="gcFactoryRightTableItem" anchor="middleCenter" extends="gcBase gcBorder">
 			<value name="size" value="500px 150px" />
 			<value name="margin" value="0px 0px 0px 5px" />	
 			<value name="imageColor" value="glass0_1" />
 			<value name="imageColor_selected" value="glass0_2" />
 			<value name="hasOverlay" value="true" />
+			<value name="hasBorders" value="true" />
+			<value name="borderLeftSize" value="1px" />
+			<value name="borderRightSize" value="1px" />
+			<value name="borderTopSize" value="1px" />
+			<value name="borderBottomSize" value="1px" />
+			<value name="borderLeftSize_selected" value="1px" />
+			<value name="borderRightSize_selected" value="1px" />
+			<value name="borderTopSize_selected" value="1px" />
+			<value name="borderBottomSize_selected" value="1px" />
+			<value name="borderLeftColor" value="gray2" />
+			<value name="borderRightColor" value="gray2" />
+			<value name="borderTopColor" value="gray2" />
+			<value name="borderBottomColor" value="gray2" />
 		</template>	
 		<template name="gcFactoryRightTableItemBarBg" anchor="rightTop" extends="gcBase gcBorder">
 			<Value name="imageUVs" value="colorBg"/>
