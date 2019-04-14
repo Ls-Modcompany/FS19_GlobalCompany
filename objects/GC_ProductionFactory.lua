@@ -1434,7 +1434,10 @@ function GC_ProductionFactory:updateFactoryLevels(fillLevel, product, fillTypeIn
 	end;
 end;
 
-function GC_ProductionFactory:setFactoryState(lineId, state, noEventSend)	
+function GC_ProductionFactory:setFactoryState(lineId, state, noEventSend)
+	if state == nil then
+		state = not self.productLines[lineId].active;
+	end;
 	GC_ProductionFactoryStateEvent.sendEvent(self, lineId, state, noEventSend);
 
 	self.productLines[lineId].active = state;
@@ -1803,6 +1806,7 @@ function GC_ProductionFactory:getProductBuyPrice(input)
 end;
 
 function GC_ProductionFactory:doProductPurchase(input)	
+	
 	if input ~= nil and input.buyLiters > 0 then		
 		if g_currentMission:getIsServer() then
 			local validLitres = math.min(input.buyLiters, math.floor(input.capacity - input.fillLevel));

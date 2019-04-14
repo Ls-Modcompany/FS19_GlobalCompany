@@ -42,6 +42,8 @@
 		<e k="GC_gui_filllevel" v="Füllstand:"/>
 		<e k="GC_gui_liter" v="%s Liter"/>
 		<e k="GC_gui_buyText" v="Kaufen (%s)"/>
+		<e k="GC_gui_activate" v="Anschalten"/>
+		<e k="GC_gui_deactivate" v="Ausschalten"/>
 		
 		
 		<e k="GC_Productline_Title_Backup" v="Produktlinien %d"/>

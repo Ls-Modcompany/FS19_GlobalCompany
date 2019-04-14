@@ -21,8 +21,7 @@ function Gc_Gui_FactoryBig:new(target, custom_mt)
     self.currentLineId = 0;
 
     
-		
-    -- g_currentMission.environment:addMinuteChangeListener(self)
+
 
 	return self;
 end;
@@ -31,26 +30,34 @@ function Gc_Gui_FactoryBig:setData(fabric, lineId)
     self.currentFactory = fabric;
     self.currentLineId = lineId;
 	
-	g_depthOfFieldManager:setBlurState(true)
+	--g_depthOfFieldManager:setBlurState(true)
 end
 
 function Gc_Gui_FactoryBig:onCreate() end;
 
 function Gc_Gui_FactoryBig:onOpen()
-	-- debugPrint(g_depthOfFieldManager.blurIsActive)
 	
-	g_depthOfFieldManager:setBlurState(true)
     
-	-- debugPrint(g_depthOfFieldManager.blurIsActive)
-	
+    g_depthOfFieldManager:setBlurState(true);
+    
+    
+	self:setButtons();
 	self:setOverview();
     self:setProductLines();
 
     self:openLineId(self.currentLineId);
-	
+    self.canRegisterInputs = true;
+    
 end;
 
 function Gc_Gui_FactoryBig:update(dt)
+    
+    if self.canRegisterInputs then
+        g_gui.inputManager:registerActionEvent(InputAction.MENU_ACCEPT, self, self.onClickActivate, false, true, false, true);
+        
+        self.canRegisterInputs = false;
+    end;
+    
 	if g_currentMission ~= nil and g_currentMission.player ~= nil then
         local farm = g_farmManager:getFarmById(g_currentMission.player.farmId)
 		if self.lastMoney ~= farm.money then
@@ -60,24 +67,30 @@ function Gc_Gui_FactoryBig:update(dt)
     end;	
 	
 	if self.liveCamera ~= nil then
-		updateRenderOverlay(self.liveCamera);
-	end;
+		--updateRenderOverlay(self.liveCamera);
+    end;
+    
+
+end;
+
+function Gc_Gui_FactoryBig:keyEvent(unicode, sym, modifier, isDown, eventUsed)
+   -- if sym == 13 and isDown then
+   --     self:onClickActivate();
+   -- end;    
 end;
 
 function Gc_Gui_FactoryBig:updateBalanceText(money)
     self.lastMoney = money;	
-	self.gui_details_currentTime:setText(g_i18n:formatMoney(money, 0, true, true));
+	self.gui_details_currentTime:setText(g_i18n:formatMoney(money, 0, true));
     if money > 0 then
-		-- self.gui_details_currentTime:applyProfile("gcFactoryBigRightOverviewText5")
         self.gui_details_currentTime:setTextColor(1, 1, 1, 1)
     else
-		-- self.gui_details_currentTime:applyProfile("gcFactoryBigRightOverviewText5_Red")
         self.gui_details_currentTime:setTextColor(0.2832, 0.0091, 0.0091, 1)
     end;
 end;
 
 function Gc_Gui_FactoryBig:onClose() 
-    g_depthOfFieldManager:setBlurState(false)
+    g_depthOfFieldManager:setBlurState(false);
     --self.currentFactory = nil;
 end;
 
@@ -89,6 +102,7 @@ function Gc_Gui_FactoryBig:openLineId(lineId)
         self.gui_details:setVisible(true);
         self.currentLineId = lineId;
         self:setDetails();
+        self:setButtons();
     end;
 end
 
@@ -116,6 +130,41 @@ function Gc_Gui_FactoryBig:onClickLineId(element)
     self:setDetails();
 end
 
+function Gc_Gui_FactoryBig:onClickClose(element)
+    g_company.gui:closeActiveGui();
+end
+
+function Gc_Gui_FactoryBig:onClickActivate()
+    local run = false;
+    if self.currentFactory:getIsFactoryLineOn(self.currentLineId) then
+        run = true;
+    else
+        if self.currentFactory:getCanOperate(self.currentLineId) then
+            run = true;
+        end;
+    end;
+
+    if run then
+        self.currentFactory:setFactoryState(self.currentLineId);
+        self:setButtons();
+    end;
+end
+
+
+
+function Gc_Gui_FactoryBig:setButtons()
+    if self.currentLineId > 0 then
+        self.gui_button_activate:setVisible(true);
+        if self.currentFactory:getIsFactoryLineOn(self.currentLineId) then
+            self.gui_button_activate:setText(g_company.languageManager:getText("GC_gui_deactivate"));
+        else
+            self.gui_button_activate:setText(g_company.languageManager:getText("GC_gui_activate"));
+        end;
+    else
+        self.gui_button_activate:setVisible(false);
+    end;
+end;
+
 function Gc_Gui_FactoryBig:setOverview()
     local data = self.currentFactory:getGuiData();
     self.gui_overview_factoryName:setText(data.factoryTitle);
@@ -141,7 +190,6 @@ function Gc_Gui_FactoryBig:setProductLines()
         self.tmp_productLine = productLine;
         local item = self.gui_productLinesTable:createItem();        
         item.lineId = i;
-        --item.buyLiters = 0;
         i = i + 1;
     end;
     self.tmp_productLine = nil;    
@@ -229,7 +277,7 @@ end
 function Gc_Gui_FactoryBig:onCreateDetailInputBuyText(element)
     if self.tmp_input ~= nil then
         element.parent.buyTextElement = element;
-        element:setText(string.format(g_company.languageManager:getText("GC_gui_liter"), g_i18n:formatNumber(Utils.getNoNil(element.parent.buyLiters, 0), 0)));
+        element:setText(string.format(g_company.languageManager:getText("GC_gui_liter"), g_i18n:formatNumber(self.tmp_input.buyLiters, 0)));
     end;
 end
 
@@ -240,7 +288,7 @@ function Gc_Gui_FactoryBig:onCreateDetailInputBuyButton(element)
         end;
         if element.name == "text" then
             element.parent.parent.buyButtonTextElement = element;
-            element:setText(string.format(g_company.languageManager:getText("GC_gui_buyText"), g_i18n:formatMoney(0, 0)));
+            element:setText(string.format(g_company.languageManager:getText("GC_gui_buyText"), g_i18n:formatMoney(self.tmp_input.buyLiters, 0)));
         end;
     end;
 end
@@ -260,6 +308,7 @@ function Gc_Gui_FactoryBig:onClickDetailPlus(element)
 end
 
 function Gc_Gui_FactoryBig:onClickDetailBuy(element)   
+    print(element.input.title)
     self.currentFactory:doProductPurchase(element.input);
     self:setDetails();
 end
