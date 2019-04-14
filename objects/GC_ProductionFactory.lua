@@ -212,11 +212,11 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 	-- REGISTER INPUT PRODUCTS --
 	-----------------------------
 	
-	local inputTitle = getXMLString(xmlFile, xmlKey .. ".registerInputProducts#headerTitle");
-	if inputTitle ~= nil then		
-		self.guiData.inputTitle = g_company.languageManager:getText(inputTitle);
+	local inputHeader = getXMLString(xmlFile, xmlKey .. ".registerInputProducts#headerTitle");
+	if inputHeader ~= nil then		
+		self.guiData.inputHeader = g_company.languageManager:getText(inputHeader);
 	else
-		self.guiData.inputTitle = g_company.languageManager:getText("GC_Input_Header_Backup");
+		self.guiData.inputHeader = g_company.languageManager:getText("GC_Input_Header_Backup");
 	end;
 	
 	local i = 0;
@@ -405,11 +405,11 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 	-- REGISTER OUTPUT PRODUCTS --
 	------------------------------
 	
-	local outputTitle = getXMLString(xmlFile, xmlKey .. ".registerOutputProducts#headerTitle");
-	if outputTitle ~= nil then		
-		self.guiData.outputTitle = g_company.languageManager:getText(outputTitle);
+	local outputHeader = getXMLString(xmlFile, xmlKey .. ".registerOutputProducts#headerTitle");
+	if outputHeader ~= nil then		
+		self.guiData.outputHeader = g_company.languageManager:getText(outputHeader);
 	else
-		self.guiData.outputTitle = g_company.languageManager:getText("GC_Output_Header_Backup");
+		self.guiData.outputHeader = g_company.languageManager:getText("GC_Output_Header_Backup");
 	end;
 
 	i = 0;
