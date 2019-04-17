@@ -31,6 +31,7 @@ function Gc_Gui_FactoryBig:updateData()
 	self:setButtons();
 	self:setOverview();
     self:setProductLines();
+    self:setDetails();
 end
 
 function Gc_Gui_FactoryBig:onCreate() end;
