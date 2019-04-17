@@ -154,6 +154,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 	end;
 
 	self.guiData = {factoryTitle = factoryTitle, factoryImage = factoryImage, factoryCamera = factoryCamera, factoryDescription = factoryDescription};
+	self.guiData.bigGuiUpdateTime = 0;
 
 	local operationKey = string.format("%s.operation", xmlKey);
 	self.showInTablet = Utils.getNoNil(getXMLBool(xmlFile, operationKey .. "#showInTablet"), true); -- FUTURE
@@ -1693,12 +1694,7 @@ end;
 -- PLAYER TRIGGER (GUI / UI) --
 -------------------------------
 
-function GC_ProductionFactory:playerTriggerActivated(lineId)
-	-- NOTES:
-	
-	-- If 'lineId' is ~= nil we will open the gui directly to this page. (ProductLine).	
-	-- If 'lineId' is == nil (Global Player Trigger) This will open to factory overview (Home Page).
-	
+function GC_ProductionFactory:playerTriggerActivated(lineId)	
 	g_company.gui:openGuiWithData("gc_factoryBig", false, self, lineId);
 end;
 
@@ -1718,6 +1714,15 @@ function GC_ProductionFactory:playerTriggerUpdate(dt, playerInTrigger, lineId)
 			-- self.infoGui = nil;
 		-- end;
 	-- end;
+
+	-- update main gui every 2 seconds if open
+	if g_company.gui:getGuiIsOpen("gc_factoryBig") then
+		if self.guiData.bigGuiUpdateTime >= 2000 then
+			g_company.gui:updateGuiData("gc_factoryBig");
+			self.guiData.bigGuiUpdateTime = self.guiData.bigGuiUpdateTime - 2000;
+		end;
+		self.guiData.bigGuiUpdateTime = self.guiData.bigGuiUpdateTime + dt;
+	end;
 end;
 
 ---------------------------------
@@ -1725,8 +1730,6 @@ end;
 ---------------------------------
 
 function GC_ProductionFactory:getGuiData(lineId)
-	--local data = self.guiData;
-	--return data.factoryTitle, data.factoryImage, data.factoryCamera, data.factoryDescription;
 	return self.guiData;
 end;
 
@@ -1747,41 +1750,6 @@ function GC_ProductionFactory:getOutputs(lineId)
 		end;
 	end;
 end;
-
---unused
-function GC_ProductionFactory:getInput(lineId, inputId)
-	if lineId ~= nil and inputId ~= nil then
-		local productLine = self.productLines[lineId];
-		if productLine ~= nil and productLine.inputs ~= nil then
-			return productLine.inputs[inputId];
-		end;
-	end;
-end;
-
---unused
-function GC_ProductionFactory:getOutput(lineId, outputId)
-	if lineId ~= nil and outputId ~= nil then
-		local productLine = self.productLines[lineId];
-		if productLine ~= nil and productLine.outputs ~= nil then
-			return productLine.outputs[outputId];
-		end;
-	end;
-end;
-
-
---[[
-function GC_ProductionFactory:getProductBuyPrice(input, litres)
-	local validLitres, price = 0, 0;
-
-	if input ~= nil and litres > 0 then
-		validLitres = math.min(litres, math.floor(input.capacity - input.fillLevel));
-		if validLitres > 0 then
-			price = input.pricePerLiter * validLitres;
-		end;
-	end;
-
-	return validLitres, price;
-end; ]]--
 
 function GC_ProductionFactory:changeBuyLiters(input, delta)
 	local newLiters = input.buyLiters + delta;
@@ -1806,8 +1774,7 @@ function GC_ProductionFactory:getProductBuyPrice(input)
 	return validLitres, price;
 end;
 
-function GC_ProductionFactory:doProductPurchase(input)	
-	
+function GC_ProductionFactory:doProductPurchase(input)		
 	if input ~= nil and input.buyLiters > 0 then		
 		if g_currentMission:getIsServer() then
 			local validLitres = math.min(input.buyLiters, math.floor(input.capacity - input.fillLevel));

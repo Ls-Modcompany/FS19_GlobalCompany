@@ -19,18 +19,18 @@ function Gc_Gui_FactoryBig:new(target, custom_mt)
 	local self = setmetatable({}, Gc_Gui_FactoryBig_mt);
             
     self.currentLineId = 0;
-
-    
-
-
 	return self;
 end;
 
 function Gc_Gui_FactoryBig:setData(fabric, lineId)
     self.currentFactory = fabric;
     self.currentLineId = lineId;
-	
-	--g_depthOfFieldManager:setBlurState(true)
+end
+
+function Gc_Gui_FactoryBig:updateData()
+	self:setButtons();
+	self:setOverview();
+    self:setProductLines();
 end
 
 function Gc_Gui_FactoryBig:onCreate() end;
@@ -43,17 +43,12 @@ function Gc_Gui_FactoryBig:onOpen()
 	self:setButtons();
 	self:setOverview();
     self:setProductLines();
+    self:setDetails();
 
     self:openLineId(self.currentLineId);
-   -- self.canRegisterInputs = true;    
 end;
 
-function Gc_Gui_FactoryBig:update(dt)    
-    --if self.canRegisterInputs then
-    --    g_gui.inputManager:registerActionEvent(InputAction.MENU_ACCEPT, self, self.onClickActivate, false, true, false, true);       
-    --    self.canRegisterInputs = false;
-    --end;
-    
+function Gc_Gui_FactoryBig:update(dt)     
 	if g_currentMission ~= nil and g_currentMission.player ~= nil then
         local farm = g_farmManager:getFarmById(g_currentMission.player.farmId)
 		if self.lastMoney ~= farm.money then
@@ -68,9 +63,9 @@ function Gc_Gui_FactoryBig:update(dt)
 end;
 
 function Gc_Gui_FactoryBig:keyEvent(unicode, sym, modifier, isDown, eventUsed)
-   -- if sym == 13 and isDown then
-   --     self:onClickActivate();
-   -- end;    
+    if sym == 13 and isDown then
+        self:onClickActivate();
+    end;    
 end;
 
 function Gc_Gui_FactoryBig:updateBalanceText(money)
@@ -85,7 +80,6 @@ end;
 
 function Gc_Gui_FactoryBig:onClose() 
     g_depthOfFieldManager:setBlurState(false);
-    --self.currentFactory = nil;
 end;
 
 function Gc_Gui_FactoryBig:openLineId(lineId)
@@ -214,7 +208,10 @@ end
 --------------------------------------Detail------------------------------------------------
 --------------------------------------------------------------------------------------------
 function Gc_Gui_FactoryBig:setDetails()
-    --self:minuteChanged(); -- set current time
+    if self.currentLineId == nil or self.currentLineId == 0 then
+        return;
+    end;
+
     self.gui_inputTable:removeElements();
     self.gui_outputTable:removeElements();
 
@@ -294,7 +291,8 @@ function Gc_Gui_FactoryBig:onCreateDetailInputBuyButton(element)
         end;
         if element.name == "text" then
             element.parent.parent.buyButtonTextElement = element;
-            element:setText(string.format(g_company.languageManager:getText("GC_gui_buyText"), g_i18n:formatMoney(self.tmp_input.buyLiters, 0)));
+            local _, price = self.currentFactory:getProductBuyPrice(self.tmp_input);
+            element:setText(string.format(g_company.languageManager:getText("GC_gui_buyText"), g_i18n:formatMoney(price, 0)));
         end;
     end;
 end

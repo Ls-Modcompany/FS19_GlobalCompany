@@ -30,7 +30,7 @@ GlobalCompanyGui.debugData = g_company.debug:getDebugData(GlobalCompanyGui.debug
 GlobalCompanyGui.DevelopementVersionTemplatesFilename = {};
 addModEventListener(GlobalCompanyGui);
 
-GlobalCompanyGui.devVersion = true;
+GlobalCompanyGui.devVersion = false;
 
 GlobalCompanyGui.guis = {};
 GlobalCompanyGui.smallGuis = {};
@@ -371,6 +371,10 @@ function GlobalCompanyGui:closeActiveGui()
 	if self.activeGui ~= nil then
 		self:closeGui(self.activeGui);
 	end;
+end;
+
+function GlobalCompanyGui:getGuiIsOpen(guiName)
+	return self.activeGui ~= nil and self.activeGui == guiName;
 end;
 
 function GlobalCompanyGui:closeActiveDialog()
