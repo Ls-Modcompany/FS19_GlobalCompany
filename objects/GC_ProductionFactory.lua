@@ -496,8 +496,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 													fillTypeIndex = fillTypeIndex,
 													isBale = false,
 													width = width,
-													length = length,
-													offset = 0.2
+													length = length
 												};
 												
 												objectSpawner.extraParamater = objectSpawner.managerId;

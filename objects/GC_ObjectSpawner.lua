@@ -107,16 +107,14 @@ function GC_ObjectSpawner:getSpaceByObjectInfo(object, maxWanted, ignoreShapesHi
 	return totalFreeAreas;
 end;
 
-function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, customOffset, ignoreShapesHit)
+function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesHit)
 	local numSpawned = 0;
 	local owner = self:getOwnerFarmId();
 
 	numberToSpawn = g_company.utils.getLess(1, numberToSpawn, 255);
 	local wantedCount = numberToSpawn;
 	
-	if object.filename ~= nil and object.width ~= nil and object.length ~= nil then
-		local offset = Utils.getNoNil(customOffset, object.offset);
-		
+	if object.filename ~= nil and object.width ~= nil and object.length ~= nil then		
 		local spawned = 0;
 		local placesToSpawn = {};
 		for _, spawnArea in ipairs (self.spawnAreas) do
@@ -183,12 +181,12 @@ function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, customOffset,
 	return numSpawned;
 end;
 
-function GC_ObjectSpawner:getSpawnAreaDataBySize(spawnArea, width, length, height, nextOffset, count, placesToSpawn, ignoreShapesHit)
+function GC_ObjectSpawner:getSpawnAreaDataBySize(spawnArea, width, length, height, customOffset, count, placesToSpawn, ignoreShapesHit)
 	local halfWidth = width * 0.5;
-	-- local halfLength = length * 0.5;
+	local halfLength = length * 0.5;
 	-- local halfHeight = height * 0.5;
 
-	local offset = halfWidth + Utils.getNoNil(nextOffset, 0.2);
+	local offset = Utils.getNoNil(customOffset, halfWidth);
 
 	local freeSpaces = 0;
 	local bitMaskDec = 528895;	
@@ -199,13 +197,13 @@ function GC_ObjectSpawner:getSpawnAreaDataBySize(spawnArea, width, length, heigh
 
 	for i = 1, count do
 		if (halfWidth + usedWidth) < areaValue then
-			for dirX = halfWidth + usedWidth, areaValue, 0.5 do
+			for dirX = halfWidth + usedWidth, areaValue, 1 do
 				local x, y, z = localToWorld(spawnArea.startNode, dirX, 0, 0);
 				local terrainHeight = getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, x, y, z) + 0.5;
 				y = math.max(terrainHeight, y);
 	
 				self.areaUsed = false;
-				local shapesHit = overlapBox(x, y, z, rx, ry, rz, halfWidth, 10, length, "collisionCallback", self, bitMaskDec, true, false);
+				local shapesHit = overlapBox(x, y, z, rx, ry, rz, halfWidth, 10, halfLength, "collisionCallback", self, bitMaskDec, true, false);
 				if (ignoreShapesHit == true or shapesHit == 0) and self.areaUsed == false then
 					usedWidth = dirX + offset;
 					
