@@ -80,7 +80,21 @@ function Gc_Gui_FactoryBig:updateBalanceText(money)
 end;
 
 function Gc_Gui_FactoryBig:onClose() 
-    g_depthOfFieldManager:setBlurState(false);
+    if self.currentFactory ~= nil then
+		if self.currentFactory.inputProducts ~= nil then		
+			for _, inputProduct in pairs(self.currentFactory.inputProducts) do
+				inputProduct.buyLiters = 0;
+			end;
+		end;
+		
+		if self.currentFactory.outputProducts ~= nil then
+			for _, outputProduct in pairs(self.currentFactory.outputProducts) do
+				outputProduct.numberToSpawn = 0;
+			end;
+		end;
+	end;
+	
+	g_depthOfFieldManager:setBlurState(false);
 end;
 
 function Gc_Gui_FactoryBig:openLineId(lineId)
@@ -119,8 +133,8 @@ function Gc_Gui_FactoryBig:onClickLineId(element)
     self:setDetails();
 end
 
-function Gc_Gui_FactoryBig:onClickClose(element)
-    g_company.gui:closeActiveGui();
+function Gc_Gui_FactoryBig:onClickClose(element)	
+	g_company.gui:closeActiveGui();
 end
 
 function Gc_Gui_FactoryBig:onClickActivate()
@@ -216,17 +230,23 @@ function Gc_Gui_FactoryBig:setDetails()
     self.gui_inputTable:removeElements();
     self.gui_outputTable:removeElements();
 
-    for _,input in pairs(self.currentFactory:getInputs(self.currentLineId)) do
-        self.tmp_input = input;
-        self.gui_inputTable:createItem();
-    end;
-    self.tmp_input = nil;   
+	local inputs = self.currentFactory:getInputs(self.currentLineId);
+	if inputs ~= nil then	
+		for _,input in pairs(inputs) do
+			self.tmp_input = input;
+			self.gui_inputTable:createItem();
+		end;
+		self.tmp_input = nil;
+	end;		
     
-    for _,output in pairs(self.currentFactory:getOutputs(self.currentLineId)) do
-        self.tmp_output = output;
-        self.gui_outputTable:createItem();
-    end;
-    self.tmp_output = nil;  
+	local outputs = self.currentFactory:getOutputs(self.currentLineId);
+	if outputs ~= nil then	
+		for _,output in pairs(outputs) do
+			self.tmp_output = output;
+			self.gui_outputTable:createItem();
+		end;
+		self.tmp_output = nil; 
+	end;
 
     if self.currentFactory:getIsFactoryLineOn(self.currentLineId) then
         self.gui_details_state:setText(g_company.languageManager:getText("GC_gui_state_on"));
@@ -234,7 +254,7 @@ function Gc_Gui_FactoryBig:setDetails()
         self.gui_details_state:setText(g_company.languageManager:getText("GC_gui_state_off"));
     end;
 
-    if self.currentFactory:getAutoStart(self.currentLineId) then
+    if self.currentFactory:getAutoStart(self.currentLineId, true) then
         self.gui_details_automatic:setText(g_company.languageManager:getText("GC_gui_buttons_yes"));
     else
         self.gui_details_automatic:setText(g_company.languageManager:getText("GC_gui_buttons_no"));
@@ -353,26 +373,28 @@ end
 
 function Gc_Gui_FactoryBig:onCreateDetailOutputPalletButtonMinusPlus(element)
     if self.tmp_output ~= nil then
-        element:setVisible(self.tmp_output.palletCreator ~= nil);
+        element:setVisible(self.tmp_output.objectSpawner ~= nil);
         element.output = self.tmp_output;
     end;
 end
 
 function Gc_Gui_FactoryBig:onCreateDetailOutputPalletText(element)
     if self.tmp_output ~= nil then
-        element:setVisible(self.tmp_output.palletCreator ~= nil);
+        element:setVisible(self.tmp_output.objectSpawner ~= nil);
         element.parent.palletTextElement = element;
-        if self.tmp_output.numberToSpawn > 1 then
-            element:setText(string.format(g_company.languageManager:getText("GC_gui_pallet2"), g_i18n:formatNumber(self.tmp_output.numberToSpawn, 0)));
+
+		local canSpawnCount = self.currentFactory:getFreePalletSpawnAreas(self.tmp_output)		
+        if canSpawnCount > 1 then
+            element:setText(string.format(g_company.languageManager:getText("GC_gui_pallet2"), g_i18n:formatNumber(canSpawnCount, 0)));
         else
-            element:setText(string.format(g_company.languageManager:getText("GC_gui_pallet1"), g_i18n:formatNumber(self.tmp_output.numberToSpawn, 0)));
+            element:setText(string.format(g_company.languageManager:getText("GC_gui_pallet1"), g_i18n:formatNumber(canSpawnCount, 0)));
         end;
     end;
 end
 
 function Gc_Gui_FactoryBig:onCreateDetailOutputPalletButton(element)
     if self.tmp_output ~= nil then
-        element:setVisible(self.tmp_output.palletCreator ~= nil);
+        element:setVisible(self.tmp_output.objectSpawner ~= nil);
         if element.name == "button" then
             element.output = self.tmp_output;
         end;
@@ -390,11 +412,11 @@ end
 function Gc_Gui_FactoryBig:onClickDetailPalletMinus(element)
     self.currentFactory:changeNumberToSpawn(element.output, -1);
     
-    if element.output.numberToSpawn > 1 then
-        element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_pallet2"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
-    else
-        element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_pallet1"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
-    end;
+    -- if element.output.numberToSpawn > 1 then
+        -- element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_pallet2"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
+    -- else
+        -- element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_pallet1"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
+    -- end;
     
     if element.output.numberToSpawn > 1 then
         element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_spawnText2"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
@@ -406,11 +428,11 @@ end
 function Gc_Gui_FactoryBig:onClickDetailPalletPlus(element)   
     self.currentFactory:changeNumberToSpawn(element.output, 1);
     
-    if element.output.numberToSpawn > 1 then
-        element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_pallet2"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
-    else
-        element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_pallet1"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
-    end;
+    -- if element.output.numberToSpawn > 1 then
+        -- element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_pallet2"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
+    -- else
+        -- element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_pallet1"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
+    -- end;
     
     if element.output.numberToSpawn > 1 then
         element.parent.palletTextElement:setText(string.format(g_company.languageManager:getText("GC_gui_spawnText2"), g_i18n:formatNumber(element.output.numberToSpawn, 0)));
