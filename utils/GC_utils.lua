@@ -155,7 +155,7 @@ function GlobalCompanyUtils.stringToTable(strg, sep, toKey, val)
 end
 
 function GlobalCompanyUtils.removeModEventListener(listener)
-	print("DEV WARNING: 'GlobalCompanyUtils.removeModEventListener' is a depreciated function in GC FS19. Use GIANTS builtIn 'removeModEventListener(self)' instead.")
+		g_company.debug:print("DEV WARNING: 'GlobalCompanyUtils.removeModEventListener' is a depreciated function in GC FS19. Use GIANTS builtIn 'removeModEventListener(self)' instead.");
 	return removeModEventListener(listener)
 
 	-- local deleteKey = 0
@@ -223,7 +223,7 @@ function GlobalCompanyUtils.getNumbersFromString(stringValue, count, returnRadia
 			if debugData ~= nil then
 				g_company.debug:writeModding(debugData, "%d-vector given, %d-vector required.", #stringTable, count)
 			else
-				print(string.format("    ERROR: %d-vector given, %d-vector required.", #stringTable, count))
+				g_company.debug:print("    ERROR: %d-vector given, %d-vector required.", #stringTable, count);
 			end
 		end
 	end
@@ -259,7 +259,7 @@ function GlobalCompanyUtils.getEvenTableFromString(stringValue, moduloValue, ret
 			if debugData ~= nil then
 				g_company.debug:writeModding(debugData, "Odd number of values '%d' given.", tableLength)
 			else
-				print(string.format("    ERROR: Odd number of values '%d' given.", tableLength))
+				g_company.debug:print("    ERROR: Odd number of values '%d' given.", tableLength);
 			end
 		end
 	end

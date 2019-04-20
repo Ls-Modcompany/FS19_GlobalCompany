@@ -248,23 +248,23 @@ function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes
 		g_company.debug:printHeader(self.debugData);
 
 		if triggerNode == nil then
-			print(string.format("    %s'triggerNode' could not be found.", prefix));
+			g_company.debug:print("    %s'triggerNode' could not be found.", prefix);
 		end;
 
 		if source.getProvidedFillTypes == nil then
-			print(string.format("    %s Target function 'getProvidedFillTypes' could not be found!", prefix));
+			g_company.debug:print("    %s Target function 'getProvidedFillTypes' could not be found!", prefix);
 		end;
 
 		if source.getAllProvidedFillLevels == nil then
-			print(string.format("    %s Target function 'getAllProvidedFillLevels' could not be found!", prefix));
+			g_company.debug:print("    %s Target function 'getAllProvidedFillLevels' could not be found!", prefix);
 		end;
 
 		if  source.getProvidedFillLevel == nil then
-			print(string.format("    %s Target function 'getProvidedFillLevel' could not be found!", prefix));
+			g_company.debug:print("    %s Target function 'getProvidedFillLevel' could not be found!", prefix);
 		end;
 
 		if source.removeFillLevel == nil then
-			print(string.format("    %s Target function 'removeFillLevel' could not be found!", prefix));
+			g_company.debug:print("    %s Target function 'removeFillLevel' could not be found!", prefix);
 		end;
 	end;
 

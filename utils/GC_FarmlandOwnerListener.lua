@@ -29,7 +29,7 @@ GC_FarmlandOwnerListener.debugIndex = g_company.debug:registerScriptName("GC_Far
 
 function GC_FarmlandOwnerListener:new()
 	if g_company.farmlandOwnerListener ~= nil then
-		print("  [LSMC - GlobalCompany > GC_FarmlandOwnerManager] - Class already registered! Use 'g_company.farmlandOwnerListener' to access farmland owner listener.");
+		g_company.debug:print("  [LSMC - GlobalCompany > GC_FarmlandOwnerManager] - Class already registered! Use 'g_company.farmlandOwnerListener' to access farmland owner listener.");
 		return;
 	end;
 

@@ -27,7 +27,7 @@ GC_ModManager.debugIndex = g_company.debug:registerScriptName("ModManager");
 
 function GC_ModManager:new()
 	if g_company.modManager ~= nil then
-		print("  [LSMC - GlobalCompany > GC_ModManager] - Class already registered! Use 'g_company.modManager' to access mod manager.");
+		g_company.debug:print("  [LSMC - GlobalCompany > GC_ModManager] - Class already registered! Use 'g_company.modManager' to access mod manager.");
 		return;
 	end;
 
@@ -270,7 +270,7 @@ function GC_ModManager:showLoadWarningGUI(strg, warningType)
 							yesText = self.texts.okButton,
 							noText = self.texts.modHubLink});
 	else
-		print(title .. "  " .. text); -- Only print a log error to the server.
+		g_company.debug:print(title .. "  " .. text); -- Only print a log error to the server.
 	end;
 end;
 

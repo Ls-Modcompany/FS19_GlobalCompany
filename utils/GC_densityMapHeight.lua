@@ -36,7 +36,7 @@ local i = 0
         local fillTypeName = getXMLString(xmlFile, key .. "#fillTypeName")
         local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillTypeName)
         if fillTypeIndex == nil then
-            print("Error loading density map height. '"..tostring(key).."' has no valid 'fillTypeName'!")
+			g_company.debug:print("Error loading density map height. '"..tostring(key).."' has no valid 'fillTypeName'!");
             return
         end
 
@@ -57,7 +57,7 @@ local i = 0
 		distanceFilename = g_company.utils.createModPath(modName, distanceFilename);
 
         if diffuseMapFilename == nil or normalMapFilename == nil or distanceFilename == nil then
-            print("Error loading density map height type. '"..tostring(key).."' is missing texture(s)!")
+			g_company.debug:print("Error loading density map height type. '"..tostring(key).."' is missing texture(s)!");
             return
         end
 

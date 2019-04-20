@@ -89,7 +89,7 @@ function GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key, count, retu
 			if debugData ~= nil then
 				g_company.debug:writeModding(debugData, "%d-vector given, %d-vector required at %s", #stringTable, count, key)
 			else
-				print(string.format("    ERROR: %d-vector given, %d-vector required at %s", #stringTable, count, key))
+				g_company.debug:print("    ERROR: %d-vector given, %d-vector required at %s", #stringTable, count, key);
 			end
 		end
 	end
@@ -126,7 +126,7 @@ function GlobalCompanyXmlUtils.getEvenTableFromXMLString(xmlFile, key, moduloVal
 			if debugData ~= nil then
 				g_company.debug:writeModding(debugData, "Odd number of values '%d' given at %s", tableLength, key)
 			else
-				print(string.format("    ERROR: Odd number of values '%d' given at %s", tableLength, key))
+				g_company.debug:print("    ERROR: Odd number of values '%d' given at %s", tableLength, key);
 			end
 		end
 	end
