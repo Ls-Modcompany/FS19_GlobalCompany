@@ -294,12 +294,14 @@ end
 
 function Gc_Gui_FactoryBig:onCreateDetailInputButtonMinusPlus(element)
     if self.tmp_input ~= nil then
+		element:setVisible(self.currentFactory:canBuyProduct());
         element.input = self.tmp_input;
     end;
 end
 
 function Gc_Gui_FactoryBig:onCreateDetailInputBuyText(element)
     if self.tmp_input ~= nil then
+		element:setVisible(self.currentFactory:canBuyProduct());
         element.parent.buyTextElement = element;
         element:setText(string.format(g_company.languageManager:getText("GC_gui_liter"), g_i18n:formatNumber(self.tmp_input.buyLiters, 0)));
     end;
@@ -307,7 +309,9 @@ end
 
 function Gc_Gui_FactoryBig:onCreateDetailInputBuyButton(element)
     if self.tmp_input ~= nil then
-        if element.name == "button" then
+        element:setVisible(self.currentFactory:canBuyProduct());
+		
+		if element.name == "button" then
             element.input = self.tmp_input;
         end;
         if element.name == "text" then

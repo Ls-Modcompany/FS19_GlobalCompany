@@ -21,7 +21,7 @@
 --
 --
 -- ToDo:
--- 		- Finish main gui and trigger gui.
+-- 		- Finish Big gui and small gui.
 -- 		- Add missing triggers (Dynamic Pallet Input, Animal Load / Unload).
 --
 --
@@ -102,10 +102,10 @@ function GC_ProductionFactory:new(isServer, isClient, customMt, xmlFilename, bas
 	self.inputProducts = {};
 	self.outputProducts = {};
 	self.factorMinuteUpdate = false;
-	
+
 	self.inputProductNameToId = {};
 	self.outputProductNameToId = {};
-	
+
 	self.numInputProducts = 0;
 	self.numOutputProducts = 0;
 
@@ -158,8 +158,8 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 		factoryCamera = factoryCamera,
 		factoryDescription = factoryDescription,
 		bigGuiUpdateTime = 0
-	};	
-	
+	};
+
 	local operationKey = string.format("%s.operation", xmlKey);
 	self.showInTablet = Utils.getNoNil(getXMLBool(xmlFile, operationKey .. "#showInTablet"), true); -- FUTURE
 	self.showInGlobalGUI = Utils.getNoNil(getXMLBool(xmlFile, operationKey .. "#showInGlobalGUI"), true); -- FUTURE
@@ -177,7 +177,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			animationManager:delete();
 		end;
 	end;
-	
+
 	self.registeredUnloadingTriggers = {};
 	if hasXMLProperty(xmlFile, xmlKey .. ".registerUnloadingTriggers") then
 		local i = 0;
@@ -200,14 +200,14 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			i = i + 1;
 		end;
 	end;
-	
+
 	local inputHeader = getXMLString(xmlFile, xmlKey .. ".registerInputProducts#headerTitle");
-	if inputHeader ~= nil then		
+	if inputHeader ~= nil then
 		self.guiData.inputHeader = g_company.languageManager:getText(inputHeader);
 	else
 		self.guiData.inputHeader = g_company.languageManager:getText("GC_Input_Header_Backup");
 	end;
-	
+
 	local i = 0;
 	while true do
 		local inputProductKey = string.format("%s.registerInputProducts.inputProduct(%d)", xmlKey, i);
@@ -269,20 +269,11 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				inputProduct.fillLevel = 0;
 				inputProduct.concatedFillTypeTitles = table.concat(concatTitles, " | "); -- Maybe gui can use this.
 				inputProduct.capacity = Utils.getNoNil(getXMLInt(xmlFile, inputProductKey .. "#capacity"), 1000);
-				inputProduct.buyLiters = 0;				
+				inputProduct.buyLiters = 0;
 
-				if self.canPurchaseInputs then					
-					local pricePerLiter = getXMLFloat(xmlFile, inputProductKey .. "#pricePerLiter");
+				if self.canPurchaseInputs then
+					local pricePerLiter = self:getValidPricePerLitre(xmlFile, inputProductKey, inputProduct.fillTypes);
 					local deliveryCostMultiplier = Utils.getNoNil(getXMLFloat(xmlFile, inputProductKey .. "#deliveryCostMultiplier"), 2.0);
-					if pricePerLiter == nil or pricePerLiter <= 0.0 then
-						pricePerLiter = 0;
-						for fTypeIndex, _ in pairs (inputProduct.fillTypes) do
-							local fillType = g_fillTypeManager:getFillTypeByIndex(fTypeIndex);
-							if fillType.pricePerLiter > pricePerLiter then
-								pricePerLiter = fillType.pricePerLiter;
-							end;
-						end;
-					end;
 
 					-- NEW FARMER = 3 | FARM MANAGER = 1.8 | START FROM SCRATCH = 1 --
 					local multiplier = math.max(EconomyManager.PRICE_MULTIPLIER[g_currentMission.missionInfo.difficulty], 1);
@@ -299,7 +290,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				end;
 
 				local inputProductId = #self.inputProducts + 1;
-				
+
 				if hasXMLProperty(xmlFile, inputProductKey .. ".inputMethods") then
 					if self.isServer then
 						if hasXMLProperty(xmlFile, inputProductKey .. ".inputMethods.rainWaterCollector") then
@@ -312,7 +303,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 										self.rainWaterCollector.updateCounter = 0;
 										self.rainWaterCollector.input = inputProduct;
 										self.rainWaterCollector.litresPerHour = litresPerHour;
-										
+
 										addMinuteChange = true;
 									else
 										g_company.debug:writeModding(self.debugData, "[FACTORY - %s] 'rainWaterCollector' is already added to 'inputProduct' %s! Only one 'rainWaterCollector' can be used for each factory.", indexName, self.rainWaterCollector.input.name);
@@ -346,7 +337,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 							self.registeredUnloadingTriggers[name].isUsed = true;
 							local trigger = self.registeredUnloadingTriggers[name].trigger;
 							local triggerId = trigger.extraParamater;
-							
+
 							local canAdd = true;
 							if trigger.fillTypes ~= nil then
 								for index, _ in pairs (inputProduct.fillTypes) do
@@ -399,15 +390,15 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 
 		i = i + 1;
 	end;
-	
+
 	for regName, item in pairs (self.registeredUnloadingTriggers) do
 		if not item.isUsed then
 			self.triggerManager:unregisterTrigger(item.trigger);
 			g_company.debug:writeModding(self.debugData, "[FACTORY - %s] unloadingTrigger '%s' found at '%s.unloadingTrigger' is not in use! This should be removed from XML.", indexName, regName, item.key);
 		end;
 	end;
-	
-	if hasXMLProperty(xmlFile, xmlKey .. ".registerOutputProducts") then		
+
+	if hasXMLProperty(xmlFile, xmlKey .. ".registerOutputProducts") then
 		self.providedFillTypes = {};
 		self.registeredLoadingTriggers = {};
 
@@ -417,7 +408,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			if not hasXMLProperty(xmlFile, loadingTriggerKey) then
 				break;
 			end;
-	
+
 			local name = getXMLString(xmlFile, loadingTriggerKey .. "#name");
 			if name ~= nil and self.registeredLoadingTriggers[name] == nil then
 				local loadingTrigger = self.triggerManager:loadTrigger(GC_LoadingTrigger, self.rootNode, xmlFile, loadingTriggerKey, {}, false);
@@ -432,26 +423,26 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			end;
 			keyId = keyId + 1;
 		end;
-		
+
 		local outputHeader = getXMLString(xmlFile, xmlKey .. ".registerOutputProducts#headerTitle");
-		if outputHeader ~= nil then		
+		if outputHeader ~= nil then
 			self.guiData.outputHeader = g_company.languageManager:getText(outputHeader);
 		else
 			self.guiData.outputHeader = g_company.languageManager:getText("GC_Output_Header_Backup");
 		end;
-	
+
 		i = 0;
 		while true do
 			local outputProductKey = string.format("%s.registerOutputProducts.outputProduct(%d)", xmlKey, i);
 			if not hasXMLProperty(xmlFile, outputProductKey) then
 				break;
 			end;
-	
+
 			local outputProductName = getXMLString(xmlFile, outputProductKey .. "#name");
 			if outputProductName ~= nil and self.outputProductNameToId[outputProductName] == nil then
 				local outputProduct = {};
 				outputProduct.name = outputProductName;
-	
+
 				local fillTypeName = getXMLString(xmlFile, outputProductKey .. "#fillType");
 				if fillTypeName ~= nil then
 					local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillTypeName);
@@ -462,23 +453,23 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 						outputProduct.fillTypeIndex = fillTypeIndex;
 						outputProduct.lastFillTypeIndex = fillTypeIndex;
 						outputProduct.capacity = Utils.getNoNil(getXMLInt(xmlFile, outputProductKey .. "#capacity"), 1000);
-	
+
 						local productTitle = getXMLString(xmlFile, outputProductKey .. "#title");
 						if productTitle ~= nil then
 							outputProduct.title =  g_company.languageManager:getText(productTitle);
 						else
 							outputProduct.title = string.format(g_company.languageManager:getText("GC_Output_Title_Backup"), self.numOutputProducts + 1);
 						end;
-						
+
 						local outputProductId = #self.outputProducts + 1;
-	
+
 						local outputMethodsKey = outputProductKey .. ".outputMethods";
 						if hasXMLProperty(xmlFile, outputMethodsKey) then
 							local triggersLoaded, invalidTriggers = {}, {};
 
 							local onDemandPalletSpawnerKey = outputMethodsKey .. ".objectSpawner";
 							if hasXMLProperty(xmlFile, onDemandPalletSpawnerKey) then
-								local filename = Utils.getNoNil(getXMLString(xmlFile, onDemandPalletSpawnerKey .. "#xmlFilename"), "$data/objects/pallets/fillablePallet/fillablePallet.xml");	
+								local filename = Utils.getNoNil(getXMLString(xmlFile, onDemandPalletSpawnerKey .. "#xmlFilename"), "$data/objects/pallets/fillablePallet/fillablePallet.xml");
 								local palletFilename = Utils.getFilename(filename, self.baseDirectory);
 								if palletFilename ~= nil and palletFilename ~= "" then
 									local palletFillUnitIndex = Utils.getNoNil(getXMLFloat(xmlFile, onDemandPalletSpawnerKey .. "#fillUnitIndex"), 1);
@@ -487,8 +478,8 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 										local width, length, widthOffset, lengthOffset = StoreItemUtil.getSizeValues(palletFilename, "vehicle", 0, {});
 										if width ~= nil and length ~= nil then
 											local objectSpawner = self.triggerManager:loadTrigger(GC_ObjectSpawner, self.rootNode, xmlFile, outputMethodsKey);
-											if objectSpawner ~= nil then											
-												
+											if objectSpawner ~= nil then
+
 												objectSpawner.object = {
 													filename = palletFilename,
 													fillUnitIndex = palletFillUnitIndex,
@@ -498,9 +489,9 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 													width = width,
 													length = length
 												};
-												
+
 												objectSpawner.extraParamater = objectSpawner.managerId;
-												outputProduct.objectSpawner = objectSpawner;								
+												outputProduct.objectSpawner = objectSpawner;
 												self.triggerIdToOutputProductId[objectSpawner.managerId] = {[fillTypeIndex] = outputProductId};
 												table.insert(triggersLoaded, "objectSpawner");
 											end;
@@ -517,15 +508,15 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 									self.registeredLoadingTriggers[name].isUsed = true;
 									local trigger = self.registeredLoadingTriggers[name].trigger;
 									local triggerId = trigger.extraParamater;
-									
+
 									if self.providedFillTypes[triggerId][fillTypeIndex] == nil then
 										self.providedFillTypes[triggerId][fillTypeIndex] = true;
 										if stationName ~= nil then
 											trigger:setStationName(stationName);
 										end;
-	
+
 										self.triggerIdToOutputProductId[triggerId][fillTypeIndex] = outputProductId;
-	
+
 										table.insert(triggersLoaded, "loadingTrigger");
 									else
 										g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Can not add Output Product '%s' to Loading Trigger '%s'! FillType '%s' already exists.", indexName, outputProductName, name, fillTypeName);
@@ -544,7 +535,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 											dynamicHeap.extraParamater = dynamicHeap.managerId;
 											outputProduct.dynamicHeap = dynamicHeap;outputProduct.dynamicHeap = dynamicHeap;
 											self.triggerIdToOutputProductId[dynamicHeap.managerId] = {[fillTypeIndex] = outputProductId};
-	
+
 											table.insert(triggersLoaded, "dynamicHeap");
 										else
 											self.triggerManager:unregisterTrigger(dynamicHeap);
@@ -555,7 +546,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 									table.insert(invalidTriggers, "dynamicHeap");
 								end;
 							end;
-	
+
 							if hasXMLProperty(xmlFile, outputMethodsKey .. ".palletCreators") then
 								if #triggersLoaded == 0 then
 									local palletCreator = self.triggerManager:loadTrigger(GC_PalletCreator, self.rootNode, xmlFile, outputMethodsKey, self.baseDirectory, outputProduct.fillTypeIndex);
@@ -563,12 +554,12 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 										if palletCreator.palletInteractionTriggers ~= nil then
 											palletCreator.extraParamater = palletCreator.managerId;
 											palletCreator:setWarningText(factoryTitle);
-	
+
 											outputProduct.palletCreator = palletCreator;
 											outputProduct.capacity = palletCreator:getTotalCapacity();
-	
+
 											self.triggerIdToOutputProductId[palletCreator.managerId] = {[fillTypeIndex] = outputProductId};
-	
+
 											table.insert(triggersLoaded, "palletCreator");
 										else
 											self.triggerManager:unregisterTrigger(palletCreator);
@@ -583,18 +574,18 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 							if #invalidTriggers > 0 then
 								triggersLoaded = table.concat(triggersLoaded, " or ");
 								invalidTriggers = table.concat(invalidTriggers, " and ");
-	
+
 								g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Invalid 'outputMethod' combinations, '%s' can not be combined with '%s'!", indexName, invalidTriggers, triggersLoaded);
 							end;
 						end;
-						
+
 						self:loadProductParts(xmlFile, outputProductKey, outputProduct);
 						self:updateFactoryLevels(0, outputProduct, nil, false);
 
 						self.outputProducts[outputProductId] = outputProduct;
 						self.numOutputProducts = outputProductId;
 						self.outputProductNameToId[outputProductName] = outputProductId;
-						
+
 						self.factorMinuteUpdate = true;
 					else
 						g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Invalid fillType '%s' given at %s", indexName, fillTypeName, outputProductKey);
@@ -609,7 +600,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 					g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Duplicate name '%s' used %s", indexName, outputProductName, outputProductKey);
 				end;
 			end;
-	
+
 			i = i + 1;
 		end;
 
@@ -621,7 +612,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 		end;
 	else
 		self.outputProducts = nil;
-	end;	
+	end;
 
 	------------------------------------
 	-- SETUP FACTORY PRODUCTION LINES --
@@ -659,7 +650,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				end;
 
 				local name = getXMLString(xmlFile, inputKey .. "#name");
-				if self.inputProductNameToId[name] ~= nil then					
+				if self.inputProductNameToId[name] ~= nil then
 					if inputProductNameToInputId[name] == nil then
 						local inputProductId = self.inputProductNameToId[name];
 						local percent = Utils.getNoNil(getXMLInt(xmlFile, inputKey .. "#percent"), 100) / 100;
@@ -673,7 +664,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 
 						productLine.inputs[inputId] = self.inputProducts[inputProductId];
 						productLine.inputs[inputId].percent = math.min(math.max(percent, 0.1), 1);
-						
+
 						productLine.inputs[inputId].id = inputId;
 						productLine.inputs[inputId].lineId = productLineId;
 					else
@@ -694,26 +685,26 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 					if not hasXMLProperty(xmlFile, outputKey) then
 						break;
 					end;
-	
+
 					local name = getXMLString(xmlFile, outputKey .. "#name");
 					if self.outputProductNameToId[name] ~= nil then
 						if outputProductNameToOutputId[name] == nil then
 							local outputProductId = self.outputProductNameToId[name];
 							local percent = Utils.getNoNil(getXMLInt(xmlFile, outputKey .. "#percent"), 100) / 100;
-	
+
 							if productLine.outputs == nil then
 								productLine.outputs = {};
 							end;
-	
+
 							local outputId = #productLine.outputs + 1;
 							outputProductNameToOutputId[name] = outputId;
-	
+
 							productLine.outputs[outputId] = self.outputProducts[outputProductId];
 							productLine.outputs[outputId].percent = math.min(math.max(percent, 0.1), 1);
-							
+
 							productLine.outputs[outputId].id = outputId;
 							productLine.outputs[outputId].lineId = productLineId;
-							
+
 							local out = productLine.outputs[outputId]
 							if out.palletCreator ~= nil then
 								self.triggerIdToLineId[out.palletCreator.extraParamater] = productLineId;
@@ -722,9 +713,9 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 								self.triggerIdToLineId[out.dynamicHeap.extraParamater] = productLineId;
 								out = nil;
 							end;
-	
+
 							local outputFillTypeIndex = self.outputProducts[outputProductId].fillTypeIndex
-	
+
 							-- Store title and image data for quick GUI access.
 							local fillType = g_fillTypeManager:getFillTypeByIndex(outputFillTypeIndex);
 							productLine.outputs[outputId].title = fillType.title;
@@ -732,8 +723,8 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 						end;
 					end;
 					outputKeyId = outputKeyId + 1;
-				end;			
-				
+				end;
+
 				addMinuteChange = true;
 				outputProductNameToOutputId = nil;
 			else
@@ -741,15 +732,15 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				if hasXMLProperty(xmlFile, productSaleKey) then
 					local productTitle = getXMLString(xmlFile, productSaleKey .. "#title");
 					if productTitle ~= nil then
-						productTitle =  g_company.languageManager:getText(productTitle);					
-				
+						productTitle =  g_company.languageManager:getText(productTitle);
+
 						local incomeEasy = Utils.getNoNil(getXMLFloat(xmlFile, productSaleKey..".incomePerHour#newFarmer"), 90.0);
 						local incomeMed = Utils.getNoNil(getXMLFloat(xmlFile, productSaleKey..".incomePerHour#farmManager"), 60.0);
 						local incomeHard = Utils.getNoNil(getXMLFloat(xmlFile, productSaleKey..".incomePerHour#startFromScratch"), 40.0);
 						local incomeTypes = {incomeEasy, incomeMed, incomeHard};
 						if #incomeTypes == 3 then
 							local difficulty = math.min(math.max(g_currentMission.missionInfo.difficulty, 1), 3);
-							productLine.productSale = {title = productTitle, incomePerHour = incomeTypes[difficulty]};							
+							productLine.productSale = {title = productTitle, incomePerHour = incomeTypes[difficulty]};
 							addHourChange = true;
 						else
 							g_company.debug:writeModding(self.debugData, "[FACTORY - %s] 'incomePerHour' is incomplete at %s!", indexName, productSaleKey);
@@ -762,7 +753,6 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				end;
 			end;
 
-			-- Load operating parts for each product line.
 			local operatingPartsKey = string.format("%s.operatingParts", productLineKey);
 			self:loadOperatingParts(xmlFile, operatingPartsKey, productLine);
 
@@ -798,10 +788,6 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			end;
 		end;
 
-		-----------------------------------------------------------------------------------------------------------------------------------------
-		-- LOAD SHARED PLAYER TRIGGER (This will be for opening the Factory GUI and future purchase, sell, and to display open / close times.) --
-		-----------------------------------------------------------------------------------------------------------------------------------------
-
 		local playerTriggerKey = string.format("%s.playerTrigger", xmlKey);
 		if hasXMLProperty(xmlFile, playerTriggerKey) then
 			local playerTrigger = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.rootNode, xmlFile, playerTriggerKey, nil, true);
@@ -811,10 +797,10 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 		end;
 
 		if self.isServer and canLoad then
-			if addMinuteChange then	
+			if addMinuteChange then
 				g_currentMission.environment:addMinuteChangeListener(self);
 			end;
-			
+
 			if addHourChange then
 				g_currentMission.environment:addHourChangeListener(self);
 			end;
@@ -902,6 +888,35 @@ function GC_ProductionFactory:loadOperatingParts(xmlFile, key, parent)
 	end;
 end;
 
+function GC_ProductionFactory:getValidPricePerLitre(xmlFile, key, fillTypes, fillTypeIndex)
+	local pricePerLiter = getXMLFloat(xmlFile, key .. "#pricePerLiter");
+	if pricePerLiter ~= nil and pricePerLiter > 0.0 then
+		return pricePerLiter;
+	else
+		local fillTypeName = getXMLString(xmlFile, key .. "#priceFromFillType");
+		if fillTypeName ~= nil then
+			local fillType = g_fillTypeManager:getFillTypeByName(fillTypeName);
+			if fillType ~= nil then
+				return fillType.pricePerLiter;
+			end;
+		end;
+
+		if fillTypeIndex == nil then
+			pricePerLiter = 0;
+			for fTypeIndex, _ in pairs (fillTypes) do
+				local fillType = g_fillTypeManager:getFillTypeByIndex(fTypeIndex);
+				if fillType ~= nil and fillType.pricePerLiter > pricePerLiter then
+					pricePerLiter = fillType.pricePerLiter;
+				end;
+			end;
+			return pricePerLiter;
+		else
+			local fillType = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex);
+			return fillType.pricePerLiter;
+		end;
+	end;
+end;
+
 function GC_ProductionFactory:delete()
 	if not self.isPlaceable then
 		g_currentMission:removeOnCreateLoadedObjectToSave(self);
@@ -911,7 +926,7 @@ function GC_ProductionFactory:delete()
 		g_currentMission.environment:removeMinuteChangeListener(self);
 		g_currentMission.environment:removeHourChangeListener(self);
 	end;
-	
+
 	if self.triggerManager ~= nil then
 		self.triggerManager:unregisterAllTriggers();
 	end;
@@ -920,7 +935,7 @@ function GC_ProductionFactory:delete()
 		self.animationManager:delete();
 	end;
 
-	if self.isClient then		
+	if self.isClient then
 		for _, product in ipairs (self.inputProducts) do
 			if product.visibilityNodes ~= nil then
 				product.visibilityNodes:delete();
@@ -930,19 +945,19 @@ function GC_ProductionFactory:delete()
 				product.fillVolumes:delete();
 			end;
 		end;
-		
+
 		if self.outputProducts ~= nil then
 			for _, product in ipairs (self.outputProducts) do
 				if product.visibilityNodes ~= nil then
 					product.visibilityNodes:delete();
 				end;
-	
+
 				if product.fillVolumes ~= nil then
 					product.fillVolumes:delete();
 				end;
 			end;
 		end;
-		
+
 		for _, productLine in ipairs (self.productLines) do
 			self:deleteOperatingParts(productLine);
 		end;
@@ -967,7 +982,7 @@ function GC_ProductionFactory:deleteOperatingParts(parent)
 	if parent.operateSounds ~= nil then
 		parent.operateSounds:delete();
 	end;
-	
+
 	if parent.operateShaders ~= nil then
 		parent.operateShaders:delete();
 	end;
@@ -992,9 +1007,9 @@ function GC_ProductionFactory:readStream(streamId, connection)
 		for _, inputProduct in ipairs (self.inputProducts) do
 			local fillLevel = 0;
 			if streamReadBool(streamId) then
-                fillLevel = streamReadFloat32(streamId);
-            end;
-			self:updateFactoryLevels(fillLevel, inputProduct, nil, false);				
+				fillLevel = streamReadFloat32(streamId);
+			end;
+			self:updateFactoryLevels(fillLevel, inputProduct, nil, false);
 		end;
 
 		if self.outputProducts ~= nil then
@@ -1003,8 +1018,14 @@ function GC_ProductionFactory:readStream(streamId, connection)
 				if streamReadBool(streamId) then
 					fillLevel = streamReadFloat32(streamId);
 				end;
-				self:updateFactoryLevels(fillLevel, outputProduct, nil, false);				
+				self:updateFactoryLevels(fillLevel, outputProduct, nil, false);
 			end;
+		end;
+
+		for lineId, productLine in ipairs (self.productLines) do
+			local active = streamReadBool(streamId);
+			local userStopped = streamReadBool(streamId);
+			self:setFactoryState(lineId, active, userStopped, true);
 		end;
 	end;
 end;
@@ -1014,13 +1035,13 @@ function GC_ProductionFactory:writeStream(streamId, connection)
 
 	if not connection:getIsServer() then
 		for _, inputProduct in ipairs (self.inputProducts) do
-            local fillLevel = inputProduct.fillLevel;
-            if streamWriteBool(streamId, fillLevel > 0) then
-                streamWriteFloat32(streamId, fillLevel);
-            end
+			local fillLevel = inputProduct.fillLevel;
+			if streamWriteBool(streamId, fillLevel > 0) then
+				streamWriteFloat32(streamId, fillLevel);
+			end
 		end;
-		
-		if self.outputProducts ~= nil then	
+
+		if self.outputProducts ~= nil then
 			for _, outputProduct in ipairs (self.outputProducts) do
 				local fillLevel = outputProduct.fillLevel;
 				if streamWriteBool(streamId, fillLevel > 0) then
@@ -1028,7 +1049,7 @@ function GC_ProductionFactory:writeStream(streamId, connection)
 				end
 			end;
 		end;
-		
+
 		for _, productLine in ipairs (self.productLines) do
 			streamWriteBool(streamId, productLine.active);
 			streamWriteBool(streamId, productLine.userStopped);
@@ -1041,24 +1062,24 @@ function GC_ProductionFactory:readUpdateStream(streamId, timestamp, connection)
 
 	if connection:getIsServer() then
 		if streamReadBool(streamId) then
-            for _, inputProduct in ipairs (self.inputProducts) do
+			for _, inputProduct in ipairs (self.inputProducts) do
 				local fillLevel = 0;
 				if streamReadBool(streamId) then
-                    fillLevel = streamReadFloat32(streamId);
-                end;
-				self:updateFactoryLevels(fillLevel, inputProduct, nil, false);				
+					fillLevel = streamReadFloat32(streamId);
+				end;
+				self:updateFactoryLevels(fillLevel, inputProduct, nil, false);
 			end;
 
-			if self.outputProducts ~= nil then	
+			if self.outputProducts ~= nil then
 				for _, outputProduct in ipairs (self.outputProducts) do
 					local fillLevel = 0;
 					if streamReadBool(streamId) then
 						fillLevel = streamReadFloat32(streamId);
 					end;
-					self:updateFactoryLevels(fillLevel, outputProduct, nil, false);				
+					self:updateFactoryLevels(fillLevel, outputProduct, nil, false);
 				end;
 			end;
-        end;
+		end;
 	end;
 end;
 
@@ -1068,12 +1089,12 @@ function GC_ProductionFactory:writeUpdateStream(streamId, connection, dirtyMask)
 	if not connection:getIsServer() then
 		if streamWriteBool(streamId, bitAND(dirtyMask, self.productionFactoryDirtyFlag) ~= 0) then
 			for _, inputProduct in ipairs (self.inputProducts) do
-                local fillLevel = inputProduct.fillLevel;
-                if streamWriteBool(streamId, fillLevel > 0) then
-                    streamWriteFloat32(streamId, fillLevel);
-                end
+				local fillLevel = inputProduct.fillLevel;
+				if streamWriteBool(streamId, fillLevel > 0) then
+					streamWriteFloat32(streamId, fillLevel);
+				end
 			end;
-			
+
 			if self.outputProducts ~= nil then
 				for _, outputProduct in ipairs (self.outputProducts) do
 					local fillLevel = outputProduct.fillLevel;
@@ -1091,19 +1112,19 @@ function GC_ProductionFactory:loadFromXMLFile(xmlFile, key)
 	if not self.isPlaceable then
 		factoryKey = string.format("%s.productionFactory", key);
 	end;
-	
+
 	local i = 0;
-    while true do
-        local inputProductKey = string.format(factoryKey .. ".inputProducts.inputProduct(%d)", i);
-        if not hasXMLProperty(xmlFile, inputProductKey) then
-            break;
-        end;
-		
+	while true do
+		local inputProductKey = string.format(factoryKey .. ".inputProducts.inputProduct(%d)", i);
+		if not hasXMLProperty(xmlFile, inputProductKey) then
+			break;
+		end;
+
 		local name = getXMLString(xmlFile, inputProductKey .. "#name");
 		if name ~= nil and self.inputProductNameToId[name] ~= nil then
 			local inputProductId = self.inputProductNameToId[name];
 			local inputProduct = self.inputProducts[inputProductId];
-			
+
 			local lastFillTypeIndex;
 			local lastFillTypeName = getXMLString(xmlFile, inputProductKey .. "#lastFillTypeName");
 			if lastFillTypeName ~= nil then
@@ -1119,7 +1140,7 @@ function GC_ProductionFactory:loadFromXMLFile(xmlFile, key)
 
 		i = i + 1;
 	end;
-	
+
 	if self.outputProducts ~= nil then
 		i = 0;
 		while true do
@@ -1127,12 +1148,12 @@ function GC_ProductionFactory:loadFromXMLFile(xmlFile, key)
 			if not hasXMLProperty(xmlFile, outputProductKey) then
 				break;
 			end;
-			
+
 			local name = getXMLString(xmlFile, outputProductKey .. "#name");
 			if name ~= nil and self.outputProductNameToId[name] ~= nil then
 				local outputProductId = self.outputProductNameToId[name];
 				local outputProduct = self.outputProducts[outputProductId];
-				
+
 				local fillLevel = 0;
 				if outputProduct.dynamicHeap ~= nil then
 					fillLevel = outputProduct.dynamicHeap:getHeapLevel();
@@ -1142,10 +1163,10 @@ function GC_ProductionFactory:loadFromXMLFile(xmlFile, key)
 				else
 					fillLevel = math.max(Utils.getNoNil(getXMLFloat(xmlFile, outputProductKey .. "#fillLevel"), 0), 0)
 				end;
-	
+
 				self:updateFactoryLevels(fillLevel, outputProduct, nil, false);
 			end;
-	
+
 			i = i + 1;
 		end;
 	end;
@@ -1175,7 +1196,7 @@ function GC_ProductionFactory:loadFromXMLFile(xmlFile, key)
 				if self.productLines[lineId].autoStart then
 					local state = Utils.getNoNil(getXMLBool(xmlFile, productLineKey .. "#state"), false);
 					local userStopped = Utils.getNoNil(getXMLBool(xmlFile, productLineKey .. "#userStopped"), false);
-	
+
 					if state and not userStopped then
 						self:setFactoryState(lineId, state, false);
 					end;
@@ -1204,42 +1225,42 @@ function GC_ProductionFactory:saveToXMLFile(xmlFile, key, usedModNames)
 
 	-- This is just for identification.
 	setXMLString(xmlFile, factoryKey .. "#indexName", self.indexName);
-	
+
 	local index = 0;
-    for _, inputProduct in ipairs(self.inputProducts) do        
+	for _, inputProduct in ipairs(self.inputProducts) do
 		local fillLevel = inputProduct.fillLevel;
 
 		if fillLevel > 0 then
 			local inputProductKey = string.format("%s.inputProducts.inputProduct(%d)", factoryKey, index);
-			
+
 			setXMLString(xmlFile, inputProductKey .. "#name", inputProduct.name);
-            setXMLFloat(xmlFile, inputProductKey .. "#fillLevel", fillLevel);
-            
+			setXMLFloat(xmlFile, inputProductKey .. "#fillLevel", fillLevel);
+
 			local lastFillTypeName = g_fillTypeManager:getFillTypeNameByIndex(inputProduct.lastFillTypeIndex);
 			if lastFillTypeName ~= nil then
 				setXMLString(xmlFile, inputProductKey .. "#lastFillTypeName", lastFillTypeName);
-			end;			
-        end;
-		
-		index = index + 1;
-    end;
+			end;
+		end;
 
-	if self.outputProducts ~= nil then	
+		index = index + 1;
+	end;
+
+	if self.outputProducts ~= nil then
 		index = 0;
-		for _, outputProduct in ipairs (self.outputProducts) do		
+		for _, outputProduct in ipairs (self.outputProducts) do
 			local fillLevel = outputProduct.fillLevel;
 			if fillLevel > 0 then
 				local outputProductKey = string.format("%s.outputProducts.outputProduct(%d)", factoryKey, index);
-				
-				
+
+
 				setXMLString(xmlFile, outputProductKey .. "#name", outputProduct.name);
 				setXMLFloat(xmlFile, outputProductKey .. "#fillLevel", outputProduct.fillLevel);
-	
+
 				if outputProduct.palletCreator ~= nil then
 					outputProduct.palletCreator:saveToXMLFile(xmlFile, outputProductKey, usedModNames)
 				end;
 			end;
-	
+
 			index = index + 1;
 		end;
 	end;
@@ -1255,13 +1276,13 @@ function GC_ProductionFactory:saveToXMLFile(xmlFile, key, usedModNames)
 		index = 0;
 		for lineId, productLine in ipairs (self.productLines) do
 			local productLineKey = string.format("%s.productLines.productLine(%d)", factoryKey, index);
-			
+
 			setXMLInt(xmlFile, productLineKey .. "#lineId", lineId);
 			setXMLBool(xmlFile, productLineKey .. "#state", productLine.active);
 			setXMLBool(xmlFile, productLineKey .. "#userStopped", productLine.userStopped);
-			
+
 			index = index + 1;
-		end;		
+		end;
 	end;
 
 	--if self.animationManager ~= nil then
@@ -1290,38 +1311,38 @@ function GC_ProductionFactory:hourChanged()
 					local stopProductLine = false;
 					local productPerHour = productLine.outputPerHour;
 					local hasProduct, producedFactor = self:getHasInputProducts(productLine, productPerHour);
-	
+
 					if hasProduct then
 						raiseFlags = true;
-		
+
 						for i = 1, #productLine.inputs do
 							local input = productLine.inputs[i];
 							local amount = producedFactor * input.percent;
-		
+
 							self:updateFactoryLevels(input.fillLevel - amount, input, input.lastFillTypeIndex, false);
-		
+
 							if input.fillLevel <= 0 then
 								stopProductLine = true;
 							end;
 						end;
-	
+
 						local income = productLine.productSale.incomePerHour * (producedFactor / productPerHour);
 						local farmId = self:getOwnerFarmId();
-						g_currentMission:addMoney(income, farmId, MoneyType.PROPERTY_INCOME, true, false);	
+						g_currentMission:addMoney(income, farmId, MoneyType.PROPERTY_INCOME, true, false);
 
 						--local customText = "Factory Income"
-						--g_currentMission:showMoneyChange(MoneyType.PROPERTY_INCOME, customText, false, farmId);					
+						--g_currentMission:showMoneyChange(MoneyType.PROPERTY_INCOME, customText, false, farmId);
 					else
 						stopProductLine = true;
 					end;
-		
+
 					if stopProductLine and productLine.active then
 						self:setFactoryState(lineId, false, false);
 					end;
 				else
 					if not productLine.userStopped then
 						local hasProduct, _ = self:getHasInputProducts(productLine, productLine.outputPerHour);
-						
+
 						if hasProduct then
 							self:setFactoryState(lineId, true, false);
 						end;
@@ -1329,7 +1350,7 @@ function GC_ProductionFactory:hourChanged()
 				end;
 			end;
 		end;
-		
+
 		if raiseFlags then
 			self:raiseDirtyFlags(self.productionFactoryDirtyFlag);
 		end;
@@ -1337,22 +1358,21 @@ function GC_ProductionFactory:hourChanged()
 end;
 
 function GC_ProductionFactory:minuteChanged()
-	if self.isServer then	
+	if self.isServer then
 		local raiseFlags = false;
-	
-		-- We only update rain water collected to clients every 10 min or after rain stops to save on network traffic.
+
 		if self.rainWaterCollector ~= nil then
 			local rainLevel = 0;
 			local input = self.rainWaterCollector.input;
-	
+
 			if g_currentMission.environment.weather:getIsRaining() then
 				local rainToCollect = g_currentMission.environment.weather:getRainFallScale() * (self.rainWaterCollector.litresPerHour / 60);
 				local newCollected = self.rainWaterCollector.collected + rainToCollect;
-				if input.fillLevel + newCollected < input.capacity then
+				if input.fillLevel + newCollected <= input.capacity then
 					self.rainWaterCollector.collected = newCollected;
 					self.rainWaterCollector.updateCounter = self.rainWaterCollector.updateCounter + 1;
 				end;
-	
+
 				if self.rainWaterCollector.updateCounter >= 10 then
 					self.rainWaterCollector.updateCounter = 0;
 					rainLevel = self.rainWaterCollector.collected;
@@ -1363,49 +1383,49 @@ function GC_ProductionFactory:minuteChanged()
 					rainLevel = self.rainWaterCollector.collected;
 				end;
 			end;
-	
+
 			if rainLevel > 0 then
 				local amount = math.min(input.fillLevel + rainLevel, input.capacity);
-				raiseFlags = true; -- Raise flags after we check if factory needs to update.
+				raiseFlags = true;
 				self:updateFactoryLevels(amount, input, FillType.WATER, false);
 				self.rainWaterCollector.collected = 0;
 			end;
 		end;
-	
+
 		if self.factorMinuteUpdate then
 			self.updateCounter = self.updateCounter + 1;
 			if self.updateCounter >= self.updateDelay then
 				self.updateCounter = 0;
-		
+
 				for lineId, productLine in pairs (self.productLines) do
-					if productLine.productSale == nil then				
+					if productLine.productSale == nil then
 						if productLine.active then
 							local stopProductLine = false;
 							local productionFactor = (productLine.outputPerHour / 60) * self.updateDelay;
-							local hasSpace, factor = self:getHasOutputSpace(productLine, productionFactor); -- Do we have space to store the new product?
-							local hasProduct, producedFactor = self:getHasInputProducts(productLine, factor); -- Max amount we can produce with the space or input product available.
-	
+							local hasSpace, factor = self:getHasOutputSpace(productLine, productionFactor);
+							local hasProduct, producedFactor = self:getHasInputProducts(productLine, factor);
+
 							if hasSpace and hasProduct then
 								raiseFlags = true;
-			
+
 								for i = 1, #productLine.inputs do
 									local input = productLine.inputs[i];
 									local amount = producedFactor * input.percent;
-			
+
 									self:updateFactoryLevels(input.fillLevel - amount, input, input.lastFillTypeIndex, false);
-			
+
 									if input.fillLevel <= 0 then
 										stopProductLine = true;
 									end;
 								end;
-			
-								if productLine.outputs ~= nil then	
+
+								if productLine.outputs ~= nil then
 									for i = 1, #productLine.outputs do
 										local output = productLine.outputs[i];
 										local amount = producedFactor * output.percent;
-				
+
 										local newFillLevel = output.fillLevel + amount
-				
+
 										if output.dynamicHeap ~= nil then
 											local dropped = output.dynamicHeap:updateDynamicHeap(amount, false);
 											newFillLevel = output.dynamicHeap:getHeapLevel();
@@ -1413,9 +1433,9 @@ function GC_ProductionFactory:minuteChanged()
 											newFillLevel, added = output.palletCreator:updatePalletCreators(amount, true);
 											stopProductLine = not added;
 										end;
-				
+
 										self:updateFactoryLevels(newFillLevel, output, output.fillTypeIndex,  false);
-				
+
 										if output.fillLevel >= output.capacity then
 											stopProductLine = true;
 										end;
@@ -1424,7 +1444,7 @@ function GC_ProductionFactory:minuteChanged()
 							else
 								stopProductLine = true;
 							end;
-			
+
 							if stopProductLine and productLine.active then
 								self:setFactoryState(lineId, false, false);
 							end;
@@ -1433,7 +1453,7 @@ function GC_ProductionFactory:minuteChanged()
 								local productionFactor = (productLine.outputPerHour / 60) * self.updateDelay;
 								local hasSpace, factor = self:getHasOutputSpace(productLine, productionFactor);
 								local hasProduct, _ = self:getHasInputProducts(productLine, factor);
-		
+
 								if hasSpace and hasProduct then
 									self:setFactoryState(lineId, true, false);
 								end;
@@ -1442,7 +1462,7 @@ function GC_ProductionFactory:minuteChanged()
 					end;
 				end;
 			end;
-		
+
 			if raiseFlags then
 				self:raiseDirtyFlags(self.productionFactoryDirtyFlag);
 			end;
@@ -1500,7 +1520,7 @@ function GC_ProductionFactory:getHasInputProducts(productLine, factor)
 						factor = adjustProduced;
 					end;
 				end;
-				
+
 				hasProduct = true;
 			else
 				hasProduct = false;
@@ -1516,25 +1536,25 @@ function GC_ProductionFactory:getCanOperate(lineId)
 	if self.productLines[lineId] ~= nil and self.productLines[lineId].inputs ~= nil then
 		for i = 1, #self.productLines[lineId].inputs do
 			local input = self.productLines[lineId].inputs[i];
-	
-			if input.fillLevel <= 0 then	
+
+			if input.fillLevel <= 0 then
 				return false
 			end;
 		end;
-	
+
 		if self.productLines[lineId].outputs ~= nil then
 			for i = 1, #self.productLines[lineId].outputs do
 				local output = self.productLines[lineId].outputs[i];
-		
-				if output.fillLevel >= output.capacity then	
+
+				if output.fillLevel >= output.capacity then
 					return false
 				end;
 			end;
 		end;
-	
+
 		return true;
 	end;
-	
+
 	return false;
 end;
 
@@ -1575,7 +1595,7 @@ function GC_ProductionFactory:setFactoryState(lineId, state, userStopped, noEven
 	if state == nil then
 		state = not self.productLines[lineId].active;
 	end;
-	
+
 	if userStopped == nil then
 		userStopped = not state;
 	end;
@@ -1585,30 +1605,29 @@ function GC_ProductionFactory:setFactoryState(lineId, state, userStopped, noEven
 	self.productLines[lineId].active = state;
 	self.productLines[lineId].userStopped = userStopped;
 
-	-- Force start / stop all operating parts.
 	if self.isClient then
 		self:setOperatingParts(self.productLines[lineId], state);
-	
+
 		if self.sharedOperatingParts ~= nil then
 			if self.sharedOperatingParts.operatingState ~= state then
 				local updateShared = true;
-	
+
 				if not state then
 					for i = 1, #self.productLines do
 						if self.productLines[i].active then
-							updateShared = false; -- Only turn off shared parts if all other lines are stopped!
+							updateShared = false;
 							break;
 						end;
 					end;
 				end;
-	
+
 				if updateShared then
 					self.sharedOperatingParts.operatingState = state;
 					self:setOperatingParts(self.sharedOperatingParts, state);
 				end;
 			end;
 		end;
-	end;	
+	end;
 end;
 
 function GC_ProductionFactory:setOperatingParts(parent, state)
@@ -1652,7 +1671,7 @@ end;
 function GC_ProductionFactory:getAutoStart(lineId, ignoreActive)
 	if ignoreActive == true then
 		return self.productLines[lineId].autoStart and not self.productLines[lineId].userStopped;
-	else	
+	else
 		return self.productLines[lineId].autoStart and not self.productLines[lineId].userStopped and not self.productLines[lineId].active;
 	end;
 end;
@@ -1705,14 +1724,12 @@ function GC_ProductionFactory:palletCreatorInteraction(level, blockedLevel, delt
 
 	local product = self:getProductFromTriggerId(triggerId, fillTypeIndex, false);
 	if product ~= nil then
-		-- Make sure we will have room to spawn.
 		local totalLevel = level + blockedLevel;
 
 		if totalLevel ~= product.fillLevel then
 			self:updateFactoryLevels(totalLevel, product, fillTypeIndex, true);
 		end;
 
-		-- This is an output so we only want to try and start / stop it.
 		local lineId = self.triggerIdToLineId[triggerId];
 		if lineId ~= nil then
 			if totalLevel < product.capacity then
@@ -1752,14 +1769,12 @@ function GC_ProductionFactory:vehicleChangedHeapLevel(heapLevel, fillTypeIndex, 
 		self:updateFactoryLevels(heapLevel, product, fillTypeIndex, true);
 		local lineId = self.triggerIdToLineId[heapId];
 		if lineId ~= nil then
-			-- If the level drops from a vehicle then try and start.
 			if startFactory then
 				if self:getAutoStart(lineId) and self:getCanOperate(lineId) then
 					self:setFactoryState(lineId, true, false);
 				end;
 			end;
 
-			-- If someone is dumping fillType into output heap then stop if overfilled.
 			if stopFactory then
 				if self.productLines[lineId].active and not self:getCanOperate(lineId) then
 					self:setFactoryState(lineId, false, false);
@@ -1792,7 +1807,6 @@ function GC_ProductionFactory:addFillLevel(farmId, fillLevelDelta, fillTypeIndex
 		product.lastFillTypeIndex = fillTypeIndex;
 		self:updateFactoryLevels(product.fillLevel + fillLevelDelta, product, fillTypeIndex, true);
 
-		-- Start the factory animations if using 'autoStart' if possible.
 		self:doAutoStart(fillTypeIndex, triggerId);
 	end;
 end;
@@ -1802,12 +1816,12 @@ function GC_ProductionFactory:removeFillLevel(farmId, fillLevelDelta, fillTypeIn
 
 	if product ~= nil then
 		self:updateFactoryLevels(product.fillLevel - fillLevelDelta, product, fillTypeIndex, true);
-
-		-- Start the factory animations if using 'autoStart' if possible.
 		self:doAutoStart(fillTypeIndex, triggerId);
 
 		return product.fillLevel;
 	end;
+
+	return;
 end;
 
 function GC_ProductionFactory:getProvidedFillTypes(triggerId)
@@ -1844,16 +1858,15 @@ end;
 -- PLAYER TRIGGER (GUI / UI) --
 -------------------------------
 
-function GC_ProductionFactory:playerTriggerActivated(lineId)	
+function GC_ProductionFactory:playerTriggerActivated(lineId)
 	g_company.gui:openGuiWithData("gc_factoryBig", false, self, lineId);
 end;
 
 function GC_ProductionFactory:playerTriggerUpdate(dt, playerInTrigger, lineId)
-	-- update main gui every 2 seconds if open
 	if g_company.gui:getGuiIsOpen("gc_factoryBig") then
-		if self.guiData.bigGuiUpdateTime >= 2000 then
+		if self.guiData.bigGuiUpdateTime >= 5000 then
 			g_company.gui:updateGuiData("gc_factoryBig");
-			self.guiData.bigGuiUpdateTime = self.guiData.bigGuiUpdateTime - 2000;
+			self.guiData.bigGuiUpdateTime = self.guiData.bigGuiUpdateTime - 5000;
 		end;
 		self.guiData.bigGuiUpdateTime = self.guiData.bigGuiUpdateTime + dt;
 	end;
@@ -1890,7 +1903,7 @@ function GC_ProductionFactory:getInputs(lineId)
 			return productLine.inputs;
 		end;
 	end;
-	
+
 	return
 end;
 
@@ -1901,27 +1914,49 @@ function GC_ProductionFactory:getOutputs(lineId)
 			return productLine.outputs;
 		end;
 	end;
-	
+
 	return
 end;
 
-function GC_ProductionFactory:changeBuyLiters(input, delta)
-	local maxToAdd = input.capacity - input.fillLevel;
-	local newLiters = input.buyLiters + delta;
+function GC_ProductionFactory:canBuyProduct()
+	local hasPermission = self.canPurchaseInputs;
 
-	if newLiters < 0 then
-		if maxToAdd > 500 then
-			delta = maxToAdd;
-		else
-			delta = 0;
-		end;
-	else
-		if newLiters > maxToAdd then
-			delta = input.buyLiters * -1;
-		end;
+	if hasPermission and g_currentMission.missionDynamicInfo.isMultiplayer then
+		return g_currentMission.isMasterUser or g_currentMission:getIsServer();
 	end;
 
-	input.buyLiters = input.buyLiters + delta;
+	return hasPermission;
+end;
+
+function GC_ProductionFactory:changeBuyLiters(input, delta)
+	local moneyAvailable = 0;
+	if g_currentMission ~= nil and g_currentMission.player ~= nil then
+		local farm = g_farmManager:getFarmById(g_currentMission.player.farmId)
+		moneyAvailable = farm.money;
+	end;
+
+	if moneyAvailable > 0 then
+		local maxLitres = input.capacity - input.fillLevel;
+		local maxCanBuy = math.floor(moneyAvailable / input.pricePerLiter);
+		local maxToAdd = math.min(maxLitres, maxCanBuy);
+
+		local newLiters = input.buyLiters + delta;
+		if newLiters < 0 then
+			if maxToAdd > Gc_Gui_FactoryBig.BUYSTEP then
+				delta = maxToAdd;
+			else
+				delta = 0;
+			end;
+		else
+			if newLiters > maxToAdd then
+				delta = input.buyLiters * -1;
+			end;
+		end;
+
+		input.buyLiters = input.buyLiters + delta;
+	else
+		input.buyLiters = 0;
+	end;
 end;
 
 function GC_ProductionFactory:getProductBuyPrice(input)
@@ -1938,18 +1973,18 @@ function GC_ProductionFactory:getProductBuyPrice(input)
 end;
 
 function GC_ProductionFactory:doProductPurchase(input)
-	if input ~= nil and input.buyLiters > 0 then		
+	if input ~= nil and input.buyLiters > 0 then
 		if g_currentMission:getIsServer() then
 			local validLitres = math.min(input.buyLiters, math.floor(input.capacity - input.fillLevel));
 			local price = input.pricePerLiter * Utils.getNoNil(validLitres, 0);
 			if price > 0 then
-				local newFillLevel = input.fillLevel + validLitres;        
+				local newFillLevel = input.fillLevel + validLitres;
 				g_currentMission:addMoney(-price, self:getOwnerFarmId(), MoneyType.OTHER, true, true);
-				self:updateFactoryLevels(newFillLevel, input, nil, true);				
+				self:updateFactoryLevels(newFillLevel, input, nil, true);
 				self:doAutoStart(nil, nil, true);
 			end;
 			input.buyLiters = 0;
-		else		
+		else
 			g_client:getServerConnection():sendEvent(GC_ProductionFactoryProductPurchaseEvent:new(self, input.lineId, input.id, input.buyLiters));
 			input.buyLiters = 0;
 		end;
@@ -1958,18 +1993,18 @@ end;
 
 function GC_ProductionFactory:spawnPalletFromOutput(output)
 	local numberSpawned = 0;
-	
+
 	if output ~= nil and output.numberToSpawn > 0 then
 		if g_currentMission:getIsServer() then
-			if output.objectSpawner ~= nil then		
+			if output.objectSpawner ~= nil then
 				local autoStart = output.fillLevel >= output.capacity;
 				local object = output.objectSpawner.object;
 				numberSpawned = output.objectSpawner:spawnByObjectInfo(object, output.numberToSpawn);
 				output.numberToSpawn = 0;
-				
-				local newFillLevel = output.fillLevel - (object.fillLevel * numberSpawned); 
+
+				local newFillLevel = output.fillLevel - (object.fillLevel * numberSpawned);
 				self:updateFactoryLevels(newFillLevel, output, nil, true);
-				
+
 				if autoStart then
 					self:doAutoStart(nil, nil, true);
 				end;
@@ -1979,13 +2014,13 @@ function GC_ProductionFactory:spawnPalletFromOutput(output)
 			output.numberToSpawn = 0;
 		end;
 	end;
-	
+
 	return numberSpawned;
 end;
 
 function GC_ProductionFactory:getFreePalletSpawnAreas(output)
 	local availableAreas = 0;
-	
+
 	if output ~= nil then
 		if output.objectSpawner ~= nil then
 			local object = output.objectSpawner.object;
@@ -1996,7 +2031,7 @@ function GC_ProductionFactory:getFreePalletSpawnAreas(output)
 			end;
 		end;
 	end;
-	
+
 	return availableAreas;
 end;
 
@@ -2018,14 +2053,12 @@ end;
 function GC_ProductionFactory:setOwnerFarmId(ownerFarmId, noEventSend)
 	GC_ProductionFactory:superClass().setOwnerFarmId(self, ownerFarmId, noEventSend);
 
-	-- Shutdown if the land is sold.
 	if not self:getIsValidFarmlandId() then
 		for lineId, _ in pairs (self.productLines) do
 			self:setFactoryState(lineId, false, false);
 		end;
 	end;
 
-	-- Push to child objects here.
 	if self.triggerManager ~= nil then
 		self.triggerManager:setAllOwnerFarmIds(ownerFarmId, noEventSend)
 	end;
