@@ -67,7 +67,7 @@ function GC_ProductionFactoryProductPurchaseEvent:run(connection)
 			self.factory:doProductPurchase(input);
 		end;
 	else
-		print("  [LSMC - GlobalCompany > GC_ProductionFactory] ERROR: ProductPurchaseEvent is a client to server only event!");
+		g_company.debug:print("  [LSMC - GlobalCompany > GC_ProductionFactory] ERROR: ProductPurchaseEvent is a client to server only event!");
 	end;
 end;
 

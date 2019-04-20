@@ -47,7 +47,7 @@ function GC_PalletCreatorWarningEvent:writeStream(streamId, connection)
 end;
 
 function GC_PalletCreatorWarningEvent:run(connection)
-	print("Error: GC_PalletCreatorWarningEvent is a server to client only event");
+	g_company.debug:print("Error: GC_PalletCreatorWarningEvent is a server to client only event");
 end;
 
 

@@ -179,7 +179,7 @@ function GlobalCompany.addRaisedUpdateable(target, raiseOnFirstRun)
 		GlobalCompany.raisedUpdateables[target] = target;
 	else
 		local debugName = g_company.debug:getScriptNameFromIndex(target.debugIndex);
-		print(string.format("  [LSMC - GlobalCompany > %s] - ERROR: 'addRaisedUpdateable' failed, function 'update(dt)' could not be found.", debugName));
+		g_company.debug:print("  [LSMC - GlobalCompany > %s] - ERROR: 'addRaisedUpdateable' failed, function 'update(dt)' could not be found.", debugName);
 	end;
 end;
 
@@ -396,8 +396,8 @@ function GlobalCompany:addPlaceableType(name, className, filename)
 	if g_company.utils.getHasPrefix(name) then
 		g_placeableTypeManager.placeableTypes[name] = {name=name, className=className, filename=filename};
 	else
-		print(string.format("  [LSMC - GlobalCompany] - ERROR: Failed to add placeable type using name '%s'! Incorrect / No prefix found.", name));
-		print("    Use prefix 'GC_' for ( GlobalCompany ) placeable mods.", "    Use prefix 'SRS_' for ( SkiRegionSimulator ) placeable mods.");
+		g_company.debug:print("  [LSMC - GlobalCompany] - ERROR: Failed to add placeable type using name '%s'! Incorrect / No prefix found.", name);
+		g_company.debug:print("    Use prefix 'GC_' for ( GlobalCompany ) placeable mods.", "    Use prefix 'SRS_' for ( SkiRegionSimulator ) placeable mods.");
 	end;
 end;
 

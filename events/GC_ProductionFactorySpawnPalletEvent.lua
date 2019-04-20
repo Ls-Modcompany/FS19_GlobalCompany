@@ -67,7 +67,7 @@ function GC_ProductionFactorySpawnPalletEvent:run(connection)
 			self.factory:spawnPalletFromOutput(output);
 		end;
 	else
-		print("  [LSMC - GlobalCompany > GC_ProductionFactory] ERROR: SpawnPalletEvent is a client to server only event!");
+		g_company.debug:print("  [LSMC - GlobalCompany > GC_ProductionFactory] ERROR: SpawnPalletEvent is a client to server only event!");
 	end;
 end;
 
