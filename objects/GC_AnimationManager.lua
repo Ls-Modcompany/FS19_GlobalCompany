@@ -243,7 +243,6 @@ function GC_AnimationManager:loadAnimationPart(xmlFile, partKey, part)
 
 		return true;
 	end;
-
 	return false
 end
 
@@ -456,6 +455,8 @@ function GC_AnimationManager:getAnimationTime(name)
 	local animation = self.animations[name];
 	if animation ~= nil then
 		return animation.currentTime / animation.duration;
+	else
+		g_company.debug:print("No animation with name %s", name)
 	end;
 
 	return 0;

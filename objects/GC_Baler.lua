@@ -107,10 +107,8 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		self.saveId = "baler_" .. indexName;
 	end;
 
-	--if self.isServer then
-		self.dirtyObject = GC_DirtyObjects:new(self.isServer, self.isClient, nil, self.baseDirectory, self.customEnvironment);
-		self.dirtyObject:load(self.nodeId);
-	--end;
+	self.dirtyObject = GC_DirtyObjects:new(self.isServer, self.isClient, nil, self.baseDirectory, self.customEnvironment);
+	self.dirtyObject:load(self.nodeId);
 
 	self.title = Utils.getNoNil(getXMLString(xmlFile, xmlKey .. "#title"), true);
 	self.autoOn = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. "#autoOn"), true);
@@ -171,16 +169,12 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		end;
 		i = i + 1;
 	end;
-	
-	--self.baleAnimation = GC_Animations:new(self.isServer, self.isClient)
-	--self.baleAnimation:load(self.nodeId, self, true, nil, xmlFile, string.format("%s.baleAnimation", mainPartKey));
-
 
 	if self.isClient then
 		self.unloadTrigger = self.triggerManager:loadTrigger(GC_UnloadingTrigger, self.nodeId , xmlFile, string.format("%s.unloadTrigger", mainPartKey), {[1] = self.fillTypes[self.activeFillTypeIndex].index}, {[1] = "DISCHARGEABLE"});
 		self.cleanHeap = self.triggerManager:loadTrigger(GC_DynamicHeap, self.nodeId , xmlFile, string.format("%s.cleanHeap", mainPartKey), self.fillTypes[self.activeFillTypeIndex].name, nil, false);
 		
-		self.playerTrigger = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.nodeId , xmlFile, string.format("%s.playerTrigger", mainPartKey), Baler.PLAYERTRIGGER_MAIN, true, g_company.languageManager:getText("GC_baler_openGui"), true);
+		self.playerTrigger = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.nodeId , xmlFile, string.format("%s.playerTrigger", mainPartKey), Baler.PLAYERTRIGGER_MAIN, true, g_company.languageManager:getText("GC_baler_openGui"));
 		self.playerTriggerClean = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.nodeId , xmlFile, string.format("%s.playerTriggerClean", mainPartKey), Baler.PLAYERTRIGGER_CLEAN, true, g_company.languageManager:getText("GC_baler_cleaner"), true);
 		
 		self.movers = GC_Movers:new(self.isServer, self.isClient);
@@ -233,10 +227,6 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		self.conveyorStacker:load(self.nodeId, self, xmlFile, string.format("%s.conveyor", stackPartKey));
 
 		self.raisedAnimationKeys = {};
-		--self.doStackAnimationEnd = GC_Animations:new(self.isServer, self.isClient)
-		--self.doStackAnimationEnd:load(self.nodeId, self, true, string.format("%s.doStackAnimationEnd", stackPartKey), xmlFile);
-		--self.doStackAnimationStart = GC_Animations:new(self.isServer, self.isClient)
-		--self.doStackAnimationStart:load(self.nodeId, self, true, string.format("%s.doStackAnimationStart", stackPartKey), xmlFile);
 		
 		if self.isClient then
 			self.soundStacker = g_company.sounds:new(self.isServer, self.isClient);
@@ -255,9 +245,6 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 
 	self.conveyorMover = GC_Conveyor:new(self.isServer, self.isClient);
 	self.conveyorMover:load(self.nodeId, self, xmlFile, string.format("%s.conveyor", baleMoverKey));
-
-	--self.moveCollisionAnimation = GC_Animations:new(self.isServer, self.isClient)
-	--self.moveCollisionAnimation:load(self.nodeId, self, true, string.format("%s.moveCollisionAnimation", baleMoverKey), xmlFile);
 
 	self.moveCollisionAnimationNode = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, string.format("%s.moveCollisionAnimation#node", baleMoverKey)), self.i3dMappings);
 	self.moveCollisionAnimationColliMask = getCollisionMask(self.moveCollisionAnimationNode);
@@ -513,7 +500,7 @@ function Baler:update(dt)
 			if self.fillLevelBunker >= 4000 then
 				if self:canUnloadBale() then					
 					self:setBaleObjectToAnimation();
-					self.baleAnimation:setAnimationsState(true);
+					self.animationManager:setAnimationByState("baleAnimation", true);
 					self.baleCounter = self.baleCounter + 1;
 					self:setFillLevelBunker(self.fillLevelBunker * -1, true);
 					if self.shouldTurnOff then
@@ -523,18 +510,20 @@ function Baler:update(dt)
 				end;
 			elseif self.fillLevel + self.fillLevelBunker >= 4000 then
 				self:setFillLevelBunker(math.min(dt / 1000 * self.pressPerSecond, 4000 - self.fillLevelBunker, self.fillLevel));
-			elseif self.baleAnimation:getAnimationTime() == 0 then
+			elseif self.animationManager:getAnimationTime("baleAnimation") == 0 then
 				self:onTurnOffBaler();
 			end;
 		end;
-		if self.baleAnimation:getAnimationTime() == 1 then
-			if self.moveCollisionAnimation:getAnimationTime() == 1 then
-				self.moveCollisionAnimation:setAnimTime(0);	
+		if self.animationManager:getAnimationTime("baleAnimation") == 1 then
+			if self.animationManager:getAnimationTime("moveCollisionAnimation") == 1 then
+				self.animationManager:setAnimationTime("moveCollisionAnimation", 0);
 				setCollisionMask(self.moveCollisionAnimationNode, 0);
 			end;
 			self:createBale(self.baleAnimationObjectNode);
-			self.baleAnimation:setAnimTime(0);
-			delete(getChildAt(self.baleAnimationObjectNode, 0));
+			self.animationManager:setAnimationTime("baleAnimation", 0);
+			if getNumOfChildren(self.baleAnimationObjectNode) > 0 then
+				delete(getChildAt(self.baleAnimationObjectNode, 0));
+			end;
 		end;
 		
 		if self.hasStack and self.state_stacker == Baler.STATE_ON then
@@ -542,16 +531,16 @@ function Baler:update(dt)
 				if self.stackerBaleTrigger:getTriggerNotEmpty() and self.fillLevelBunker > 0 then		
 					if self.stackerBaleTrigger:getNum() < self.stackBalesTarget and self.state_balerMove == Baler.STATE_OFF then
 						self.animationState = Baler.ANIMATION_ISSTACKING;
-						self.doStackAnimationStart:setAnimationsState(true);
+						self.animationManager:setAnimationByState("doStackAnimationStart", true)
 					else
 						if self.state_balerMove == Baler.STATE_OFF and self.moverBaleTrigger:getTriggerEmpty() then
 							self:onTurnOnBaleMover();
 							self.stackBales = {};
 							setCollisionMask(self.moveCollisionAnimationNode, self.moveCollisionAnimationColliMask);
-							self.moveCollisionAnimation:setAnimationsState(true);
+							self.animationManager:setAnimationByState("moveCollisionAnimation", true)
 						end;
-						if self.moveCollisionAnimation:getAnimationTime() == 1 then
-							self.moveCollisionAnimation:setAnimTime(0);	
+						if self.animationManager:getAnimationTime("moveCollisionAnimation") == 1 then
+							self.animationManager:setAnimationTime("moveCollisionAnimation", 0);
 							setCollisionMask(self.moveCollisionAnimationNode, 0);
 						end;
 					end;
@@ -569,11 +558,11 @@ function Baler:update(dt)
 					end;
 				end;
 			elseif self.animationState == Baler.ANIMATION_ISSTACKING then
-				if self.doStackAnimationStart:getAnimationTime() == 1 then
+				if self.animationManager:getAnimationTime("doStackAnimationStart") == 1 then
 					self.animationState = Baler.ANIMATION_CANSTACKEND;
 					self.raisedAnimationKeys = {};
 					self.stackerBaleTrigger:reset();
-				elseif self.doStackAnimationStart:getAnimationTime() >= 0.6 and self.raisedAnimationKeys["0.6"] == nil then
+				elseif self.animationManager:getAnimationTime("doStackAnimationStart") >= 0.6 and self.raisedAnimationKeys["0.6"] == nil then
 					self:setBaleObjectToFork();
 					for _,bale in pairs(self.stackBales) do
 						bale:delete();
@@ -584,15 +573,15 @@ function Baler:update(dt)
 			elseif self.animationState == Baler.ANIMATION_CANSTACKEND then
 				if self.stackerBaleTrigger:getTriggerNotEmpty() then
 					self.animationState = Baler.ANIMATION_ISSTACKINGEND;
-					self.doStackAnimationEnd:setAnimationsState(true);
+					self.animationManager:setAnimationByState("doStackAnimationEnd", true)
 				end
 			elseif self.animationState == Baler.ANIMATION_ISSTACKINGEND then
-				if self.doStackAnimationEnd:getAnimationTime() == 1 then
+				if self.animationManager:getAnimationTime("doStackAnimationEnd") == 1 then
 					self.animationState = Baler.ANIMATION_CANSTACK;
 					self.raisedAnimationKeys = {};				
-					self.doStackAnimationEnd:setAnimTime(0);	
-					self.doStackAnimationStart:setAnimTime(0);	
-				elseif self.doStackAnimationEnd:getAnimationTime() >= 0.3 and self.raisedAnimationKeys["0.3"] == nil then
+					self.animationManager:setAnimationTime("doStackAnimationEnd", 0);	
+					self.animationManager:setAnimationTime("doStackAnimationStart", 0);	
+				elseif self.animationManager:getAnimationTime("doStackAnimationEnd") >= 0.3 and self.raisedAnimationKeys["0.3"] == nil then
 					self:removeBaleObjectFromFork();
 					self.raisedAnimationKeys["0.3"] = true;
 				end;
@@ -694,7 +683,7 @@ function Baler:setFillTypEvent(data, noEventSend)
 			self:onTurnOnBaleMover();
 			self.stackBales = {};
 			setCollisionMask(self.moveCollisionAnimationNode, self.moveCollisionAnimationColliMask);
-			self.moveCollisionAnimation:setAnimationsState(true);
+			self.animationManager:setAnimationByState("moveCollisionAnimation", true)
 		end;
 	end;
 	self.activeFillTypeIndex = data[1]; 
@@ -707,7 +696,7 @@ end;
 -- data is empty table
 function Baler:setBaleObjectToAnimationEvent(data, noEventSend)
 	g_company.eventManager:createEvent(self.eventId_setBaleObjectToAnimation, data, false, noEventSend);
-	--if self.isClient then
+	if self.isClient then
 		for _,info in pairs (self.baleAnimationObjects) do
 			if info.fillTypeIndex == self.activeFillTypeIndex then
 				local newBale = clone(info.node, false, false, false);
@@ -716,7 +705,7 @@ function Baler:setBaleObjectToAnimationEvent(data, noEventSend)
 				break;
 			end;
 		end;
-	--end;
+	end;
 end;
 
 function Baler:removeBaleObjectFromFork(noEventSend)
@@ -754,7 +743,7 @@ function Baler:setBaleObjectToForkEvent(data, noEventSend)
 end;
 
 function Baler:canUnloadBale()
-	local canUnloadBale = self.baleAnimation:getAnimationTime() == 0;
+	local canUnloadBale = self.animationManager:getAnimationTime("baleAnimation") == 0;
 	if canUnloadBale and self.hasStack then
 		canUnloadBale = self.stackerBaleTrigger:getTriggerEmpty() and self.animationState ~= Baler.ANIMATION_ISSTACKING and self.animationState ~= Baler.ANIMATION_ISSTACKINGEND;
 	end;
@@ -877,7 +866,6 @@ end;
 -- 1: num
 function Baler:setStackBalesTargetEvent(data, noEventSend)
 	g_company.eventManager:createEvent(self.eventId_baleTarget, data, false, noEventSend);
-	print(string.format("setStackBalesTargetEvent %s", data[1]));
 	self.stackBalesTarget = data[1];
 end;
 
