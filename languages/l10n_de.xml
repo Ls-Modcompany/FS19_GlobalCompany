@@ -30,6 +30,7 @@
 		<e k="GC_settings2_title" v="Objektinformation anzeigen"/>
 		<e k="GC_settings3_title" v="Pferdehelfer anstellen (300€ / Pferd / Tag)"/>
 		<e k="GC_settings4_title" v="Mehr Bäume aktivieren"/>
+		<e k="GC_settings5_title" v="Ballen aufschneiden aktivieren"/>
 		
 		<!-- Factory -->
 		<e k="GC_gui_buttons_back" v="Zurück"/>

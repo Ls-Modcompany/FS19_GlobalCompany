@@ -30,6 +30,7 @@
 		<e k="GC_settings2_title" v="Show objectinfo"/>
 		<e k="GC_settings3_title" v="Horsehelper (300€ / Horse / Day)"/>
 		<e k="GC_settings4_title" v="Activate more trees"/>
+		<e k="GC_settings5_title" v="Activate cut bales"/>
 		
 		<!-- Factory -->
 		<e k="GC_gui_buttons_back" v="Back"/>

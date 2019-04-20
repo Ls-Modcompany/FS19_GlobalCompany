@@ -37,6 +37,7 @@ function Gc_Gui_MainSettings:loadSettings()
     self.gui_btn_settings_2:setActive(g_company.settings:getSetting("objectInfo"));
     self.gui_btn_settings_3:setActive(g_company.settings:getSetting("horseHelper"));
     self.gui_btn_settings_4:setActive(g_company.settings:getSetting("moreTrees"));
+    self.gui_btn_settings_5:setActive(g_company.settings:getSetting("cutBales"));
 end;
 
 function Gc_Gui_MainSettings:onClickBtnSetting(btn, parameter)
