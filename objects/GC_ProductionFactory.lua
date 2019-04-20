@@ -73,14 +73,14 @@ function GC_ProductionFactory:onCreate(transformId)
 	else
 		g_company.debug:print("  [LSMC - GlobalCompany] - [GC_ProductionFactory]");
 		if indexName == nil then
-			g_company.debug:print(string.format("    ONCREATE: Trying to load 'FACTORY' with nodeId name %s, attribute 'indexName' could not be found.", getName(transformId)));
+			g_company.debug:print("    ONCREATE: Trying to load 'FACTORY' with nodeId name %s, attribute 'indexName' could not be found.", getName(transformId));
 		else
 			if xmlFilename == nil then
-				g_company.debug:print(string.format("    ONCREATE: [FACTORY - %s]  Attribute 'xmlFilename' is missing!", indexName));
+				g_company.debug:print("    ONCREATE: [FACTORY - %s]  Attribute 'xmlFilename' is missing!", indexName);
 			end;
 
 			if farmlandId == nil then
-				g_company.debug:print(string.format("    ONCREATE: [FACTORY - %s]  Attribute 'farmlandId' is missing!", indexName));
+				g_company.debug:print("    ONCREATE: [FACTORY - %s]  Attribute 'farmlandId' is missing!", indexName);
 			end;
 		end;
 	end;
