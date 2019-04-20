@@ -180,12 +180,12 @@ function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes
 					self.triggerStatus.fallOffShader = {node = fallOffShaderNode};
 					setVisibility(fallOffShaderNode, true);
 
-					local isActive = Utils.getNoNil(getXMLBool(xmlFile, fallOffKey .. ".noObject#isActive"), false);
+					local isActive = Utils.getNoNil(getXMLBool(xmlFile, fallOffKey .. ".noObject#isActive"), true);
 					local rgb = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, fallOffKey .. ".noObject#rgb", 3, false, self.debugData, {0.2122, 0.5271, 0.0307});
 					self.triggerStatus.fallOffShader.noObject = {isActive = isActive, rgb = rgb};
 					setShaderParameter(fallOffShaderNode, "colorScale", rgb[1], rgb[2], rgb[3], 1, false);
 
-					isActive = Utils.getNoNil(getXMLBool(xmlFile, fallOffKey .. ".foundObject#isActive"), false);
+					isActive = Utils.getNoNil(getXMLBool(xmlFile, fallOffKey .. ".foundObject#isActive"), true);
 					rgb = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, fallOffKey .. ".foundObject#rgb", 3, false, self.debugData, {0.9301, 0.2874, 0.0130});
 					self.triggerStatus.fallOffShader.foundObject = {isActive = isActive, rgb = rgb};
 

@@ -59,10 +59,13 @@ function GC_ProductionFactoryProductPurchaseEvent:writeStream(streamId, connecti
 end;
 
 function GC_ProductionFactoryProductPurchaseEvent:run(connection)
-	if not connection:getIsServer() then	
-		local input = self:getInput(self.lineId, self.inputId);
-		input.buyLiters = self.litres;
-		self.factory:doProductPurchase(input);
+	if not connection:getIsServer() then
+		local productLine = self.factory.productLines[self.lineId];
+		if productLine ~= nil and productLine.inputs ~= nil then
+			local input =  productLine.inputs[self.inputId];
+			input.buyLiters = self.litres;
+			self.factory:doProductPurchase(input);
+		end;
 	else
 		print("  [LSMC - GlobalCompany > GC_ProductionFactory] ERROR: ProductPurchaseEvent is a client to server only event!");
 	end;

@@ -750,6 +750,58 @@
 			<value name="margin" value="10px 5px 0px 0px" />	
 		</template>	
 
-
+		<!-- Factory Small -->		
+		<template name="gcFactorySmallBackground" anchor="rightCenter" extends="gcBase gcBorder">
+			<value name="imageFilename" value="g_baseUIFilename"/>
+			<value name="imageUVs" value="10px 1010px 4px 4px"/>
+			<value name="imageColor" value="0.018 0.016 0.015 0.6"/>
+			
+			
+			<value name="size" value="800px 890px" />
+			<value name="position" value="-25px -70px" />
+			<!-- <value name="imageColor" value="glass5_70" /> -->
+			<value name="hasBorders" value="true" />
+			<value name="borderTopSize" value="1px" />
+			<value name="borderTopColor" value="gray2" />
+			<value name="borderLeftSize" value="1px" />
+			<value name="borderLeftColor" value="gray2" />
+			<value name="borderRightSize" value="1px" />
+			<value name="borderRightColor" value="gray2" />
+			<value name="borderBottomSize" value="6px" />
+			<value name="borderBottomColor" value="orange" />
+		</template>		
+		
+		<template name="gcFactorySmallHeader" anchor="middleTop" extends="gcBase gcBorder">
+			<value name="size" value="750px 50px" />
+			<value name="imageColor" value="transparent" />
+			<value name="hasBorders" value="true" />
+			<value name="borderBottomSize" value="4px" />
+			<value name="borderBottomColor" value="gray2" />
+		</template>
+		
+		<template name="gcFactorySmallHeaderText" anchor="middleCenter" extends="gcBase_text">
+			<value name="textSize" value="25px" />
+			<value name="textAlignment" value="center" />	
+		</template>
+		
+		<template name="gcFactorySmallInputs" anchor="middleTop" extends="gcBase gcBorder">
+			<value name="size" value="350px 50px" />
+			<value name="position" value="-200px -60px" />
+			<value name="imageColor" value="transparent" />
+		</template>
+		
+		<template name="gcFactorySmallInputsText" anchor="leftCenter" extends="gcBase_text">
+			<value name="textSize" value="25px" />
+			<value name="textAlignment" value="center" />	
+		</template>	
+		
+		<template name="gcFactorySmallSplit" anchor="middleCenter" extends="gcBase gcBorder">
+			<value name="size" value="0px 650px" />
+			<value name="position" value="0px 30px" />
+			<value name="imageColor" value="transparent" />
+			<value name="hasBorders" value="true" />
+			<value name="borderLeftSize" value="2px" />
+			<value name="borderLeftColor" value="gray2" />
+		</template>
 	</templates>	
 </guiTemplates>
