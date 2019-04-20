@@ -535,6 +535,7 @@
 		</template>	
 		<template name="gcFactoryBigRightOverviewText4" anchor="leftTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="28px" />
+			<value name="textAlignment" value="left" />	
 		</template>	
 		<template name="gcFactoryBigRightOverviewText5" anchor="rightTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="28px" />
@@ -548,6 +549,7 @@
 		<template name="gcFactoryBigRightOverviewText7" anchor="leftTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="19px" />
 			<value name="textColor" value="orange" />
+			<value name="textAlignment" value="left" />	
 		</template>	
 		<template name="gcFactoryBigRightOverviewText8" anchor="middleTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="22px" />
