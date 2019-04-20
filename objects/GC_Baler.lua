@@ -115,6 +115,15 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	self.title = Utils.getNoNil(getXMLString(xmlFile, xmlKey .. "#title"), true);
 	self.autoOn = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. "#autoOn"), true);
 
+	
+	local animationManager = GC_AnimationManager:new(self.isServer, self.isClient);
+	if animationManager:load(self.nodeId, self, xmlFile, xmlKey, true) then
+		animationManager:register(true);
+		self.animationManager = animationManager;
+	else
+		animationManager:delete();
+	end;
+
 	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	-----------------------------------------------------------------------MainPart--------------------------------------------------------------------------------------
 	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -163,8 +172,9 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		i = i + 1;
 	end;
 	
-	self.baleAnimation = GC_Animations:new(self.isServer, self.isClient)
-	self.baleAnimation:load(self.nodeId, self, true, nil, xmlFile, string.format("%s.baleAnimation", mainPartKey));
+	--self.baleAnimation = GC_Animations:new(self.isServer, self.isClient)
+	--self.baleAnimation:load(self.nodeId, self, true, nil, xmlFile, string.format("%s.baleAnimation", mainPartKey));
+
 
 	if self.isClient then
 		self.unloadTrigger = self.triggerManager:loadTrigger(GC_UnloadingTrigger, self.nodeId , xmlFile, string.format("%s.unloadTrigger", mainPartKey), {[1] = self.fillTypes[self.activeFillTypeIndex].index}, {[1] = "DISCHARGEABLE"});
@@ -223,10 +233,10 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		self.conveyorStacker:load(self.nodeId, self, xmlFile, string.format("%s.conveyor", stackPartKey));
 
 		self.raisedAnimationKeys = {};
-		self.doStackAnimationEnd = GC_Animations:new(self.isServer, self.isClient)
-		self.doStackAnimationEnd:load(self.nodeId, self, true, string.format("%s.doStackAnimationEnd", stackPartKey), xmlFile);
-		self.doStackAnimationStart = GC_Animations:new(self.isServer, self.isClient)
-		self.doStackAnimationStart:load(self.nodeId, self, true, string.format("%s.doStackAnimationStart", stackPartKey), xmlFile);
+		--self.doStackAnimationEnd = GC_Animations:new(self.isServer, self.isClient)
+		--self.doStackAnimationEnd:load(self.nodeId, self, true, string.format("%s.doStackAnimationEnd", stackPartKey), xmlFile);
+		--self.doStackAnimationStart = GC_Animations:new(self.isServer, self.isClient)
+		--self.doStackAnimationStart:load(self.nodeId, self, true, string.format("%s.doStackAnimationStart", stackPartKey), xmlFile);
 		
 		if self.isClient then
 			self.soundStacker = g_company.sounds:new(self.isServer, self.isClient);
@@ -246,8 +256,8 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	self.conveyorMover = GC_Conveyor:new(self.isServer, self.isClient);
 	self.conveyorMover:load(self.nodeId, self, xmlFile, string.format("%s.conveyor", baleMoverKey));
 
-	self.moveCollisionAnimation = GC_Animations:new(self.isServer, self.isClient)
-	self.moveCollisionAnimation:load(self.nodeId, self, true, string.format("%s.moveCollisionAnimation", baleMoverKey), xmlFile);
+	--self.moveCollisionAnimation = GC_Animations:new(self.isServer, self.isClient)
+	--self.moveCollisionAnimation:load(self.nodeId, self, true, string.format("%s.moveCollisionAnimation", baleMoverKey), xmlFile);
 
 	self.moveCollisionAnimationNode = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, string.format("%s.moveCollisionAnimation#node", baleMoverKey)), self.i3dMappings);
 	self.moveCollisionAnimationColliMask = getCollisionMask(self.moveCollisionAnimationNode);
@@ -293,17 +303,8 @@ function Baler:delete()
 	if self.conveyorFillTypeEffect ~= nil then
 		self.conveyorFillTypeEffect:delete();
 	end;
-	if self.baleAnimation ~= nil then
-		self.baleAnimation:delete();
-	end;
-	if self.doStackAnimationStart ~= nil then
-		self.doStackAnimationStart:delete();
-	end;
-	if self.doStackAnimationEnd ~= nil then
-		self.doStackAnimationEnd:delete();
-	end;
-	if self.moveCollisionAnimation ~= nil then
-		self.moveCollisionAnimation:delete();
+	if self.animationManager ~= nil then
+		self.animationManager:delete();
 	end;
 	if self.soundMain ~= nil then
 		self.soundMain:delete();
@@ -338,12 +339,12 @@ function Baler:readStream(streamId, connection)
 		self:setFillLevelBunker(streamReadFloat32(streamId), true, true);
 		self.baleCounter = streamReadInt16(streamId);
 		self.autoOn = streamReadBool(streamId);
-		self.baleAnimation:setAnimTime(streamReadFloat32(streamId));
-		if self.baleAnimation:getAnimationTime() > 0 then	
+		self.animationManager:setAnimationTime("baleAnimation", streamReadFloat32(streamId));
+		if self.animationManager:getAnimationTime("baleAnimation") > 0 then	
 			self:setBaleObjectToAnimation(true);	
-			self.baleAnimation:setAnimationsState(true);
+			self.animationManager:setAnimationByState("baleAnimation", true);
 		end;
-
+		
 		if self.hasStack then
 			self.state_stacker = streamReadInt16(streamId);
 			self.stackBalesTarget = streamReadInt16(streamId);
@@ -362,14 +363,16 @@ function Baler:readStream(streamId, connection)
 				end;
 			end;
 
-			self.doStackAnimationEnd:setAnimTime(streamReadFloat32(streamId));
-			if self.doStackAnimationEnd:getAnimationTime() > 0 and self.doStackAnimationEnd:getAnimationTime() < 1 then		
-				self.doStackAnimationEnd:setAnimationsState(true);
+			self.animationManager:setAnimationTime("doStackAnimationEnd", streamReadFloat32(streamId));
+			local time = self.animationManager:getAnimationTime("doStackAnimationEnd");
+			if time > 0  and time < 1 then		
+				self.animationManager:setAnimationByState("doStackAnimationEnd", true);
 			end;
-
-			self.doStackAnimationStart:setAnimTime(streamReadFloat32(streamId));
-			if self.doStackAnimationStart:getAnimationTime() > 0 and self.doStackAnimationStart:getAnimationTime() < 1 then		
-				self.doStackAnimationStart:setAnimationsState(true);
+			
+			self.animationManager:setAnimationTime("doStackAnimationStart", streamReadFloat32(streamId));
+			local time = self.animationManager:getAnimationTime("doStackAnimationStart");
+			if time > 0  and time < 1 then		
+				self.animationManager:setAnimationByState("doStackAnimationStart", true);
 			end;
 		end;
 
@@ -390,15 +393,15 @@ function Baler:writeStream(streamId, connection)
 		streamWriteFloat32(streamId, self.fillLevelBunker);
 		streamWriteInt16(streamId, self.baleCounter);
 		streamWriteBool(streamId, self.autoOn);
-		streamWriteFloat32(streamId, self.baleAnimation:getAnimationTime());
+		streamWriteFloat32(streamId, self.animationManager:getAnimationTime("baleAnimation"));
 		
 		if self.hasStack then
 			streamWriteInt16(streamId, self.state_stacker);
 			streamWriteInt16(streamId, self.stackBalesTarget);
 			streamWriteInt16(streamId, self.animationState);
 			streamWriteInt16(streamId, getNumOfChildren(self.forkNode));
-			streamWriteFloat32(streamId, self.doStackAnimationStart:getAnimationTime());
-			streamWriteFloat32(streamId, self.doStackAnimationEnd:getAnimationTime());
+			streamWriteFloat32(streamId, self.animationManager:getAnimationTime("doStackAnimationStart"));
+			streamWriteFloat32(streamId, self.animationManager:getAnimationTime("doStackAnimationEnd"));
 		end;
 
 		streamWriteInt16(streamId, self.state_balerMove);
@@ -438,10 +441,11 @@ function Baler:loadFromXMLFile(xmlFile, key)
 	self:setFillLevelBunker(getXMLFloat(xmlFile, key..".baler#fillLevelBunker"), true, true);
 	self.baleCounter = getXMLFloat(xmlFile, key..".baler#counter");
 	self.autoOn = getXMLBool(xmlFile, key..".baler#autoOn");
-	self.baleAnimation:setAnimTime(getXMLFloat(xmlFile, key..".baler#animationTime"));
-	if self.baleAnimation:getAnimationTime() > 0 then	
+	
+	self.animationManager:setAnimationTime("baleAnimation", getXMLFloat(xmlFile, key..".baler#animationTime"));
+	if self.animationManager:getAnimationTime("baleAnimation") > 0 then	
 		self:setBaleObjectToAnimation(true);	
-		self.baleAnimation:setAnimationsState(true);
+		self.animationManager:setAnimationByState("baleAnimation", true);
 	end;
 
 	self.state_stacker = getXMLInt(xmlFile, key..".stacker#state");
@@ -460,15 +464,17 @@ function Baler:loadFromXMLFile(xmlFile, key)
 			break;
 		end;
 	end;
-
-	self.doStackAnimationEnd:setAnimTime(getXMLFloat(xmlFile, key..".stacker#doStackAnimationEndTime"));
-	if self.doStackAnimationEnd:getAnimationTime() > 0 and self.doStackAnimationEnd:getAnimationTime() < 1 then		
-		self.doStackAnimationEnd:setAnimationsState(true);
+	
+	self.animationManager:setAnimationTime("doStackAnimationEnd", getXMLFloat(xmlFile, key..".stacker#doStackAnimationEndTime"));
+	local time = self.animationManager:getAnimationTime("doStackAnimationEnd");
+	if time > 0  and time < 1 then		
+		self.animationManager:setAnimationByState("doStackAnimationEnd", true);
 	end;
-
-	self.doStackAnimationStart:setAnimTime(getXMLFloat(xmlFile, key..".stacker#doStackAnimationStartTime"));
-	if self.doStackAnimationStart:getAnimationTime() > 0 and self.doStackAnimationStart:getAnimationTime() < 1 then		
-		self.doStackAnimationStart:setAnimationsState(true);
+	
+	self.animationManager:setAnimationTime("doStackAnimationStart", getXMLFloat(xmlFile, key..".stacker#doStackAnimationStartTime"));
+	local time = self.animationManager:getAnimationTime("doStackAnimationStart");
+	if time > 0  and time < 1 then		
+		self.animationManager:setAnimationByState("doStackAnimationStart", true);
 	end;
 
 	self.state_balerMove = getXMLInt(xmlFile, key..".mover#state");
@@ -486,14 +492,14 @@ function Baler:saveToXMLFile(xmlFile, key, usedModNames)
 	setXMLInt(xmlFile, key .. ".baler#fillType", self.activeFillTypeIndex);
 	setXMLFloat(xmlFile, key .. ".baler#counter", self.baleCounter);
 	setXMLBool(xmlFile, key .. ".baler#autoOn", self.autoOn);
-	setXMLFloat(xmlFile, key .. ".baler#animationTime", self.baleAnimation:getAnimationTime());
+	setXMLFloat(xmlFile, key .. ".baler#animationTime", self.animationManager:getAnimationTime("baleAnimation"));
 
 	setXMLInt(xmlFile, key .. ".stacker#state", self.state_stacker);
 	setXMLInt(xmlFile, key .. ".stacker#stackBalesTarget", self.stackBalesTarget);
 	setXMLInt(xmlFile, key .. ".stacker#animationState", self.animationState);
 	setXMLInt(xmlFile, key .. ".stacker#forkNodeNums", getNumOfChildren(self.forkNode));	
-	setXMLFloat(xmlFile, key .. ".stacker#doStackAnimationStartTime", self.doStackAnimationStart:getAnimationTime());
-	setXMLFloat(xmlFile, key .. ".stacker#doStackAnimationEndTime", self.doStackAnimationEnd:getAnimationTime());
+	setXMLFloat(xmlFile, key .. ".stacker#doStackAnimationStartTime", self.animationManager:getAnimationTime("doStackAnimationStart"));
+	setXMLFloat(xmlFile, key .. ".stacker#doStackAnimationEndTime", self.animationManager:getAnimationTime("doStackAnimationEnd"));
 
 	setXMLInt(xmlFile, key .. ".mover#state", self.state_balerMove);
 
