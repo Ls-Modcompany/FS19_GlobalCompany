@@ -350,16 +350,10 @@ function Baler:readStream(streamId, connection)
 				end;
 			end;
 
-			self.animationManager:setAnimationTime("doStackAnimationEnd", streamReadFloat32(streamId));
-			local time = self.animationManager:getAnimationTime("doStackAnimationEnd");
+			self.animationManager:setAnimationTime("stackAnimation", streamReadFloat32(streamId));
+			local time = self.animationManager:getAnimationTime("stackAnimation");
 			if time > 0  and time < 1 then		
-				self.animationManager:setAnimationByState("doStackAnimationEnd", true);
-			end;
-			
-			self.animationManager:setAnimationTime("doStackAnimationStart", streamReadFloat32(streamId));
-			local time = self.animationManager:getAnimationTime("doStackAnimationStart");
-			if time > 0  and time < 1 then		
-				self.animationManager:setAnimationByState("doStackAnimationStart", true);
+				self.animationManager:setAnimationByState("stackAnimation", true);
 			end;
 		end;
 
@@ -387,8 +381,7 @@ function Baler:writeStream(streamId, connection)
 			streamWriteInt16(streamId, self.stackBalesTarget);
 			streamWriteInt16(streamId, self.animationState);
 			streamWriteInt16(streamId, getNumOfChildren(self.forkNode));
-			streamWriteFloat32(streamId, self.animationManager:getAnimationTime("doStackAnimationStart"));
-			streamWriteFloat32(streamId, self.animationManager:getAnimationTime("doStackAnimationEnd"));
+			streamWriteFloat32(streamId, self.animationManager:getAnimationTime("stackAnimation"));
 		end;
 
 		streamWriteInt16(streamId, self.state_balerMove);
@@ -452,16 +445,10 @@ function Baler:loadFromXMLFile(xmlFile, key)
 		end;
 	end;
 	
-	self.animationManager:setAnimationTime("doStackAnimationEnd", getXMLFloat(xmlFile, key..".stacker#doStackAnimationEndTime"));
-	local time = self.animationManager:getAnimationTime("doStackAnimationEnd");
+	self.animationManager:setAnimationTime("stackAnimation", getXMLFloat(xmlFile, key..".stacker#stackAnimation"));
+	local time = self.animationManager:getAnimationTime("stackAnimation");
 	if time > 0  and time < 1 then		
-		self.animationManager:setAnimationByState("doStackAnimationEnd", true);
-	end;
-	
-	self.animationManager:setAnimationTime("doStackAnimationStart", getXMLFloat(xmlFile, key..".stacker#doStackAnimationStartTime"));
-	local time = self.animationManager:getAnimationTime("doStackAnimationStart");
-	if time > 0  and time < 1 then		
-		self.animationManager:setAnimationByState("doStackAnimationStart", true);
+		self.animationManager:setAnimationByState("stackAnimation", true);
 	end;
 
 	self.state_balerMove = getXMLInt(xmlFile, key..".mover#state");
@@ -485,8 +472,7 @@ function Baler:saveToXMLFile(xmlFile, key, usedModNames)
 	setXMLInt(xmlFile, key .. ".stacker#stackBalesTarget", self.stackBalesTarget);
 	setXMLInt(xmlFile, key .. ".stacker#animationState", self.animationState);
 	setXMLInt(xmlFile, key .. ".stacker#forkNodeNums", getNumOfChildren(self.forkNode));	
-	setXMLFloat(xmlFile, key .. ".stacker#doStackAnimationStartTime", self.animationManager:getAnimationTime("doStackAnimationStart"));
-	setXMLFloat(xmlFile, key .. ".stacker#doStackAnimationEndTime", self.animationManager:getAnimationTime("doStackAnimationEnd"));
+	setXMLFloat(xmlFile, key .. ".stacker#stackAnimation", self.animationManager:getAnimationTime("stackAnimation"));
 
 	setXMLInt(xmlFile, key .. ".mover#state", self.state_balerMove);
 
@@ -528,10 +514,11 @@ function Baler:update(dt)
 		
 		if self.hasStack and self.state_stacker == Baler.STATE_ON then
 			if self.animationState == Baler.ANIMATION_CANSTACK then
-				if self.stackerBaleTrigger:getTriggerNotEmpty() and self.fillLevelBunker > 0 then		
+				if self.stackerBaleTrigger:getTriggerNotEmpty() and self.fillLevelBunker > 0 then	
 					if self.stackerBaleTrigger:getNum() < self.stackBalesTarget and self.state_balerMove == Baler.STATE_OFF then
 						self.animationState = Baler.ANIMATION_ISSTACKING;
-						self.animationManager:setAnimationByState("doStackAnimationStart", true)
+						self.raisedAnimationKeys = {};
+						self.animationManager:setAnimationByState("stackAnimation", true)
 					else
 						if self.state_balerMove == Baler.STATE_OFF and self.moverBaleTrigger:getTriggerEmpty() then
 							self:onTurnOnBaleMover();
@@ -558,32 +545,34 @@ function Baler:update(dt)
 					end;
 				end;
 			elseif self.animationState == Baler.ANIMATION_ISSTACKING then
-				if self.animationManager:getAnimationTime("doStackAnimationStart") == 1 then
+				if self.animationManager:getRealAnimationTimeSeconds("stackAnimation") >= 2 and self.raisedAnimationKeys["2"] == nil then
 					self.animationState = Baler.ANIMATION_CANSTACKEND;
-					self.raisedAnimationKeys = {};
+					self.animationManager:stopAnimation("stackAnimation")
 					self.stackerBaleTrigger:reset();
-				elseif self.animationManager:getAnimationTime("doStackAnimationStart") >= 0.6 and self.raisedAnimationKeys["0.6"] == nil then
+					self.raisedAnimationKeys["2"] = true;
+				elseif self.animationManager:getRealAnimationTimeSeconds("stackAnimation") >= 1 and self.raisedAnimationKeys["1"] == nil then
 					self:setBaleObjectToFork();
 					for _,bale in pairs(self.stackBales) do
 						bale:delete();
 					end;
 					self.stackBales = {};
-					self.raisedAnimationKeys["0.6"] = true;
+					self.raisedAnimationKeys["1"] = true;
 				end;
 			elseif self.animationState == Baler.ANIMATION_CANSTACKEND then
 				if self.stackerBaleTrigger:getTriggerNotEmpty() then
 					self.animationState = Baler.ANIMATION_ISSTACKINGEND;
-					self.animationManager:setAnimationByState("doStackAnimationEnd", true)
+					--self.animationManager:setRealAnimationTime("stackAnimation", 2.1 * 1000);
+					--self.animationManager:setAnimationByState("stackAnimation", true)
+					self.animationManager:playAnimation("stackAnimation", 1, 2000 / self.animationManager:getAnimationDuration("stackAnimation"))
 				end
 			elseif self.animationState == Baler.ANIMATION_ISSTACKINGEND then
-				if self.animationManager:getAnimationTime("doStackAnimationEnd") == 1 then
+				if self.animationManager:getRealAnimationTimeSeconds("stackAnimation") >= 4.59999 then
 					self.animationState = Baler.ANIMATION_CANSTACK;
-					self.raisedAnimationKeys = {};				
-					self.animationManager:setAnimationTime("doStackAnimationEnd", 0);	
-					self.animationManager:setAnimationTime("doStackAnimationStart", 0);	
-				elseif self.animationManager:getAnimationTime("doStackAnimationEnd") >= 0.3 and self.raisedAnimationKeys["0.3"] == nil then
+					--self.animationManager:stopAnimation("stackAnimation")
+					self.animationManager:setAnimationTime("stackAnimation", 0);	
+				elseif self.animationManager:getRealAnimationTimeSeconds("stackAnimation") >= 2.6 and self.raisedAnimationKeys["2.6"] == nil then
 					self:removeBaleObjectFromFork();
-					self.raisedAnimationKeys["0.3"] = true;
+					self.raisedAnimationKeys["2.6"] = true;
 				end;
 			end;
 		end;
@@ -709,7 +698,7 @@ function Baler:setBaleObjectToAnimationEvent(data, noEventSend)
 end;
 
 function Baler:removeBaleObjectFromFork(noEventSend)
-	self:setBaleObjectToForkEvent({}, noEventSend);   
+	self:removeBaleObjectFromForkEvent({}, noEventSend);   
 end;
 
 -- data is empty table
