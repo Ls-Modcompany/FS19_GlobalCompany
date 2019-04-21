@@ -68,6 +68,8 @@ function GC_Gui:loadFromXMLRec(xmlFile, key, actGui)
 			guiElement = GC_Gui_button:new(self.classGui);
 		elseif t == "table" then
 			guiElement = GC_Gui_table:new(self.classGui);
+		elseif t == "input" then
+			guiElement = GC_Gui_input:new(self.classGui);
 		else
 			guiElement = GC_Gui_element:new(self.classGui, nil, true);
 		end;

@@ -7,20 +7,29 @@
           <GuiElement type="text" template="gcMdHeaderText" id="gui_header" />   
         </GuiElement>
 
-        <GuiElement type="flowLayout" template="gcMdContentLayout">
+        <GuiElement type="flowLayout" template="gcMdContentLayout" id="mode_text">
           <GuiElement type="image" template="gcMdContentIcon" >    
             <GuiElement type="image" template="gcMdContentIconTyp" id="gui_icon" />  
           </GuiElement>  
-          <GuiElement type="text" template="gcMdContentText" id="gui_text" />   
+          <GuiElement type="text" template="gcMdContentText" id="gui_text_text" />   
+        </GuiElement>
+
+        <GuiElement type="flowLayout" template="gcMdContentLayoutInput" id="mode_input">
+          <GuiElement type="text" template="gcMdContentTextInput" id="gui_input_text" />   
+          <GuiElement type="input" template="gcMdContentInput" id="gui_input" />   
         </GuiElement>
         
         <GuiElement type="flowLayout" template="gcMdContentButtonsLayout" id="gui_buttons_ok">
-          <GuiElement type="button" template="gcMdContentButtonsButton" size="1000px 50px" text="$l10n_gui_buttons_ok" onClick="onClick"/>
+          <GuiElement type="button" template="gcMdContentButtonsButton" size="1000px 50px" text="$l10n_GC_gui_buttons_ok" onClick="onClick"/>
+        </GuiElement>
+        <GuiElement type="flowLayout" template="gcMdContentButtonsLayout" id="gui_buttons_okBack">
+          <GuiElement type="button" template="gcMdContentButtonsButton" size="500px 50px" text="$l10n_GC_gui_buttons_ok" onClick="onClick" parameter="1"/>
+          <GuiElement type="button" template="gcMdContentButtonsButton" size="500px 50px" text="$l10n_GC_gui_buttons_back" onClick="onClick"/>
         </GuiElement>
 
         <GuiElement type="flowLayout" template="gcMdContentButtonsLayout" id="gui_buttons_yesNoExit">
-          <GuiElement type="button" template="gcMdContentButtonsButton" size="500px 50px" text="$l10n_gui_buttons_yes" onClick="onClick" parameter="1"/>
-          <GuiElement type="button" template="gcMdContentButtonsButton" size="500px 50px" text="$l10n_gui_buttons_no" onClick="onClick" />
+          <GuiElement type="button" template="gcMdContentButtonsButton" size="500px 50px" text="$l10n_GC_gui_buttons_yes" onClick="onClick" parameter="1"/>
+          <GuiElement type="button" template="gcMdContentButtonsButton" size="500px 50px" text="$l10n_GC_gui_buttons_no" onClick="onClick" />
         </GuiElement>
       </GuiElement>
     </GuiElement>

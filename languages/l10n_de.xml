@@ -17,6 +17,7 @@
 		<e k="GC_gui_buttons_ok" v="OK"/>
 		<e k="GC_gui_buttons_yes" v="Ja"/>
 		<e k="GC_gui_buttons_no" v="Nein"/>
+		<e k="GC_gui_buttons_back" v="Zurück"/>
 		<e k="GC_gui_modHubLink" v="ModHub Download Link"/>
 		<e k="GC_gui_buttons_nextWarning" v="Next Warning"/>
 		<e k="GC_gui_buttons_nextConflict" v="Next Conflict"/>
@@ -33,7 +34,6 @@
 		<e k="GC_settings5_title" v="Ballen aufschneiden aktivieren"/>
 		
 		<!-- Factory -->
-		<e k="GC_gui_buttons_back" v="Zurück"/>
 		<e k="GC_gui_overview" v="Übersicht"/>
 		<e k="GC_gui_productLines" v="Produktlinien"/>
 		<e k="GC_gui_description" v="Beschreibung"/>

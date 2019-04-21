@@ -44,8 +44,10 @@ GlobalCompanyGui.template.uiElements = {};
 
 GlobalCompanyGui.MULTIDIALOG_MODE_OK = 0;
 GlobalCompanyGui.MULTIDIALOG_MODE_YES_NO = 1;
-GlobalCompanyGui.MULTIDIALOG_SIGN_EXCLAMATION = 0;
-GlobalCompanyGui.MULTIDIALOG_SIGN_QUESTION = 1;
+GlobalCompanyGui.MULTIDIALOG_MODE_INPUT = 2;
+GlobalCompanyGui.MULTIDIALOG_SIGN_Non = 0;
+GlobalCompanyGui.MULTIDIALOG_SIGN_EXCLAMATION = 1;
+GlobalCompanyGui.MULTIDIALOG_SIGN_QUESTION = 2;
 
 source(g_currentModDirectory .. "gui/elements/Gui.lua");
 source(g_currentModDirectory .. "gui/elements/GuiElement.lua");
@@ -56,6 +58,7 @@ source(g_currentModDirectory .. "gui/elements/Button.lua");
 source(g_currentModDirectory .. "gui/elements/Borders.lua");
 source(g_currentModDirectory .. "gui/elements/Table.lua");
 source(g_currentModDirectory .. "gui/elements/Slider.lua");
+source(g_currentModDirectory .. "gui/elements/Input.lua");
 
 source(g_currentModDirectory .. "gui/FakeGui.lua");
 source(g_currentModDirectory .. "gui/MultiDialog.lua");
@@ -121,6 +124,14 @@ function GlobalCompanyGui:update(dt)
 			end;
 			if self.activeGui ~= nil then
 				self.guis[self.activeGui].gui:openGui();
+			end;
+			for name, open in pairs(self.smallGuis) do
+				if open then
+					self.guis[name].gui:openGui();
+				end;
+			end; 
+			if self.activeGuiDialog ~= nil then
+				self.guis[self.activeGuiDialog].gui:openGui();
 			end;
 			self.DevelopementVersionTimer = 70;
 		else

@@ -42,7 +42,45 @@ function GC_Gui_MultiDialog:onCreate()
 end;
 
 function GC_Gui_MultiDialog:onOpen()
+    if self.mode == nil then
+        self.mode = g_company.gui.MODE_OK;
+    end;
+
+    if self.sign == nil then
+        self.sign = g_company.gui.SIGN_NONE;
+    end;
+
+    self.gui_header:setText(self.header);
     
+    self.gui_buttons_ok:setVisible(false);
+    self.gui_buttons_okBack:setVisible(false);
+    self.gui_buttons_yesNoExit:setVisible(false);
+
+    if self.mode == g_company.gui.MULTIDIALOG_MODE_INPUT then
+        self.mode_text:setVisible(false);
+        self.gui_input:setVisible(true);
+        self.gui_input_text:setText(self.text);
+    else
+        self.mode_text:setVisible(true);
+        self.mode_input:setVisible(false);
+        self.gui_text_text:setText(self.text);
+    end;
+
+    if self.mode == g_company.gui.MULTIDIALOG_MODE_OK then
+        self.gui_buttons_ok:setVisible(true);
+    elseif self.mode == g_company.gui.MULTIDIALOG_MODE_YES_NO then
+        self.gui_buttons_yesNoExit:setVisible(true);
+    elseif self.mode == g_company.gui.MULTIDIALOG_MODE_INPUT then
+        self.gui_buttons_okBack:setVisible(true);
+    end;
+    
+    if self.sign == g_company.gui.MULTIDIALOG_SIGN_NONE then
+        self.gui_icon:setVisible(false);
+    elseif self.sign == g_company.gui.MULTIDIALOG_SIGN_EXCLAMATION then
+        self.gui_icon:setImageUv("icon_info");
+    elseif self.sign == g_company.gui.MULTIDIALOG_SIGN_QUESTION then
+        self.gui_icon:setImageUv("icon_question");
+    end;
 end
 
 function GC_Gui_MultiDialog:update(dt)
@@ -53,38 +91,22 @@ function GC_Gui_MultiDialog:onClose(element)
 
 end
 
-function GC_Gui_MultiDialog:setData(target, header, text, mode, sign)
+function GC_Gui_MultiDialog:setData(target, header, text, reference, mode, sign)
     self.target = target;
-
-    if mode == nil then
-        mode = g_company.gui.MODE_OK;
-    end;
-
-    if sign == nil then
-        sign = g_company.gui.SIGN_EXCLAMATION;
-    end;
-
-    if mode == g_company.gui.MULTIDIALOG_MODE_OK then
-        self.gui_buttons_ok:setVisible(true);
-        self.gui_buttons_yesNoExit:setVisible(false);
-    elseif mode == g_company.gui.MULTIDIALOG_MODE_YES_NO then
-        self.gui_buttons_ok:setVisible(false);
-        self.gui_buttons_yesNoExit:setVisible(true);
-    end;
-    
-    if sign == g_company.gui.MULTIDIALOG_SIGN_EXCLAMATION then
-        self.gui_icon:setImageUv("icon_info");
-    elseif sign == g_company.gui.MULTIDIALOG_SIGN_QUESTION then
-        self.gui_icon:setImageUv("icon_question");
-    end;
-
-    self.gui_header:setText(header);
-    self.gui_text:setText(text);
+    self.header = header;
+    self.text = text;
+    self.reference = reference;
+    self.mode = mode;
+    self.sign = sign;
 end
 
 function GC_Gui_MultiDialog:onClick(element, parameter)
     if self.target ~= nil and self.target.multiDialogOnClick ~= nil then
-        self.target.multiDialogOnClick(self.target, parameter == "1");
+        if self.mode == g_company.gui.MULTIDIALOG_MODE_INPUT then
+            self.target.multiDialogOnClick(self.target, parameter == "1", self.reference, self.gui_input.textElement.text);
+        else
+            self.target.multiDialogOnClick(self.target, parameter == "1", self.reference);
+        end;
     end;
     g_company.gui:closeActiveDialog();
 end;
