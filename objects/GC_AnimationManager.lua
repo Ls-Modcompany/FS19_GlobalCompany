@@ -421,10 +421,28 @@ function GC_AnimationManager:getIsAnimationPlaying(name)
 	return self.activeAnimations[name] ~= nil;
 end;
 
+function GC_AnimationManager:getAnimationDuration(name)
+	local animation = self.animations[name];
+	if animation ~= nil then
+		return animation.duration;
+	end;
+
+	return 0;
+end;
+
 function GC_AnimationManager:getRealAnimationTime(name)
 	local animation = self.animations[name];
 	if animation ~= nil then
 		return animation.currentTime;
+	end;
+
+	return 0;
+end;
+
+function GC_AnimationManager:getRealAnimationTimeSeconds(name)
+	local animation = self.animations[name];
+	if animation ~= nil then
+		return animation.currentTime / 1000;
 	end;
 
 	return 0;
