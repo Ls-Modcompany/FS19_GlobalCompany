@@ -26,103 +26,145 @@
 --
 --
 
+GC_Checker = {}
 
-GC_Checker = {};
-GC_Checker.modName = g_currentModName;
+function GC_Checker:init()
+	if g_globalCompanyChecker == nil then
+		GC_Checker.modsToCheck = {}
+		GC_Checker.errorsToShow = {}		
+		GC_Checker.startUpdateTime = 2000
+		
+		addModEventListener(GC_Checker)
+		
+		getfenv(0)["g_globalCompanyChecker"] = GC_Checker
+	end
+	
+	g_globalCompanyChecker:addModToList(g_currentModName)
+end
 
-addModEventListener(GC_Checker);
+function GC_Checker:addModToList(modName)
+	if g_globalCompanyChecker.modsToCheck[modName] == nil then
+		g_globalCompanyChecker.modsToCheck[modName] = GC_Checker.getWarningText(g_languageShort)
+	end
+end
 
 function GC_Checker:loadMap(i3dFilePath)
-	self.showWarning = false;
-	self.startUpdateTime = 2000;
-	self.hasModEventListener = true;
-
-	if g_company ~= nil then
-		self:delete();
-	else
-		local mod = g_modManager:getModByName(GC_Checker.modName);
-		local xmlFile = loadXMLFile("TempModDesc", mod.modFile);
-		local versionString = getXMLString(xmlFile, "modDesc.globalCompany#minimumVersion");
-		if versionString ~= nil then
-			self.modData = mod;
-			self.showWarning = true;
-			self.versionString = versionString;
-			self.okButtonText = g_i18n:getText("button_ok");
-			self.downloadButtonText = g_i18n:getText("button_modHubDownload");
-			self.warningText = self:getWarningText(g_languageShort);
-		else
-			g_logManager:error("Required version number was not given at 'modDesc.globalCompany#minimumVersion' in modDesc ( %s )!", mod.modFile);
-			self:delete();
-		end;
-
-		delete(xmlFile);
-	end;
-end;
+	if g_company == nil then	
+		for modName, warningText in pairs (g_globalCompanyChecker.modsToCheck) do
+			local mod = g_modManager:getModByName(modName)
+			local xmlFile = loadXMLFile("TempModDesc", mod.modFile)
+			if xmlFile ~= nil and xmlFile ~= 0 then
+				local versionString = getXMLString(xmlFile, "modDesc.globalCompany#minimumVersion")
+				if versionString ~= nil then					
+					local data = {}
+					data.modData = mod
+					data.showWarning = true
+					data.versionString = versionString
+					data.okButtonText = g_i18n:getText("button_ok")
+					data.downloadButtonText = g_i18n:getText("button_modHubDownload")
+					data.warningText = warningText
+					
+					table.insert(g_globalCompanyChecker.errorsToShow, data)
+				else
+					g_logManager:error("Required version number was not given at 'modDesc.globalCompany#minimumVersion' in modDesc ( %s )!", mod.modFile)
+				end
+			
+				delete(xmlFile)
+			end
+		end
+	else	
+		self:delete()
+	end
+end
 
 function GC_Checker:delete()
-	if self.hasModEventListener then
-		self.hasModEventListener = false;
-		removeModEventListener(self);
+	if g_globalCompanyChecker ~= nil then	
+		removeModEventListener(g_globalCompanyChecker)
+		g_globalCompanyChecker = nil
 	end;
-end;
+end
 
 function GC_Checker:update(dt)
-	if self.startUpdateTime > 0 then
-		self.startUpdateTime = self.startUpdateTime - dt;
-	else
-		if self.showWarning and not g_gui:getIsGuiVisible() then
-			self.showWarning = false;
-			self:showModWarningGUI();
-		end;
-	end;
-end;
+	if g_globalCompanyChecker ~= nil then
+		if g_globalCompanyChecker.startUpdateTime > 0 then		
+			g_globalCompanyChecker.startUpdateTime = g_globalCompanyChecker.startUpdateTime - dt
+		else
+			for i = 1, #g_globalCompanyChecker.errorsToShow do
+				local mod = g_globalCompanyChecker.errorsToShow[i]					
+				if mod ~= nil and not g_gui:getIsGuiVisible() then
+					if mod.showWarning then	
+						mod.showWarning = false
+						g_globalCompanyChecker:showModWarningGUI(mod)
+					else
+						g_globalCompanyChecker.errorsToShow[i] = nil
+					end
+				end
+			end
+			
+			if next(g_globalCompanyChecker.errorsToShow) == nil then
+				g_globalCompanyChecker:delete()
+			end
+		end
+	end
+end
 
-function GC_Checker:showModWarningGUI()
-	local title = string.format("%s - %s", self.modData.title, self.modData.version);
+function GC_Checker:showModWarningGUI(mod)
+	local title = string.format("%s - %s", mod.modData.title, mod.modData.version)
 
-	local url = " www.ls-modcompany.com ";
+	local url = " www.ls-modcompany.com "
 	if g_languageShort == "de" then
-		url = " www.ls-modcompany.de ";
-	end;
+		url = " www.ls-modcompany.de "
+	end
 
-	local text = string.format(self.warningText, self.versionString, url);
+	local text = string.format(mod.warningText, mod.versionString, url)
 
-	g_gui:showYesNoDialog({title = title,
-						   text = text,
-						   dialogType = DialogElement.TYPE_WARNING,
-						   callback = self.openModHubLink,
-						   target = self,
-						   yesText = self.okButtonText,
-						   noText = self.downloadButtonText});
-end;
+	g_gui:showYesNoDialog({
+		title = title,
+		text = text,
+		dialogType = DialogElement.TYPE_WARNING,
+		callback = g_globalCompanyChecker.openModHubLink,
+		target = g_globalCompanyChecker,
+		yesText = mod.okButtonText,
+		noText = mod.downloadButtonText
+	})
+end
 
 function GC_Checker:openModHubLink(isYes)
 	if isYes == false then
-		local language = g_languageShort;
-		local link = "mods.php?lang=en&title=fs2019&filter=org&org_id=65115&page=0#";
+		local language = g_languageShort
+		local link = "mods.php?lang=en&title=fs2019&filter=org&org_id=65115&page=0#"
 		if language == "de" or language == "fr" then
-			link = "mods.php?lang=" .. language .. "&title=fs2019&filter=org&org_id=65115&page=0#";
-		end;
+			link = "mods.php?lang=" .. language .. "&title=fs2019&filter=org&org_id=65115&page=0#"
+		end
 
-		openWebFile(link, "");
+		openWebFile(link, "")
 	else
-		g_gui:showGui("");
-	end;
+		g_gui:showGui("")
+	end
+end
 
-	self:delete();
-end;
-
-function GC_Checker:getWarningText(language)
-	local warnings = {["en"] = "Global Company Version %s or greater is required for this mod / map to operate. Please visit modHub download link for the latest official version or visit '%s' for Global Company support.",
-					  ["de"] = "Für die Verwendung dieses Mods / dieser Map ist Global Company Version %s oder höher erforderlich. Bitte im ModHub die aktuelle offizielle Version downloaden, oder besuche '%s' für den Global Company Support."};
+-- Do not add or change texts here. Each mod loads its own text in other languages if needed from the 'l10n' entries.
+-- Any changes here will / can  break other 'Global Company' mods when loading!!!!!
+function GC_Checker.getWarningText(language)
+	local warnings = {
+		["en"] = "Global Company Version %s or greater is required for this mod / map to operate. Please visit modHub download link for the latest official version or visit '%s' for Global Company support.",
+		["de"] = "Für die Verwendung dieses Mods / dieser Map ist Global Company Version %s oder höher erforderlich. Bitte im ModHub die aktuelle offizielle Version downloaden, oder besuche '%s' für den Global Company Support."
+	}
 
 	if warnings[language] ~= nil then
-		return warnings[language];
+		return warnings[language]
 	else
 		if g_i18n:hasText("GC_globalCompanyMissing") then
-			return g_i18n:getText("GC_globalCompanyMissing");
+			return g_i18n:getText("GC_globalCompanyMissing")
 		else
-			return warnings["en"];
-		end;
-	end;
-end;
+			return warnings["en"]
+		end
+	end
+end
+
+GC_Checker:init()
+
+
+
+
+
