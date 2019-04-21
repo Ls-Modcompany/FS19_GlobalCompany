@@ -785,7 +785,7 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 				x = element.parent.drawPosition[1] + element.parent.size[1] - element.margin[3] - element.size[1] + element.position[1];
 			end;
 		end;
-	elseif element.parent.name == "table" then
+	elseif element.parent.name == "table" and element.name ~= "slider" then
 		if element.parent.orientation == GC_Gui_table.ORIENTATION_X then				
 			local xRow = math.floor((index - 1) / element.parent.maxItemsY);
 			local yRow = (index - 1) % element.parent.maxItemsY;

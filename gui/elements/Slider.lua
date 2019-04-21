@@ -14,12 +14,6 @@ GC_Gui_slider = {};
 local GC_Gui_slider_mt = Class(GC_Gui_slider, GC_Gui_element);
 getfenv(0)["GC_Gui_slider"] = GC_Gui_slider;
 
-GC_Gui_slider.ORIENTATION_X = 1;
-GC_Gui_slider.ORIENTATION_Y = 2;
-
-GC_Gui_slider.TYP_TABLE = 1;
-GC_Gui_slider.TYP_LIST = 2;
-
 function GC_Gui_slider:new(gui, custom_mt)
     if custom_mt == nil then
         custom_mt = GC_Gui_slider_mt;
@@ -27,25 +21,24 @@ function GC_Gui_slider:new(gui, custom_mt)
 	
 	local self = GC_Gui_element:new(gui, custom_mt);
 	self.name = "slider";
-	
-    
-    
-	
+
+	self.minHeight = GuiUtils.getNormalizedValues("20px", self.outputSize);	
 	return self;
 end;
 
 function GC_Gui_slider:loadTemplate(templateName, xmlFile, key, overlayName)
 	GC_Gui_slider:superClass().loadTemplate(self, templateName, xmlFile, key);	
-    
-    
+	
+	self.buttonElement = GC_Gui_button:new(self.gui);
+	self.buttonElement:loadTemplate(templateName, xmlFile, key);
+
+	self:addElement(self.buttonElement);
+	
 	self:loadOnCreate();
 end;
 
 function GC_Gui_slider:copy(src)
 	GC_Gui_slider:superClass().copy(self, src);
-	
-
-    
 	self:copyOnCreate();
 end;
 
@@ -57,9 +50,6 @@ end;
 function GC_Gui_slider:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)	
 	if not self:getDisabled() then
 		eventUsed = GC_Gui_slider:superClass().mouseEvent(self, posX, posY, isDown, isUp, button, eventUsed)
-	
-        
-        
 	end;
 	return eventUsed;
 end;
@@ -77,12 +67,27 @@ function GC_Gui_slider:draw(index)
 	GC_Gui_slider:superClass().draw(self,index);
 end;
 
+function GC_Gui_slider:setController(table)
+	self.controller = table;
+	self:updateItems();
+end;
 
+function GC_Gui_slider:setPosition(pos)	
+	self.buttonElement.sliderPosition[2] = self.stepsize * pos;
+end;
 
+function GC_Gui_slider:moveSlider(x, y)
+	self.buttonElement.sliderPosition[2] = math.min(math.max(self.buttonElement.sliderPosition[2] + y, 0), self.size[2] - self.buttonElement.size[2]);	
+	self.controller:setPosition(math.floor(self.buttonElement.sliderPosition[2] / self.stepsize));
+end;
 
-
-
-
-
-
-
+function GC_Gui_slider:updateItems()
+	if self.controller ~= nil then
+		self.stepsize = self.size[2] / ( 1 + (#self.controller.items - (self.controller.maxItemsX * self.controller.maxItemsY)));
+		local size = math.max(self.stepsize, self.minHeight[1]);
+		self.buttonElement.size[2] = size;
+		if self.buttonElement.overlayElement ~= nil then
+			self.buttonElement.overlayElement.size[2] = size;
+		end;
+	end;
+end;

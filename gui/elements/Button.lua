@@ -38,7 +38,9 @@ function GC_Gui_button:new(gui, custom_mt)
 	self.clickSound = nil;
 	
     self.doubleClickInterval = 1000;
-    self.doubleClickTime = 0;
+	self.doubleClickTime = 0;
+	
+	self.sliderPosition = {0,0};
 	
 	return self;
 end;
@@ -154,7 +156,8 @@ function GC_Gui_button:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
 		if not eventUsed then
 			if g_company.gui:checkClickZone(posX, posY, clickZone, self.isRoundButton) then
 				if not self.mouseEntered then
-					self.mouseEntered = true;
+					self.mouseEntered = true;					
+					self.backupPos = {posX, posY};
 					self:setSelected(true, self.parent.name == "table");
 					if self.callback_onEnter ~= nil then
 						self.gui[self.callback_onEnter](self.gui, self, self.parameter);
@@ -203,7 +206,16 @@ function GC_Gui_button:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
 						self.gui[self.callback_onLeave](self.gui, self, self.parameter);
 					end;
 				end;
-			
+			end;
+			if self.mouseDown and self.parent.name == "slider" then
+				if isUp and button == Input.MOUSE_BUTTON_LEFT and self.mouseDown then
+					self.mouseDown = false;
+					self:setSelected(false);
+				else
+					self:setSelected(true);
+					self.parent:moveSlider(self.backupPos[1] - posX, self.backupPos[2] - posY);	
+					self.backupPos = {posX, posY};
+				end;
 			end;
 		end;		
 	end;	
@@ -223,6 +235,9 @@ end;
 
 function GC_Gui_button:draw(index)
 	self.drawPosition[1], self.drawPosition[2] = g_company.gui:calcDrawPos(self, index);	
+	
+	self.drawPosition[1] = self.drawPosition[1] + self.sliderPosition[1];
+	self.drawPosition[2] = self.drawPosition[2] - self.sliderPosition[2];
 	
 	
 	if self.debugEnabled then

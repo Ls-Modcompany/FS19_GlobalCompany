@@ -56,7 +56,7 @@ function GC_Gui_table:loadTemplate(templateName, xmlFile, key, overlayName)
 	self.maxItemsX = g_company.gui:getTemplateValueNumber(templateName, "maxItemsX", self.maxItemsX);
 	self.maxItemsY = g_company.gui:getTemplateValueNumber(templateName, "maxItemsY", self.maxItemsY);
 
-	self.hasSlider = g_company.gui:getTemplateValueBool(templateName, "hasBorders", false);	
+	self.hasSlider = g_company.gui:getTemplateValueBool(templateName, "hasSlider", false);	
 	
 	local orientation = g_company.gui:getTemplateValue(templateName, "orientation");	
 
@@ -73,11 +73,13 @@ function GC_Gui_table:loadTemplate(templateName, xmlFile, key, overlayName)
 
 	if self.hasSlider then
 		self.slider = GC_Gui_slider:new();
-		self.slider:loadTemplate(templateName, xmlFile, key);
-		self:addElement(self.slider);
+		self.slider:loadTemplate(string.format( "%sSlider",templateName), xmlFile, key);
+		self.slider.parent = self;
+		--self:addElement(self.slider);
 		if self.id ~= nil then
 			self.gui[string.format("%s_slider",self.id)] = self.slider;
 		end;
+		self.slider:setController(self);
 	end;
 
 	self:loadOnCreate();
@@ -113,11 +115,21 @@ function GC_Gui_table:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
 				if Input.isMouseButtonPressed(Input.MOUSE_BUTTON_WHEEL_UP) then
 					eventUsed = true;
 					self:scrollTable(-1);
+					if self.hasSlider then
+						self.slider:setPosition(self.scrollCount);
+					end;
 				elseif Input.isMouseButtonPressed(Input.MOUSE_BUTTON_WHEEL_DOWN) then
 					eventUsed = true;
 					self:scrollTable(1);
+					if self.hasSlider then
+						self.slider:setPosition(self.scrollCount);
+					end;
 				end;
 			end;		
+		end;
+
+		if not eventUsed and self.slider ~= nil then
+			self.slider:mouseEvent(posX, posY, isDown, isUp, button, eventUsed);
 		end;
 	end;
 	return eventUsed;
@@ -125,14 +137,23 @@ end;
 
 function GC_Gui_table:keyEvent(unicode, sym, modifier, isDown, eventUsed)
 	GC_Gui_table:superClass().keyEvent(self, unicode, sym, modifier, isDown, eventUsed);
+	if self.slider ~= nil then
+		self.slider:keyEvent(unicode, sym, modifier, isDown, eventUsed);
+	end;
 end;
 
 function GC_Gui_table:update(dt)
 	GC_Gui_table:superClass().update(self, dt);
+	if self.slider ~= nil then
+		self.slider:update(dt);
+	end;
 end;
 
 function GC_Gui_table:draw(index)
 	self.drawPosition[1], self.drawPosition[2] = g_company.gui:calcDrawPos(self, index);
+	if self.slider ~= nil then
+		self.slider:draw(index);
+	end;
 	GC_Gui_table:superClass().draw(self,index);
 end;
 
@@ -180,6 +201,16 @@ function GC_Gui_table:updateVisibleItems()
 			break;
 		end;
 	end;
+	if self.hasSlider then
+		self.slider:updateItems()
+	end;
+end;
+
+function GC_Gui_table:setPosition(pos)
+	if self.scrollCount ~= pos then
+		self.scrollCount = pos;
+		self:scrollItems();
+	end;
 end;
 
 function GC_Gui_table:scrollTable(num)
@@ -188,22 +219,26 @@ function GC_Gui_table:scrollTable(num)
 	else
 		self.scrollCount = self.scrollCount + num;	
 		
-		local m,s,e;
-		if self.orientation == GC_Gui_table.ORIENTATION_X then
-			m = self.maxItemsY;
-		elseif self.orientation == GC_Gui_table.ORIENTATION_Y then
-			m = self.maxItemsX;
-		end;			
-		self:updateVisibleItems(); --#Pfusch am Mod
-		if self.maxItemsY*self.maxItemsX - table.getn(self.elements) >= m then
-			self.scrollCount = self.scrollCount - 1;
-		end;
-		
-		if self.scrollCount < 0 then
-			self.scrollCount = 0;
-		end;
+		self:scrollItems();
 	end;
 	self:updateVisibleItems();
+end;
+
+function GC_Gui_table:scrollItems()
+	local m,s,e;
+	if self.orientation == GC_Gui_table.ORIENTATION_X then
+		m = self.maxItemsY;
+	elseif self.orientation == GC_Gui_table.ORIENTATION_Y then
+		m = self.maxItemsX;
+	end;			
+	self:updateVisibleItems(); --#Pfusch am Mod
+	if self.maxItemsY*self.maxItemsX - table.getn(self.elements) >= m then
+		self.scrollCount = self.scrollCount - 1;
+	end;
+	
+	if self.scrollCount < 0 then
+		self.scrollCount = 0;
+	end;
 end;
 
 function GC_Gui_table:setActive(state, e)
