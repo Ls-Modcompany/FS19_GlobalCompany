@@ -340,7 +340,7 @@ function GC_AnimationManager:playAnimation(name, speed, animTime, noEventSend)
 			end;
 		end;
 
-		if true or noEventSend == nil or noEventSend == false then
+		if noEventSend == nil or noEventSend == false then
 			local animationId = self.animationNameToId[name];
 			if g_server ~= nil then
 				g_server:broadcastEvent(GC_AnimationManagerStartEvent:new(self, animationId, speed, animTime), nil, nil, self);
