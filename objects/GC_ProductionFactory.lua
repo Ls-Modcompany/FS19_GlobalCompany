@@ -760,7 +760,8 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			local playerTriggerKey = string.format("%s.playerTrigger", productLineKey);
 			if hasXMLProperty(xmlFile, playerTriggerKey) then
 				local nextId = #self.productLines + 1;
-				local playerTrigger = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.rootNode, xmlFile, playerTriggerKey, nextId, true);
+				local activateText = g_company.languageManager:getText("GC_Open_Product_Menu");
+				local playerTrigger = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.rootNode, xmlFile, playerTriggerKey, nextId, true, activateText);
 				if playerTrigger ~=  nil then
 					productLine.playerTrigger = playerTrigger;
 					self.drawProductLineUI[nextId] = Utils.getNoNil(getXMLBool(xmlFile, playerTriggerKey .. "#drawUI"), true);
@@ -790,7 +791,8 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 
 		local playerTriggerKey = string.format("%s.playerTrigger", xmlKey);
 		if hasXMLProperty(xmlFile, playerTriggerKey) then
-			local playerTrigger = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.rootNode, xmlFile, playerTriggerKey, nil, true);
+			local activateText = g_company.languageManager:getText("GC_Open_Overview_Menu");
+			local playerTrigger = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.rootNode, xmlFile, playerTriggerKey, nil, true, activateText);
 			if playerTrigger ~= nil then
 				self.playerTrigger = playerTrigger;
 			end;
@@ -1430,7 +1432,8 @@ function GC_ProductionFactory:minuteChanged()
 											local dropped = output.dynamicHeap:updateDynamicHeap(amount, false);
 											newFillLevel = output.dynamicHeap:getHeapLevel();
 										elseif output.palletCreator ~= nil then
-											newFillLevel, added = output.palletCreator:updatePalletCreators(amount, true);
+											local fillLevel, added = output.palletCreator:updatePalletCreators(amount, true);
+											newFillLevel = fillLevel;
 											stopProductLine = not added;
 										end;
 

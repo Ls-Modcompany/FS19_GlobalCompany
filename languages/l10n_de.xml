@@ -30,6 +30,7 @@
 		<e k="GC_settings2_title" v="Objektinformation anzeigen"/>
 		<e k="GC_settings3_title" v="Pferdehelfer anstellen (300€ / Pferd / Tag)"/>
 		<e k="GC_settings4_title" v="Mehr Bäume aktivieren"/>
+		<e k="GC_settings5_title" v="Ballen aufschneiden aktivieren"/>
 		
 		<!-- Factory -->
 		<e k="GC_gui_buttons_back" v="Zurück"/>
@@ -51,14 +52,16 @@
 		<e k="GC_gui_pallet1" v="%s Palette"/>
 		<e k="GC_gui_pallet2" v="%s Paletten"/>
 		<e k="GC_gui_spawnText1" v="%s Palette erzeugen"/>
-		<e k="GC_gui_spawnText2" v="%s Paletten erzeugen"/>
-		
+		<e k="GC_gui_spawnText2" v="%s Paletten erzeugen"/>		
 		
 		<e k="GC_Productline_Title_Backup" v="Produktlinie %d"/>
 		<e k="GC_Input_Title_Backup" v="Rohstoff %d"/>
 		<e k="GC_Output_Title_Backup" v="Produkt %d"/>
 		<e k="GC_Input_Header_Backup" v="Rohstoffe"/>
 		<e k="GC_Output_Header_Backup" v="Produkte"/>
+		
+		<e k="GC_Open_Product_Menu" v="Open product menu"/>
+		<e k="GC_Open_Overview_Menu" v="Open overview menu"/>
 
 		<!-- BaleShreader -->
 		<e k="GC_baleShreader_openSteer" v="Steuerung öffnen"/>

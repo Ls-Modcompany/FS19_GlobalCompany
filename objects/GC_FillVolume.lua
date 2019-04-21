@@ -135,7 +135,7 @@ function GC_FillVolume:load(nodeId, target, xmlFile, xmlKey, capacity, forceCapa
 end;
 
 function GC_FillVolume:delete()
-	if self.isClient then
+	if self.isClient and self.fillVolumes ~= nil then
 		for _, volume in pairs(self.fillVolumes) do
 			if volume.volume ~= nil then
 				delete(volume.volume);

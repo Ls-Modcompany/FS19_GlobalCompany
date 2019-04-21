@@ -26,7 +26,6 @@
 --
 --
 -- ToDo:
---		- Look to add 'delete' support and 'autoload' support.
 --
 --
 
@@ -53,7 +52,6 @@ function GC_PalletCreator:new(isServer, isClient, customMt)
 	self.locatedNodeId = nil;
 	self.selectedPallet = nil;
 	self.numberOfSpawners = 0;
-	self.levelCheckTimerId = 0;
 
 	return self;
 end;
@@ -77,6 +75,11 @@ function GC_PalletCreator:load(nodeId, target, xmlFile, xmlKey, baseDirectory, p
 		return false;
 	end;
 
+	if self.target.palletCreatorInteraction == nil then
+		g_company.debug:writeModding(self.debugData, "Parent script does not contain function 'palletCreatorInteraction(totalLevel, blockedLevel, deltaWaiting, fillTypeIndex, extraParamater)'.");
+		return false;
+	end;
+
 	local returnValue = false;
 	local palletCreatorsKey = string.format("%s.palletCreators", xmlKey);
 
@@ -91,92 +94,93 @@ function GC_PalletCreator:load(nodeId, target, xmlFile, xmlKey, baseDirectory, p
 			local filename = Utils.getNoNil(getXMLString(xmlFile, palletCreatorsKey .. "#xmlFilename"), "");
 			self.palletFilename = Utils.getFilename(filename, self.baseDirectory);
 			if self.palletFilename ~= nil and self.palletFilename ~= "" then
-				self.palletFillTypeIndex = fillTypeIndex;
-				self.palletFillUnitIndex = Utils.getNoNil(getXMLFloat(xmlFile, palletCreatorsKey .. "#fillUnitIndex"), 1);
+				local storeItem = g_storeManager:getItemByXMLFilename(self.palletFilename)
+				if storeItem ~= nil then
+					self.palletFillTypeIndex = fillTypeIndex;
+					self.palletFillUnitIndex = Utils.getNoNil(getXMLFloat(xmlFile, palletCreatorsKey .. "#fillUnitIndex"), 1);
 
-				local palletCapacity = getXMLFloat(xmlFile, palletCreatorsKey .. "#palletCapacity");
-				self.palletCapacity = math.max(Utils.getNoNil(palletCapacity, 0), 0);
+					local palletCapacity = getXMLFloat(xmlFile, palletCreatorsKey .. "#palletCapacity");
+					self.palletCapacity = math.max(Utils.getNoNil(palletCapacity, 0), 0);
 
-				if self.palletCapacity > 0 then
-					local sizeWidth, sizeLength, widthOffset, lengthOffset = StoreItemUtil.getSizeValues(self.palletFilename, "vehicle", 0, {});
-					if sizeWidth ~= nil and sizeLength ~= nil then
-						self.palletSizeWidth = sizeWidth;
-						self.palletSizeLength = sizeLength;
-						self.palletSizeWidthExtent = sizeWidth * 0.5;
-						self.palletSizeLengthExtent = sizeLength * 0.5;
+					if self.palletCapacity > 0 then
+						local sizeWidth, sizeLength, widthOffset, lengthOffset = StoreItemUtil.getSizeValues(self.palletFilename, "vehicle", 0, {});
+						if sizeWidth ~= nil and sizeLength ~= nil then
+							self.palletSizeWidth = sizeWidth;
+							self.palletSizeLength = sizeLength;
+							self.palletSizeWidthExtent = sizeWidth * 0.5;
+							self.palletSizeLengthExtent = sizeLength * 0.5;
 
-						local startFill = Utils.getNoNil(getXMLFloat(xmlFile, palletCreatorsKey .. "#startFillThreshold"), 0.75);
-						self.startFillThreshold = math.max(startFill, 0.75); -- Minimum we will accept is 0.75 litres.
+							local startFill = Utils.getNoNil(getXMLFloat(xmlFile, palletCreatorsKey .. "#startFillThreshold"), 0.75);
+							self.startFillThreshold = math.max(startFill, 0.75); -- Minimum we will accept is 0.75 litres.
 
-						self.showWarnings = Utils.getNoNil(getXMLBool(xmlFile, palletCreatorsKey .. "#showWarnings"), true);
-						local warningInterval = Utils.getNoNil(getXMLInt(xmlFile, palletCreatorsKey .. "#minWarningInterval"), 5); -- Default five minutes between warnings.
-						self.warningInterval = math.max(warningInterval, 1) * 60000;
-						self.nextWarningTime = g_currentMission.time;
+							self.showWarnings = Utils.getNoNil(getXMLBool(xmlFile, palletCreatorsKey .. "#showWarnings"), true);
+							local warningInterval = Utils.getNoNil(getXMLInt(xmlFile, palletCreatorsKey .. "#minWarningInterval"), 5); -- Default five minutes between warnings.
+							self.warningInterval = math.max(warningInterval, 1) * 60000;
+							self.nextWarningTime = g_currentMission.time;
 
-						local i = 0;
-						while true do
-							local key = string.format("%s.palletCreator(%d)", palletCreatorsKey, i);
-							if not hasXMLProperty(xmlFile, key) then
-								break;
-							end;
-
-							local node = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, key .. "#node"), target.i3dMappings);
-							if node ~= nil then
-								if self.palletSpawners ~= nil then
-									table.insert(self.palletSpawners, node);
-								else
-									self.palletSpawners = {node};
+							local i = 0;
+							while true do
+								local key = string.format("%s.palletCreator(%d)", palletCreatorsKey, i);
+								if not hasXMLProperty(xmlFile, key) then
+									break;
 								end;
 
-								local palletInteractionTrigger = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, key .. "#palletInteractionTrigger"), target.i3dMappings);
-								if palletInteractionTrigger ~= nil then
-									if self.target.palletCreatorInteraction ~= nil then
+								local node = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, key .. "#node"), target.i3dMappings);
+								if node ~= nil then
+									if self.palletSpawners ~= nil then
+										table.insert(self.palletSpawners, node);
+									else
+										self.palletSpawners = {node};
+									end;
+
+									local palletInteractionTrigger = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, key .. "#palletInteractionTrigger"), target.i3dMappings);
+									if palletInteractionTrigger ~= nil then
 										if self.palletInteractionTriggers == nil then
 											self.palletInteractionTriggers = {};
 										end;
 
-										-- Do this now so we can still check these loaded on the client side.
 										if self.isServer then
 											addTrigger(palletInteractionTrigger, "palletInteractionTriggerCallback", self);
 										end;
 
 										table.insert(self.palletInteractionTriggers, palletInteractionTrigger);
-									else
-										g_company.debug:writeModding(self.debugData, "'palletInteractionTrigger' can not be loaded! Parent script does not contain function 'palletCreatorInteraction(totalLevel, blockedLevel, deltaWaiting, fillTypeIndex, extraParamater)'.");
 									end;
 								end;
+
+								i = i + 1;
 							end;
 
-							i = i + 1;
-						end;
+							self.numberOfSpawners = #self.palletSpawners;
 
-						self.numberOfSpawners = #self.palletSpawners;
+							if self.numberOfSpawners > 0 then
+								local activateDebugDraw = Utils.getNoNil(getXMLBool(xmlFile, palletCreatorsKey .. "#activateDebugDraw"), false);
+								if self.isClient and activateDebugDraw then
+									self.debugDrawData = {};
+									for i = 1, self.numberOfSpawners do
+										self.debugDrawData[i] = {name = "", id = ""};
+										self.debugDrawData[i].name = getName(self.palletSpawners[i]);
+										self.debugDrawData[i].id = string.format("<palletCreator(%d) />", i - 1);
+										self.debugDrawData[i].colours = {0.5, 1.0, 0.5, 1.0};
+									end;
 
-						if self.numberOfSpawners > 0 then
-							local activateDebugDraw = Utils.getNoNil(getXMLBool(xmlFile, palletCreatorsKey .. "#activateDebugDraw"), false);
-							if self.isClient and activateDebugDraw then
-								g_company.addUpdateable(self, self.debugDraw);
-
-								self.debugDrawData = {};
-								for i = 1, self.numberOfSpawners do
-									self.debugDrawData[i] = {name = "", id = ""};
-									self.debugDrawData[i].name = getName(self.palletSpawners[i]);
-									self.debugDrawData[i].id = string.format("<palletCreator(%d) />", i - 1);
-									self.debugDrawData[i].colours = {0.5, 1.0, 0.5, 1.0};
+									self:raiseActive();
+									g_company.debug:writeWarning(self.debugData, "'drawDebug' is active at %s#activateDebugDraw! Make sure to disable this before release.", palletCreatorsKey);
 								end;
 
-								g_company.debug:writeWarning(self.debugData, "'drawDebug' is active at %s#activateDebugDraw! Make sure to disable this before release.", palletCreatorsKey);
-							end;
+								if self.isServer then
+									self:setPalletCreatorId()
+								end;
 
-							returnValue = true;
-						else
-							g_company.debug:writeModding(self.debugData, "No 'palletCreator' nodes have been found at %s", palletCreatorsKey);
+								returnValue = true;
+							else
+								g_company.debug:writeModding(self.debugData, "No 'palletCreator' nodes have been found at %s", palletCreatorsKey);
+							end;
 						end;
 					else
-						g_company.debug:writeModding(self.debugData, "A store item using xml filename '%s' could not be found. ( %s#xmlFilename )", self.palletFilename, palletCreatorsKey);
+						g_company.debug:writeModding(self.debugData, "No 'palletCapacity' has been given, this should match capacity given in pallet xml file. ( %s )", palletCreatorsKey);
 					end;
 				else
-					g_company.debug:writeModding(self.debugData, "No 'palletCapacity' has been given, this should match capacity given in pallet xml file. ( %s )", palletCreatorsKey);
+					g_company.debug:writeModding(self.debugData, "A store item using xml filename '%s' could not be found. ( %s#xmlFilename )", self.palletFilename, palletCreatorsKey);
 				end;
 			else
 				g_company.debug:writeModding(self.debugData, "'xmlFilename' key is 'nil' at %s#xmlFilename", palletCreatorsKey);
@@ -199,26 +203,40 @@ function GC_PalletCreator:delete()
 			end;
 			self.palletInteractionTriggers = nil;
 		end;
-
-		if self.levelCheckTimerId ~= 0 then
-			removeTimer(self.levelCheckTimerId);
-		end;
 	end;
 end;
 
-function GC_PalletCreator:debugDraw(dt)
+function GC_PalletCreator:update(dt)
+	if self.isServer and self.levelCheckTimer ~= nil then
+		if self.levelCheckTimer > 0 then
+			self.levelCheckTimer = self.levelCheckTimer - dt;
+			self:raiseActive();
+		else
+			local level, blockedLevel = self:getTotalFillLevel(true, false);
+			self.target:palletCreatorInteraction(level, blockedLevel, self.deltaToAdd, self.palletFillTypeIndex, self.extraParamater);
+			self.levelCheckTimer = nil;
+		end;
+	end;
+
+	if self.isClient and self.debugDrawData ~= nil then
+		self:debugDrawUpdate(dt);
+		self:raiseActive();
+	end;
+end;
+
+function GC_PalletCreator:debugDrawUpdate(dt)
 	if self.debugDrawData ~= nil then
 		for i = 1, self.numberOfSpawners do
 			local spawner = self.palletSpawners[i];
 			local x, y, z = getWorldTranslation(spawner);
-			local rx, ry, rz = getWorldRotation(spawner);			
+			local rx, ry, rz = getWorldRotation(spawner);
 			DebugUtil.drawDebugNode(spawner, nil);
 			DebugUtil.drawOverlapBox(x, y - 5, z, rx, ry, rz, self.palletSizeWidthExtent, 10, self.palletSizeLengthExtent, 0.5, 1.0, 0.5);
 			Utils.renderTextAtWorldPosition(x, y + 5.5, z, self.debugDrawData[i].name, getCorrectTextSize(0.018), 0, self.debugDrawData[i].colours);
 			Utils.renderTextAtWorldPosition(x, y + 5, z, self.debugDrawData[i].id, getCorrectTextSize(0.018), 0, self.debugDrawData[i].colours);
 		end;
 	end;
-	
+
 
 	-- if g_currentMission.nodeToObject ~= nil then
 		-- local total, pallets, bales = 0, 0, 0
@@ -232,7 +250,7 @@ function GC_PalletCreator:debugDraw(dt)
 				-- end;
 			-- end;
 		-- end;
-		
+
 		-- g_currentMission:addExtraPrintText(string.format("Total %d | Pallets %d | Bales %d", total, pallets, bales));
 	-- end;
 end;
@@ -243,43 +261,38 @@ function GC_PalletCreator:updatePalletCreators(delta, includeDeltaToAdd)
 
 		if self.deltaToAdd > 0 then
 			local totalFillLevel = self:getTotalFillLevel(false, false);
-			
-			local addDelta = false;
+
+			local appliedDelta = 0;
 			if self.selectedPallet ~= nil then
 				if self:checkPalletIsValid() then
-					addDelta = true;
-					local appliedDelta = self.selectedPallet:addFillUnitFillLevel(self:getOwnerFarmId(), self.palletFillUnitIndex, self.deltaToAdd, self.palletFillTypeIndex, ToolType.UNDEFINED);
+					appliedDelta = self.selectedPallet:addFillUnitFillLevel(self:getOwnerFarmId(), self.palletFillUnitIndex, self.deltaToAdd, self.palletFillTypeIndex, ToolType.UNDEFINED);
 					self.deltaToAdd = self.deltaToAdd - appliedDelta;
-
 					totalFillLevel = totalFillLevel + appliedDelta;
-					
-					-- If we have 'deltaToAdd' then we must have finished filling last pallet?
+
 					if self.deltaToAdd > 0 and self.deltaToAdd > self.startFillThreshold then
-						addDelta = self:findNextPallet();
+						appliedDelta = self:findNextPallet();
+						totalFillLevel = totalFillLevel + appliedDelta;
 					end;
 				else
 					if self.deltaToAdd > self.startFillThreshold then
-						addDelta = self:findNextPallet();
+						appliedDelta = self:findNextPallet();
+						totalFillLevel = totalFillLevel + appliedDelta;
 					end;
 				end;
 			else
 				if self.deltaToAdd > self.startFillThreshold then
-					addDelta = self:findNextPallet();
+					appliedDelta = self:findNextPallet();
+					totalFillLevel = totalFillLevel + appliedDelta;
 				end;
 			end;
-			
-			if addDelta then
-				local appliedDelta = self.selectedPallet:addFillUnitFillLevel(self:getOwnerFarmId(), self.palletFillUnitIndex, self.deltaToAdd, self.palletFillTypeIndex, ToolType.UNDEFINED);
-				self.deltaToAdd = self.deltaToAdd - appliedDelta;
-				
-				totalFillLevel = totalFillLevel + appliedDelta;
-			else
+
+			if appliedDelta <= 0 then
 				if includeDeltaToAdd then
 					totalFillLevel = totalFillLevel + self.deltaToAdd;
 				end;
 			end;
-			
-			return totalFillLevel, addDelta;
+
+			return totalFillLevel, appliedDelta > 0;
 		end;
 	else
 		g_company.debug:writeDev(self.debugData, "'updatePalletCreators' is a client only function!");
@@ -335,26 +348,38 @@ function GC_PalletCreator:findNextPallet()
 
 	-- If no pallets to fill then find a free node to create a new one at.
 	if self.selectedPallet ~= nil then
-		return true;
+		local appliedDelta = self.selectedPallet:addFillUnitFillLevel(self:getOwnerFarmId(), self.palletFillUnitIndex, self.deltaToAdd, self.palletFillTypeIndex, ToolType.UNDEFINED);
+		self.deltaToAdd = self.deltaToAdd - appliedDelta;
+
+		return appliedDelta;
 	else
 		if nextSpawnerToUse ~= nil then
 			self.spawnerInUse = nextSpawnerToUse.spawner;
 			local x, _, z = getWorldTranslation(self.spawnerInUse);
 			local _, ry, _ = getWorldRotation(self.spawnerInUse);
 			self.selectedPallet = g_currentMission:loadVehicle(self.palletFilename, x, nil, z, 0.5, ry, true, 0, Vehicle.PROPERTY_STATE_OWNED, self:getOwnerFarmId(), nil, nil);
-			
-			-- We do not want to update 'target:palletCreatorInteraction()' when creating a new pallet.
-			self.spawnedPallet = self.palletInteractionTriggers[nextSpawnerToUse.spawnerId] ~= nil;
-			
-			return true;
+
+			-- local deltaToAdd = self.deltaToAdd;
+			-- local fillUnit = self.selectedPallet:getFillUnitByIndex(self.palletFillUnitIndex)
+			-- if fillUnit.startFillLevel ~= nil then
+				-- deltaToAdd = deltaToAdd - fillUnit.startFillLevel;
+			-- end;
+
+			local appliedDelta = self.selectedPallet:addFillUnitFillLevel(self:getOwnerFarmId(), self.palletFillUnitIndex, self.deltaToAdd, self.palletFillTypeIndex, ToolType.UNDEFINED);
+			self.deltaToAdd = self.deltaToAdd - appliedDelta;
+
+			self.spawnedPallet = self.selectedPallet;
+			self:setPalletCreatorId(self.selectedPallet, false);
+
+			return appliedDelta;
 		else
 			if self:canShowWarning() then
 				self:showWarningMessage();
 			end;
 		end;
 	end;
-	
-	return false;
+
+	return 0;
 end;
 
 function GC_PalletCreator:checkSpawner(spawner)
@@ -362,7 +387,7 @@ function GC_PalletCreator:checkSpawner(spawner)
 	local x, y, z = getWorldTranslation(spawner);
 	local rx, ry, rz = getWorldRotation(spawner);
 	local overlap = overlapBox(x, y - 5, z, rx, ry, rz, self.palletSizeWidthExtent, 10, self.palletSizeLengthExtent, "spawnAreaCallback", self, nil, true, false, true);
-	
+
 	return x, y, z, rx, ry, rz, overlap;
 end;
 
@@ -399,7 +424,7 @@ end;
 
 function GC_PalletCreator:loadFromXMLFile(xmlFile, key)
 	self.deltaToAdd = Utils.getNoNil(getXMLFloat(xmlFile, key .. ".palletCreator#deltaToAdd"), self.deltaToAdd);
-	
+
 	return true
 end;
 
@@ -463,7 +488,7 @@ function GC_PalletCreator:getTotalFillLevel(getBlockedLevel, includeDeltaToAdd)
 			end;
 		end;
 	end;
-	
+
 	if includeDeltaToAdd == true then
 		totalLevel = totalLevel + self.deltaToAdd;
 	end;
@@ -562,28 +587,80 @@ function GC_PalletCreator:palletInteractionTriggerCallback(triggerId, otherId, o
 	if onEnter or onLeave then
 		local object = g_currentMission:getNodeObject(otherShapeId);
 		if object ~= nil and (object.isa ~= nil and object:isa(Vehicle)) and object.typeName == "pallet" then
-			-- If another timer is set then remove it so we only check once.
-			if self.levelCheckTimerId ~= 0 then
-				removeTimer(self.levelCheckTimerId);
+			if self.spawnedPallet ~= object then
+				self:setPalletCreatorId(object, onLeave)
+				self.levelCheckTimer = 2000;
+				self:raiseActive();
+			else
+				self.spawnedPallet = nil;
 			end;
-
-			-- Wait 2 seconds to do the check so we can make sure the pallet made it to the overlapBox area.
-			self.levelCheckTimerId = addTimer(2000, "levelCheckTimerCallback", self);
 		end;
 	end;
 end;
 
-function GC_PalletCreator:levelCheckTimerCallback()
-	if self.spawnedPallet ~= true then
-		local level, blockedLevel = self:getTotalFillLevel(true, false);
-		self.target:palletCreatorInteraction(level, blockedLevel, self.deltaToAdd, self.palletFillTypeIndex, self.extraParamater);
+function GC_PalletCreator:setPalletCreatorId(pallet, onLeave)
+	if pallet ~= nil then
+		if onLeave then
+			if pallet.gcPalletCreatorId ~= nil then
+				if pallet.removeDeleteListener ~= nil then
+					pallet:removeDeleteListener(self, "onDeletePallet");
+				end;
+
+				pallet.gcPalletCreatorId = nil;
+			end;
+		else
+			if pallet.unmountDynamic ~= nil and pallet.gcPalletCreatorId == nil then
+				pallet.gcPalletCreatorId = NetworkUtil.getObjectId(self);
+				pallet.unmountDynamic = Utils.appendedFunction(pallet.unmountDynamic, GC_PalletCreator.unmountDynamic);
+				if pallet.addDeleteListener ~= nil then
+					pallet:addDeleteListener(self, "onDeletePallet");
+				end;
+			end;
+		end;
+	else
+		for i = 1, self.numberOfSpawners do
+			self.palletInSpawner = nil;
+			self:checkSpawner(self.palletSpawners[i]);
+			if self.palletInSpawner ~= nil then
+				if self.palletInSpawner.unmountDynamic ~= nil and self.palletInSpawner.gcPalletCreatorId == nil then
+					self.palletInSpawner.gcPalletCreatorId = NetworkUtil.getObjectId(self);
+					self.palletInSpawner.unmountDynamic = Utils.appendedFunction(self.palletInSpawner.unmountDynamic, GC_PalletCreator.unmountDynamic);
+					if self.palletInSpawner.addDeleteListener ~= nil then
+						self.palletInSpawner:addDeleteListener(self, "onDeletePallet");
+					end;
+				end;
+			end
+		end;
 	end;
-
-	self.spawnedPallet = false;
-	self.levelCheckTimerId = 0;
-
-	return false;
 end;
+
+function GC_PalletCreator:unmountDynamic(isDelete)
+	if self.gcPalletCreatorId ~= nil then
+		local object = NetworkUtil.getObject(self.gcPalletCreatorId)
+		if object ~= nil then
+			object.levelCheckTimer = 2000;
+			object:raiseActive();
+
+			if self.removeDeleteListener ~= nil then
+				self:removeDeleteListener(object, "onDeletePallet");
+			end;
+		end;
+
+		self.gcPalletCreatorId = nil;
+	end;
+end
+
+function GC_PalletCreator:onDeletePallet(pallet)
+	if pallet.gcPalletCreatorId ~= nil then
+		local object = NetworkUtil.getObject(pallet.gcPalletCreatorId)
+		if object ~= nil then
+			object.levelCheckTimer = 2000;
+			object:raiseActive();
+		end;
+
+		pallet.gcPalletCreatorId = nil;
+	end;
+end
 
 
 

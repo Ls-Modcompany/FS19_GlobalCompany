@@ -20,7 +20,7 @@
 		<text name="input_GC_BALESHREADER_TURNON_AREALIGHTS"><en>turnAreaLights</en></text>
 		<text name="input_GC_MAIN"><en>GlobalCompany</en><de>GlobalCompany</de></text>
 		<text name="input_GC_TEST"><en>test</en></text>
-		<text name="input_GC_BALEADDON_CUT"><en>Ballen aufschneiden</en></text>
+		<text name="input_GC_BALEADDON_CUT"><en>Cut Bale</en><de>Ballen aufschneiden</de></text>
 	</l10n>		
 	
 	<actions>

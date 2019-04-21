@@ -11,7 +11,7 @@
 -- Changelog:
 --
 -- 	v1.0.0.0 (29.03.2019):
--- 		- initial fs19 (aPuehri)
+-- 			- initial fs19 (aPuehri)
 --
 --
 -- Notes:
@@ -47,7 +47,7 @@ function GC_BaleAddon:init()
 		g_company.addUpdateable(self, self.update);			
 	end;
 
-	-- g_company.settings:initSetting(self, "baleCut", true);
+	g_company.settings:initSetting(self, "cutBales", true);
 	
 	return self;
 end;
@@ -63,7 +63,7 @@ end;
 function GC_BaleAddon:update(dt)
 	if self.isClient then
 		GC_BaleAddon.enableCutBale = false;
-		if g_currentMission.player.isControlled and not g_currentMission.player.isCarryingObject then
+		if g_company.settings:getSetting("cutBales") and g_currentMission.player.isControlled and not g_currentMission.player.isCarryingObject then
 			if g_currentMission.player.isObjectInRange then
 				if (g_currentMission.player.lastFoundObject ~= nil) then
 					local foundObjectId = g_currentMission.player.lastFoundObject;
