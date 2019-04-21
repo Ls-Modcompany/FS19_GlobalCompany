@@ -27,7 +27,7 @@
 		<!-- Settings -->
 		<e k="GC_settings_header" v="GlobalCompany - Settings"/>
 		<e k="GC_settings1_title" v="Activate placeable anywhere"/>
-		<e k="GC_settings2_title" v="Show objectinfo"/>
+		<e k="GC_settings2_title" v="Show object info"/>
 		<e k="GC_settings3_title" v="Horsehelper (300€ / Horse / Day)"/>
 		<e k="GC_settings4_title" v="Activate more trees"/>
 		<e k="GC_settings5_title" v="Activate cut bales"/>
@@ -58,6 +58,11 @@
 		<e k="GC_Productline_Title_Backup" v="Production Line %d"/>
 		<e k="GC_Input_Title_Backup" v="Input %d"/>
 		<e k="GC_Output_Title_Backup" v="Output %d"/>
+		<e k="GC_Input_Header_Backup" v="Inputs"/>
+		<e k="GC_Output_Header_Backup" v="Outputs"/>
+		
+		<e k="GC_Open_Product_Menu" v="Open product menu"/>
+		<e k="GC_Open_Overview_Menu" v="Open overview menu"/>
 
 		<!-- BaleShreader -->
 		<e k="GC_baleShreader_openSteer" v="Open Steer"/>
@@ -69,9 +74,9 @@
 
 		<!-- Baler -->
 		<e k="GC_baler_title" v="Baler"/>
-		<e k="GC_baler_title_witStack" v="Baler with Stackl"/>
+		<e k="GC_baler_title_witStack" v="Baler with Stack"/>
 		<e k="GC_baler_cleaner" v="Clean Baler"/>
-		<e k="GC_baler_openGui" v="Open HUd"/>
+		<e k="GC_baler_openGui" v="Open Hud"/>
 		<e k="GC_baler_closeGui" v="Close Hud"/>
 		<e k="GC_baler_makeEmpty" v="empty"/>
 		<e k="GC_baler_turnOn" v="Switch on"/>
