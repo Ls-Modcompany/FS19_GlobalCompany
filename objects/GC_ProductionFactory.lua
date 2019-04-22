@@ -411,7 +411,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 
 			local name = getXMLString(xmlFile, loadingTriggerKey .. "#name");
 			if name ~= nil and self.registeredLoadingTriggers[name] == nil then
-				local loadingTrigger = self.triggerManager:loadTrigger(GC_LoadingTrigger, self.rootNode, xmlFile, loadingTriggerKey, {}, false);
+				local loadingTrigger = self.triggerManager:loadTrigger(GC_LoadingTrigger, self.rootNode, xmlFile, loadingTriggerKey, {}, false, true);
 				if loadingTrigger ~= nil then
 					local triggerId = loadingTrigger.managerId;
 					loadingTrigger.extraParamater = triggerId;
@@ -1840,7 +1840,7 @@ function GC_ProductionFactory:getAllProvidedFillLevels(farmId, triggerId)
 			local output = self:getProductFromTriggerId(triggerId, fillTypeIndex, false);
 			if output ~= nil then
 				fillLevels[fillTypeIndex] = Utils.getNoNil(fillLevels[fillTypeIndex], 0) + output.fillLevel;
-				capacity = capacity + output.capacity;
+				--capacity = capacity + output.capacity;
 			end;
 		end;
 	end;

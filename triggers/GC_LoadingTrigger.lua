@@ -54,7 +54,7 @@ function GC_LoadingTrigger:new(isServer, isClient, customMt)
 	return self;
 end;
 
-function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes, infiniteCapacity)
+function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes, infiniteCapacity, blockUICapacity)
 	if nodeId == nil or source == nil or xmlFile == nil or xmlKey == nil then
 		local text = "Loading failed! 'nodeId' parameter = %s, 'source' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s";
 		g_company.debug:logWrite(GC_LoadingTrigger.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, source ~= nil, xmlFile ~= nil, xmlKey ~= nil);
@@ -79,6 +79,7 @@ function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes
 
 		self.autoStart = xmlUtils.getXMLValue(getXMLBool, xmlFile, xmlKey .. "#autoStart", false);
 		self.hasInfiniteCapacity = Utils.getNoNil(infiniteCapacity, false);
+		self.blockUICapacity = Utils.getNoNil(blockUICapacity, false);
 
 		local startText = xmlUtils.getXMLValue(getXMLString, xmlFile, xmlKey .. "#startText", "action_siloStartFilling");
 		local stopText = xmlUtils.getXMLValue(getXMLString, xmlFile, xmlKey .. "#stopText", "action_siloStopFilling");
@@ -403,7 +404,7 @@ function GC_LoadingTrigger:onActivateObject()
 
 		if not self.autoStart then
 			local text;
-			if self.hasInfiniteCapacity then
+			if self.hasInfiniteCapacity or self.blockUICapacity then
 				text = string.format("%s", self.stationName);
 			else
 				text = string.format("%s (%s)", self.stationName, g_i18n:formatFluid(capacity));
