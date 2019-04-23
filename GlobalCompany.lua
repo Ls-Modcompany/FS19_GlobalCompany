@@ -17,7 +17,6 @@
 --
 --
 -- ToDo:
---		- 'loadParameters' only for one environment! this is not good (kevink98)
 --		- convert all scripts to use 'GC_DebugUtils' (kevink98 / GtX)
 --
 --
@@ -26,11 +25,10 @@ GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
 GlobalCompany.version = "1.0.0.0"; -- Release Version.
-GlobalCompany.versionDate = "04.05.2018"; -- Release Date ??
+GlobalCompany.versionDate = "04.05.2019"; -- Release Date ??
 GlobalCompany.currentVersionId = 1000; -- Mod Manager ID. (Version number without periods.)
 GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
 
-GlobalCompany.LOADTYP_XMLFILENAME = 1;
 
 function GlobalCompany.initialLoad()
 	if GlobalCompany.initialLoadComplete ~= nil then
@@ -79,8 +77,7 @@ function GlobalCompany.initialLoad()
 		GlobalCompany.updateables = {};
 		GlobalCompany.raisedUpdateables = {};
 		GlobalCompany.environments = {};
-		GlobalCompany.loadParameters = {};
-		GlobalCompany.loadParametersToEnvironment = {};
+		GlobalCompany.xmlLoads = {};
 
 		g_company.modManager:initDevelopmentWarning(GlobalCompany.isDevelopmentVersion);
 
@@ -123,30 +120,17 @@ function GlobalCompany.initialLoad()
 			end;
 
 			if path ~= nil then
-				local xmlFile = loadXMLFile("globalCompany", path);
-
-				GlobalCompany.environments[modName] = {};
-				GlobalCompany.environments[modName].fullPath = path;
-				GlobalCompany.environments[modName].xmlFile = xmlFile;
-				GlobalCompany.environments[modName].specializations = getXMLString(xmlFile, "globalCompany.specializations#xmlFilename");
-				GlobalCompany.environments[modName].shopManager = getXMLString(xmlFile, "globalCompany.shopManager#xmlFilename");
-				GlobalCompany.environments[modName].densityMapHeight = getXMLString(xmlFile, "globalCompany.densityMapHeight#xmlFilename");
-				GlobalCompany.environments[modName].densityMapHeightOverwriteOrginalFunction = getXMLBool(xmlFile, "globalCompany.densityMapHeight#overwriteOrginalFunction");
+				
+				GlobalCompany.environments[modName] = loadXMLFile("globalCompany", path);
 			end;
 		end;
 
-		for modName, values in pairs(GlobalCompany.environments) do
-			if values.shopManager ~= nil and values.shopManager ~= "" then
-				g_company.shopManager:loadFromXML(modName, g_company.utils.createModPath(modName, values.shopManager));
-			end;
-
-			if values.specializations ~= nil and values.specializations ~= "" then
-				g_company.specializations:loadFromXML(modName, g_company.utils.createModPath(modName, values.specializations));
-			end;
-
-			if values.densityMapHeightOverwriteOrginalFunction then
-				g_densityMapHeightManager.loadMapData = function() return true; end;
-			end;
+		for modName, xmlFile in pairs(GlobalCompany.environments) do
+			-- add specializations
+				--g_company.specializations:loadFromXML(modName, g_company.utils.createModPath(modName, values.specializations));
+			g_company.shopManager:loadFromXML(modName, xmlFile);
+			-- add densityMapHeightOverwriteOrginalFunction
+				--g_densityMapHeightManager.loadMapData = function() return true; end;
 		end;
 
 		g_company.languageManager:loadModLanguageFiles(modLanguageFiles);
@@ -205,8 +189,8 @@ function GlobalCompany.removeUpdateable(target, update)
 end;
 
 --|| Parameters ||--
-function GlobalCompany.addLoadParameter(name, key, typ)
-	GlobalCompany.loadParameters[name] = {key=key, typ=typ, value=nil, environment=nil};
+function GlobalCompany.addXmlLoad(target)
+	GlobalCompany.xmlLoads[target] = {target=target};
 end;
 
 --| Load Source Files |--
@@ -226,7 +210,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "utils/GC_shopManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_TriggerManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_specializations.lua");
-	source(GlobalCompany.dir .. "utils/GC_densityMapHeight.lua");
+	--source(GlobalCompany.dir .. "utils/GC_densityMapHeight.lua"); --fixed with patch 1.3
 	source(GlobalCompany.dir .. "utils/GC_FarmlandOwnerListener.lua");
 
 	--|| Gui ||--
@@ -315,27 +299,15 @@ function GlobalCompany:loadMap()
 	
 	g_company.gui:load();
 
-	for modName, e in pairs(GlobalCompany.environments) do
-		for name, v in pairs(GlobalCompany.loadParameters) do
-			if v.typ == GlobalCompany.LOADTYP_XMLFILENAME then
-				local value = getXMLString(e.xmlFile, string.format("globalCompany%s#xmlFilename", v.key));
-				if value ~= nil then
-					GlobalCompany.loadParameters[name].value = value;
-					GlobalCompany.loadParameters[name].environment = modName;
-				end;
+	for modName, xmlFile in pairs(GlobalCompany.environments) do
+		for xmlLoad, _ in pairs(GlobalCompany.xmlLoads) do
+			if xmlLoads.loadXml ~= nil then
+				xmlLoads.loadXml(xmlLoad, modName, xmlFile);
+			else
+				--error
 			end;
 		end;
-
-		-- if e.shopManager ~= nil and e.shopManager ~= "" then
-			-- g_company.shopManager:loadFromXML(modName, g_company.utils.createModPath(modName, e.shopManager));
-		-- end;
-
-		if e.densityMapHeight ~= nil and e.densityMapHeight ~= "" then
-			g_company.densityMapHeight:loadFromXML(modName, g_company.utils.createModPath(modName, e.densityMapHeight));
-		end;
-
-		delete(e.xmlFile);
-	end;
+	end;	
 
 	g_company.settings = GlobalCompanySettings:load();
 
