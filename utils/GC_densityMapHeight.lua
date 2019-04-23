@@ -15,7 +15,7 @@
 -- 
 -- Notes:
 -- 	fixed error from giants function
--- 
+--  Update 23.4: This is fixed with patch 1.3
 -- ToDo:
 --
 -- 
