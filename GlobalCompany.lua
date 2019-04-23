@@ -119,8 +119,7 @@ function GlobalCompany.initialLoad()
 				end;
 			end;
 
-			if path ~= nil then
-				
+			if path ~= nil then				
 				GlobalCompany.environments[modName] = loadXMLFile("globalCompany", path);
 			end;
 		end;
