@@ -88,14 +88,14 @@ function GlobalCompany.initialLoad()
 		GlobalCompany.loadSourceFiles();
 		GlobalCompany.loadPlaceables();
 
-		g_company.farmlandOwnerListener = GC_FarmlandOwnerListener:new();		
+		g_company.farmlandOwnerListener = GC_FarmlandOwnerListener:new();
 
-		GlobalCompany.loadEnviroment(modName, GlobalCompany.dir .. "xml/globalCompany.xml", false);		
+		GlobalCompany.loadEnviroment(modName, GlobalCompany.dir .. "xml/globalCompany.xml", false);
 		g_company.modManager:initSelectedMods();
 
 		for modName, xmlFile in pairs(GlobalCompany.environments) do
 			g_company.shopManager:loadFromXML(modName, xmlFile);
-			
+
 			-- add specializations
 			--g_company.specializations:loadFromXML(modName, g_company.utils.createModPath(modName, values.specializations));
 
@@ -114,13 +114,13 @@ end;
 function GlobalCompany.loadEnviroment(modName, path, isMod)
 	local xmlFile = loadXMLFile("globalCompany", path);
 	GlobalCompany.environments[modName] = xmlFile;
-	
+
 	if isMod then
 		g_company.debug:singleLogWrite(g_company.debug.MODDING, "Initialising environments for mod '%s'", modName);
 	end;
 end;
 
--- @kevink98 @aPuehri 
+-- @kevink98 @aPuehri
 -- Using the following in a mod's 'modDesc' you can init GC functions or addModEventListeners after GC loads.
 -- Script still needs to be loaded from modDesc using 'extraSourceFiles'.
 -- <globalCompany minimumVersion="1.0.0.0"> <customClasses> <customClass name="MyAddonScript"/> </customClasses> </globalCompany>
@@ -129,22 +129,22 @@ function GlobalCompany:initModClasses()
 	if g_company.modClassNames ~= nil then
 		for modName, modClasses in pairs (g_company.modClassNames) do
 			local modEnv = getfenv(0)["_G"][modName];
-			if modEnv ~= nil then				
+			if modEnv ~= nil then
 				local baseDirectory = g_modNameToDirectory[modName];
-				for _, className in ipairs(modClasses) do	
+				for _, className in ipairs(modClasses) do
 					if className ~= nil and modEnv[className] ~= nil and modEnv[className].initGlobalCompany ~= nil then
-						modEnv[className].initGlobalCompany(modEnv[className], modName, baseDirectory, GlobalCompany.environments[modName]);					
+						modEnv[className].initGlobalCompany(modEnv[className], modName, baseDirectory, GlobalCompany.environments[modName]);
 					end;
 				end;
 			end;
-			
+
 			-- Delete XML to cleanup correctly.
 			if GlobalCompany.environments[modName] ~= nil then
 				delete(GlobalCompany.environments[modName]);
 				GlobalCompany.environments[modName] = nil;
 			end;
 		end;
-		
+
 		g_company.modClassNames = nil;
 	end;
 end;
@@ -211,9 +211,9 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "GlobalCompanySettings.lua");
 
 	--|| Utils / Managers ||--
-	source(GlobalCompany.dir .. "utils/GC_mathUtils.lua");
 	source(GlobalCompany.dir .. "utils/GC_xmlUtils.lua");
 	source(GlobalCompany.dir .. "utils/GC_i3dLoader.lua");
+	source(GlobalCompany.dir .. "utils/GC_mathUtils.lua");
 	source(GlobalCompany.dir .. "utils/GC_cameraUtil.lua");
 	source(GlobalCompany.dir .. "utils/GC_shopManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_TriggerManager.lua");
@@ -226,6 +226,7 @@ function GlobalCompany.loadSourceFiles()
 
 	--|| Objects ||--
 	source(GlobalCompany.dir .. "objects/GC_Clock.lua");
+	source(GlobalCompany.dir .. "objects/GC_Baler.lua");
 	source(GlobalCompany.dir .. "objects/GC_Sounds.lua");
 	source(GlobalCompany.dir .. "objects/GC_Movers.lua");
 	source(GlobalCompany.dir .. "objects/GC_Shaders.lua");
@@ -236,6 +237,8 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_Animations.lua");
 	source(GlobalCompany.dir .. "objects/GC_FillVolume.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicHeap.lua");
+	source(GlobalCompany.dir .. "objects/GC_BaleShreader.lua");
+	source(GlobalCompany.dir .. "objects/GC_DirtyObjects.lua");
 	source(GlobalCompany.dir .. "objects/GC_PalletCreator.lua");
 	source(GlobalCompany.dir .. "objects/GC_ObjectSpawner.lua");
 	source(GlobalCompany.dir .. "objects/GC_RotationNodes.lua");
@@ -247,9 +250,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_AnimationManager.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
 	--source(GlobalCompany.dir .. "objects/GC_DynamicPalletAreas.lua");
-	source(GlobalCompany.dir .. "objects/GC_BaleShreader.lua");
-	source(GlobalCompany.dir .. "objects/GC_DirtyObjects.lua");
-	source(GlobalCompany.dir .. "objects/GC_Baler.lua");	
+	source(GlobalCompany.dir .. "objects/GC_FillTypeConstructor.lua");
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
@@ -259,16 +260,17 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "triggers/GC_UnloadingTrigger.lua");
 
 	--|| Placeables ||--
-	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");
-	source(GlobalCompany.dir .. "placeables/GC_BaleShreaderPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
+	source(GlobalCompany.dir .. "placeables/GC_BaleShreaderPlaceable.lua");
+	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");
+	source(GlobalCompany.dir .. "placeables/GC_FillTypeConstructorPlaceable.lua");
 
 	--|| Additionals ||--
-	source(GlobalCompany.dir .. "additionals/GC_ExtendedPlaceable.lua");
-	source(GlobalCompany.dir .. "additionals/GC_HorseHelper.lua");
+	source(GlobalCompany.dir .. "additionals/GC_BaleAddon.lua");
 	source(GlobalCompany.dir .. "additionals/GC_MoreTrees.lua");
 	source(GlobalCompany.dir .. "additionals/GC_ObjectInfo.lua");
-	source(GlobalCompany.dir .. "additionals/GC_BaleAddon.lua");
+	source(GlobalCompany.dir .. "additionals/GC_HorseHelper.lua");
+	source(GlobalCompany.dir .. "additionals/GC_ExtendedPlaceable.lua");
 
 	--|| Events ||--
 	source(GlobalCompany.dir .. "events/GC_PalletCreatorWarningEvent.lua");
@@ -277,7 +279,6 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryStateEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactorySpawnPalletEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryProductPurchaseEvent.lua");
-
 end;
 
 --| Add Base GC Placeables |--
@@ -288,9 +289,10 @@ function GlobalCompany.loadPlaceables()
 
 	local placeablesDir = GlobalCompany.dir .. "placeables/";
 
-	GlobalCompany:addPlaceableType("GC_ProductionFactoryPlaceable", "GC_ProductionFactoryPlaceable", placeablesDir .. "GC_ProductionFactoryPlaceable.lua");
-	GlobalCompany:addPlaceableType("GC_BaleShreaderPlaceable", "GC_BaleShreaderPlaceable", placeablesDir .. "GC_BaleShreaderPlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_BalerPlaceable", "GC_BalerPlaceable", placeablesDir .. "GC_BalerPlaceable.lua");
+	GlobalCompany:addPlaceableType("GC_BaleShreaderPlaceable", "GC_BaleShreaderPlaceable", placeablesDir .. "GC_BaleShreaderPlaceable.lua");
+	GlobalCompany:addPlaceableType("GC_ProductionFactoryPlaceable", "GC_ProductionFactoryPlaceable", placeablesDir .. "GC_ProductionFactoryPlaceable.lua");
+	GlobalCompany:addPlaceableType("GC_FillTypeConstructor", "GC_FillTypeConstructorPlaceable", placeablesDir .. "GC_FillTypeConstructorPlaceable.lua");
 end;
 
 --| Main |--
@@ -302,7 +304,7 @@ end;
 
 function GlobalCompany:loadMap()
 	g_company.debug:loadConsoleCommands();
-	
+
 	g_company.gui:load();
 
 	-- for modName, xmlFile in pairs(GlobalCompany.environments) do
@@ -313,7 +315,7 @@ function GlobalCompany:loadMap()
 				-- --error
 			-- end;
 		-- end;
-	-- end;	
+	-- end;
 
 	g_company.settings = GlobalCompanySettings:load();
 
