@@ -148,15 +148,14 @@ end;
 
 -- Print to log without header.
 function GC_DebugUtils:singleLogWrite(level, message, ...)
-	local text = "";
 	if self.printLevel[level] == true then
-		text = "  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[level] .. string.format(message, ...);
-	else
-		text = "  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[GC_DebugUtils.ERROR] .. string.format(message, ...);
+		local text = "  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[level] .. string.format(message, ...);
+	-- else
+		-- text = "  [LSMC - GlobalCompany] - " .. self.printLevelPrefix[GC_DebugUtils.ERROR] .. string.format(message, ...);
+		
+		print(text);
+		table.insert(self.savedErrors, text);
 	end;
-
-	print(text);
-	table.insert(self.savedErrors, text);
 end;
 
 -- Print to log with header.
