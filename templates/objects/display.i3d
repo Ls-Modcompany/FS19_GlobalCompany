@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="iso-8859-1"?>
+<i3D name="untitled" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+    <Asset>
+        <Export program="GIANTS Editor 64bit" version="8.1.0"/>
+    </Asset>
+    <Files>
+        <File fileId="2" filename="$data/shaders/numberShader.xml"/>
+        <File fileId="3" filename="textures/details_diffuse.dds"/>
+        <File fileId="4" filename="textures/details_normal.dds"/>
+        <File fileId="5" filename="textures/details_specular.dds"/>
+        <File fileId="1" filename="textures/numbers_diffuse.png"/>
+    </Files>
+    <Materials>
+        <Material name="number_mat" materialId="9" alphaBlending="true" customShaderId="2">
+            <Texture fileId="1"/>
+            <CustomParameter name="number" value="-1 0 0 0"/>
+            <CustomParameter name="numberColor" value="0.0009 0.0021 0.0144 1"/>
+        </Material>
+        <Material name="acmat0" materialId="19">
+            <Texture fileId="3"/>
+            <Normalmap fileId="4"/>
+            <Glossmap fileId="5"/>
+        </Material>
+    </Materials>
+    <Shapes externalShapesFile="display.i3d.shapes"/>
+    <Dynamics/>
+    <Scene>
+        <TransformGroup name="Display" rotation="0 -0 -1.00179e-05" nodeId="71">
+            <Shape shapeId="1" name="numberPart1" translation="0.399723 0.1 0.08" clipDistance="75" nodeId="72" materialIds="9" castsShadows="true" receiveShadows="true"/>
+            <Shape shapeId="2" name="numberPart2" translation="0.309 0.1 0.08" clipDistance="75" nodeId="73" materialIds="9" castsShadows="true" receiveShadows="true"/>
+            <Shape shapeId="2" name="numberPart3" translation="0.219248 0.1 0.08" clipDistance="75" nodeId="74" materialIds="9" castsShadows="true" receiveShadows="true"/>
+            <Shape shapeId="2" name="numberPart4" translation="0.129248 0.1 0.08" clipDistance="75" nodeId="75" materialIds="9" castsShadows="true" receiveShadows="true"/>
+            <Shape shapeId="2" name="numberPart5" translation="0.039248 0.1 0.08" clipDistance="75" nodeId="76" materialIds="9" castsShadows="true" receiveShadows="true"/>
+            <Shape shapeId="2" name="numberPart6" translation="-0.050752 0.1 0.08" clipDistance="75" nodeId="77" materialIds="9" castsShadows="true" receiveShadows="true"/>
+            <Shape shapeId="2" name="numberPart7" translation="-0.140752 0.1 0.08" clipDistance="75" nodeId="78" materialIds="9" castsShadows="true" receiveShadows="true"/>
+            <Shape shapeId="2" name="numberPart8" translation="-0.230752 0.1 0.08" clipDistance="75" nodeId="79" materialIds="9" castsShadows="true" receiveShadows="true"/>
+            <Shape shapeId="2" name="numberPart9" translation="-0.320752 0.1 0.08" clipDistance="75" nodeId="80" materialIds="9" castsShadows="true" receiveShadows="true"/>
+            <Shape shapeId="2" name="numberPart10" translation="-0.410752 0.1 0.08" clipDistance="75" nodeId="81" materialIds="9" castsShadows="true" receiveShadows="true"/>
+            <Shape shapeId="3" name="Gehaeuse" scale="0.7 1 1" nodeId="82" materialIds="19" castsShadows="true" receiveShadows="true"/>
+            <Shape shapeId="4" name="Halterung" translation="4.93438e-09 0.0914671 0.0295773" rotation="0 -5.78539e-27 -1.15013e-06" scale="0.7 1 1" nodeId="83" materialIds="19" castsShadows="true" receiveShadows="true"/>
+        </TransformGroup>
+    </Scene>
+</i3D>

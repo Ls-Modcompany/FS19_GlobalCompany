@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="iso-8859-1"?>
+<i3D name="untitled" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+    <Asset>
+        <Export program="GIANTS Editor 64bit" version="8.1.0"/>
+    </Asset>
+    <Files>
+        <File fileId="1" filename="$data/maps/textures/shared/warningStripes_diffuse.png"/>
+        <File fileId="2" filename="$data/maps/textures/shared/warningStripes_normal.png"/>
+        <File fileId="3" filename="$data/maps/textures/shared/warningStripes_specular.png"/>
+    </Files>
+    <Materials>
+        <Material name="warningStripes_mat" materialId="6">
+            <Texture fileId="1"/>
+            <Normalmap fileId="2"/>
+            <Glossmap fileId="3"/>
+        </Material>
+    </Materials>
+    <Shapes externalShapesFile="warningStripes.i3d.shapes"/>
+    <Dynamics/>
+    <Scene>
+        <TransformGroup name="warningStripes" translation="10 0 -5.3" nodeId="116">
+            <Shape shapeId="1" name="warningStripesCorner1" translation="-2.39264 0 -4.392" clipDistance="200" nodeId="117" materialIds="6" receiveShadows="true" decalLayer="1"/>
+            <Shape shapeId="2" name="warningStripesCorner2" translation="2.38803 0 -4.384" clipDistance="200" nodeId="118" materialIds="6" receiveShadows="true" decalLayer="1"/>
+            <Shape shapeId="1" name="warningStripesCorner3" translation="2.39415 0 4.389" rotation="-180 -5.00896e-06 -180" clipDistance="200" nodeId="119" materialIds="6" receiveShadows="true" decalLayer="1"/>
+            <Shape shapeId="2" name="warningStripesCorner4" translation="-2.39827 0 4.393" rotation="-180 0 -180" clipDistance="200" nodeId="120" materialIds="6" receiveShadows="true" decalLayer="1"/>
+        </TransformGroup>
+    </Scene>
+</i3D>

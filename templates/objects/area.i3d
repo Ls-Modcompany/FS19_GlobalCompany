@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="iso-8859-1"?>
+<i3D name="untitled" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+    <Asset>
+        <Export program="GIANTS Editor 64bit" version="8.1.0"/>
+    </Asset>
+    <Files/>
+    <Materials>
+        <Material name="lambert1" materialId="15" diffuseColor="0.494118 0.494118 0.494118 1"/>
+    </Materials>
+    <Shapes externalShapesFile="area.i3d.shapes"/>
+    <Dynamics/>
+    <Scene>
+        <TransformGroup name="area" translation="-25.1282 2.37761 2.24385" rotation="-0 -90 0" nodeId="126">
+            <TransformGroup name="start" translation="-0.355644 0 -4.76374" rotation="0 -90 0" nodeId="127">
+                <TransformGroup name="width" translation="4.46553 0 0" nodeId="128"/>
+                <TransformGroup name="heigth" translation="0 0 4.50549" nodeId="129"/>
+            </TransformGroup>
+            <Shape shapeId="1" name="interactionTrigger" translation="-2.58846 0.955943 -1.38558" scale="0.08 0.6 0.4" static="true" trigger="true" collisionMask="15736832" nodeId="130" materialIds="15" castsShadows="true" receiveShadows="true" nonRenderable="true"/>
+        </TransformGroup>
+    </Scene>
+</i3D>

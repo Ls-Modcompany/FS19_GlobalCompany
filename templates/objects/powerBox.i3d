@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="iso-8859-1"?>
+<i3D name="untitled" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+    <Asset>
+        <Export program="GIANTS Editor 64bit" version="8.1.0"/>
+    </Asset>
+    <Files>
+        <File fileId="3" filename="$data/maps/textures/shared/default_specular.dds"/>
+        <File fileId="1" filename="textures/electrical_diffuse.dds"/>
+        <File fileId="2" filename="textures/electrical_normal.dds"/>
+    </Files>
+    <Materials>
+        <Material name="electric_mat" materialId="4">
+            <Texture fileId="1"/>
+            <Normalmap fileId="2"/>
+            <Glossmap fileId="3"/>
+        </Material>
+    </Materials>
+    <Shapes externalShapesFile="powerBox.i3d.shapes"/>
+    <Dynamics/>
+    <Scene>
+        <Shape shapeId="1" name="powerBox" translation="-5.30695 0.759841 -4.04681" rotation="0 180 0" static="true" clipDistance="300" nodeId="179" materialIds="4" castsShadows="true" receiveShadows="true">
+            <Shape shapeId="2" name="switchHandle" translation="0.238911 0.855893 -0.027" kinematic="true" clipDistance="300" nodeId="180" materialIds="4" castsShadows="true" receiveShadows="true"/>
+        </Shape>
+    </Scene>
+</i3D>

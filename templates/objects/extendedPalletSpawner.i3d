@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="iso-8859-1"?>
+<i3D name="untitled" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+    <Asset>
+        <Export program="GIANTS Editor 64bit" version="8.1.0"/>
+    </Asset>
+    <Files>
+        <File fileId="1" filename="textures/leakyConcreteWall_diffuse.png"/>
+    </Files>
+    <Materials>
+        <Material name="leakyConcreteWall_diffuse" materialId="10">
+            <Texture fileId="1"/>
+        </Material>
+        <Material name="lambert1" materialId="15" diffuseColor="0.494118 0.494118 0.494118 1"/>
+    </Materials>
+    <Shapes externalShapesFile="extendedPalletSpawner.i3d.shapes"/>
+    <Dynamics/>
+    <Scene>
+        <TransformGroup name="ExtendedPalletSpawner" nodeId="157">
+            <Shape shapeId="1" name="palletSpawner" translation="-4.23117 -0.025 6.50804" static="true" clipDistance="150" nodeId="158" materialIds="10" castsShadows="true" receiveShadows="true">
+                <TransformGroup name="palletSpawnerPlaceNode1" translation="0 0.12 0" rotation="0 -90 0" nodeId="159"/>
+            </Shape>
+            <Shape shapeId="1" name="palletSpawner" translation="-9.04397 -0.025 6.50804" static="true" clipDistance="150" nodeId="160" materialIds="10" castsShadows="true" receiveShadows="true">
+                <TransformGroup name="palletSpawnerPlaceNode2" translation="0 0.12 0" rotation="0 -90 0" nodeId="161"/>
+            </Shape>
+            <Shape shapeId="2" name="palletInteractionTrigger" translation="-4.28264 1.15047 6.61143" scale="0.03 0.5 0.2" static="true" trigger="true" collisionMask="15736832" nodeId="162" materialIds="15" castsShadows="true" receiveShadows="true" nonRenderable="true"/>
+            <Shape shapeId="2" name="palletInteractionTrigger" translation="-9.06156 1.15047 6.61143" scale="0.03 0.5 0.2" static="true" trigger="true" collisionMask="15736832" nodeId="163" materialIds="15" castsShadows="true" receiveShadows="true" nonRenderable="true"/>
+        </TransformGroup>
+    </Scene>
+</i3D>
