@@ -3,14 +3,19 @@
 --
 -- @Interface: --
 -- @Author: LS-Modcompany
--- @Date: 07.03.2018
--- @Version: 1.0.0.0
+-- @Date: 24.04.2019
+-- @Version: 1.1.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
 --
--- 	v1.0.0.0 ():
+-- 	v1.1.0.0 (24.04.2019):
+-- 		- remove 'modEventListener' as in FS19 this is now a problem if more than one script in a mod is using it.
+--		- This is done to support 'addonScripts' if needed.
+--
+--
+-- 	v1.0.0.0 (07.03.2019):
 -- 		- initial fs19 (GtX)
 --		- 'de' warning translation (aPuehri)
 --
@@ -33,9 +38,9 @@ function GC_Checker:init()
 		GC_Checker.modsToCheck = {}
 		GC_Checker.errorsToShow = {}		
 		GC_Checker.startUpdateTime = 2000
-		
-		addModEventListener(GC_Checker)
-		
+
+		Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, GC_Checker.onStartMission);
+
 		getfenv(0)["g_globalCompanyChecker"] = GC_Checker
 	end
 	
@@ -48,14 +53,17 @@ function GC_Checker:addModToList(modName)
 	end
 end
 
-function GC_Checker:loadMap(i3dFilePath)
+function GC_Checker:onStartMission()
 	if g_company == nil then	
+		local needUpdateable = false;
+		
 		for modName, warningText in pairs (g_globalCompanyChecker.modsToCheck) do
 			local mod = g_modManager:getModByName(modName)
 			local xmlFile = loadXMLFile("TempModDesc", mod.modFile)
 			if xmlFile ~= nil and xmlFile ~= 0 then
 				local versionString = getXMLString(xmlFile, "modDesc.globalCompany#minimumVersion")
 				if versionString ~= nil then					
+					needUpdateable = true;
 					local data = {}
 					data.modData = mod
 					data.showWarning = true
@@ -72,15 +80,19 @@ function GC_Checker:loadMap(i3dFilePath)
 				delete(xmlFile)
 			end
 		end
+		
+		if needUpdateable then
+			g_currentMission:addUpdateable(g_globalCompanyChecker);
+		end;
 	else	
-		self:delete()
+		g_globalCompanyChecker:delete()
 	end
 end
 
 function GC_Checker:delete()
-	if g_globalCompanyChecker ~= nil then	
-		removeModEventListener(g_globalCompanyChecker)
-		g_globalCompanyChecker = nil
+	if g_globalCompanyChecker ~= nil then
+		g_currentMission:removeUpdateable(g_globalCompanyChecker)
+		getfenv(0)["g_globalCompanyChecker"] = nil;
 	end;
 end
 

@@ -52,8 +52,7 @@ function GC_shopManager:loadFromXML(modName, xmlFile)
 		for name, category in pairs(g_storeManager.categories) do
 			categories[category.orderId] = name:lower();
 		end;
-	end;
-			
+	
 		i = 0;
 		while true do
 			local keySub = string.format("%s.sortCategories.category(%d)", key, i);

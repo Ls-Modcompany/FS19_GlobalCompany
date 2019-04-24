@@ -17,7 +17,6 @@
 --
 --
 -- ToDo:
---		- convert all scripts to use 'GC_DebugUtils' (kevink98 / GtX)
 --
 --
 
@@ -52,7 +51,7 @@ function GlobalCompany.initialLoad()
 
 		--| Load Language Manager |--
 		source(GlobalCompany.dir .. "utils/GC_languageManager.lua");
-		g_company.languageManager:load(GlobalCompany.dir); -- We need to load Global Company texts first for 'modManager' to use.
+		g_company.languageManager:load(GlobalCompany.dir);
 
 		--| Load Mod Manager |--
 		source(GlobalCompany.dir .. "utils/GC_ModManager.lua");
@@ -65,10 +64,13 @@ function GlobalCompany.initialLoad()
 		duplicateLoad = true;
 	end;
 
-	-- Can we load?
-	if g_company.modManager:doLoadCheck(g_currentModName, duplicateLoad, GlobalCompany.isDevelopmentVersion) then
+	local modName = g_currentModName;
+	if g_company.modManager:doLoadCheck(modName, duplicateLoad, GlobalCompany.isDevelopmentVersion) then
 		g_company.debug:singleLogWrite(GC_DebugUtils.BLANK, "Loading Version: %s (%s)", GlobalCompany.version, GlobalCompany.versionDate);
 		addModEventListener(GlobalCompany);
+
+		-- @kevink98 @aPuehri If you have another idea let me know ;-)
+		Mission00.load = Utils.prependedFunction(Mission00.load, GlobalCompany.initModClasses);
 
 		Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, GlobalCompany.init);
 
@@ -78,66 +80,73 @@ function GlobalCompany.initialLoad()
 		GlobalCompany.raisedUpdateables = {};
 		GlobalCompany.environments = {};
 		GlobalCompany.xmlLoads = {};
+		GlobalCompany.modClassNames = {};
+		GlobalCompany.modLanguageFiles = {};
 
 		g_company.modManager:initDevelopmentWarning(GlobalCompany.isDevelopmentVersion);
 
 		GlobalCompany.loadSourceFiles();
 		GlobalCompany.loadPlaceables();
 
-		g_company.farmlandOwnerListener = GC_FarmlandOwnerListener:new();
+		g_company.farmlandOwnerListener = GC_FarmlandOwnerListener:new();		
 
-		local modLanguageFiles = {};
-
-		local selectedMods = {};
-		if g_server == nil then
-			selectedMods = g_mpLoadingScreen.missionDynamicInfo.mods;
-		else
-			selectedMods = g_modSelectionScreen.missionDynamicInfo.mods;
-		end;
-
-		for _, mod in pairs(selectedMods) do
-			local path;
-			local modName = mod.modName;
-
-			if mod.modDir ~= nil then
-				path = mod.modDir .. "globalCompany.xml";
-				if not fileExists(path) then
-					path = mod.modDir .. "xml/globalCompany.xml";
-					if not fileExists(path) then
-						path = nil;
-					end;
-				end;
-
-				-- Ignore Global Company language files.
-				if modName ~= g_currentModName then
-					local langFullPath = g_company.languageManager:getLanguagesFullPath(mod.modDir);
-					if langFullPath ~= nil then
-						--if g_company.languageManager:checkEnglishBackupExists(langFullPath, modName) then
-							modLanguageFiles[modName] = langFullPath;
-						--end;
-					end;
-				end;
-			end;
-
-			if path ~= nil then				
-				GlobalCompany.environments[modName] = loadXMLFile("globalCompany", path);
-			end;
-		end;
+		GlobalCompany.loadEnviroment(modName, GlobalCompany.dir .. "xml/globalCompany.xml", false);		
+		g_company.modManager:initSelectedMods();
 
 		for modName, xmlFile in pairs(GlobalCompany.environments) do
-			-- add specializations
-				--g_company.specializations:loadFromXML(modName, g_company.utils.createModPath(modName, values.specializations));
 			g_company.shopManager:loadFromXML(modName, xmlFile);
+			
+			-- add specializations
+			--g_company.specializations:loadFromXML(modName, g_company.utils.createModPath(modName, values.specializations));
+
 			-- add densityMapHeightOverwriteOrginalFunction
-				--g_densityMapHeightManager.loadMapData = function() return true; end;
+			--g_densityMapHeightManager.loadMapData = function() return true; end;
 		end;
 
-		g_company.languageManager:loadModLanguageFiles(modLanguageFiles);
+		g_company.languageManager:loadModLanguageFiles(GlobalCompany.modLanguageFiles);
 	else
-		getfenv(0)["g_company"] = nil; -- Clear if there is an error loading or a duplicate.
+		getfenv(0)["g_company"] = nil;
 	end;
 
 	GlobalCompany.initialLoadComplete = true;
+end;
+
+function GlobalCompany.loadEnviroment(modName, path, isMod)
+	local xmlFile = loadXMLFile("globalCompany", path);
+	GlobalCompany.environments[modName] = xmlFile;
+	
+	if isMod then
+		g_company.debug:singleLogWrite(g_company.debug.MODDING, "Initialising environments for mod '%s'", modName);
+	end;
+end;
+
+-- @kevink98 @aPuehri 
+-- Using the following in a mod's 'modDesc' you can init GC functions or addModEventListeners after GC loads.
+-- Script still needs to be loaded from modDesc using 'extraSourceFiles'.
+-- <globalCompany minimumVersion="1.0.0.0"> <customClasses> <customClass name="MyAddonScript"/> </customClasses> </globalCompany>
+-- function MyAddonScript:initGlobalCompany(customEnvironment, baseDirectory, xmlFile) end;
+function GlobalCompany:initModClasses()
+	if g_company.modClassNames ~= nil then
+		for modName, modClasses in pairs (g_company.modClassNames) do
+			local modEnv = getfenv(0)["_G"][modName];
+			if modEnv ~= nil then				
+				local baseDirectory = g_modNameToDirectory[modName];
+				for _, className in ipairs(modClasses) do	
+					if className ~= nil and modEnv[className] ~= nil and modEnv[className].initGlobalCompany ~= nil then
+						modEnv[className].initGlobalCompany(modEnv[className], modName, baseDirectory, GlobalCompany.environments[modName]);					
+					end;
+				end;
+			end;
+			
+			-- Delete XML to cleanup correctly.
+			if GlobalCompany.environments[modName] ~= nil then
+				delete(GlobalCompany.environments[modName]);
+				GlobalCompany.environments[modName] = nil;
+			end;
+		end;
+		
+		g_company.modClassNames = nil;
+	end;
 end;
 
 --|| Init ||--
@@ -188,9 +197,9 @@ function GlobalCompany.removeUpdateable(target, update)
 end;
 
 --|| Parameters ||--
-function GlobalCompany.addXmlLoad(target)
-	GlobalCompany.xmlLoads[target] = {target=target};
-end;
+-- function GlobalCompany.addXmlLoad(target)
+	-- GlobalCompany.xmlLoads[target] = {target=target};
+-- end;
 
 --| Load Source Files |--
 function GlobalCompany.loadSourceFiles()
@@ -293,20 +302,18 @@ end;
 
 function GlobalCompany:loadMap()
 	g_company.debug:loadConsoleCommands();
-
-	g_company.modManager:checkActiveModVersions(); -- Check active mods for version ID
 	
 	g_company.gui:load();
 
-	for modName, xmlFile in pairs(GlobalCompany.environments) do
-		for xmlLoad, _ in pairs(GlobalCompany.xmlLoads) do
-			if xmlLoads.loadXml ~= nil then
-				xmlLoads.loadXml(xmlLoad, modName, xmlFile);
-			else
-				--error
-			end;
-		end;
-	end;	
+	-- for modName, xmlFile in pairs(GlobalCompany.environments) do
+		-- for xmlLoad, _ in pairs(GlobalCompany.xmlLoads) do
+			-- if xmlLoads.loadXml ~= nil then
+				-- xmlLoads.loadXml(xmlLoad, modName, xmlFile);
+			-- else
+				-- --error
+			-- end;
+		-- end;
+	-- end;	
 
 	g_company.settings = GlobalCompanySettings:load();
 

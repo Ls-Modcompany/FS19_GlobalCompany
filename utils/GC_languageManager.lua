@@ -3,12 +3,16 @@
 --
 -- @Interface: --
 -- @Author: LS-Modcompany / kevink98
--- @Date: 17.12.2018
--- @Version: 1.0.0.0
+-- @Date: 24.04.2019
+-- @Version: 1.1.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+--
+-- 	v1.1.0.0 (24.04.2019):
+-- 		- update consoleCommand
+--
 --
 -- 	v1.0.0.0 ():
 -- 		- initial fs19 (kevink98)
@@ -21,24 +25,26 @@
 --
 
 GC_languageManager = {};
-GC_languageManager.debugIndex = g_company.debug:registerScriptName("LanguageManager");
+GC_languageManager.debugIndex = g_company.debug:registerScriptName("GC_languageManager");
 
 g_company.languageManager = GC_languageManager;
 
-local baseModNameToPrefix = {["GlobalCompany"] = "GC",
-							 ["GlobalCompanyTablet"] = "GCT",
-							 ["GlobalCompanySRS"] = "SRS"};
+local baseModNameToPrefix = {
+	["GlobalCompany"] = "GC",
+	["GlobalCompanyTablet"] = "GCT",
+	["GlobalCompanySRS"] = "SRS"
+};
 
 function GC_languageManager:load(loadingDirectory)
 	GC_languageManager.debugData = g_company.debug:getDebugData(GC_languageManager.debugIndex, g_company);
 
-	addConsoleCommand("gcCompareLanguageFiles", "Compare language files. For mods use [modName] [folder](optional)", "consoleCommandCompareLanguageFiles", GC_languageManager);
+	addConsoleCommand("gcCompareLanguageFiles", "Compare language files. For mods use [modName]", "consoleCommandCompareLanguageFiles", GC_languageManager);
 
 	if loadingDirectory ~= nil then
 		local baseLanguageFullPath = g_company.languageManager:getLanguagesFullPath(loadingDirectory);
 		GC_languageManager:loadEntries(g_currentModName, baseLanguageFullPath, "l10n.elements.e(%d)");
 
-		g_company.debug:writeDev(GC_languageManager.debugData, "Standard language XML file has been loaded successfully."); -- Only print in development mode.
+		g_company.debug:writeDev(GC_languageManager.debugData, "Standard language XML file has been loaded successfully.");
 	end;
 end;
 
@@ -81,8 +87,8 @@ function GC_languageManager:loadEntries(modName, fullPath, baseKey)
 		local v = getXMLString(xmlFile, key.."#v");
 
 		if k ~= nil and v ~= nil then
-			if GC_languageManager:getCanUseText(k, rootModName) then -- Make sure the texts are mod specific.
-				if globalTexts[k] == nil then -- Stop duplicates and print warning.
+			if GC_languageManager:getCanUseText(k, rootModName) then
+				if globalTexts[k] == nil then
 					globalTexts[k] = v;
 				else
 					table.insert(duplicateTable, k);
@@ -97,7 +103,6 @@ function GC_languageManager:loadEntries(modName, fullPath, baseKey)
 
 	delete(xmlFile);
 
-	-- Group print all warning at the end.
 	if #duplicateTable > 0 then
 		local text = "The following duplicate text entries have been found in '%s' (%s)! Please remove these."
 		g_company.debug:writeWarning(GC_languageManager.debugData, text, fullPath, modName);
@@ -129,8 +134,8 @@ function GC_languageManager:loadEntries(modName, fullPath, baseKey)
 end
 
 function GC_languageManager:getLanguagesFullPath(modPath)
-	local languageSuffixs = {g_languageSuffix, "_en", "_de"};
-	for i = 1, 3 do
+	local languageSuffixs = {g_languageSuffix, "_en"};
+	for i = 1, 2 do
 		local fullPath = string.format("%sl10n%s.xml", modPath, languageSuffixs[i]);
 		if fileExists(fullPath) then
 			return fullPath;
@@ -145,7 +150,6 @@ function GC_languageManager:getLanguagesFullPath(modPath)
 	return;
 end;
 
--- @kevink98 Should we force people to include 'English' if they have text files.
 function GC_languageManager:checkEnglishBackupExists(fullPath, modName)
 	local filename = string.format("l10n%s", g_languageSuffix);
 	if filename == "l10n_en" then
@@ -219,73 +223,83 @@ function GC_languageManager:getCanUseText(text, modName)
 	return false;
 end;
 
-function GC_languageManager:consoleCommandCompareLanguageFiles(modName, folder)
-	GC_languageManager:compareLanguageFiles(modName, folder);
+function GC_languageManager:consoleCommandCompareLanguageFiles(modName)
+	GC_languageManager:compareLanguageFiles(modName);
 	return "Comparing of language files completed."
 end;
 
-function GC_languageManager:compareLanguageFiles(modName, folder)
+function GC_languageManager:compareLanguageFiles(modName)
 	local filesFound = false;
 	local languages = {};
 	local setNames = {};
+	local path;
 
-	-- Default 'GC' path.
-	local path = g_company.dir .. "languages";
-
-	-- Allow modName to be given and location (folder) of mod text files for checking.
+	-- Allow modName to be given for checking.
+	-- We find the folder from 2 possible locations using 'en' as it is a minimum to load anyway ;-)
 	if modName ~= nil then
 		if g_modIsLoaded[modName] then
-			if folder == nil then
-				folder = "";
+			local tempPath = g_modNameToDirectory[modName];
+			local fullPath = string.format("%sl10n_en.xml", tempPath);
+			if fileExists(fullPath) then
+				path = tempPath;
+			else
+				fullPath = string.format("%slanguages/l10n_en.xml", tempPath);
+				if fileExists(fullPath) then
+					path = tempPath .. "languages/"
+				end;
 			end;
-			path = g_modNameToDirectory[modName] .. folder
 		else
 			g_company.debug:singleLogWrite(GC_DebugUtils.WARNING, "Unable to find an active mode with a filename '%s'.", modName);
 		end;
-	end;
-
-	-- This will check all available game languages.
-	for i = 1, getNumOfLanguages() do
-		local languageCode = getLanguageCode(i - 1);
-		local fileName = string.format("l10n_%s.xml", languageCode);
-		local fullPath = string.format("%s/%s", path, fileName);
-		if fileExists(fullPath) then
-			filesFound = true;
-			languages[fileName] = {};
-			local xmlFile = loadXMLFile("TempConfig", fullPath);
-
-			local j = 0;
-			while true do
-				local key = string.format("l10n.elements.e(%d)", j);
-				if not hasXMLProperty(xmlFile, key) then
-					break;
-				end;
-
-				local k = getXMLString(xmlFile, key.."#k");
-				local v = getXMLString(xmlFile, key.."#v");
-
-				if k ~= nil and v ~= nil then
-					languages[fileName][k] = true; -- Save names for each language.
-					setNames[k] = true; -- Save complete list of names to compare with.
-				end;
-
-				j = j + 1;
-			end;
-
-			delete(xmlFile);
-		end;
-	end;
-
-	if filesFound then
-		for textName, _ in pairs(setNames) do
-			for fileName, texts in pairs(languages) do
-				if texts[textName] == nil then
-					g_company.debug:singleLogWrite(GC_DebugUtils.WARNING, "Text '%s' is missing in %s", textName, fileName);
-				end;
-			end;
-		end;
 	else
-		g_company.debug:singleLogWrite(GC_DebugUtils.WARNING, "Invalid file path '%s' given! No language files found.", path);
+		-- Default 'GC' path.
+		path = g_company.dir .. "languages/";
+	end;
+	
+	-- This will check all available game languages.
+	if path ~= nil then
+		for i = 1, getNumOfLanguages() do
+			local languageCode = getLanguageCode(i - 1);
+			local fileName = string.format("l10n_%s.xml", languageCode);
+			local fullPath = string.format("%s%s", path, fileName);
+			if fileExists(fullPath) then
+				filesFound = true;
+				languages[fileName] = {};
+				local xmlFile = loadXMLFile("languagesXML", fullPath);
+	
+				local j = 0;
+				while true do
+					local key = string.format("l10n.elements.e(%d)", j);
+					if not hasXMLProperty(xmlFile, key) then
+						break;
+					end;
+	
+					local k = getXMLString(xmlFile, key .. "#k");
+					local v = getXMLString(xmlFile, key .. "#v");
+	
+					if k ~= nil and v ~= nil then
+						languages[fileName][k] = true; -- Save names for each language.
+						setNames[k] = true; -- Save complete list of names to compare with.
+					end;
+	
+					j = j + 1;
+				end;
+	
+				delete(xmlFile);
+			end;
+		end;
+		
+		if filesFound then
+			for textName, _ in pairs(setNames) do
+				for fileName, texts in pairs(languages) do
+					if texts[textName] == nil then
+						g_company.debug:singleLogWrite(GC_DebugUtils.WARNING, "Text '%s' is missing in %s", textName, fileName);
+					end;
+				end;
+			end;
+		else
+			g_company.debug:singleLogWrite(GC_DebugUtils.WARNING, "No language files found at '%s' or '%slanguages/'.", path, path);
+		end;
 	end;
 end;
 

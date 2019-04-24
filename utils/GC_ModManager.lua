@@ -10,8 +10,8 @@
 --
 -- Changelog:
 --
--- 	v1.0.0.0 ():
--- 		- initial fs19 (GtX)
+--  v1.0.0.0 ():
+--      - initial fs19 (GtX)
 --
 -- Notes:
 --
@@ -38,6 +38,7 @@ function GC_ModManager:new()
 	self.isClient = g_client ~= nil;
 
 	self:initInvalidMods();
+	self.ignoreFiles = {["FS19_GlobalCompany"] = true, ["FS19_GlobalCompany_update"] = true};
 
 	self.startUpdateTime = 2000; -- Wait 2 sec to show any messages.
 
@@ -75,45 +76,92 @@ function GC_ModManager:new()
 	return self;
 end;
 
-function GC_ModManager:checkActiveModVersions()
-	if self.isClient then
-		self.modVersionCheck = true;
+function GC_ModManager:initSelectedMods()
+	local selectedMods = {};
+	if self.isServer then
+		selectedMods = g_modSelectionScreen.missionDynamicInfo.mods;
+	else
+		selectedMods = g_mpLoadingScreen.missionDynamicInfo.mods;
+	end;
 
-		local activeMods = g_modManager:getActiveMods();
-		for i = 1, #activeMods do
-			local mod = activeMods[i];
+	for _, mod in pairs(selectedMods) do
+		local modName = mod.modName;
+		local modDir = mod.modDir;
 
-			-- Do not check GlobalCompany Mod. ;-)
-			if mod.modName ~= "FS19_GlobalCompany" and mod.modName ~= "FS19_GlobalCompany_update" then
+		if self.ignoreFiles[modName] == nil then
+			if mod.modFile ~= nil and modDir ~= nil then
 				local xmlFile = loadXMLFile("TempModDesc", mod.modFile);
 
-				local versionString = getXMLString(xmlFile, "modDesc.globalCompany#minimumVersion");
-				if versionString ~= nil then
-					local modVersionId = self:getVersionId(versionString);
-					if modVersionId ~= nil and modVersionId ~= "" then
-						if modVersionId > self:getCurrentVersionId() then
-							if self.modVersionErrors == nil then
-								self.modVersionErrors = {};
-								self:doAddUpdateable(true);
-							end;
-
-							local isModMap = g_modManager:isModMap(mod.modName);
-							self.modVersionErrors[mod.modName] = {versionString = versionString, author = mod.author, isModMap = isModMap};
-							self.numModVersionErrors = self.numModVersionErrors + 1;
-						end;
-					else
-						g_company.debug:writeModding(self.debugData, "%s is not a valid version number at 'modDesc.globalCompany#minimumVersion' in modDesc %s!", versionString, mod.modFile);
-					end;
-				end;
-
-				if self.invalidMods[mod.modName] or self.invalidMods[mod.title] then
+				if self.invalidMods[modName] or self.invalidMods[mod.title] then
 					if self.modInvalidErrors == nil then
 						self.modInvalidErrors = {};
 						self:doAddUpdateable(true);
 					end;
 
-					self.modInvalidErrors[mod.modName] = {author = mod.author};
+					self.modInvalidErrors[modName] = {author = mod.author};
 					self.numInvalidModsErrors = self.numInvalidModsErrors + 1;
+				else
+					-- If the 'mod' does not have the 'globalCompany' KEY we will not load any files. --
+					-- This will speed up load times as we only check GC Mods this way! --
+					-- <globalCompany minimumVersion="1.0.0.0"/>
+					local key = "modDesc.globalCompany";
+					if hasXMLProperty(xmlFile, key) then
+						local versionString = getXMLString(xmlFile, key .. "#minimumVersion");
+						if versionString ~= nil then
+							local modVersionId = self:getVersionId(versionString);
+							if modVersionId ~= nil and modVersionId ~= "" then
+								if modVersionId > self:getCurrentVersionId() then
+									if self.modVersionErrors == nil then
+										self.modVersionErrors = {};
+										self:doAddUpdateable(true);
+									end;
+
+									local isModMap = g_modManager:isModMap(modName);
+									self.modVersionErrors[modName] = {versionString = versionString, author = mod.author, isModMap = isModMap};
+									self.numModVersionErrors = self.numModVersionErrors + 1;
+								end;
+
+								-- Try to load 'globalCompany.xml' if it exists. --
+								local path = modDir .. "globalCompany.xml";
+								if fileExists(path) then
+									g_company.loadEnviroment(modName, path, true);
+								else
+									path = modDir .. "xml/globalCompany.xml";
+									if fileExists(path) then
+										g_company.loadEnviroment(modName, path, true);
+									end;
+								end;
+
+								-- Try to load language files if they exists. --
+								local langFullPath = g_company.languageManager:getLanguagesFullPath(modDir);
+								if langFullPath ~= nil then
+									if g_company.languageManager:checkEnglishBackupExists(langFullPath, modName) then
+										g_company.modLanguageFiles[modName] = langFullPath;
+									end;
+								end;
+
+								-- If we have 'customClasses' then store these to be called before load. --
+								local i = 0;
+								while true do
+									local customClassKey = string.format("%s.customClasses.customClass(%d)", key, i);
+									local className = getXMLString(xmlFile, customClassKey .. "#name");
+									if className == nil then
+										break;
+									end
+
+									if g_company.modClassNames[modName] == nil then
+										g_company.modClassNames[modName] = {};
+									end;
+
+									table.insert(g_company.modClassNames[modName], className);
+
+									i = i + 1;
+								end;
+							else
+								g_company.debug:writeModding(self.debugData, "%s is not a valid version number at '%s#minimumVersion' in modDesc %s!", versionString, key, mod.modFile);
+							end;
+						end;
+					end;
 				end;
 
 				delete(xmlFile);
@@ -261,7 +309,7 @@ function GC_ModManager:showLoadWarningGUI(strg, warningType)
 	end;
 
 	if self.isClient then
-		g_gui:closeAllDialogs(); -- Make sure we are on top when opened.
+		--g_gui:closeAllDialogs(); -- Make sure we are on top when opened.
 		g_gui:showYesNoDialog({title = self.texts.guiTitle,
 							text = text,
 							dialogType = DialogElement.TYPE_LOADING,
