@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="iso-8859-1"?>
+<i3D name="farmSiloSmall" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+    <Asset>
+        <Export program="GIANTS Editor 64bit" version="8.1.0"/>
+    </Asset>
+    <Files>
+        <File fileId="4" filename="$data/shaders/emissiveFalloffShader.xml"/>
+        <File fileId="2" filename="$data/shared/default_normal.png"/>
+        <File fileId="3" filename="$data/shared/materialHolders/defaultGlow_diffuse.png"/>
+    </Files>
+    <Materials>
+        <Material name="default_mat" materialId="10" diffuseColor="0.494118 0.494118 0.494118 1">
+            <Normalmap fileId="2"/>
+        </Material>
+        <Material name="defaultGlow_mat" materialId="12" alphaBlending="true" customShaderId="4" customShaderVariation="colorScale">
+            <Emissivemap fileId="3"/>
+            <CustomParameter name="colorScale" value="0 1 0 1"/>
+        </Material>
+        <Material name="lambert1" materialId="11" diffuseColor="0.494118 0.494118 0.494118 1"/>
+    </Materials>
+    <Shapes externalShapesFile="loadingTrigger.i3d.shapes"/>
+    <Dynamics/>
+    <Scene>
+        <TransformGroup name="loadingTriggers" nodeId="35">
+            <Shape shapeId="1" name="loadingTrigger" translation="0 5 0" static="true" trigger="true" collisionMask="1073741824" nodeId="36" materialIds="11" castsShadows="true" receiveShadows="true" nonRenderable="true"/>
+            <TransformGroup name="dischargeNode" translation="0 5.1 0" nodeId="37"/>
+            <TransformGroup name="dischargeEffect" translation="0 5.1 0" nodeId="38">
+                <Shape shapeId="2" name="pipeEffect" rotation="90 0 0" clipDistance="300" nodeId="39" materialIds="10" castsShadows="true" receiveShadows="true"/>
+                <Shape shapeId="3" name="pipeEffectSmoke" translation="0 -4.45118 0" visibility="false" clipDistance="100" nodeId="40" materialIds="10" castsShadows="true" receiveShadows="true"/>
+            </TransformGroup>
+            <Shape shapeId="4" name="mapTargetMarker" translation="0 5.1 0" rotation="180 0 0" scale="0.04 0.001 0.04" visibility="false" clipDistance="5000" nodeId="41" materialIds="12" castsShadows="true" receiveShadows="true"/>
+        </TransformGroup>
+    </Scene>
+    <UserAttributes>
+        <UserAttribute nodeId="41">
+            <Attribute name="onCreate" type="scriptCallback" value="BaseMission.onCreateMapTargetMarker"/>
+        </UserAttribute>
+    </UserAttributes>
+</i3D>
