@@ -63,7 +63,7 @@ end;
 function GC_BaleAddon:update(dt)
 	if self.isClient then
 		GC_BaleAddon.enableCutBale = false;
-		if g_company.settings:getSetting("cutBales") and g_currentMission.player.isControlled and not g_currentMission.player.isCarryingObject then
+		if g_company.settings:getSetting("cutBales", true) and g_currentMission.player.isControlled and not g_currentMission.player.isCarryingObject then
 			if g_currentMission.player.isObjectInRange then
 				if (g_currentMission.player.lastFoundObject ~= nil) then
 					local foundObjectId = g_currentMission.player.lastFoundObject;
