@@ -53,7 +53,7 @@ function GC_PalletExtendedTrigger:load(nodeId, target, xmlFile, xmlKey, referenc
     self.reference = reference;
     self.mode = mode;
 	
-	self.palletInsideCounter = 0;
+	self.palletsInside = {};
 
 	if xmlFile ~= nil and xmlKey ~= nil then
 		local palletTriggerNode = getXMLString(xmlFile, xmlKey .. "#palletTriggerNode");
@@ -69,7 +69,15 @@ function GC_PalletExtendedTrigger:setTriggerNode(palletTriggerNode)
 	if palletTriggerNode ~= nil then
 		self.palletTriggerNode = I3DUtil.indexToObject(self.rootNode, palletTriggerNode, self.target.i3dMappings);
 		if self.palletTriggerNode ~= nil then
-			addTrigger(self.palletTriggerNode, "palletTriggerCallback", self);
+            addTrigger(self.palletTriggerNode, "palletTriggerCallback", self);
+            
+            self.childTriggers = {};
+            for i=1, getNumOfChildren(self.palletTriggerNode) do
+                local childTrigger = getChildAt(self.palletTriggerNode, i-1);
+                addTrigger(childTrigger, "palletTriggerCallback", self);
+                table.insert(self.childTriggers, childTrigger);
+            end;
+
 			return true;
 		end;
 	end;
@@ -80,45 +88,52 @@ end;
 function GC_PalletExtendedTrigger:delete()
 	if self.palletTriggerNode ~= nil then
 		removeTrigger(self.palletTriggerNode);
-	end;
+    end;
+    for _, trigger in pairs(self.childTriggers) do
+        removeTrigger(trigger);
+    end;
 end;
 
 function GC_PalletExtendedTrigger:palletTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay, otherShapeId)
 	local object = g_currentMission:getNodeObject(otherId)
 	if object ~= nil and object.isPalletExtended then
-        print("callback")
-        --[[
         if onEnter then	
-			if self.mode == GC_PalletExtendedTrigger.MODE_COUNTER then
-				self.palletInsideCounter = self.palletInsideCounter + 1;
-				if self.target.onEnterBaleTrigger ~= nil then
-					self.target:onEnterBaleTrigger(self.reference, object);
-				end;
-			end;
-		elseif onLeave then
-			if self.mode == GC_PalletExtendedTrigger.MODE_COUNTER then
-				self.palletInsideCounter = math.max(self.palletInsideCounter - 1, 0);
-				if self.target.onLeaveBaleTrigger ~= nil then
-					self.target:onLeaveBaleTrigger(self.reference, object);
-				end;
-			end;
+            self.palletsInside[object] = object;
+            if self.target.onEnterPalletExtendedTrigger ~= nil then
+                self.target:onEnterPalletExtendedTrigger(self.reference, object);
+            end;
+            print(object:getFillTypeName())
+        elseif onLeave then
+            self.palletsInside[object] = nil;
+            if self.target.onLeavePalletExtendedTrigger ~= nil then
+                self.target:onLeavePalletExtendedTrigger(self.reference, object);
+            end;
         end;
-        ]]--
 	end;
 end;
 
-function GC_PalletExtendedTrigger:getTriggerEmpty()
-	return self.palletInsideCounter == 0;
+function GC_PalletExtendedTrigger:getFullFillLevel()
+    local fillLevel = 0;
+    for _, object in pairs(self.palletsInside) do
+        fillLevel = fillLevel + object:getFillLevel();
+    end;
+    return fillLevel;
 end;
 
-function GC_PalletExtendedTrigger:getTriggerNotEmpty()
-	return self.palletInsideCounter ~= 0;
+function GC_PalletExtendedTrigger:getFullFillLevelByFillType(filltype)
+    local fillLevel = 0;
+    for _, object in pairs(self.palletsInside) do
+        if object:getFillTyp() == filltype then
+            fillLevel = fillLevel + object:getFillLevel();
+        end;
+    end;
+    return fillLevel;
 end;
 
-function GC_PalletExtendedTrigger:reset()
-	self.palletInsideCounter = 0;
-end;
-
-function GC_PalletExtendedTrigger:getNum()
-	return self.palletInsideCounter;
+function GC_PalletExtendedTrigger:getAvailableFillTypes()
+    local fillTypes = {};
+    for _, object in pairs(self.palletsInside) do
+        table.insert(fillTypes, object:getFillTyp());
+    end;
+    return fillTypes;
 end;
