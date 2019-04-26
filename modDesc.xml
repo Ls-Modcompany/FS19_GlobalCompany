@@ -19,14 +19,14 @@
     <l10n>		
 		<text name="input_GC_BALESHREADER_TURNON_AREALIGHTS"><en>turnAreaLights</en></text>
 		<text name="input_GC_MAIN"><en>GlobalCompany</en><de>GlobalCompany</de></text>
-		<text name="input_GC_TEST"><en>test</en></text>
+		<text name="input_GC_GREENHOUSE_VENTILATOR"><en>greenhouse ventilator</en></text>
 		<text name="input_GC_BALEADDON_CUT"><en>Cut Bale</en><de>Ballen aufschneiden</de></text>
 	</l10n>		
 	
 	<actions>
         <action name="GC_BALESHREADER_TURNON_AREALIGHTS" />
         <action name="GC_MAIN" />
-        <action name="GC_TEST" />
+        <action name="GC_GREENHOUSE_VENTILATOR" />
 		<action name="GC_BALEADDON_CUT" />
     </actions>
 
@@ -38,13 +38,14 @@
         <actionBinding action="GC_MAIN">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_g" axisComponent="+" neutralInput="0" index="1"/>
         </actionBinding> 
-        <actionBinding action="GC_TEST">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_r" axisComponent="+" neutralInput="0" index="1"/>
+        <actionBinding action="GC_GREENHOUSE_VENTILATOR">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_b" axisComponent="+" neutralInput="0" index="1"/>
         </actionBinding>
         <actionBinding action="GC_BALEADDON_CUT">
             <binding device="KB_MOUSE_DEFAULT" input="MOUSE_BUTTON_RIGHT" axisComponent="+" neutralInput="0" index="3"/>
         </actionBinding>		
     </inputBinding>
+    
     
 
 </modDesc>
