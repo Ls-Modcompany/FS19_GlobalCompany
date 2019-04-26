@@ -49,7 +49,7 @@ function GC_ObjectInfo:init()
 end;
 
 function GC_ObjectInfo:update(dt)
-	if self.isClient and g_company.settings:getSetting("objectInfo") then
+	if self.isClient and g_company.settings:getSetting("objectInfo", true) then
 		self.showInfo = false;
 		if g_currentMission.player.isControlled and not g_currentMission.player.isCarryingObject then
 			if g_currentMission.player.isObjectInRange then
