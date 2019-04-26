@@ -23,7 +23,6 @@
 --
 --
 -- ToDo:
--- 		fix money messages (70, 72)
 --
 --
 
@@ -49,7 +48,7 @@ end;
 
 function GC_HorseHelper:hourChanged()
 	if g_company.settings:getSetting("horseHelper", true) and g_currentMission.environment.currentHour == 23 then		
-		local moneyToFarmId = {};
+		local moneyToOwner = {};
 		for _,husbandry in pairs(g_currentMission.husbandries) do
 			for _,animal in pairs(husbandry:getAnimals()) do
 				if animal.module.animalType == "HORSE" then
@@ -66,11 +65,8 @@ function GC_HorseHelper:hourChanged()
 		end;
 		for farmId, factor in pairs(moneyToOwner) do
 			if g_server ~= nil then
-				local price = factor * GC_HorseHelper.price * -1;
-				--g_farmManager:updateFarmStats(farmId, "animalUpkeep", price)
-				g_currentMission:addMoney(price, farmId, "animalUpkeep");
-				--MoneyType.ANIMAL_UPKEEP
-				--g_currentMission:showMoneyChange("animalUpkeep", nil, false, vehicle:getActiveFarm())
+				local price = factor * GC_HorseHelper.price;
+				g_currentMission:addMoney(-price, farmId, MoneyType.ANIMAL_UPKEEP, true, true);
 			end;
 		end;	
 	end;
