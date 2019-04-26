@@ -1,4 +1,17 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <globalCompany>		
-    <shopManager xmlFilename="xml/shop.xml" />
+    <shopManager>
+        <addCategories>
+            <category type="PLACEABLE" name="globalCompanyPlaceable" title="$l10n_GC_category_globalCompanyPlaceable" image="store_globalCompanyPlaceable.dds" />
+        </addCategories>
+        
+        <sortCategories>
+            <category type="PLACEABLE" name="globalCompanyPlaceable" after="containers" />
+        </sortCategories>
+    </shopManager>
+
+    <specializations>
+        <specialization name="palletExtended" className="PalletExtended" filename="specializations/PalletExtended.lua" onlyLoad="true" />
+    </specializations>
+
 </globalCompany>
