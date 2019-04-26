@@ -95,9 +95,7 @@ function GlobalCompany.initialLoad()
 
 		for modName, xmlFile in pairs(GlobalCompany.environments) do
 			g_company.shopManager:loadFromXML(modName, xmlFile);
-
-			-- add specializations
-			--g_company.specializations:loadFromXML(modName, g_company.utils.createModPath(modName, values.specializations));
+			g_company.specializations:loadFromXML(modName, xmlFile);
 
 			-- add densityMapHeightOverwriteOrginalFunction
 			--g_densityMapHeightManager.loadMapData = function() return true; end;
