@@ -37,17 +37,20 @@ function GC_ModManager:new()
 	self.isServer = g_server ~= nil;
 	self.isClient = g_client ~= nil;
 
+	self.allActiveMods = {};
+	self.invalidMods = {};
 	self:initInvalidMods();
+
 	self.ignoreFiles = {["FS19_GlobalCompany"] = true, ["FS19_GlobalCompany_update"] = true};
 
 	self.startUpdateTime = 2000; -- Wait 2 sec to show any messages.
 
 	self.canShowDevelopmentGUI = false;
 
-	self.modVersionErrors = nil;
+	--self.modVersionErrors = nil;
 	self.numModVersionErrors = 0;
 
-	self.modInvalidErrors = nil;
+	--self.modInvalidErrors = nil;
 	self.numInvalidModsErrors = 0;
 
 	self.modVersionCheck = false;
@@ -92,15 +95,17 @@ function GC_ModManager:initSelectedMods()
 			if mod.modFile ~= nil and modDir ~= nil then
 				local xmlFile = loadXMLFile("TempModDesc", mod.modFile);
 
-				if self.invalidMods[modName] or self.invalidMods[mod.title] then
-					if self.modInvalidErrors == nil then
-						self.modInvalidErrors = {};
-						self:doAddUpdateable(true);
-					end;
 
-					self.modInvalidErrors[modName] = {author = mod.author};
-					self.numInvalidModsErrors = self.numInvalidModsErrors + 1;
-				else
+				self.allActiveMods[modName] = {author=mod.author, title=mod.title};
+				self:doAddUpdateable(true);
+				--if self.invalidMods[modName] or self.invalidMods[mod.title] then
+				--	if self.modInvalidErrors == nil then
+				--		self.modInvalidErrors = {};
+				--	end;
+
+				--	self.modInvalidErrors[modName] = {author = mod.author};
+				--	self.numInvalidModsErrors = self.numInvalidModsErrors + 1;
+				--else
 					-- If the 'mod' does not have the 'globalCompany' KEY we will not load any files. --
 					-- This will speed up load times as we only check GC Mods this way! --
 					-- <globalCompany minimumVersion="1.0.0.0"/>
@@ -157,12 +162,15 @@ function GC_ModManager:initSelectedMods()
 
 									i = i + 1;
 								end;
+
+								-- Init invalid Mods
+								self:loadInitInvalidModsByXml(xmlFile, key);
 							else
 								g_company.debug:writeModding(self.debugData, "%s is not a valid version number at '%s#minimumVersion' in modDesc %s!", versionString, key, mod.modFile);
 							end;
 						end;
 					end;
-				end;
+				--end;
 
 				delete(xmlFile);
 			end;
@@ -190,12 +198,25 @@ function GC_ModManager:update(dt)
 		if self.canShowDevelopmentGUI then
 			self.canShowDevelopmentGUI = false;
 			self:showDevelopmentGUI();
-		else
+		else			
+			if self.lodedInvalidMods == nil then
+				for modName, data in pairs(self.allActiveMods) do
+					if self.invalidMods[modName] or self.invalidMods[data.title] then
+						if self.modInvalidErrors == nil then
+							self.modInvalidErrors = {};
+						end;
+						self.modInvalidErrors[modName] = data.author;
+						self.numInvalidModsErrors = self.numInvalidModsErrors + 1;
+					end;
+				end;
+				self.lodedInvalidMods = true;
+			end;
+
 			-- Check for invalid mods first.
 			if self.modInvalidErrors ~= nil then
-				for modName, data in pairs(self.modInvalidErrors) do
+				for modName, author in pairs(self.modInvalidErrors) do
 					if not g_gui:getIsGuiVisible() then
-						self:showModConflictWarningGui(modName, data.author);
+						self:showModConflictWarningGui(modName, author);
 						self.modInvalidErrors[modName] = nil;
 						self.numInvalidModsErrors = self.numInvalidModsErrors - 1;
 					end;
@@ -431,8 +452,23 @@ function GC_ModManager:getCurrentVersionId()
 end;
 
 function GC_ModManager:initInvalidMods()
-	self.invalidMods = {};
 	self.invalidMods["PlaceAnywhere"] = true;
+end;
+
+function GC_ModManager:loadInitInvalidModsByXml(xmlFile, key)
+	if hasXMLProperty(xmlFile, key) then
+		local i = 0;
+		while true do
+			local invalidModKey = string.format("%s.invalidMods.invalidMod(%d)",key, i);
+			if not hasXMLProperty(xmlFile, invalidModKey) then
+				return;
+			end;
+			local name = getXMLString(xmlFile, invalidModKey .. "#name");
+			self.invalidMods[name] = true;
+			g_company.debug:singleLogWrite(g_company.debug.MODDING, "Add mod '%s' as invalid Mod!", name);
+			i = i + 1;
+		end;
+	end;
 end;
 
 

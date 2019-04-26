@@ -118,6 +118,7 @@ function GlobalCompany.loadEnviroment(modName, path, isMod)
 	if isMod then
 		g_company.debug:singleLogWrite(g_company.debug.MODDING, "Initialising environments for mod '%s'", modName);
 	end;
+	g_company.modManager:loadInitInvalidModsByXml(xmlFile, "globalCompany");
 end;
 
 -- @kevink98 @aPuehri
