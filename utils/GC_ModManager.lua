@@ -453,6 +453,8 @@ end;
 
 function GC_ModManager:initInvalidMods()
 	self.invalidMods["PlaceAnywhere"] = true;
+	self.invalidMods["FS19_MoreTrees"] = true;
+	self.invalidMods["FS19_HorseHelper"] = true;
 end;
 
 function GC_ModManager:loadInitInvalidModsByXml(xmlFile, key)
