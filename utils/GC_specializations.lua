@@ -27,20 +27,31 @@ local debugIndex = g_company.debug:registerScriptName("GlobalCompany-GC_speciali
 GC_specializations = {};
 g_company.specializations = GC_specializations;
 GC_specializations.specs = {};
+GC_specializations.modNeedSpec = {};
 
-function GC_specializations:loadFromXML(modName, xmlPath)
-	local xmlFile = loadXMLFile("specializations", xmlPath);	
-		
-	local i = 0;
-	while true do
-		local key = string.format("specializations.specialization(%d)", i);
-		if not hasXMLProperty(xmlFile, key) then
-			break;
+function GC_specializations:loadFromXML(modName, xmlFile)
+	local key = "globalCompany.specializations";
+	if hasXMLProperty(xmlFile, key) then
+		local externalXml = getXMLString(xmlFile, string.format("%s#xmlFilename", key));
+		if externalXml ~= nil then
+			xmlFile = loadXMLFile("specializations", g_company.utils.createModPath(modName, externalXml));
+			key = "specializations";
 		end;	
-		GC_specializations:registerSpecialization(xmlFile, key, modName); 				
-		i = i + 1;
-	end;	
-	delete(xmlFile);
+
+		local i = 0;
+		while true do
+			local key = string.format("%s.specialization(%d)", key, i);
+			if not hasXMLProperty(xmlFile, key) then
+				break;
+			end;	
+			GC_specializations:registerSpecialization(xmlFile, key, modName); 				
+			i = i + 1;
+		end;	
+
+		if externalXml ~= nil then
+			delete(xmlFile);	
+		end;	
+	end;
 end;
 
 function GC_specializations:registerSpecialization(xmlFile, key, modName)
@@ -49,11 +60,19 @@ function GC_specializations:registerSpecialization(xmlFile, key, modName)
 	local filename = Utils.getNoNil(getXMLString(xmlFile, string.format("%s#filename", key)), "");
 	local onlyLoad = Utils.getNoNil(getXMLString(xmlFile, string.format("%s#onlyLoad", key)), false);
 	filename = g_company.utils.createModPath(modName, filename)
-	
+
 	if onlyLoad then
-		name = string.format("%s.%s", modName, name);	
-		className = string.format("%s.%s", modName, className);	
-		g_specializationManager:addSpecialization(name, className, filename, modName);	
+		local mName = string.format("%s.%s", modName, name);	
+		local cName = string.format("%s.%s", modName, className);	
+		g_specializationManager:addSpecialization(mName, cName, filename, modName);	
+		
+		if GC_specializations.modNeedSpec[name] ~= nil then
+			for _, mName in pairs(GC_specializations.modNeedSpec[name])do
+				local mNameN = string.format("%s.%s", mName, name);	
+				local cNameN = string.format("%s.%s", mName, className);	
+				g_specializationManager:addSpecialization(mNameN, cNameN, filename, mName);	
+			end;
+		end;
 	else
 		local specEnvName = string.format("%s.%s", "FS19_GlobalCompany", name);
 		table.insert(GC_specializations.specs, {specEnvName=specEnvName, modName=modName, name=name, className=className, filename=filename});	
@@ -108,9 +127,11 @@ function GC_specializations:getCanAddSpec(vehicleType, spec, s)
 	return spec.prerequisitesPresent(vehicleType.specializations);
 end;
 
+function GC_specializations:addNeedSpec(modName, specName)
+	if GC_specializations.modNeedSpec[specName] == nil then
+		GC_specializations.modNeedSpec[specName] = {};
+	end;
+	table.insert(GC_specializations.modNeedSpec[specName], modName);
+end;
+
 GlobalCompany.addLoadable(GC_specializations, GC_specializations.load);
-
-
-
-
-
