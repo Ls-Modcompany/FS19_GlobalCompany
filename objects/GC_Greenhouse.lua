@@ -32,6 +32,7 @@ GC_Greenhouse.debugIndex = g_company.debug:registerScriptName("GC_Greenhouse");
 GC_Greenhouse.DOORTRIGGER = 0;
 GC_Greenhouse.GREENHOUSETRIGGER = 1;
 GC_Greenhouse.VENTILATOR = 2;
+GC_Greenhouse.palletExtendedTrigger = 3;
 
 getfenv(0)["GC_Greenhouse"] = GC_Greenhouse;
 
@@ -160,8 +161,13 @@ function GC_Greenhouse:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		i = i + 1;
 	end;
 
+	local palletExtendedTriggerKey = string.format("%s.palletExtendedTrigger", xmlKey);
+	if hasXMLProperty(xmlFile, palletExtendedTriggerKey) then
+		self.palletExtendedTrigger = self.triggerManager:loadTrigger(GC_PalletExtendedTrigger, self.rootNode, xmlFile, palletExtendedTriggerKey, GC_Greenhouse.palletExtendedTrigger);
+	end;
 	
 
+	
 	
 	--[[
 	if self.isServer and canLoad then

@@ -19,9 +19,8 @@
 -- ToDo:
 -- 
 
-local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Vehicles-PalletExtended");
-
 PalletExtended = {};
+PalletExtended.debugIndex = g_company.debug:registerScriptName("GlobalCompany-Vehicles-PalletExtended", true);
 
 function PalletExtended.initSpecialization()
     
@@ -38,6 +37,7 @@ function PalletExtended.registerEventListeners(vehicleType)
 end;
 
 function PalletExtended:onLoad(savegame)
+    self.isPalletExtended = true;
 	self.fillTyp = getXMLString(self.xmlFile, "vehicle.palletExtended#fillType");
 	self.fillLevel = getXMLString(self.xmlFile, "vehicle.palletExtended#fillLevel");
 end;

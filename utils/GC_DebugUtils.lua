@@ -277,7 +277,7 @@ function GC_DebugUtils:setAllLevels(value)
 	return count;
 end;
 
-function GC_DebugUtils:registerScriptName(scriptName)
+function GC_DebugUtils:registerScriptName(scriptName, isSpec)
 	if type(scriptName) ~= "string" then
 		local text = "  [LSMC - GlobalCompany > GC_DebugUtils] - 'registerScriptName' failed! '" .. tostring(scriptName) .. "' is not a string value.";
 		print(text);
@@ -292,7 +292,8 @@ function GC_DebugUtils:registerScriptName(scriptName)
 		self.registeredScriptNames[scriptName] = self.registeredScriptsCount;
 
 		return self.registeredScriptsCount;
-	else
+	elseif not isSpec then -- @gtx: i'm not sure, if that is good... but if the script is a spec, and i register it in multiple mod-environments,
+		-- then will the function ``g_specializationManager:addSpecialization`` call every times ``source`` and so this function here also multiple times.
 		local text = string.format("  [LSMC - GlobalCompany > GC_DebugUtils] - Script name %s is already registered! Registered Script Id = %d", scriptName, self.registeredScriptNames[scriptName]);
 		print(text);
 		table.insert(self.savedErrors, text);

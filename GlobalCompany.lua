@@ -258,6 +258,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "triggers/GC_PlayerTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_LoadingTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_UnloadingTrigger.lua");
+	source(GlobalCompany.dir .. "triggers/GC_PalletExtendedTrigger.lua");
 
 	--|| Placeables ||--
 	source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
