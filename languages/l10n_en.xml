@@ -82,7 +82,7 @@
 		<e k="GC_baler_turnOn" v="Switch on"/>
 		<e k="GC_baler_turnOff" v="Switch on"/>
 		<e k="GC_baler_info_machineData" v="Plant data"/>
-		<e k="GC_baler_info_fillLevel" v="Baler fill Level"/>
+		<e k="GC_baler_info_fillLevel" v="Fill Level"/>
 		<e k="GC_baler_info_fillLevelBunker" v="Bunker fill Level"/>
 		<e k="GC_baler_info_counter" v="Bale Counter"/>
 		<e k="GC_baler_info_automatic" v="Automatic Start"/>
