@@ -165,21 +165,6 @@ function GC_ModManager:initSelectedMods()
 
 								-- Init invalid Mods
 								self:loadInitInvalidModsByXml(xmlFile, key);
-
-								local i = 0;
-								while true do
-									local specializationKey = string.format("%s.loadSpecializations.specialization(%d)", key, i);
-									local specName = getXMLString(xmlFile, specializationKey .. "#name");
-									if specName == nil then
-										break;
-									end
-
-									g_company.specializations:addNeedSpec(modName, specName);
-
-									i = i + 1;
-								end;
-
-
 							else
 								g_company.debug:writeModding(self.debugData, "%s is not a valid version number at '%s#minimumVersion' in modDesc %s!", versionString, key, mod.modFile);
 							end;

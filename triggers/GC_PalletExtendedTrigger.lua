@@ -119,10 +119,10 @@ function GC_PalletExtendedTrigger:getFullFillLevel()
     return fillLevel;
 end;
 
-function GC_PalletExtendedTrigger:getFullFillLevelByFillType(filltype)
+function GC_PalletExtendedTrigger:getFullFillLevelByFillType(id)
     local fillLevel = 0;
     for _, object in pairs(self.palletsInside) do
-        if object:getFillTyp() == filltype then
+        if object:getFillType() == id then
             fillLevel = fillLevel + object:getFillLevel();
         end;
     end;
@@ -132,7 +132,7 @@ end;
 function GC_PalletExtendedTrigger:getAvailableFillTypes()
     local fillTypes = {};
     for _, object in pairs(self.palletsInside) do
-        table.insert(fillTypes, object:getFillTyp());
+        table.insert(fillTypes, object:getFillType());
     end;
     return fillTypes;
 end;

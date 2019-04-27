@@ -11,7 +11,9 @@
     </shopManager>
 
     <specializations>
-        <specialization name="palletExtended" className="PalletExtended" filename="specializations/PalletExtended.lua" onlyLoad="true" />
+        <registerSpecializations>
+            <specialization name="palletExtended" className="PalletExtended" filename="specializations/PalletExtended.lua" onlyLoad="true" />
+        </registerSpecializations>
     </specializations>
 
 </globalCompany>

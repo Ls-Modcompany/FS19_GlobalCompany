@@ -21,6 +21,7 @@
 		<text name="input_GC_MAIN"><en>GlobalCompany</en><de>GlobalCompany</de></text>
 		<text name="input_GC_GREENHOUSE_VENTILATOR"><en>greenhouse ventilator</en></text>
 		<text name="input_GC_GREENHOUSE_FILLTYP"><en>greenhouse filltyp</en></text>
+		<text name="input_GC_GREENHOUSE_PLANT"><en>greenhouse plant</en></text>
 		<text name="input_GC_BALEADDON_CUT"><en>Cut Bale</en><de>Ballen aufschneiden</de></text>
 	</l10n>		
 	
@@ -29,6 +30,7 @@
         <action name="GC_MAIN" />
         <action name="GC_GREENHOUSE_VENTILATOR" />
         <action name="GC_GREENHOUSE_FILLTYP" />
+        <action name="GC_GREENHOUSE_PLANT" />
 		<action name="GC_BALEADDON_CUT" />
     </actions>
 
@@ -41,10 +43,13 @@
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_g" axisComponent="+" neutralInput="0" index="1"/>
         </actionBinding> 
         <actionBinding action="GC_GREENHOUSE_VENTILATOR">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_b" axisComponent="+" neutralInput="0" index="1"/>
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_v" axisComponent="+" neutralInput="0" index="1"/>
         </actionBinding>
         <actionBinding action="GC_GREENHOUSE_FILLTYP">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_y" axisComponent="+" neutralInput="0" index="1"/>
+        </actionBinding>
+        <actionBinding action="GC_GREENHOUSE_PLANT">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_b" axisComponent="+" neutralInput="0" index="1"/>
         </actionBinding>
         <actionBinding action="GC_BALEADDON_CUT">
             <binding device="KB_MOUSE_DEFAULT" input="MOUSE_BUTTON_RIGHT" axisComponent="+" neutralInput="0" index="3"/>

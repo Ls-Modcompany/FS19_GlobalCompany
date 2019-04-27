@@ -32,20 +32,20 @@ end;
 
 function PalletExtended.registerEventListeners(vehicleType)
 	SpecializationUtil.registerEventListener(vehicleType, "onLoad", PalletExtended);
-    SpecializationUtil.registerFunction(vehicleType, "getFillTyp", PalletExtended.getFillTyp);
+    SpecializationUtil.registerFunction(vehicleType, "getFillType", PalletExtended.getFillType);
     SpecializationUtil.registerFunction(vehicleType, "getFillLevel", PalletExtended.getFillLevel);
     SpecializationUtil.registerFunction(vehicleType, "getFillTypeName", PalletExtended.getFillTypeName);
 end;
 
 function PalletExtended:onLoad(savegame)
     self.isPalletExtended = true;
-	self.fillTyp = getXMLString(self.xmlFile, "vehicle.palletExtended#fillType");
+	self.fillType = g_company.fillTypeManager:getFillTypeByName(getXMLString(self.xmlFile, "vehicle.palletExtended#fillType"));
 	self.fillLevel = getXMLString(self.xmlFile, "vehicle.palletExtended#fillLevel");
-	self.fillTypLang = getXMLString(self.xmlFile, "vehicle.palletExtended#fillTypLang");
+	self.fillTypeLang = getXMLString(self.xmlFile, "vehicle.palletExtended#fillTypeLang");
 end;
 
-function PalletExtended:getFillTyp()
-    return self.fillTyp;
+function PalletExtended:getFillType()
+    return self.fillType;
 end;
 
 function PalletExtended:getFillLevel()
@@ -53,5 +53,5 @@ function PalletExtended:getFillLevel()
 end;
 
 function PalletExtended:getFillTypeName()
-    return g_company.languageManager:getText(string.format("GlobalCompanyFillType_%s", self.fillTypLang));
+    return g_company.languageManager:getText(string.format("GlobalCompanyFillType_%s", self.fillTypeLang));
 end;

@@ -151,6 +151,10 @@ function GC_ActivableObject:getOn()
     return self.isOn;
 end;
 
+function GC_ActivableObject:isAdded()
+    return self.eventId ~= nil;
+end;
+
 function GC_ActivableObject:update(dt)
 	self.currentDelayTime = math.max(0, self.currentDelayTime - dt);
 	if self.currentDelayTime > 0 then

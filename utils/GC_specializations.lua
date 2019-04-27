@@ -40,7 +40,7 @@ function GC_specializations:loadFromXML(modName, xmlFile)
 
 		local i = 0;
 		while true do
-			local key = string.format("%s.specialization(%d)", key, i);
+			local key = string.format("%s.registerSpecializations.specialization(%d)", key, i);
 			if not hasXMLProperty(xmlFile, key) then
 				break;
 			end;	
@@ -48,10 +48,21 @@ function GC_specializations:loadFromXML(modName, xmlFile)
 			i = i + 1;
 		end;	
 
+		i = 0;
+		while true do
+			local specializationKey = string.format("%s.loadSpecializations.specialization(%d)", key, i);
+			local specName = getXMLString(xmlFile, specializationKey .. "#name");
+			if specName == nil then
+				break;
+			end
+			GC_specializations:addNeedSpec(modName, specName);
+			i = i + 1;
+		end;
+
 		if externalXml ~= nil then
 			delete(xmlFile);	
-		end;	
-	end;
+		end;		
+	end;		
 end;
 
 function GC_specializations:registerSpecialization(xmlFile, key, modName)
@@ -89,7 +100,7 @@ function GC_specializations:load()
 				local vehicleTypes = g_vehicleTypeManager:getVehicleTypes();
 				for typeName, vehicleType in pairs(vehicleTypes) do
 					if vehicleType ~= nil and vehicleType.specializations ~= nil then
-						if self:getCanAddSpec(vehicleType, spec, s) then
+						if GC_specializations:getCanAddSpec(vehicleType, spec, s) then
 							g_vehicleTypeManager:addSpecialization(typeName, s.specEnvName);
 
 							spec.registerEventListeners(vehicleType);

@@ -89,7 +89,7 @@ function GC_DebugUtils:new(customMt)
 
 	-- Set print levels prefix.
 	self.printLevelPrefix[GC_DebugUtils.BLANK] = "";
-	self.printLevelPrefix[GC_DebugUtils.MODDING] = "MODDING ERROR: ";
+	self.printLevelPrefix[GC_DebugUtils.MODDING] = "MODDING: ";
 	self.printLevelPrefix[GC_DebugUtils.ERROR] = "ERROR: ";
 	self.printLevelPrefix[GC_DebugUtils.WARNING] = "WARNING: ";
 	self.printLevelPrefix[GC_DebugUtils.INFORMATIONS] = "INFORMATIONS: ";

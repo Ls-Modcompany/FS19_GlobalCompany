@@ -213,11 +213,6 @@ function GC_languageManager:getCanUseText(text, modName)
 				return subText == baseModNameToPrefix[modName];
 			end;
 		end;
-	else  
-		local stringStart, _ = text:find("GlobalCompanyFillType_", 1, true);
-		if stringStart == 1 then 
-			return true;
-		end;
 	end;
 	
 	local stringStart, stringEnd = text:find(modName, 1, true);

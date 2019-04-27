@@ -1,5 +1,5 @@
 -- 
--- GlobalCompany - SRSManager - GC_shopManager
+-- GlobalCompany - Utils - GC_shopManager
 -- 
 -- @Interface: --
 -- @Author: LS-Modcompany / kevink98

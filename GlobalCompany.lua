@@ -89,6 +89,7 @@ function GlobalCompany.initialLoad()
 		GlobalCompany.loadPlaceables();
 
 		g_company.farmlandOwnerListener = GC_FarmlandOwnerListener:new();
+		g_company.fillTypeManager = GC_FillTypeManager:new();
 
 		GlobalCompany.loadEnviroment(modName, GlobalCompany.dir .. "xml/globalCompany.xml", false);
 		g_company.modManager:initSelectedMods();
@@ -96,9 +97,7 @@ function GlobalCompany.initialLoad()
 		for modName, xmlFile in pairs(GlobalCompany.environments) do
 			g_company.shopManager:loadFromXML(modName, xmlFile);
 			g_company.specializations:loadFromXML(modName, xmlFile);
-
-			-- add densityMapHeightOverwriteOrginalFunction
-			--g_densityMapHeightManager.loadMapData = function() return true; end;
+			g_company.fillTypeManager:loadFromXML(xmlFile);			
 		end;
 
 		g_company.languageManager:loadModLanguageFiles(GlobalCompany.modLanguageFiles);
@@ -219,6 +218,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "utils/GC_specializations.lua");
 	--source(GlobalCompany.dir .. "utils/GC_densityMapHeight.lua"); --fixed with patch 1.3
 	source(GlobalCompany.dir .. "utils/GC_FarmlandOwnerListener.lua");
+	source(GlobalCompany.dir .. "utils/GC_FillTypeManager.lua");
 
 	--|| Gui ||--
 	source(GlobalCompany.dir .. "GlobalCompanyGui.lua");

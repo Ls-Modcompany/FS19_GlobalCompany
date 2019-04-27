@@ -31,16 +31,17 @@ GC_Greenhouse.debugIndex = g_company.debug:registerScriptName("GC_Greenhouse");
 
 GC_Greenhouse.DOORTRIGGER = 0;
 GC_Greenhouse.GREENHOUSETRIGGER = 1;
-GC_Greenhouse.PALLETEXTENDEDTRIGGER = 3;
-
-GC_Greenhouse.VENTILATOR = 2;
+GC_Greenhouse.PALLETEXTENDEDTRIGGER = 2;
+GC_Greenhouse.VENTILATOR = 3;
 GC_Greenhouse.SELECTEDFILLTYP = 4;
+GC_Greenhouse.PLANT = 5;
 
-GC_Greenhouse.STATE_CANPLANT = 5;
-GC_Greenhouse.STATE_GROW = 5;
-GC_Greenhouse.STATE_HARVEST = 6;
-GC_Greenhouse.STATE_DEATH = 7;
-GC_Greenhouse.STATE_NEEDCLEAN = 8;
+GC_Greenhouse.STATE_PREPERATION = 1;
+GC_Greenhouse.STATE_CANPLANT = 2;
+GC_Greenhouse.STATE_GROW = 3;
+GC_Greenhouse.STATE_HARVEST = 4;
+GC_Greenhouse.STATE_DEATH = 5;
+GC_Greenhouse.STATE_NEEDCLEAN = 6;
 
 getfenv(0)["GC_Greenhouse"] = GC_Greenhouse;
 
@@ -130,7 +131,6 @@ function GC_Greenhouse:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		animationManager:delete();
 	end;
 
-
 	local doorKey = string.format("%s.door", xmlKey);
 	if hasXMLProperty(xmlFile, doorKey) then
 		self.doorTrigger = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.rootNode, xmlFile, doorKey, GC_Greenhouse.DOORTRIGGER, true);
@@ -141,42 +141,28 @@ function GC_Greenhouse:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	if hasXMLProperty(xmlFile, greenhouseTriggerKey) then
 		self.greenhouseTrigger = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.rootNode, xmlFile, greenhouseTriggerKey, GC_Greenhouse.GREENHOUSETRIGGER);
 	end;
-
-	
 	
 	self.activableObjects = {};
 	self.activableObjects[GC_Greenhouse.VENTILATOR] = g_company.activableObject:new(self.isServer, self.isClient);
 	self.activableObjects[GC_Greenhouse.VENTILATOR]:load(self, GC_Greenhouse.VENTILATOR);
 	self.activableObjects[GC_Greenhouse.VENTILATOR]:loadFromXML(xmlFile, greenhouseTriggerKey .. ".ventilator");
-	self.activableObjects[GC_Greenhouse.VENTILATOR].canActivable = function (self) return true; end
+	self.activableObjects[GC_Greenhouse.VENTILATOR].canActivable = function (g) return true; end
 	
 	self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP] = g_company.activableObject:new(self.isServer, self.isClient);
 	self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP]:load(self, GC_Greenhouse.SELECTEDFILLTYP);
 	self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP]:loadFromXML(xmlFile, greenhouseTriggerKey .. ".selectFilltype");
-	self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP].canActivable = function (self) return true; end
-
+	self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP].canActivable = function (g) return g.state == GC_Greenhouse.STATE_PREPERATION or g.state == GC_Greenhouse.STATE_CANPLANT end
 	
-	self.fillTypes = {};
-	local i = 0;
-	while true do
-		local key = string.format("%s.fillTypes.fillType(%d)", xmlKey, i);
-		if not hasXMLProperty(xmlFile, key) then
-			break;
-		end;
+	self.activableObjects[GC_Greenhouse.PLANT] = g_company.activableObject:new(self.isServer, self.isClient);
+	self.activableObjects[GC_Greenhouse.PLANT]:load(self, GC_Greenhouse.PLANT);
+	self.activableObjects[GC_Greenhouse.PLANT]:loadFromXML(xmlFile, greenhouseTriggerKey .. ".doPlant");
+	self.activableObjects[GC_Greenhouse.PLANT].canActivable = function (g) return g.state == GC_Greenhouse.STATE_CANPLANT end
+	
+	self.fillTypes = g_company.fillTypeManager:readFillTypesFromXML(xmlFile, xmlKey)
 
-		local name = getXMLString(xmlFile, key .. "#name");
-		local langName = g_company.languageManager:getText(getXMLString(xmlFile, key .. "#langName"));
-
-		table.insert(self.fillTypes, {fillTyp=name, langName=langName})
-
-		if i == 0 then
-			self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP]:setActivateText(string.format(g_company.languageManager:getText("GlobalCompanyPlaceable_Greenhouses_selectSeed"), langName));
-			self.activeFillType = 1;
-		end;
-
-		i = i + 1;
-	end;
-
+	self.activeFillType = self.fillTypes[1];
+	self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP]:setActivateText(string.format(g_company.languageManager:getText("GlobalCompanyPlaceable_Greenhouses_selectSeed"), g_company.fillTypeManager:getFillTypeLangNameById(self.activeFillType)));
+	
 	local palletExtendedTriggerKey = string.format("%s.palletExtendedTrigger", xmlKey);
 	if hasXMLProperty(xmlFile, palletExtendedTriggerKey) then
 		self.palletExtendedTrigger = self.triggerManager:loadTrigger(GC_PalletExtendedTrigger, self.rootNode, xmlFile, palletExtendedTriggerKey, GC_Greenhouse.PALLETEXTENDEDTRIGGER);
@@ -197,6 +183,8 @@ function GC_Greenhouse:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	self.ventilatorRunningMinutes = 0;
 	self.ventilatorCostPerMinute = Utils.getNoNil(getXMLInt(xmlFile, xmlKey .. "#ventilatorCostPerMinute"), 1);
 
+	self.state = GC_Greenhouse.STATE_PREPERATION;
+
 	g_currentMission.environment:addMinuteChangeListener(self);
 	g_currentMission.environment:addHourChangeListener(self);
 	
@@ -205,8 +193,6 @@ function GC_Greenhouse:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 
 	return true;
 end;
-
-
 
 function GC_Greenhouse:delete()
 	if not self.isPlaceable then
@@ -294,14 +280,21 @@ function GC_Greenhouse:onActivableObject(ref, isOn)
 	if GC_Greenhouse.VENTILATOR == ref then
 		self.state_ventilator = not self.state_ventilator;
 	elseif GC_Greenhouse.SELECTEDFILLTYP == ref then
-		if self.fillTypes[self.activeFillType + 1] ~= nil then
-			self.activeFillType = self.activeFillType + 1;
-			print("plis")
-		else
-			self.activeFillType = 1;
-			print("res")
+		
+		local takeNext = false;
+		for key, fillType in pairs(self.fillTypes) do
+			if takeNext then
+				self.activeFillType = fillType.id;
+				takeNext = false;
+				break;
+			elseif fillType.id == self.activeFillType then
+				takeNext = true;
+			end;
 		end;
-		self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP]:setActivateText(string.format(g_company.languageManager:getText("GlobalCompanyPlaceable_Greenhouses_selectSeed"), self.fillTypes[self.activeFillType].langName));
+		if takeNext then
+			self.activeFillType = self.fillTypes[1].id;
+		end;
+		self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP]:setActivateText(string.format(g_company.languageManager:getText("GlobalCompanyPlaceable_Greenhouses_selectSeed"), g_company.fillTypeManager:getFillTypeLangNameById(self.activeFillType)));
 	end;
 end;
 
@@ -327,11 +320,7 @@ end;
 
 function GC_Greenhouse:playerTriggerOnEnter(ref)
 	if ref == GC_Greenhouse.GREENHOUSETRIGGER then
-		for _, activableObject in pairs(self.activableObjects) do
-			if activableObject.canActivable(activableObject) then
-				activableObject:addActivatableObject();   
-			end;
-		end;
+		self:updateControlls();
 	end;
 end;
 
@@ -343,8 +332,16 @@ function GC_Greenhouse:playerTriggerOnLeave(ref)
 	end;
 end;
 
+function GC_Greenhouse:onEnterPalletExtendedTrigger(ref)
+	if ref == GC_Greenhouse.PALLETEXTENDEDTRIGGER then
+		self:controlState();
+	end;
+end;
+
 function GC_Greenhouse:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, toolType, fillPositionData, extraParamater)
 	self.waterFillLevel = self.waterFillLevel + fillLevelDelta;
+	self:controlState();
+	self:updateControlls();
 end;
 
 function GC_Greenhouse:getFreeCapacity(fillTypeIndex, farmId, extraParamater)
@@ -397,3 +394,45 @@ function GC_Greenhouse:hourChanged()
 		self.ventilatorRunningMinutes = 0;
 	end;
 end;
+
+function GC_Greenhouse:setState(newState, noEventSend)
+	if self.state ~= newState then
+		--event
+		self.state = newState;
+		print("set to state " .. newState);
+		self:updateControlls();
+	end;
+end
+
+function GC_Greenhouse:controlState()
+	if self.isServer then
+		if self.state == GC_Greenhouse.STATE_PREPERATION then
+			if self.waterFillLevel > 0 and self.palletExtendedTrigger:getFullFillLevelByFillType(self.activeFillType) > 0 then
+				self:setState(GC_Greenhouse.STATE_CANPLANT);
+			end;
+		elseif self.state == GC_Greenhouse.STATE_CANPLANT then
+
+		elseif self.state == GC_Greenhouse.STATE_GROW then
+
+		elseif self.state == GC_Greenhouse.STATE_HARVEST then
+
+		elseif self.state == GC_Greenhouse.STATE_DEATH then
+
+		elseif self.state == GC_Greenhouse.STATE_NEEDCLEAN then
+
+		end;
+	end;
+end;
+
+function GC_Greenhouse:updateControlls()
+	if self.isClient and self.greenhouseTrigger:getPlayerInTrigger() then
+		for _, activableObject in pairs(self.activableObjects) do
+			if activableObject:isAdded() and not activableObject.canActivable(self) then
+				activableObject:removeActivatableObject();   
+			elseif not activableObject:isAdded() and activableObject.canActivable(self) then			
+				activableObject:addActivatableObject();   
+			end;
+		end;
+	end;
+end
+
