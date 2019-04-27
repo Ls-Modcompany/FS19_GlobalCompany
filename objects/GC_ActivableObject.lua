@@ -48,7 +48,7 @@ function GC_ActivableObject:load(target, reference, inputAction, triggerOnlyKeys
 	self.triggerUp = true;
 	self.triggerDown = false;
 	self.triggerAlways = false;
-	self.delayTime = delayTime;
+	self.delayTime = 50;
 	self.currentDelayTime = 0;
 	
 	if triggerUp ~= nil then
@@ -66,16 +66,32 @@ function GC_ActivableObject:load(target, reference, inputAction, triggerOnlyKeys
 
     self.onText = "onText";
     self.offText = "offText";
-    self:setActivateText(self.onText);
 
+	g_company.addRaisedUpdateable(self);
 	return true;
 end;
+
+function GC_ActivableObject:loadFromXML(xmlFile, xmlKey)	
+	self.inputAction = Utils.getNoNil(InputAction[getXMLString(xmlFile, xmlKey .. "#turnAction")], self.inputAction);
+	self.triggerOnlyKeys = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. "#triggerOnlyKeys"), self.triggerOnlyKeys);
+	
+	local onText = getXMLString(xmlFile, xmlKey .. "#onText")
+	if onText ~= nil then
+		self:setToOnText(g_company.languageManager:getText(onText));
+	end;
+
+	local offText = getXMLString(xmlFile, xmlKey .. "#offText")
+	if offText ~= nil then
+		self:setToOffText(g_company.languageManager:getText(offText));
+	end;
+end
 
 function GC_ActivableObject:delete()
 	if self.eventId ~= nil then
 		g_inputBinding:removeActionEvent(self.eventId);
 		self.eventId = nil;
 	end;
+	g_company.removeRaisedUpdateable(self);
 end;
 
 function GC_ActivableObject:onActivateObject()
@@ -85,6 +101,7 @@ function GC_ActivableObject:onActivateObject()
 				self.target:onActivableObject(self.reference, self.isOn);
 			end;
 			self.currentDelayTime = self.delayTime;
+			self:raiseUpdate();
 		end;
 	else
 		self.isOn = not self.isOn;
@@ -117,6 +134,9 @@ end;
 
 function GC_ActivableObject:setActivateText(text)
 	g_inputBinding:setActionEventText(self.eventId, tostring(text));
+	if self.triggerOnlyKeys then
+		self:setToOnText(text);
+	end;
 end;
 
 function GC_ActivableObject:setToOnText(text)
@@ -133,6 +153,7 @@ end;
 
 function GC_ActivableObject:update(dt)
 	self.currentDelayTime = math.max(0, self.currentDelayTime - dt);
+	if self.currentDelayTime > 0 then
+		self:raiseUpdate();
+	end;
 end;
-
-

@@ -31,8 +31,16 @@ GC_Greenhouse.debugIndex = g_company.debug:registerScriptName("GC_Greenhouse");
 
 GC_Greenhouse.DOORTRIGGER = 0;
 GC_Greenhouse.GREENHOUSETRIGGER = 1;
+GC_Greenhouse.PALLETEXTENDEDTRIGGER = 3;
+
 GC_Greenhouse.VENTILATOR = 2;
-GC_Greenhouse.palletExtendedTrigger = 3;
+GC_Greenhouse.SELECTEDFILLTYP = 4;
+
+GC_Greenhouse.STATE_CANPLANT = 5;
+GC_Greenhouse.STATE_GROW = 5;
+GC_Greenhouse.STATE_HARVEST = 6;
+GC_Greenhouse.STATE_DEATH = 7;
+GC_Greenhouse.STATE_NEEDCLEAN = 8;
 
 getfenv(0)["GC_Greenhouse"] = GC_Greenhouse;
 
@@ -134,36 +142,44 @@ function GC_Greenhouse:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		self.greenhouseTrigger = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.rootNode, xmlFile, greenhouseTriggerKey, GC_Greenhouse.GREENHOUSETRIGGER);
 	end;
 
+	
+	
 	self.activableObjects = {};
+	self.activableObjects[GC_Greenhouse.VENTILATOR] = g_company.activableObject:new(self.isServer, self.isClient);
+	self.activableObjects[GC_Greenhouse.VENTILATOR]:load(self, GC_Greenhouse.VENTILATOR);
+	self.activableObjects[GC_Greenhouse.VENTILATOR]:loadFromXML(xmlFile, greenhouseTriggerKey .. ".ventilator");
+	self.activableObjects[GC_Greenhouse.VENTILATOR].canActivable = function (self) return true; end
+	
+	self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP] = g_company.activableObject:new(self.isServer, self.isClient);
+	self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP]:load(self, GC_Greenhouse.SELECTEDFILLTYP);
+	self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP]:loadFromXML(xmlFile, greenhouseTriggerKey .. ".selectFilltype");
+	self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP].canActivable = function (self) return true; end
+
+	
+	self.fillTypes = {};
 	local i = 0;
 	while true do
-		local key = string.format("%s.action(%d)", greenhouseTriggerKey, i);
+		local key = string.format("%s.fillTypes.fillType(%d)", xmlKey, i);
 		if not hasXMLProperty(xmlFile, key) then
 			break;
 		end;
 
 		local name = getXMLString(xmlFile, key .. "#name");
-		local turnAction = getXMLString(xmlFile, key .. "#turnAction");
-		local onText = getXMLString(xmlFile, key .. "#onText");
-		local offText = getXMLString(xmlFile, key .. "#offText");
+		local langName = g_company.languageManager:getText(getXMLString(xmlFile, key .. "#langName"));
 
-		local activableObject = g_company.activableObject:new(self.isServer, self.isClient);
-		local ref = self[name:upper()];
-		activableObject:load(self, ref, turnAction);
-		activableObject:setToOnText(g_company.languageManager:getText(onText));
-		activableObject:setToOffText(g_company.languageManager:getText(offText));
+		table.insert(self.fillTypes, {fillTyp=name, langName=langName})
 
-		activableObject.canActivable = function (self)
-			return true;
-		end
+		if i == 0 then
+			self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP]:setActivateText(string.format(g_company.languageManager:getText("GlobalCompanyPlaceable_Greenhouses_selectSeed"), langName));
+			self.activeFillType = 1;
+		end;
 
-		self.activableObjects[ref] = activableObject;
 		i = i + 1;
 	end;
 
 	local palletExtendedTriggerKey = string.format("%s.palletExtendedTrigger", xmlKey);
 	if hasXMLProperty(xmlFile, palletExtendedTriggerKey) then
-		self.palletExtendedTrigger = self.triggerManager:loadTrigger(GC_PalletExtendedTrigger, self.rootNode, xmlFile, palletExtendedTriggerKey, GC_Greenhouse.palletExtendedTrigger);
+		self.palletExtendedTrigger = self.triggerManager:loadTrigger(GC_PalletExtendedTrigger, self.rootNode, xmlFile, palletExtendedTriggerKey, GC_Greenhouse.PALLETEXTENDEDTRIGGER);
 	end;
 	
 
@@ -172,18 +188,18 @@ function GC_Greenhouse:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		self.waterTrigger = self.triggerManager:loadTrigger(GC_UnloadingTrigger, self.rootNode, xmlFile, waterTriggerKey);
 	end;
 	
-	--[[
-	if self.isServer and canLoad then
-		if addMinuteChange then
-			g_currentMission.environment:addMinuteChangeListener(self);
-		end;
+	self.waterFillLevel = 0;
+	self.waterCapacity = getXMLFloat(xmlFile, waterTriggerKey .. "#capacity");
+	
+	self.currentTemperature = 15;
+	self.targetTemperature = 15;
+	self.state_ventilator = false;
+	self.ventilatorRunningMinutes = 0;
+	self.ventilatorCostPerMinute = Utils.getNoNil(getXMLInt(xmlFile, xmlKey .. "#ventilatorCostPerMinute"), 1);
 
-		if addHourChange then
-			g_currentMission.environment:addHourChangeListener(self);
-		end;
-	end;
-	]]--
-
+	g_currentMission.environment:addMinuteChangeListener(self);
+	g_currentMission.environment:addHourChangeListener(self);
+	
 	self.greenhouseDirtyFlag = self:getNextDirtyFlag();
 	
 
@@ -270,10 +286,24 @@ function GC_Greenhouse:saveToXMLFile(xmlFile, key, usedModNames)
 end;
 
 function GC_Greenhouse:update(dt)
-	
-	
+
 end;
 
+
+function GC_Greenhouse:onActivableObject(ref, isOn)
+	if GC_Greenhouse.VENTILATOR == ref then
+		self.state_ventilator = not self.state_ventilator;
+	elseif GC_Greenhouse.SELECTEDFILLTYP == ref then
+		if self.fillTypes[self.activeFillType + 1] ~= nil then
+			self.activeFillType = self.activeFillType + 1;
+			print("plis")
+		else
+			self.activeFillType = 1;
+			print("res")
+		end;
+		self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP]:setActivateText(string.format(g_company.languageManager:getText("GlobalCompanyPlaceable_Greenhouses_selectSeed"), self.fillTypes[self.activeFillType].langName));
+	end;
+end;
 
 function GC_Greenhouse:playerTriggerActivated(ref)
 	if GC_Greenhouse.DOORTRIGGER == ref then
@@ -314,12 +344,56 @@ function GC_Greenhouse:playerTriggerOnLeave(ref)
 end;
 
 function GC_Greenhouse:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, toolType, fillPositionData, extraParamater)
-	print(fillLevelDelta)
-	
+	self.waterFillLevel = self.waterFillLevel + fillLevelDelta;
 end;
 
-function GC_Greenhouse:getFreeCapacity()
-	return 500;
-	
+function GC_Greenhouse:getFreeCapacity(fillTypeIndex, farmId, extraParamater)
+	return self.waterCapacity - self.waterFillLevel;
 end;
 
+function GC_Greenhouse:minuteChanged()
+	if self.isServer then
+		local nightTemp, dayTemp = g_currentMission.environment.weather:getCurrentMinMaxTemperatures();
+		local currentHour = g_currentMission.environment.currentHour;
+
+		local startDayHour = 8;
+		local startNightHour = 19;
+
+		local factor = 0;
+		if currentHour >= startDayHour and currentHour < startNightHour then
+			if self.state_ventilator then
+				factor = self:getVentilatorTempChange();
+			else
+				factor = 0.03;
+			end;
+		else
+			if self.state_ventilator then
+				factor = self:getVentilatorTempChange();
+			else
+				factor = -0.02;
+			end;
+		end;
+		self.currentTemperature = self.currentTemperature + factor;
+
+		if self.state_ventilator then
+			self.ventilatorRunningMinutes = self.ventilatorRunningMinutes + 1;
+		end;
+	end;
+end
+
+function GC_Greenhouse:getVentilatorTempChange()
+	if self.targetTemperature > self.currentTemperature then
+		return math.min(self.targetTemperature-self.currentTemperature, 0.01);
+	elseif self.targetTemperature < self.currentTemperature then
+		return math.min(self.currentTemperature-self.targetTemperature, 0.01) * -1;
+	else
+		return 0;
+	end;
+end
+
+function GC_Greenhouse:hourChanged()
+	if self.ventilatorRunningMinutes > 0 then
+		g_currentMission:addMoney(self.ventilatorRunningMinutes * self.ventilatorCostPerMinute * -1, self:getOwnerFarmId(), MoneyType.OTHER, true, false);
+		self.ventilatorRunningMinutes = 0;
+	end;
+end;
