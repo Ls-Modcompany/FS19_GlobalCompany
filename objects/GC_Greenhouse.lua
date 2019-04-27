@@ -167,7 +167,10 @@ function GC_Greenhouse:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	end;
 	
 
-	
+	local waterTriggerKey = string.format("%s.watertrigger", xmlKey);
+	if hasXMLProperty(xmlFile, palletExtendedTriggerKey) then
+		self.waterTrigger = self.triggerManager:loadTrigger(GC_UnloadingTrigger, self.rootNode, xmlFile, waterTriggerKey);
+	end;
 	
 	--[[
 	if self.isServer and canLoad then
@@ -274,7 +277,7 @@ end;
 
 function GC_Greenhouse:playerTriggerActivated(ref)
 	if GC_Greenhouse.DOORTRIGGER == ref then
-		if self.animationManager:getCurrentPosition(self.doorAnimationName) > 0 then
+		if self.animationManager:getAnimationTime(self.doorAnimationName) > 0 then
 			self.animationManager:setAnimationByState(self.doorAnimationName, false);
 		else
 			self.animationManager:setAnimationByState(self.doorAnimationName, true);
@@ -284,7 +287,7 @@ end;
 
 function GC_Greenhouse:playerTriggerGetActivateText(ref)
 	if GC_Greenhouse.DOORTRIGGER == ref then
-		if self.animationManager:getCurrentPosition(self.doorAnimationName) > 0 then
+		if self.animationManager:getAnimationTime(self.doorAnimationName) > 0 then
 			return g_company.languageManager:getText("GlobalCompanyPlaceable_Greenhouses_closeDoor");
 		else
 			return g_company.languageManager:getText("GlobalCompanyPlaceable_Greenhouses_openDoor");
@@ -308,5 +311,15 @@ function GC_Greenhouse:playerTriggerOnLeave(ref)
 			activableObject:removeActivatableObject();
 		end;
 	end;
+end;
+
+function GC_Greenhouse:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, toolType, fillPositionData, extraParamater)
+	print(fillLevelDelta)
+	
+end;
+
+function GC_Greenhouse:getFreeCapacity()
+	return 500;
+	
 end;
 

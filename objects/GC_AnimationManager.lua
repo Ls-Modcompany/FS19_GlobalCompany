@@ -439,15 +439,6 @@ function GC_AnimationManager:getRealAnimationTime(name)
 	return 0;
 end;
 
-function GC_AnimationManager:getCurrentPosition(name)
-	local animation = self.animations[name];
-	if animation ~= nil then
-		return animation.currentTime / animation.duration;
-	end;
-
-	return 0;
-end;
-
 function GC_AnimationManager:getRealAnimationTimeSeconds(name)
 	local animation = self.animations[name];
 	if animation ~= nil then

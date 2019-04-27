@@ -96,13 +96,12 @@ end;
 
 function GC_PalletExtendedTrigger:palletTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay, otherShapeId)
 	local object = g_currentMission:getNodeObject(otherId)
-	if object ~= nil and object.isPalletExtended then
+	if object ~= nil and object.typeName == "palletExtended" then
         if onEnter then	
             self.palletsInside[object] = object;
             if self.target.onEnterPalletExtendedTrigger ~= nil then
                 self.target:onEnterPalletExtendedTrigger(self.reference, object);
             end;
-            print(object:getFillTypeName())
         elseif onLeave then
             self.palletsInside[object] = nil;
             if self.target.onLeavePalletExtendedTrigger ~= nil then
