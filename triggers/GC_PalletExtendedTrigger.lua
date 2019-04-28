@@ -98,12 +98,17 @@ function GC_PalletExtendedTrigger:palletTriggerCallback(triggerId, otherId, onEn
 	local object = g_currentMission:getNodeObject(otherId)
 	if object ~= nil and object.typeName == "palletExtended" then
         if onEnter then	
-            self.palletsInside[object] = object;
+            table.insert(self.palletsInside, object);
             if self.target.onEnterPalletExtendedTrigger ~= nil then
                 self.target:onEnterPalletExtendedTrigger(self.reference, object);
             end;
         elseif onLeave then
-            self.palletsInside[object] = nil;
+            for k, o in pairs(self.palletsInside) do
+                if o == object then
+                    table.remove(self.palletsInside, k);
+                    break;
+                end;
+            end;
             if self.target.onLeavePalletExtendedTrigger ~= nil then
                 self.target:onLeavePalletExtendedTrigger(self.reference, object);
             end;
@@ -111,7 +116,22 @@ function GC_PalletExtendedTrigger:palletTriggerCallback(triggerId, otherId, onEn
 	end;
 end;
 
+function GC_PalletExtendedTrigger:checkPallets()
+    local haveRemoved = false;
+    for k,o in pairs(self.palletsInside) do
+        if not entityExists(o.rootNode) then
+            table.remove(self.palletsInside, k);
+            haveRemoved = true;
+            break;
+        end;
+    end;
+    if haveRemoved then
+        self:checkPallets();
+    end;
+end
+
 function GC_PalletExtendedTrigger:getFullFillLevel()
+    self:checkPallets();
     local fillLevel = 0;
     for _, object in pairs(self.palletsInside) do
         fillLevel = fillLevel + object:getFillLevel();
@@ -120,9 +140,10 @@ function GC_PalletExtendedTrigger:getFullFillLevel()
 end;
 
 function GC_PalletExtendedTrigger:getFullFillLevelByFillType(id)
+    self:checkPallets();
     local fillLevel = 0;
     for _, object in pairs(self.palletsInside) do
-        if object:getFillType() == id then
+        if object:getFillTypeId() == id then
             fillLevel = fillLevel + object:getFillLevel();
         end;
     end;
@@ -130,9 +151,21 @@ function GC_PalletExtendedTrigger:getFullFillLevelByFillType(id)
 end;
 
 function GC_PalletExtendedTrigger:getAvailableFillTypes()
+    self:checkPallets();
     local fillTypes = {};
     for _, object in pairs(self.palletsInside) do
         table.insert(fillTypes, object:getFillType());
     end;
     return fillTypes;
+end;
+
+function GC_PalletExtendedTrigger:getObjectsByFillType(id)
+    self:checkPallets();
+    local objects = {};
+    for _, object in pairs(self.palletsInside) do
+        if object:getFillTypeId() == id then
+            table.insert(objects, object);
+        end;
+    end;
+    return objects;
 end;

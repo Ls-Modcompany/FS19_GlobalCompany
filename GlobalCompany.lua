@@ -64,8 +64,8 @@ function GlobalCompany.initialLoad()
 		duplicateLoad = true;
 	end;
 
-	local modName = g_currentModName;
-	if g_company.modManager:doLoadCheck(modName, duplicateLoad, GlobalCompany.isDevelopmentVersion) then
+	local modNameCurrent = g_currentModName;
+	if g_company.modManager:doLoadCheck(modNameCurrent, duplicateLoad, GlobalCompany.isDevelopmentVersion) then
 		g_company.debug:singleLogWrite(GC_DebugUtils.BLANK, "Loading Version: %s (%s)", GlobalCompany.version, GlobalCompany.versionDate);
 		addModEventListener(GlobalCompany);
 
@@ -91,16 +91,23 @@ function GlobalCompany.initialLoad()
 		g_company.farmlandOwnerListener = GC_FarmlandOwnerListener:new();
 		g_company.fillTypeManager = GC_FillTypeManager:new();
 
-		GlobalCompany.loadEnviroment(modName, GlobalCompany.dir .. "xml/globalCompany.xml", false);
+		GlobalCompany.loadEnviroment(modNameCurrent, GlobalCompany.dir .. "xml/globalCompany.xml", false);
 		g_company.modManager:initSelectedMods();
+		g_company.languageManager:loadModLanguageFiles(GlobalCompany.modLanguageFiles);
 
+		local xmlFileCurrentMod = nil;
 		for modName, xmlFile in pairs(GlobalCompany.environments) do
 			g_company.shopManager:loadFromXML(modName, xmlFile);
-			g_company.specializations:loadFromXML(modName, xmlFile);
-			g_company.fillTypeManager:loadFromXML(xmlFile);			
-		end;
+			g_company.fillTypeManager:loadFromXML(xmlFile);
 
-		g_company.languageManager:loadModLanguageFiles(GlobalCompany.modLanguageFiles);
+			if modName == modNameCurrent then
+				xmlFileCurrentMod = xmlFile;
+			else
+				g_company.specializations:loadFromXML(modName, xmlFile);	
+			end;
+		end;
+		g_company.specializations:loadFromXML(modNameCurrent, xmlFileCurrentMod);	
+
 	else
 		getfenv(0)["g_company"] = nil;
 	end;

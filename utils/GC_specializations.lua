@@ -75,7 +75,7 @@ function GC_specializations:registerSpecialization(xmlFile, key, modName)
 	if onlyLoad then
 		local mName = string.format("%s.%s", modName, name);	
 		local cName = string.format("%s.%s", modName, className);	
-		g_specializationManager:addSpecialization(mName, cName, filename, modName);	
+		g_specializationManager:addSpecialization(mName, cName, filename, modName);
 		
 		if GC_specializations.modNeedSpec[name] ~= nil then
 			for _, mName in pairs(GC_specializations.modNeedSpec[name])do

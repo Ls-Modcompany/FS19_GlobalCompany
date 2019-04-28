@@ -32,20 +32,27 @@ end;
 
 function PalletExtended.registerEventListeners(vehicleType)
 	SpecializationUtil.registerEventListener(vehicleType, "onLoad", PalletExtended);
-    SpecializationUtil.registerFunction(vehicleType, "getFillType", PalletExtended.getFillType);
+    SpecializationUtil.registerFunction(vehicleType, "getFillTypeId", PalletExtended.getFillTypeId);
     SpecializationUtil.registerFunction(vehicleType, "getFillLevel", PalletExtended.getFillLevel);
     SpecializationUtil.registerFunction(vehicleType, "getFillTypeName", PalletExtended.getFillTypeName);
+    SpecializationUtil.registerFunction(vehicleType, "setFillLevel", PalletExtended.setFillLevel);
+    SpecializationUtil.registerFunction(vehicleType, "setFillLevelEvent", PalletExtended.setFillLevelEvent);
+    SpecializationUtil.registerFunction(vehicleType, "addFillLevel", PalletExtended.addFillLevel);
 end;
 
 function PalletExtended:onLoad(savegame)
     self.isPalletExtended = true;
-	self.fillType = g_company.fillTypeManager:getFillTypeByName(getXMLString(self.xmlFile, "vehicle.palletExtended#fillType"));
+	self.fillTypeId = g_company.fillTypeManager:getFillTypeIdByName(getXMLString(self.xmlFile, "vehicle.palletExtended#fillType"));
 	self.fillLevel = getXMLString(self.xmlFile, "vehicle.palletExtended#fillLevel");
-	self.fillTypeLang = getXMLString(self.xmlFile, "vehicle.palletExtended#fillTypeLang");
+    self.fillTypeLang = getXMLString(self.xmlFile, "vehicle.palletExtended#fillTypeLang");
+    self.deleteIfEmpty = Utils.getNoNil(getXMLBool(self.xmlFile, "vehicle.palletExtended#deleteIfEmpty"), true);
+
+    
+	self.eventId_setFillLevel = g_company.eventManager:registerEvent(self, self.setFillLevelEvent);
 end;
 
-function PalletExtended:getFillType()
-    return self.fillType;
+function PalletExtended:getFillTypeId()
+    return self.fillTypeId;
 end;
 
 function PalletExtended:getFillLevel()
@@ -54,4 +61,20 @@ end;
 
 function PalletExtended:getFillTypeName()
     return g_company.languageManager:getText(string.format("GlobalCompanyFillType_%s", self.fillTypeLang));
+end;
+
+function PalletExtended:setFillLevel(newLevel, noEventSend)
+    self:setFillLevelEvent({newLevel}, noEventSend);
+end;
+
+function PalletExtended:setFillLevelEvent(data, noEventSend)
+    g_company.eventManager:createEvent(self.eventId_setFillLevel, data, false, noEventSend);
+    self.fillLevel = data[1];
+    if self.isServer and self.fillLevel == 0 and self.deleteIfEmpty then
+        self:delete();
+    end;
+end;
+
+function PalletExtended:addFillLevel(level)
+    self:setFillLevel(self:getFillLevel() + level);
 end;

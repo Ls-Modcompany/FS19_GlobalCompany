@@ -99,7 +99,7 @@ end
 
 function GC_FillTypeManager:getFillTypeLangNameById(id)
     if self.fillTypesById[id] ~= nil then
-        return self.fillTypeId[id].langName;
+        return self.fillTypesById[id].langName;
     else
         --debug
         return "Not found"
@@ -108,7 +108,7 @@ end;
 
 function GC_FillTypeManager:getFillTypeNameById(id)
     if self.fillTypesById[id] ~= nil then
-        return self.fillTypeId[id].name;
+        return self.fillTypesById[id].name;
     else
         --debug
         return "Not found"
@@ -118,6 +118,15 @@ end;
 function GC_FillTypeManager:getFillTypeByName(name)
     if self.fillTypesByName[name] ~= nil then
         return self.fillTypesByName[name];
+    else
+        --debug
+        return "Not found"
+    end;
+end;
+
+function GC_FillTypeManager:getFillTypeIdByName(name)
+    if self.fillTypesByName[name] ~= nil then
+        return self.fillTypesByName[name].id;
     else
         --debug
         return "Not found"
