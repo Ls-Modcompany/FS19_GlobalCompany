@@ -180,38 +180,38 @@ function GC_Gui_borders:draw(index)
 	if self.imageLeft ~= nil then
 		local  x = self.parent.drawPosition[1];
 		local  y = self.parent.drawPosition[2];
-		local  sx = self:getBorderLeftSize();
-		local  sy = self.parent.size[2];	
 		setOverlayUVs(self.imageLeft, unpack(self.uv));
-		setOverlayColor(self.imageLeft, unpack(self:getBorderLeftColor()));
-		renderOverlay(self.imageLeft, x,y,sx,sy);
+		setOverlayColor(self.imageLeft, unpack(self:getBorderLeftColor()));		
+		local sizeX = math.max(self:getBorderLeftSize(), 1 / g_screenWidth);
+		local sizeY = math.max(self.parent.size[2], 1 / g_screenHeight);
+		renderOverlay(self.imageLeft, x,y,sizeX, sizeY);
 	end;
 	if self.imageRight ~= nil then
 		local  x = self.parent.drawPosition[1] + self.parent.size[1] - self:getBorderRightSize();
 		local  y = self.parent.drawPosition[2];
-		local  sx = self:getBorderRightSize();
-		local  sy = self.parent.size[2];	
 		setOverlayUVs(self.imageRight, unpack(self.uv));
 		setOverlayColor(self.imageRight, unpack(self:getBorderRightColor()));
-		renderOverlay(self.imageRight, x,y,sx,sy);
+		local sizeX = math.max(self:getBorderRightSize(), 1 / g_screenWidth);
+		local sizeY = math.max(self.parent.size[2], 1 / g_screenHeight);
+		renderOverlay(self.imageRight, x,y,sizeX, sizeY);
 	end;
 	if self.imageTop ~= nil then
 		local  x = self.parent.drawPosition[1];
 		local  y = self.parent.drawPosition[2] + self.parent.size[2] - self:getBorderTopSize();
-		local  sx = self.parent.size[1];
-		local  sy = self:getBorderTopSize();
 		setOverlayUVs(self.imageTop, unpack(self.uv));
 		setOverlayColor(self.imageTop, unpack(self:getBorderTopColor()));
-		renderOverlay(self.imageTop, x,y,sx,sy);
+		local sizeX = math.max(self.parent.size[1], 1 / g_screenWidth);
+		local sizeY = math.max(self:getBorderLeftSize(), 1 / g_screenHeight);
+		renderOverlay(self.imageTop, x,y,sizeX, sizeY);
 	end;
 	if self.imageBottom ~= nil then
 		local  x = self.parent.drawPosition[1];
 		local  y = self.parent.drawPosition[2];
-		local  sx = self.parent.size[1];
-		local  sy = self:getBorderBottomSize();	
 		setOverlayUVs(self.imageBottom, unpack(self.uv));
-		setOverlayColor(self.imageBottom, unpack(self:getBorderBottomColor()));
-		renderOverlay(self.imageBottom, x,y,sx,sy);
+		setOverlayColor(self.imageBottom, unpack(self:getBorderBottomColor()));		
+		local sizeX = math.max(self.parent.size[1], 1 / g_screenWidth);
+		local sizeY = math.max(self:getBorderBottomSize(), 1 / g_screenHeight);
+		renderOverlay(self.imageTop, x,y,sizeX, sizeY);
 	end;
 	GC_Gui_borders:superClass().draw(self,index);
 end;

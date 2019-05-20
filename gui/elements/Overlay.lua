@@ -162,7 +162,10 @@ function GC_Gui_overlay:draw(index)
 			setOverlayRotation(self.imageOverlay, self.rotation, self.size[1] * 0.5, self.size[2] * 0.5);
 			setOverlayUVs(self.imageOverlay, unpack(self:getUVs()));
 			setOverlayColor(self.imageOverlay, unpack(self:getImageColor()));
-			renderOverlay(self.imageOverlay, self.drawPosition[1], self.drawPosition[2], self.size[1] * self.scaleX, self.size[2] * self.scaleY);
+			
+			local sizeX = math.max(self.size[1], 1 / g_screenWidth);
+			local sizeY = math.max(self.size[2], 1 / g_screenHeight);			
+			renderOverlay(self.imageOverlay, self.drawPosition[1], self.drawPosition[2], sizeX * self.scaleX, sizeY * self.scaleY);
 		end;
 	end;
 
