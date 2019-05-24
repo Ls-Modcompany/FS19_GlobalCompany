@@ -19,8 +19,8 @@
 		<e k="GC_gui_buttons_no" v="Nein"/>
 		<e k="GC_gui_buttons_back" v="Zurück"/>
 		<e k="GC_gui_modHubLink" v="ModHub Download Link"/>
-		<e k="GC_gui_buttons_nextWarning" v="Next Warning"/>
-		<e k="GC_gui_buttons_nextConflict" v="Next Conflict"/>
+		<e k="GC_gui_buttons_nextWarning" v="Nächste Warnung"/>
+		<e k="GC_gui_buttons_nextConflict" v="Nächster Konflikt"/>
 		
 		<!-- General -->
 		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
@@ -60,8 +60,8 @@
 		<e k="GC_Input_Header_Backup" v="Rohstoffe"/>
 		<e k="GC_Output_Header_Backup" v="Produkte"/>
 		
-		<e k="GC_Open_Product_Menu" v="Open product menu"/>
-		<e k="GC_Open_Overview_Menu" v="Open overview menu"/>
+		<e k="GC_Open_Product_Menu" v="Öffne Produktmenü"/>
+		<e k="GC_Open_Overview_Menu" v="Öffne Übersichtsmenü"/>
 
 		<!-- BaleShreader -->
 		<e k="GC_baleShreader_openSteer" v="Steuerung öffnen"/>
