@@ -211,7 +211,7 @@ function GC_Gui_borders:draw(index)
 		setOverlayColor(self.imageBottom, unpack(self:getBorderBottomColor()));		
 		local sizeX = math.max(self.parent.size[1], 1 / g_screenWidth);
 		local sizeY = math.max(self:getBorderBottomSize(), 1 / g_screenHeight);
-		renderOverlay(self.imageTop, x,y,sizeX, sizeY);
+		renderOverlay(self.imageBottom, x,y,sizeX, sizeY);
 	end;
 	GC_Gui_borders:superClass().draw(self,index);
 end;
