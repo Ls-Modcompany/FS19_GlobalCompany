@@ -34,8 +34,8 @@ GC_EventManager.TYP_UINT16 = 7;
 GC_EventManager.TYP_STRING = 8;
 
 GC_EventManager.BIT_8 = 0;
-GC_EventManager.BIT_16 = 0;
-GC_EventManager.BIT_32 = 0;
+GC_EventManager.BIT_16 = 1;
+GC_EventManager.BIT_32 = 2;
 
 function GC_EventManager:new()
     local self = setmetatable({}, GC_EventManager_mt);	
