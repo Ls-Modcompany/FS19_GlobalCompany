@@ -73,10 +73,10 @@ function GC_ObjectSpawner:load(nodeId, target, xmlFile, xmlKey, keyName)
 			if endX > startX then
 				table.insert(self.spawnAreas, {startNode = startNode, endNode = endNode});
 			else
-				DebugPrint("ERROR", "SPACE")
+				DebugPrint("ERROR", "SPACE") -- C:/Users/kevin/Documents/My Games/FarmingSimulator2019/mods/FS19_GlobalCompany/objects/GC_ObjectSpawner.lua:79: attempt to call global 'DebugPrint' (a nil value)
 			end;
 		else
-			DebugPrint("ERROR", "No Nodes")
+			DebugPrint("ERROR", "No Nodes") -- C:/Users/kevin/Documents/My Games/FarmingSimulator2019/mods/FS19_GlobalCompany/objects/GC_ObjectSpawner.lua:79: attempt to call global 'DebugPrint' (a nil value)
 		end;
 
 		i = i + 1;
