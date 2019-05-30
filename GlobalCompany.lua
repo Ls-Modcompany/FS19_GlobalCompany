@@ -335,6 +335,8 @@ function GlobalCompany:loadMap()
 	-- end;
 
 	g_company.settings = GlobalCompanySettings:load();
+	g_currentMission.saveSavegame = Utils.appendedFunction(g_currentMission.saveSavegame, g_company.settings.saveSettings);
+    g_company.settings:loadSettings();
 
 	for _,loadable in pairs(GlobalCompany.loadables) do
 		loadable.loadF(loadable.target);
