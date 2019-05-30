@@ -432,12 +432,14 @@
 
 
 		<!-- FactoryBig -->
-
 		<template name="gcFactoryBig" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="1920px 1080px" />
+			<value name="imageColor" value="glass0_1" />
+		</template>
+		<template name="gcFactoryBigTransparent" anchor="middleCenter" extends="gcBase">
 			<value name="size" value="1800px 950px" />
 			<value name="imageColor" value="transparent" />
-		</template>
-		
+		</template>		
 		<template name="gcFactoryBigBackgroundLeft" anchor="middleCenter" extends="gcBase gcBorder">
 			<value name="size" value="400px 850px" />
 			<value name="position" value="-650px 20px" />

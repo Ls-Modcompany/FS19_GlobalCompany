@@ -1,106 +1,108 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <GUI>
   <GuiElement type="image" template="gcFactoryBig">
+    <GuiElement type="image" template="gcFactoryBigTransparent">
 
-    <GuiElement type="image" template="gcFactoryBigBackgroundLeft">
-        <GuiElement type="button" template="gcFactoryBigLeftBtnOverview" text="$l10n_GC_gui_overview" onClick="onClickToOverview" />
-        <GuiElement type="text" template="gcFactoryBigLeftPLText" text="$l10n_GC_gui_productLines" />  
-        
-      <GuiElement type="table" template="gcFactoryBigLeftPLTable" id="gui_productLinesTable">				
-        <GuiElement type="button" template="gcFactoryBigLeftPLTableItem" isTableTemplate="true" onClick="onClickLineId">
-          <GuiElement type="text" template="gcFactoryBigLeftPLTableItemText" onCreate="onCreateLeftItemTitle" />
-          <GuiElement type="text" template="gcFactoryBigLeftPLTableItemTextActive" onCreate="onCreateLeftItemActive" text="$l10n_GC_gui_active" />
-          <GuiElement type="text" template="gcFactoryBigLeftPLTableItemTextOutput" onCreate="onCreateLeftItemOutput" />
-        </GuiElement>			
-        
+      <GuiElement type="image" template="gcFactoryBigBackgroundLeft">
+          <GuiElement type="button" template="gcFactoryBigLeftBtnOverview" text="$l10n_GC_gui_overview" onClick="onClickToOverview" />
+          <GuiElement type="text" template="gcFactoryBigLeftPLText" text="$l10n_GC_gui_productLines" />  
+          
+        <GuiElement type="table" template="gcFactoryBigLeftPLTable" id="gui_productLinesTable">				
+          <GuiElement type="button" template="gcFactoryBigLeftPLTableItem" isTableTemplate="true" onClick="onClickLineId">
+            <GuiElement type="text" template="gcFactoryBigLeftPLTableItemText" onCreate="onCreateLeftItemTitle" />
+            <GuiElement type="text" template="gcFactoryBigLeftPLTableItemTextActive" onCreate="onCreateLeftItemActive" text="$l10n_GC_gui_active" />
+            <GuiElement type="text" template="gcFactoryBigLeftPLTableItemTextOutput" onCreate="onCreateLeftItemOutput" />
+          </GuiElement>			
+          
+        </GuiElement>
       </GuiElement>
-    </GuiElement>
 
-    <GuiElement type="image" template="gcFactoryBigBackgroundRight">
-        
-        <GuiElement template="gcBase" id="gui_overview" >
-            <GuiElement type="image" template="gcSeperator" size="300px 2px" position="400px 320px" />
-            <GuiElement type="image" template="gcSeperator" size="2px 780px" position="200px 0px" />            
-            <GuiElement type="image" template="gcFactoryBigRightOverviewImageBackground">       
-              <GuiElement type="image" template="gcFactoryBigRightOverviewImage" id="gui_overview_image" />  
-            </GuiElement>          
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText1" position="-200px -100px" id="gui_overview_factoryName" />  
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText2" position="400px -30px" text="$l10n_GC_gui_description" />  
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText3" position="400px -150px" id="gui_overview_description" />  
-        </GuiElement>
+      <GuiElement type="image" template="gcFactoryBigBackgroundRight">
+          
+          <GuiElement template="gcBase" id="gui_overview" >
+              <GuiElement type="image" template="gcSeperator" size="300px 2px" position="400px 320px" />
+              <GuiElement type="image" template="gcSeperator" size="2px 780px" position="200px 0px" />            
+              <GuiElement type="image" template="gcFactoryBigRightOverviewImageBackground">       
+                <GuiElement type="image" template="gcFactoryBigRightOverviewImage" id="gui_overview_image" />  
+              </GuiElement>          
+              <GuiElement type="text" template="gcFactoryBigRightOverviewText1" position="-200px -100px" id="gui_overview_factoryName" />  
+              <GuiElement type="text" template="gcFactoryBigRightOverviewText2" position="400px -30px" text="$l10n_GC_gui_description" />  
+              <GuiElement type="text" template="gcFactoryBigRightOverviewText3" position="400px -150px" id="gui_overview_description" />  
+          </GuiElement>
 
-        <GuiElement template="gcBase" id="gui_details" >
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText4" position="80px -20px" id="gui_details_factoryName" />  
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText5" position="-80px -20px" id="gui_details_currentTime" /> 
-            <GuiElement type="image" template="gcSeperator" size="1100px 2px" position="0px 350px" />    
-            
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText6" position="100px -90px" text="$l10n_GC_gui_state" />  
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText6" position="100px -120px" text="$l10n_GC_gui_automatic" />  
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText7" position="300px -90px" id="gui_details_state" />  
-            <GuiElement type="text" template="gcFactoryBigRightOverviewText7" position="300px -120px" id="gui_details_automatic" /> 
+          <GuiElement template="gcBase" id="gui_details" >
+              <GuiElement type="text" template="gcFactoryBigRightOverviewText4" position="80px -20px" id="gui_details_factoryName" />  
+              <GuiElement type="text" template="gcFactoryBigRightOverviewText5" position="-80px -20px" id="gui_details_currentTime" /> 
+              <GuiElement type="image" template="gcSeperator" size="1100px 2px" position="0px 350px" />    
+              
+              <GuiElement type="text" template="gcFactoryBigRightOverviewText6" position="100px -90px" text="$l10n_GC_gui_state" />  
+              <GuiElement type="text" template="gcFactoryBigRightOverviewText6" position="100px -120px" text="$l10n_GC_gui_automatic" />  
+              <GuiElement type="text" template="gcFactoryBigRightOverviewText7" position="300px -90px" id="gui_details_state" />  
+              <GuiElement type="text" template="gcFactoryBigRightOverviewText7" position="300px -120px" id="gui_details_automatic" /> 
 
-            <GuiElement type="image" template="gcSeperator" size="2px 600px" position="0px -80px" />  
-            <GuiElement type="image" template="gcSeperator" size="1000px 2px" position="0px 260px" />  
+              <GuiElement type="image" template="gcSeperator" size="2px 600px" position="0px -80px" />  
+              <GuiElement type="image" template="gcSeperator" size="1000px 2px" position="0px 260px" />  
 
-            <GuiElement type="image" template="gcFactoryBigRightInput" >
-              <GuiElement type="text" template="gcFactoryBigRightOverviewText8" position="0px -5px" id="gui_details_input" />                  
+              <GuiElement type="image" template="gcFactoryBigRightInput" >
+                <GuiElement type="text" template="gcFactoryBigRightOverviewText8" position="0px -5px" id="gui_details_input" />                  
 
-              <GuiElement type="table" template="gcFactoryRightTable" id="gui_inputTable">		
-                <GuiElement type="button" template="gcFactoryRightTableItem" isTableTemplate="true">
-                  <GuiElement type="text" template="gcFactoryBigRightOverviewText9" position="10px 0px" onCreate="onCreateDetailInputTitle" />
-                  <GuiElement type="text" template="gcFactoryBigRightOverviewText10" position="210px -40px" text="$l10n_GC_gui_capacity" />
-                  <GuiElement type="text" template="gcFactoryBigRightOverviewText10" position="210px -70px" text="$l10n_GC_gui_filllevel" />
-                  <GuiElement type="text" template="gcFactoryBigRightOverviewText11" position="300px -40px" onCreate="onCreateDetailInputCapacity" />
-                  <GuiElement type="text" template="gcFactoryBigRightOverviewText11" position="300px -70px" onCreate="onCreateDetailInputFillLevel" />
-                  
-                  <GuiElement type="image" template="gcFactoryRightTableItemBarBg" size="202px 25px" position="-89px -9px" />
-                  <GuiElement type="image" template="gcFactoryRightTableItemBar" size="200px 23px" position="210px -10px" onCreate="onCreateDetailInputBar" />
-                  <GuiElement type="text" template="gcFactoryBigRightOverviewText11" position="430px -5px" onCreate="onCreateDetailInputPercent" />
-                  
-                  <GuiElement type="text" template="gcFactoryBigRightOverviewText12" position="20px -110px" onCreate="onCreateDetailInputBuyText" />
-                  <GuiElement type="button" template="gcButton" size="40px 40px" position="-90px -50px" text="-" onCreate="onCreateDetailInputButtonMinusPlus" onClick="onClickDetailMinus" />
-                  <GuiElement type="button" template="gcButton" size="40px 40px" position="-40px -50px" text="+" onCreate="onCreateDetailInputButtonMinusPlus" onClick="onClickDetailPlus" />
-                  <GuiElement type="button" template="gcFactoryRightTableItemBtnSml" size="200px 40px" position="90px -50px" onCreate="onCreateDetailInputBuyButton" onClick="onClickDetailBuy" />
-                </GuiElement>	
-              </GuiElement>                
-            </GuiElement>
-
-            <GuiElement type="image" template="gcFactoryBigRightOutput" >
-              <GuiElement type="text" template="gcFactoryBigRightOverviewText8" position="0px -5px" id="gui_details_output" />                  
-
-              <GuiElement type="table" template="gcFactoryRightTable" id="gui_outputTable">				
-                <GuiElement type="button" template="gcFactoryRightTableItem" isTableTemplate="true">
-                  <GuiElement type="text" template="gcFactoryBigRightOverviewText9" position="10px 0px" onCreate="onCreateDetailOutputTitle" />
-                  <GuiElement type="text" template="gcFactoryBigRightOverviewText10" position="210px -40px" text="$l10n_GC_gui_capacity" />
-                  <GuiElement type="text" template="gcFactoryBigRightOverviewText10" position="210px -70px" text="$l10n_GC_gui_filllevel" />
-                  <GuiElement type="text" template="gcFactoryBigRightOverviewText11" position="300px -40px" onCreate="onCreateDetailOutputCapacity" />
-                  <GuiElement type="text" template="gcFactoryBigRightOverviewText11" position="300px -70px" onCreate="onCreateDetailOutputFillLevel" />
-                  
-                  <GuiElement type="image" template="gcFactoryRightTableItemBarBg" size="202px 25px" position="-89px -9px" />
-                  <GuiElement type="image" template="gcFactoryRightTableItemBar" size="200px 23px" position="210px -10px" onCreate="onCreateDetailOutputBar" />
-                  <GuiElement type="text" template="gcFactoryBigRightOverviewText11" position="430px -5px" onCreate="onCreateDetailOutputPercent" />
-                  
-                  
-                  <GuiElement type="text" template="gcFactoryBigRightOverviewText12" position="20px -110px" onCreate="onCreateDetailOutputPalletText" />
-                  <GuiElement type="button" template="gcButton" size="40px 40px" position="-90px -50px" text="-" onCreate="onCreateDetailOutputPalletButtonMinusPlus" onClick="onClickDetailPalletMinus" />
-                  <GuiElement type="button" template="gcButton" size="40px 40px" position="-40px -50px" text="+" onCreate="onCreateDetailOutputPalletButtonMinusPlus" onClick="onClickDetailPalletPlus" />
-                  <GuiElement type="button" template="gcFactoryRightTableItemBtnSml" size="200px 40px" position="90px -50px" onCreate="onCreateDetailOutputPalletButton" onClick="onClickDetailSpawnPallet" />
-                </GuiElement>	              
+                <GuiElement type="table" template="gcFactoryRightTable" id="gui_inputTable">		
+                  <GuiElement type="button" template="gcFactoryRightTableItem" isTableTemplate="true">
+                    <GuiElement type="text" template="gcFactoryBigRightOverviewText9" position="10px 0px" onCreate="onCreateDetailInputTitle" />
+                    <GuiElement type="text" template="gcFactoryBigRightOverviewText10" position="210px -40px" text="$l10n_GC_gui_capacity" />
+                    <GuiElement type="text" template="gcFactoryBigRightOverviewText10" position="210px -70px" text="$l10n_GC_gui_filllevel" />
+                    <GuiElement type="text" template="gcFactoryBigRightOverviewText11" position="300px -40px" onCreate="onCreateDetailInputCapacity" />
+                    <GuiElement type="text" template="gcFactoryBigRightOverviewText11" position="300px -70px" onCreate="onCreateDetailInputFillLevel" />
+                    
+                    <GuiElement type="image" template="gcFactoryRightTableItemBarBg" size="202px 25px" position="-89px -9px" />
+                    <GuiElement type="image" template="gcFactoryRightTableItemBar" size="200px 23px" position="210px -10px" onCreate="onCreateDetailInputBar" />
+                    <GuiElement type="text" template="gcFactoryBigRightOverviewText11" position="430px -5px" onCreate="onCreateDetailInputPercent" />
+                    
+                    <GuiElement type="text" template="gcFactoryBigRightOverviewText12" position="20px -110px" onCreate="onCreateDetailInputBuyText" />
+                    <GuiElement type="button" template="gcButton" size="40px 40px" position="-90px -50px" text="-" onCreate="onCreateDetailInputButtonMinusPlus" onClick="onClickDetailMinus" />
+                    <GuiElement type="button" template="gcButton" size="40px 40px" position="-40px -50px" text="+" onCreate="onCreateDetailInputButtonMinusPlus" onClick="onClickDetailPlus" />
+                    <GuiElement type="button" template="gcFactoryRightTableItemBtnSml" size="200px 40px" position="90px -50px" onCreate="onCreateDetailInputBuyButton" onClick="onClickDetailBuy" />
+                  </GuiElement>	
+                </GuiElement>                
               </GuiElement>
-                
-            </GuiElement>
-   
 
-        </GuiElement>
+              <GuiElement type="image" template="gcFactoryBigRightOutput" >
+                <GuiElement type="text" template="gcFactoryBigRightOverviewText8" position="0px -5px" id="gui_details_output" />                  
 
-    </GuiElement>
-
+                <GuiElement type="table" template="gcFactoryRightTable" id="gui_outputTable">				
+                  <GuiElement type="button" template="gcFactoryRightTableItem" isTableTemplate="true">
+                    <GuiElement type="text" template="gcFactoryBigRightOverviewText9" position="10px 0px" onCreate="onCreateDetailOutputTitle" />
+                    <GuiElement type="text" template="gcFactoryBigRightOverviewText10" position="210px -40px" text="$l10n_GC_gui_capacity" />
+                    <GuiElement type="text" template="gcFactoryBigRightOverviewText10" position="210px -70px" text="$l10n_GC_gui_filllevel" />
+                    <GuiElement type="text" template="gcFactoryBigRightOverviewText11" position="300px -40px" onCreate="onCreateDetailOutputCapacity" />
+                    <GuiElement type="text" template="gcFactoryBigRightOverviewText11" position="300px -70px" onCreate="onCreateDetailOutputFillLevel" />
+                    
+                    <GuiElement type="image" template="gcFactoryRightTableItemBarBg" size="202px 25px" position="-89px -9px" />
+                    <GuiElement type="image" template="gcFactoryRightTableItemBar" size="200px 23px" position="210px -10px" onCreate="onCreateDetailOutputBar" />
+                    <GuiElement type="text" template="gcFactoryBigRightOverviewText11" position="430px -5px" onCreate="onCreateDetailOutputPercent" />
+                    
+                    
+                    <GuiElement type="text" template="gcFactoryBigRightOverviewText12" position="20px -110px" onCreate="onCreateDetailOutputPalletText" />
+                    <GuiElement type="button" template="gcButton" size="40px 40px" position="-90px -50px" text="-" onCreate="onCreateDetailOutputPalletButtonMinusPlus" onClick="onClickDetailPalletMinus" />
+                    <GuiElement type="button" template="gcButton" size="40px 40px" position="-40px -50px" text="+" onCreate="onCreateDetailOutputPalletButtonMinusPlus" onClick="onClickDetailPalletPlus" />
+                    <GuiElement type="button" template="gcFactoryRightTableItemBtnSml" size="200px 40px" position="90px -50px" onCreate="onCreateDetailOutputPalletButton" onClick="onClickDetailSpawnPallet" />
+                  </GuiElement>	              
+                </GuiElement>
+                  
+              </GuiElement>
     
-    <GuiElement type="flowLayout" template="gcFactoryBigButtonsLayout">
-        <GuiElement type="button" template="gcBaseGuiButton" inputAction="MENU_BACK" onClick="onClickClose" />
-        <GuiElement type="text" template="gcBaseGuiButtonText" text="$l10n_GC_gui_buttons_back" />    
-        <GuiElement type="button" position="350px 0px" template="gcBaseGuiButtonNext" inputAction="MENU_ACCEPT" onClick="onClickActivate" id="gui_button_activate_btn" />
-        <GuiElement type="text" template="gcBaseGuiButtonText" id="gui_button_activate" />    
+
+          </GuiElement>
+
+      </GuiElement>
+
+      
+      <GuiElement type="flowLayout" template="gcFactoryBigButtonsLayout">
+          <GuiElement type="button" template="gcBaseGuiButton" inputAction="MENU_BACK" onClick="onClickClose" />
+          <GuiElement type="text" template="gcBaseGuiButtonText" text="$l10n_GC_gui_buttons_back" />    
+          <GuiElement type="button" position="350px 0px" template="gcBaseGuiButtonNext" inputAction="MENU_ACCEPT" onClick="onClickActivate" id="gui_button_activate_btn" />
+          <GuiElement type="text" template="gcBaseGuiButtonText" id="gui_button_activate" />    
+      </GuiElement>
     </GuiElement>
   </GuiElement>
 

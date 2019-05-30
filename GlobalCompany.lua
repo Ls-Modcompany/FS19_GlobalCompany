@@ -243,7 +243,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_Animations.lua");
 	source(GlobalCompany.dir .. "objects/GC_FillVolume.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicHeap.lua");
-	source(GlobalCompany.dir .. "objects/GC_BaleShreader.lua");
+	--source(GlobalCompany.dir .. "objects/GC_BaleShreader.lua");
 	source(GlobalCompany.dir .. "objects/GC_DirtyObjects.lua");
 	source(GlobalCompany.dir .. "objects/GC_PalletCreator.lua");
 	source(GlobalCompany.dir .. "objects/GC_ObjectSpawner.lua");
@@ -257,7 +257,8 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
 	--source(GlobalCompany.dir .. "objects/GC_DynamicPalletAreas.lua");
 	source(GlobalCompany.dir .. "objects/GC_FillTypeConstructor.lua");
-	source(GlobalCompany.dir .. "objects/GC_Greenhouse.lua");
+	--source(GlobalCompany.dir .. "objects/GC_Greenhouse.lua");
+	--source(GlobalCompany.dir .. "objects/GC_FuelStation.lua");
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
@@ -265,14 +266,15 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "triggers/GC_PlayerTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_LoadingTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_UnloadingTrigger.lua");
-	source(GlobalCompany.dir .. "triggers/GC_PalletExtendedTrigger.lua");
+	--source(GlobalCompany.dir .. "triggers/GC_PalletExtendedTrigger.lua");
 
 	--|| Placeables ||--
 	source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
-	source(GlobalCompany.dir .. "placeables/GC_BaleShreaderPlaceable.lua");
+	--source(GlobalCompany.dir .. "placeables/GC_BaleShreaderPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_FillTypeConstructorPlaceable.lua");
-	source(GlobalCompany.dir .. "placeables/GC_GreenhousePlaceable.lua");
+	--source(GlobalCompany.dir .. "placeables/GC_GreenhousePlaceable.lua");
+	--source(GlobalCompany.dir .. "placeables/GC_FuelStationPlaceable.lua");
 
 	--|| Additionals ||--
 	source(GlobalCompany.dir .. "additionals/GC_BaleAddon.lua");
@@ -289,8 +291,8 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "events/GC_ProductionFactorySpawnPalletEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryProductPurchaseEvent.lua");
 
-	--|| Events ||--
-	source(GlobalCompany.dir .. "specializations/PalletExtended.lua");
+	--|| Specializations ||--
+	--source(GlobalCompany.dir .. "specializations/PalletExtended.lua");
 	
 end;
 
@@ -303,10 +305,11 @@ function GlobalCompany.loadPlaceables()
 	local placeablesDir = GlobalCompany.dir .. "placeables/";
 
 	GlobalCompany:addPlaceableType("GC_BalerPlaceable", "GC_BalerPlaceable", placeablesDir .. "GC_BalerPlaceable.lua");
-	GlobalCompany:addPlaceableType("GC_BaleShreaderPlaceable", "GC_BaleShreaderPlaceable", placeablesDir .. "GC_BaleShreaderPlaceable.lua");
+	--GlobalCompany:addPlaceableType("GC_BaleShreaderPlaceable", "GC_BaleShreaderPlaceable", placeablesDir .. "GC_BaleShreaderPlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_ProductionFactoryPlaceable", "GC_ProductionFactoryPlaceable", placeablesDir .. "GC_ProductionFactoryPlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_FillTypeConstructor", "GC_FillTypeConstructorPlaceable", placeablesDir .. "GC_FillTypeConstructorPlaceable.lua");
-	GlobalCompany:addPlaceableType("GC_GreenhousePlaceable", "GC_GreenhousePlaceable", placeablesDir .. "GC_GreenhousePlaceable.lua");
+	--GlobalCompany:addPlaceableType("GC_GreenhousePlaceable", "GC_GreenhousePlaceable", placeablesDir .. "GC_GreenhousePlaceable.lua");
+	--GlobalCompany:addPlaceableType("GC_FuelStationPlaceable", "GC_FuelStationPlaceable", placeablesDir .. "GC_FuelStationPlaceable.lua");
 end;
 
 --| Main |--

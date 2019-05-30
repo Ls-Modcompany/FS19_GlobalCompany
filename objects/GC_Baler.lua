@@ -184,9 +184,8 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		self.conveyorFillType:load(self.nodeId, self, xmlFile, string.format("%s.conveyor", mainPartKey));
 		self.conveyorFillTypeEffect = GC_ConveyorEffekt:new(self.isServer, self.isClient);
 		self.conveyorFillTypeEffect:load(self.nodeId, self, xmlFile, string.format("%s.conveyor.effect", mainPartKey));
-
 		
-		self.baleAnimationObjectNode = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, string.format("%s.baleAnimation.objects#node", mainPartKey)), self.i3dMappings);
+		--self.baleAnimationObjectNode = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, string.format("%s.baleAnimation.objects#node", mainPartKey)), self.i3dMappings);
 		self.baleAnimationObjects = {};
 		
 		i = 0;
@@ -505,10 +504,10 @@ function Baler:update(dt)
 				self.animationManager:setAnimationTime("moveCollisionAnimation", 0);
 				setCollisionMask(self.moveCollisionAnimationNode, 0);
 			end;
-			self:createBale(self.baleAnimationObjectNode);
+			self:createBale(self.animationManager:getPartsOfAnimation("baleAnimation")[1].node);
 			self.animationManager:setAnimationTime("baleAnimation", 0);
-			if getNumOfChildren(self.baleAnimationObjectNode) > 0 then
-				delete(getChildAt(self.baleAnimationObjectNode, 0));
+			if not self.isServer and getNumOfChildren(self.animationManager:getPartsOfAnimation("baleAnimation")[1]) > 0 then
+				delete(getChildAt(self.animationManager:getPartsOfAnimation("baleAnimation")[1], 0));
 			end;
 		end;
 		
@@ -650,7 +649,7 @@ end;
 function Baler:setFillLevelEvent(data, noEventSend)     
 	g_company.eventManager:createEvent(self.eventId_setFillLevel, data, false, noEventSend);
 	self.fillLevel = data[1];
-	if self.isClient then
+	if g_client ~= nil then
 		self.movers:updateMovers(data[1], self.activeFillTypeIndex);    
 		g_company.gui:updateGuiData("gcPlaceable_baler");
 	end;	
@@ -676,6 +675,7 @@ function Baler:setFillTypEvent(data, noEventSend)
 		end;
 	end;
 	self.activeFillTypeIndex = data[1]; 
+	print("setFilltype " .. self.activeFillTypeIndex)
 end;
 
 function Baler:setBaleObjectToAnimation(noEventSend)
@@ -685,12 +685,15 @@ end;
 -- data is empty table
 function Baler:setBaleObjectToAnimationEvent(data, noEventSend)
 	g_company.eventManager:createEvent(self.eventId_setBaleObjectToAnimation, data, false, noEventSend);
-	if self.isClient then
+	print("setBaleObjectToAnimationEvent")
+	if not self.isServer then
+		print("setBaleObjectToAnimationEvent isClient")
 		for _,info in pairs (self.baleAnimationObjects) do
+			print(info.fillTypeIndex .. "  " .. self.activeFillTypeIndex)
 			if info.fillTypeIndex == self.activeFillTypeIndex then
 				local newBale = clone(info.node, false, false, false);
 				setVisibility(newBale, true);
-				link(self.baleAnimationObjectNode, newBale);		
+				link(self.animationManager:getPartsOfAnimation("baleAnimation")[1].node, newBale);	
 				break;
 			end;
 		end;
@@ -746,7 +749,7 @@ function Baler:createBale(ref)
 	local t = self.fillTypeToBaleType[self.activeFillTypeIndex];
 	local baleType = g_baleTypeManager:getBale(self.activeFillTypeIndex, false, t.width, t.height, t.length, t.diameter);	
 	local filename = Utils.getFilename(baleType.filename, self.baseDirectory);
-	local baleObject = Bale:new(self.isServer, self.isClient);
+	local baleObject = Bale:new(self.isServer, g_client ~= nil);
 	local x,y,z = getWorldTranslation(ref);
 	local rx,ry,rz = getWorldRotation(ref);
 	baleObject:load(filename, x,y,z,rx,ry,rz, 4000);
@@ -769,7 +772,7 @@ function Baler:onTurnOnBalerEvent(data, noEventSend)
 		self:raiseActive();
 	end;
 
-	if self.isClient then
+	if g_client ~= nil then
 		self.conveyorFillTypeEffect:setFillType(self.activeFillTypeIndex);
 		self.conveyorFillTypeEffect:start();
 		self.conveyorFillType:start();
@@ -785,7 +788,7 @@ function Baler:onTurnOffBalerEvent(data, noEventSend)
 	g_company.eventManager:createEvent(self.eventId_onTurnOffBaler, data, false, noEventSend);
 	self.state_baler = Baler.STATE_OFF;
 
-	if self.isClient then
+	if g_client ~= nil then
 		self.conveyorFillTypeEffect:stop();
 		self.conveyorFillType:stop();
 	end;
