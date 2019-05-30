@@ -62,9 +62,9 @@ end;
 
 function GC_EventManager:createEvent(targetId, data, useOwnIndex, noEventSend)    
 	if targetId ~= nil and (noEventSend == nil or noEventSend == false) then
-        if self.isServer then        
+        if self.isServer then      
             g_server:broadcastEvent(GC_DefaultEvent:new(targetId, data, useOwnIndex))
-        else
+        else 
 			g_client:getServerConnection():sendEvent(GC_DefaultEvent:new(targetId, data, useOwnIndex))
         end;
     end;
@@ -178,6 +178,13 @@ function GC_EventManager:raiseSynch(targetId, data)
     target.func(target.target, data, true);
 end;
 
+function GC_EventManager:countTable(dataTable)
+    local i = 0;
+    for _,_ in pairs(dataTable) do
+        i = i + 1;
+    end;
+    return i;
+end
 
 GC_DefaultEvent = {};
 GC_DefaultEvent_mt = Class(GC_DefaultEvent, Event);
@@ -199,7 +206,7 @@ end;
 function GC_DefaultEvent:writeStream(streamId, connection)
     streamWriteUInt16(streamId, self.targetId);
     streamWriteBool(streamId, self.useOwnIndex);
-    streamWriteUInt16(streamId, table.getn(self.data));
+    streamWriteUInt16(streamId, g_company.eventManager:countTable(self.data));
 
     for k,v in pairs (self.data) do
         if self.useOwnIndex then
@@ -215,12 +222,12 @@ function GC_DefaultEvent:readStream(streamId, connection)
     self.targetId = streamReadUInt16(streamId);
     self.useOwnIndex = streamReadBool(streamId);
     local lenght = streamReadUInt16(streamId);
-
+    
     for i=1, lenght do
         if self.useOwnIndex then   
             local k = g_company.eventManager:doRead(streamId);
             local v = g_company.eventManager:doRead(streamId);
-            table.insert(self.data, v);
+            self.data[k] = v;
         else
             local v = g_company.eventManager:doRead(streamId);
             table.insert(self.data, v);
