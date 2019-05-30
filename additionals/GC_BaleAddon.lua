@@ -47,7 +47,7 @@ function GC_BaleAddon:init()
 		g_company.addUpdateable(self, self.update);			
 	end;
 
-	g_company.settings:initSetting(self, "cutBales", true);
+	g_company.settings:initSetting("cutBales", true);
 	
 	return self;
 end;

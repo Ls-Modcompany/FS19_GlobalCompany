@@ -38,7 +38,7 @@ function GC_MoreTrees:init()
 	
 	self.debugData = g_company.debug:getDebugData(GC_MoreTrees.debugIndex, g_company);
         
-    g_company.settings:initSetting(self, "moreTrees", true);
+    g_company.settings:initSetting("moreTrees", true);
 
 	return self;
 end;

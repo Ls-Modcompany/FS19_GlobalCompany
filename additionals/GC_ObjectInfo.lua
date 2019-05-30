@@ -43,7 +43,7 @@ function GC_ObjectInfo:init()
 		g_company.addUpdateable(self, self.update);	
 	end;
 
-	g_company.settings:initSetting(self, "objectInfo", true);
+	g_company.settings:initSetting("objectInfo", true);
 	
 	return self;
 end;

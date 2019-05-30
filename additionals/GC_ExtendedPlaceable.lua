@@ -40,7 +40,7 @@ function GC_ExtendedPlaceable:init()
     self.backup_DISPLACEMENT = PlacementScreenController.DISPLACEMENT_COST_PER_M3;
     self.backup_SCULPT = Landscaping.SCULPT_BASE_COST_PER_M3;
         
-    g_company.settings:initSetting(self, "extendedPlaceable", true);
+    g_company.settings:initSetting("extendedPlaceable", true);
 
 	return self;
 end;

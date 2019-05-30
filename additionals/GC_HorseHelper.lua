@@ -43,7 +43,7 @@ function GC_HorseHelper:init()
 	self.debugData = g_company.debug:getDebugData(GC_HorseHelper.debugIndex, g_company);
 
 	g_currentMission.environment:addHourChangeListener(self);		
-    g_company.settings:initSetting(self, "horseHelper", true);
+    g_company.settings:initSetting("horseHelper", true);
 end;
 
 function GC_HorseHelper:hourChanged()
