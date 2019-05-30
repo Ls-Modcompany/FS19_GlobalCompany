@@ -348,7 +348,7 @@ function GC_AnimationManager:playAnimation(name, speed, animTime, noEventSend)
 				g_client:getServerConnection():sendEvent(GC_AnimationManagerStartEvent:new(self, animationId, speed, animTime));
 			end;
 		end;
-
+		
 		if self.activeAnimations[name] == nil then
 			self.activeAnimations[name] = animation;
 			self.numActiveAnimations = self.numActiveAnimations + 1;
@@ -988,8 +988,3 @@ function GC_AnimationManager:loadAnimationNamesFromXML(xmlFile, xmlKey, warningE
 
 	return;
 end;
-
-
-
-
-

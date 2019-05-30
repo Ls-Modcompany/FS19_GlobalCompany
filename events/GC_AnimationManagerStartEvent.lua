@@ -65,8 +65,3 @@ function GC_AnimationManagerStartEvent:run(connection)
 		g_server:broadcastEvent(GC_AnimationManagerStartEvent:new(self.object, self.animationId, self.speed, self.animTime), nil, connection, self.object);
 	end;
 end;
-
-
-
-
-
