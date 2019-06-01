@@ -335,7 +335,8 @@ function GlobalCompany:loadMap()
 	-- end;
 
 	g_company.settings = GlobalCompanySettings:load();
-	g_currentMission.saveSavegame = Utils.appendedFunction(g_currentMission.saveSavegame, g_company.settings.saveSettings);
+	-- g_currentMission.saveSavegame = Utils.appendedFunction(g_currentMission.saveSavegame, g_company.settings.saveSettings); 
+	FSBaseMission.saveSavegame = Utils.appendedFunction(FSBaseMission.saveSavegame, g_company.settings.saveSettings); --@KevinK98 changed due to savegame problems with other mods
     g_company.settings:loadSettings();
 
 	for _,loadable in pairs(GlobalCompany.loadables) do
