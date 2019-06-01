@@ -3,12 +3,15 @@
 --
 -- @Interface: --
 -- @Author: LS-Modcompany / aPuehri
--- @Date: 29.03.2019
--- @Version: 1.0.0.0
+-- @Date: 01.06.2019
+-- @Version: 1.0.1.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+--
+-- 	v1.0.1.0 (01.06.2019)/(aPuehri):
+-- 		- smaler changes
 --
 -- 	v1.0.0.0 (29.03.2019):
 -- 			- initial fs19 (aPuehri)
@@ -27,12 +30,14 @@ local GC_BaleAddon_mt = Class(GC_BaleAddon);
 InitObjectClass(GC_BaleAddon, "GC_BaleAddon");
 
 GC_BaleAddon.debugIndex = g_company.debug:registerScriptName("GC_BaleAddon");
-GC_BaleAddon.eventName = {};
 GC_BaleAddon.enableCutBale = false;
 GC_BaleAddon.object = nil;
 
 function GC_BaleAddon:load()
     Player.registerActionEvents = Utils.appendedFunction(Player.registerActionEvents, GC_BaleAddon.registerActionEvents);
+    Player.removeActionEvents = Utils.appendedFunction(Player.removeActionEvents, GC_BaleAddon.removeActionEventsPlayer);
+    --initialize
+    GC_BaleAddon.eventName = {};
 end;
 
 function GC_BaleAddon:init()
@@ -56,10 +61,13 @@ end;
 function GC_BaleAddon:registerActionEvents()
     local result, eventName = InputBinding.registerActionEvent(g_inputBinding, 'GC_BALEADDON_CUT',self, GC_BaleAddon.actionCut ,false ,true ,false ,true);
     if result then
-        g_inputBinding:setActionEventTextPriority(eventName, GS_PRIO_HIGH);
         table.insert(GC_BaleAddon.eventName, eventName);
-        g_inputBinding.events[eventName].displayIsVisible = false;
+        g_inputBinding:setActionEventTextVisibility(eventName, false);
     end;
+end;
+
+function GC_BaleAddon:removeActionEventsPlayer()
+    GC_BaleAddon.eventName = {};
 end;
 
 function GC_BaleAddon:update(dt)
@@ -81,13 +89,16 @@ function GC_BaleAddon:update(dt)
                         end;
                     end;
                 end;
-            elseif self.isMultiplayer and g_company.settings:getSetting("objectInfo", true) then
-                if (GC_ObjectInfo.mpFoundBale~= nil) then
-                    GC_BaleAddon.object = GC_ObjectInfo.mpFoundBale;
-                    if (GC_BaleAddon.object.typeName == nil) and (GC_BaleAddon.object.fillType ~= nil) and (GC_BaleAddon.object.fillLevel ~= nil) then
-                        GC_BaleAddon.enableCutBale = GC_BaleAddon:getCanCutBale(GC_BaleAddon.object);
-                    end;
-                end;
+            -- elseif g_company.settings:getSetting("objectInfo", true) then
+            --     if (GC_ObjectInfo.foundBale~= nil) then
+            --         if GC_BaleAddon.object ~= GC_ObjectInfo.foundBale then
+            --             GC_BaleAddon.object = GC_ObjectInfo.foundBale;
+            --             gc_debugPrint(GC_ObjectInfo.foundBale, nil, nil, "GC_BaleAddon - GC_ObjectInfo.foundBale");
+            --         end;
+            --         if (GC_BaleAddon.object.typeName == nil) and (GC_BaleAddon.object.fillType ~= nil) and (GC_BaleAddon.object.fillLevel ~= nil) then
+            --             GC_BaleAddon.enableCutBale = GC_BaleAddon:getCanCutBale(GC_BaleAddon.object);
+            --         end;
+            --     end;
             end;	
         end;
         GC_BaleAddon:displayHelp(GC_BaleAddon.enableCutBale);
@@ -101,9 +112,9 @@ function GC_BaleAddon:actionCut(actionName, keyStatus, arg3, arg4, arg5)
 end;
 
 function GC_BaleAddon:displayHelp(state)
-    for i=1, #self.eventName, 1 do
-        if (g_inputBinding.events[self.eventName[i]] ~= nil) then
-            g_inputBinding.events[self.eventName[i]].displayIsVisible = state;
+    for i=1, #GC_BaleAddon.eventName, 1 do
+        if (GC_BaleAddon.eventName[i] ~= nil) then
+            g_inputBinding:setActionEventTextVisibility(GC_BaleAddon.eventName[i], state);
         end;	
     end;
 end;
@@ -152,7 +163,6 @@ function GC_BaleAddon:cutBale(foundObject, isServer, isClient)
         foundObject:setFillLevel(foundObject:getFillLevel() - dropped);
         
         if isServer then
-            print ("Server delete");
             if (foundObject:getFillLevel() <= minLevel) then
                 foundObject:delete();
             end;

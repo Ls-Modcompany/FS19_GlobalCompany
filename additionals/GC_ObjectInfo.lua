@@ -32,7 +32,7 @@ local GC_ObjectInfo_mt = Class(GC_ObjectInfo);
 InitObjectClass(GC_ObjectInfo, "GC_ObjectInfo");
 
 GC_ObjectInfo.debugIndex = g_company.debug:registerScriptName("Gc_ObjectInfo");
-GC_ObjectInfo.mpFoundBale = nil;
+GC_ObjectInfo.foundBale = nil;
 
 function GC_ObjectInfo:init()
 	local self = setmetatable({}, GC_ObjectInfo_mt);
@@ -56,48 +56,17 @@ end;
 
 function GC_ObjectInfo:update(dt)
 	if self.isClient and not (self.isServer and self.isMultiplayer) and g_company.settings:getSetting("objectInfo", true) then
-		self.showInfo = false;
-		GC_ObjectInfo.mpFoundBale = nil;
 		if g_currentMission.player.isControlled and not g_currentMission.player.isCarryingObject then
-			if g_currentMission.player.isObjectInRange then
-				if (g_currentMission.player.lastFoundObject ~= nil) then
-					local foundObjectId = g_currentMission.player.lastFoundObject;
-					if (foundObjectId ~= self.debugPrintObjectId) then
-						g_company.debug:writeDevDebug(self.debugData, "New foundObjectId = %s", foundObjectId);
-					end;
-					if (foundObjectId ~= g_currentMission.terrainDetailId) then	
-						if (getRigidBodyType(foundObjectId) == "Dynamic") then
-							local object = g_currentMission:getNodeObject(foundObjectId);
-							if (object~= nil) then
-								if (object.fillType ~= nil) and (object.fillLevel ~= nil) then
-									self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(Utils.getNoNil(g_fillTypeManager.fillTypes[object.fillType].title,"unknown"));
-									self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level'):format(object.fillLevel);
-									self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object.ownerFarmId));
-									self.showInfo = true;
-								elseif (object.typeName == "pallet") then
-									if (object.getFillUnits ~= nil) then
-										local fUnit = object:getFillUnits();
-										if object:getFillUnitExists(fUnit[1].fillUnitIndex) then
-											local lev = Utils.getNoNil(g_company.mathUtils.round(fUnit[1].fillLevel,0.01),0);
-											local perc = Utils.getNoNil(g_company.mathUtils.round((object:getFillUnitFillLevelPercentage(fUnit[1].fillUnitIndex) * 100),0.01),0);
-											self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(Utils.getNoNil(g_fillTypeManager.fillTypes[fUnit[1].fillType].title,"unknown"));
-											self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level2'):format(lev, perc);
-											self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object.ownerFarmId));
-											self.showInfo = true;
-										end;
-									end;
-								end;
-								self.debugPrintObjectId = foundObjectId;
-							end;			
-						end;
-					end;
-				end;
-			else
-				local x,y,z = localToWorld(g_currentMission.player.cameraNode, 0,0,1.0);
-				local dx,dy,dz = localDirectionToWorld(g_currentMission.player.cameraNode, 0,0,-1);
-				local distance = Player.MAX_PICKABLE_OBJECT_DISTANCE * 2.2;
-				raycastAll(x,y,z, dx,dy,dz, "infoObjectRaycastCallback", distance, self);
-			end;
+			self.showInfo = false;
+			GC_ObjectInfo.foundBale = nil;
+			-- check objects in front of player
+			local x,y,z = localToWorld(g_currentMission.player.cameraNode, 0,0,1.0);
+			local dx,dy,dz = localDirectionToWorld(g_currentMission.player.cameraNode, 0,0,-1);
+			local distance = Player.MAX_PICKABLE_OBJECT_DISTANCE * 1.75;
+			raycastAll(x,y,z, dx,dy,dz, "infoObjectRaycastCallback", distance, self);			
+		else
+			self.showInfo = false;
+			GC_ObjectInfo.foundBale = nil;
 		end;
 			
 		if self.showInfo then
@@ -110,11 +79,14 @@ function GC_ObjectInfo:update(dt)
 			g_company.gui:closeGui("gcObjectInfo");
 			self.gui = nil;
 		end;
+	else
+		self.showInfo = false;
+		GC_ObjectInfo.foundBale = nil;
 	end;
 end;
 
 function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
-	if (hitObjectId ~= g_currentMission.terrainDetailId) then
+	if (hitObjectId ~= nil) and (hitObjectId ~= g_currentMission.terrainDetailId) then
 		local locRigidBodyType = getRigidBodyType(hitObjectId);
 		if (locRigidBodyType == "Dynamic") or (self.isMultiplayer and (locRigidBodyType == "Kinematic")) then
 			local object = g_currentMission:getNodeObject(hitObjectId);		
@@ -131,19 +103,21 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 							self.showInfo = true;
 						end;
 					end;
-				elseif self.isMultiplayer and (object.typeName == nil) and (object.fillType ~= nil) and (object.fillLevel ~= nil) then
+				elseif (object.typeName == nil) and (object.fillType ~= nil) and (object.fillLevel ~= nil) then
 					if object:isa(Bale) then
-						GC_ObjectInfo.mpFoundBale = object;
+						GC_ObjectInfo.foundBale = object;						
+						self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(Utils.getNoNil(g_fillTypeManager.fillTypes[object.fillType].title,"unknown"));
+						self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level'):format(object.fillLevel);
+						self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object.ownerFarmId));
+						self.showInfo = true;						
 					end;
-					self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(Utils.getNoNil(g_fillTypeManager.fillTypes[object.fillType].title,"unknown"));
-					self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level'):format(object.fillLevel);
-					self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object.ownerFarmId));
-					self.showInfo = true;
 				end;
+
 				if (hitObjectId ~= self.debugPrintObjectId) then
 					g_company.debug:writeDevDebug(self.debugData, "hitObjectId = %s, locRigidBodyType = %s", hitObjectId, locRigidBodyType);
 					-- gc_debugPrint(object, nil, 1, "ObjectInfo");
 				end;
+
 				self.debugPrintObjectId = hitObjectId;
 			end;
 		end;
