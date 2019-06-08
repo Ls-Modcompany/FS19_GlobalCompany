@@ -94,5 +94,16 @@
 		<e k="GC_ObjectInfo_level2" v="Füllstand: %s Liter (%s%%)"/>
 		<e k="GC_ObjectInfo_owner" v="Besitzer: %s"/>
 
+		<!-- DynamicStorage -->
+		<e k="GC_dynamicStorage_unloadSettings" v="Abladeeinstellungen"/>
+		<e k="GC_dynamicStorage_gui_header_unloading" v="Abladeposition wählen"/>
+		<e k="GC_dynamicStorage_gui_header_loading" v="Aufladebox wählen"/>
+		<e k="GC_dynamicStorage_gui_fillLevel_unloading" v="Wähle aus, in welche Box abgeladen werden soll. Beachte, dass in jede Box nur eine Frucht abgeladen werden kann."/>
+		<e k="GC_dynamicStorage_gui_fillLevel_loading" v="Wähle aus, aus welcher Box geladen werden soll."/>
+		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s Liter"/>
+		<e k="GC_dynamicStorage_gui_empty" v="leer"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Abladeposition bestätigen"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Aufladebox bestätigen"/>
+
 	</elements>
 </l10n>

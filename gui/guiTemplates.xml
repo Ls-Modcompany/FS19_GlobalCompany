@@ -832,5 +832,102 @@
 			<value name="borderLeftSize" value="2px" />
 			<value name="borderLeftColor" value="gray2" />
 		</template>
+
+
+	
+		<!-- DynamicStorage -->
+		<template name="gcDynStorage" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="1920px 1080px" />
+			<value name="imageColor" value="glass0_1" />
+		</template>
+		<template name="gcDynStorageBackground" anchor="middleCenter" extends="gcBase gcBorder">
+			<value name="size" value="1600px 850px" />
+			<value name="position" value="0px 0px" />
+			<value name="hasBorders" value="true" />
+			<value name="borderBottomSize" value="6px" />
+			<value name="borderBottomColor" value="orange" />
+			<Value name="imageUVs" value="colorBg"/>
+			<value name="imageColor" value="0.018 0.016 0.015 0.6" />
+		</template>
+		<template name="gcDynStorageButtonsLayout" anchor="middleBottom" extends="gcBase">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="left" />
+			<value name="position" value="0px 50px" />
+			<value name="size" value="1600px 50px" />
+		</template>
+		<template name="gcDynStorageTextHeader" anchor="middleTop" extends="gcBase_text">
+			<value name="textSize" value="26px" />
+			<value name="textBold" value="true" />
+			<value name="textAlignment" value="center" />	
+			<value name="margin" value="0px 20px 0px 0px" />
+		</template>	
+		<template name="gcDynStorageTextInfo" anchor="middleTop" extends="gcBase_text">
+			<value name="textSize" value="20px" />
+			<value name="textAlignment" value="center" />	
+			<value name="margin" value="0px 80px 0px 0px" />
+			<value name="textColor_selected" value="white" />
+		</template>	
+		<template name="gcDynStorageBox" anchor="middleCenter" extends="gcBase">
+			<value name="orientation" value="x" />
+			<value name="maxItemsX" value="6" />
+			<value name="maxItemsY" value="1" />	
+			<value name="position" value="0px 0px" />
+			<value name="size" value="1600px 400px" />
+		</template>
+		<template name="gcDynStorageBoxBackgroud" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="250px 400px" />
+			<value name="position" value="0px 0px" />
+			<Value name="imageUVs" value="colorBg"/>
+			<value name="imageColor" value="0.018 0.016 0.015 0.8" />
+			<value name="imageColor_selected" value="orange" />
+			<value name="margin" value="5px 0px 5px 0px" />
+			<value name="hasOverlay" value="true" />	
+			<value name="isActivable" value="true" />
+			<value name="canDeactivable" value="false" />
+		</template>
+		<template name="gcDynStorageBoxTextNumber" anchor="middleTop" extends="gcDynStorageTextInfo">
+			<value name="textSize" value="25px" />
+			<value name="margin" value="0px 30px 0px 0px" />
+		</template>	
+		<template name="gcDynStorageBoxTextContent" anchor="middleTop" extends="gcDynStorageTextInfo">
+			<value name="textSize" value="20px" />
+			<value name="margin" value="0px 130px 0px 0px" />
+		</template>	
+		<template name="gcDynStorageBoxTextFillLevel" anchor="middleTop" extends="gcDynStorageTextInfo">
+			<value name="textSize" value="20px" />
+			<value name="margin" value="0px 180px 0px 0px" />
+		</template>	
+		<template name="gcDynStorageBoxFillLevelBg" anchor="middleTop" extends="gcBase gcBorder">
+			<Value name="imageUVs" value="colorBg"/>
+			<Value name="imageColor" value="transparent"/>
+			<Value name="imageColor_selected" value="transparent"/>
+			<value name="hasBorders" value="true" />
+			<value name="borderLeftSize" value="1px" />
+			<value name="borderRightSize" value="1px" />
+			<value name="borderTopSize" value="1px" />
+			<value name="borderBottomSize" value="1px" />
+			<value name="borderLeftSize_selected" value="1px" />
+			<value name="borderRightSize_selected" value="1px" />
+			<value name="borderTopSize_selected" value="1px" />
+			<value name="borderBottomSize_selected" value="1px" />
+			<value name="borderLeftColor" value="gray1" />
+			<value name="borderRightColor" value="gray1" />
+			<value name="borderTopColor" value="gray1" />
+			<value name="borderBottomColor" value="gray1" />
+		</template>
+		<template name="gcDynStorageBoxFillLevel" anchor="leftCenter" extends="gcBase">
+			<Value name="imageUVs" value="colorBg"/>
+			<Value name="imageColor" value="orange"/>
+			<Value name="imageColor_selected" value="0.018 0.016 0.015 0.8"/>
+			<value name="margin" value="1px 0px 0px 0px" />
+		</template>
+
+
+
+
+
+
+
+
 	</templates>	
 </guiTemplates>

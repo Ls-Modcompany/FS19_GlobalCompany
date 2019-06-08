@@ -259,6 +259,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_FillTypeConstructor.lua");
 	--source(GlobalCompany.dir .. "objects/GC_Greenhouse.lua");
 	--source(GlobalCompany.dir .. "objects/GC_FuelStation.lua");
+	source(GlobalCompany.dir .. "objects/GC_DynamicStorage.lua");
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
@@ -275,6 +276,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "placeables/GC_FillTypeConstructorPlaceable.lua");
 	--source(GlobalCompany.dir .. "placeables/GC_GreenhousePlaceable.lua");
 	--source(GlobalCompany.dir .. "placeables/GC_FuelStationPlaceable.lua");
+	source(GlobalCompany.dir .. "placeables/GC_DynamicStoragePlaceable.lua");
 
 	--|| Additionals ||--
 	source(GlobalCompany.dir .. "additionals/GC_BaleAddon.lua");
@@ -310,6 +312,7 @@ function GlobalCompany.loadPlaceables()
 	GlobalCompany:addPlaceableType("GC_FillTypeConstructor", "GC_FillTypeConstructorPlaceable", placeablesDir .. "GC_FillTypeConstructorPlaceable.lua");
 	--GlobalCompany:addPlaceableType("GC_GreenhousePlaceable", "GC_GreenhousePlaceable", placeablesDir .. "GC_GreenhousePlaceable.lua");
 	--GlobalCompany:addPlaceableType("GC_FuelStationPlaceable", "GC_FuelStationPlaceable", placeablesDir .. "GC_FuelStationPlaceable.lua");
+	GlobalCompany:addPlaceableType("GC_DynamicStoragePlaceable", "GC_DynamicStoragePlaceable", placeablesDir .. "GC_DynamicStoragePlaceable.lua");
 end;
 
 --| Main |--

@@ -67,6 +67,7 @@ source(g_currentModDirectory .. "gui/objects/ObjectInfo.lua");
 source(g_currentModDirectory .. "gui/objects/GcMain.lua");
 source(g_currentModDirectory .. "gui/objects/FactoryBig.lua");
 source(g_currentModDirectory .. "gui/objects/FactorySmall.lua");
+source(g_currentModDirectory .. "gui/objects/DynamicStorage.lua");
 
 function GlobalCompanyGui:init()	
 	for _,inAc in pairs(self.toInit_actionEvents) do
@@ -107,6 +108,7 @@ function GlobalCompanyGui:load()
 	g_company.gui:registerGui("gc_factorySmall", nil, Gc_Gui_FactorySmall, false, false);
 	g_company.gui:registerGui("gcPlaceable_baler", nil, Gc_Gui_Baler, true, true);
 	g_company.gui:registerGui("gcObjectInfo", nil, Gc_Gui_ObjectInfo, false, false);
+	g_company.gui:registerGui("gc_dynamicStorage", nil, Gc_Gui_DynamicStorage, true, true);
 	
 	self.activeGuiDialogs = {};
 	self.registeredActonEvents = false;
