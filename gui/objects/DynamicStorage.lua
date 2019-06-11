@@ -73,6 +73,11 @@ function Gc_Gui_DynamicStorage:setData(storage, isUnloading, activeUnloadingBox)
                     item:setActive(true);
                 end;
             end;
+        else
+            local trigger = storage.loadingTrigger;
+            if not trigger.validFillableObject:getFillUnitAllowsFillType(trigger.validFillableFillUnitIndex, place.activeFillTypeIndex) then
+               item:setDisabled(true);                
+            end;
         end;
     end;
     self.tmp_place = nil;

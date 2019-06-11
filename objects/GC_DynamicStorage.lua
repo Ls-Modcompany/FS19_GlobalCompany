@@ -100,7 +100,10 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	self.isPlaceable = isPlaceable;
 
 	self.triggerManager = GC_TriggerManager:new(self);
-	self.i3dMappings = GC_i3dLoader:loadI3dMapping(xmlFile, xmlKey .. ".i3dMappings");
+    self.i3dMappings = GC_i3dLoader:loadI3dMapping(xmlFile, xmlKey .. ".i3dMappings");
+    
+    local materialPath = getXMLString(xmlFile, xmlKey .. ".materials#materialHolder");
+	self.materials = GC_i3dLoader:loadMaterials(materialPath, self.baseDirectory, xmlFile, xmlKey .. ".materials", self.i3dMappings);
 
 	self.saveId = getXMLString(xmlFile, xmlKey .. "#saveId");
 	if self.saveId == nil then
@@ -112,6 +115,7 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 
     self:setActiveUnloadingBox();
     self.vehicleInteractionInTrigger = false;
+    self.vehicleInteractionConter = 0;
 
     local usedFillTypeNames = {};
     local i = 0;
@@ -276,8 +280,16 @@ function GC_DynamicStorage:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, t
     if fillLevelDelta > 0 then
         local place = self.places[self.activeUnloadingBox];
         if place.fillLevel == 0 then
+            
             place.activeFillTypeIndex = fillTypeIndex;
+            local material = self.materials[g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex):lower()];            
+            if material ~= nil then
+                for _,mover in pairs(place.movers.movers) do
+                    setMaterial(mover.node, material, 0);
+                end;
+            end;
         end;
+
         if place.activeFillTypeIndex == fillTypeIndex then
             place.fillLevel = place.fillLevel + fillLevelDelta;      
             place.movers:updateMovers(place.fillLevel);
@@ -338,12 +350,11 @@ end;
 function GC_DynamicStorage:vehicleInteractionTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay)	
     if onEnter or onLeave then
         if onEnter then
-            if not self.vehicleInteractionInTrigger then
-                --if g_currentMission.accessHandler:canFarmAccess(g_currentMission:getFarmId(), self.target) then				
-                    self.vehicleInteractionInTrigger = true;
-                    self.vehicleInteractionActivation:addActivatableObject();
-                --end;
+            if self.vehicleInteractionInTrigger then          
+                self.vehicleInteractionActivation:removeActivatableObject();
             end;
+            self.vehicleInteractionInTrigger = true;
+            self.vehicleInteractionActivation:addActivatableObject();
         else
             if self.vehicleInteractionInTrigger then
                 self.vehicleInteractionInTrigger = false;
@@ -354,8 +365,13 @@ function GC_DynamicStorage:vehicleInteractionTriggerCallback(triggerId, otherId,
 end;
 
 function GC_DynamicStorage:loadingTriggerOnActivateObject()
-    local gui = g_company.gui:openGuiWithData("gc_dynamicStorage", false, self, false);
-    gui.classGui:setCloseCallback(self, self.loadingTriggerOnActivateObjectCallback);
+    if not self.loadingTrigger.isLoading then
+        local gui = g_company.gui:openGuiWithData("gc_dynamicStorage", false, self, false);
+        gui.classGui:setCloseCallback(self, self.loadingTriggerOnActivateObjectCallback);
+    else
+		self.loadingTrigger:setIsLoading(false);
+    end;
+	g_currentMission:addActivatableObject(self.loadingTrigger);
 end
 
 function GC_DynamicStorage:loadingTriggerOnActivateObjectCallback()
