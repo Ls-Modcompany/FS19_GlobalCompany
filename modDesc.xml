@@ -54,7 +54,7 @@
             <binding device="KB_MOUSE_DEFAULT" input="KEY_b" axisComponent="+" neutralInput="0" index="1"/>
         </actionBinding>
         <actionBinding action="GC_BALEADDON_CUT">
-            <binding device="KB_MOUSE_DEFAULT" input="MOUSE_BUTTON_RIGHT" axisComponent="+" neutralInput="0" index="1"/>
+            <binding device="KB_MOUSE_DEFAULT" input="MOUSE_BUTTON_RIGHT" axisComponent="+" neutralInput="0" index="3"/>
         </actionBinding>		
         <actionBinding action="GC_DYNSTORAGE_VEHICLEINTERACTION">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_t" axisComponent="+" neutralInput="0" index="1"/>
