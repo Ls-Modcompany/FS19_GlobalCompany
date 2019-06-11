@@ -17,8 +17,8 @@ Changelog:
 <GUI>  
   <GuiElement type="image" template="gcMainBackground">  
     <GuiElement type="image" template="gcMainMenu">  
-        <GuiElement type="button" template="gcBaseGuiButton" anchor="leftCenter" position="20px 0px" inputAction="MENU_PAGE_PREV" />
-        <GuiElement type="button" template="gcBaseGuiButton" anchor="rightCenter" position="-20px 0px" inputAction="MENU_PAGE_NEXT" />
+        <GuiElement type="button" template="gcBaseGuiButton" anchor="leftCenter" position="20px 0px" inputAction="MENU_PAGE_PREV" onClick="onClickMenuPrev" />
+        <GuiElement type="button" template="gcBaseGuiButton" anchor="rightCenter" position="-20px 0px" inputAction="MENU_PAGE_NEXT" onClick="onClickMenuNext" />
         <GuiElement type="flowLayout" template="gcMainMenuLayout" id="gui_menu">				
           <GuiElement type="button" template="gcMainMenuItem" id="gui_menuItem" onClick="onClickMainMenu">
             <GuiElement type="image" template="gcMainMenuItemIcon" />  

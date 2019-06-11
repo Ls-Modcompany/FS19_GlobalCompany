@@ -65,8 +65,7 @@ function Gc_Gui_MainGui:onOpen()
     else
         local toOpen = Utils.getNoNil(self.activePage, 1);
         self:onClickMainMenu(self.gui_menu.elements[toOpen]);
-        self.gui_menu.elements[toOpen]:setActive(true);
-        
+        self.gui_menu.elements[toOpen]:setActive(true);        
     end;
 end;
 
@@ -113,8 +112,14 @@ function Gc_Gui_MainGui:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
 end;
 
 function Gc_Gui_MainGui:keyEvent(unicode, sym, modifier, isDown, eventUsed)
-	if self.activeGui ~= nil and self.activeGui.keyEvent ~= nil then
-		self.activeGui:keyEvent(unicode, sym, modifier, isDown, eventUsed)
+    if self.activeGui ~= nil and self.activeGui.keyEvent ~= nil then
+        if sym == 113 and isDown then
+            self:onClickMenuPrev();
+        elseif sym == 101 and isDown then
+            self:onClickMenuNext();
+        else
+            self.activeGui:keyEvent(unicode, sym, modifier, isDown, eventUsed)
+        end;    
 	end;
 end;
 
@@ -128,4 +133,20 @@ function Gc_Gui_MainGui:draw()
 	if self.activeGui ~= nil and self.activeGui.draw ~= nil then
         self.activeGui:draw();
     end;
+end;
+
+function Gc_Gui_MainGui:onClickMenuPrev()
+    local toOpen = math.max(self.activePage - 1, 1);
+    self:onClickMainMenu(self.gui_menu.elements[toOpen]);
+    for i=1, #self.gui_menu.elements do
+        self.gui_menu.elements[i]:setActive(i == toOpen);      
+    end;       
+end;
+
+function Gc_Gui_MainGui:onClickMenuNext()
+    local toOpen = math.min(self.activePage + 1, #self.gui_menu.elements);
+    self:onClickMainMenu(self.gui_menu.elements[toOpen]);
+    for i=1, #self.gui_menu.elements do
+        self.gui_menu.elements[i]:setActive(i == toOpen);      
+    end;  
 end;
