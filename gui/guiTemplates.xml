@@ -31,12 +31,14 @@
 		<color name="glass5_70" value="0.04 0.04 0.04 0.95" />
 		
 		<color name="image" value="1 1 1 1" />
-		<color name="image_disabled" value="07098 07098 07098 1" />
+		<color name="image_disabled" value="0.6 0.6 0.6 0.3" />
+		<color name="image_disabled2" value="0.6 0.6 0.6 0.5" />
 		<color name="image_selected" value="1 1 1 1" />
 		<color name="image_selected2" value="0.9910 0.3865 0.0100 1" />
 		
 		<color name="text" value="1 1 1 1" />		
 		<color name="text_disabled" value="0.498 0.498 0.498 1" />		
+		<color name="text_disabled2" value="0.65 0.65 0.65 1" />		
 		<color name="text_selected" value="0.9910 0.3865 0.0100 1" />
 	</colors>
 	
@@ -901,6 +903,7 @@
 			<Value name="imageUVs" value="colorBg"/>
 			<Value name="imageColor" value="transparent"/>
 			<Value name="imageColor_selected" value="transparent"/>
+			<value name="imageColor_disabled" value="text_disabled" />
 			<value name="hasBorders" value="true" />
 			<value name="borderLeftSize" value="1px" />
 			<value name="borderRightSize" value="1px" />
@@ -914,11 +917,16 @@
 			<value name="borderRightColor" value="gray1" />
 			<value name="borderTopColor" value="gray1" />
 			<value name="borderBottomColor" value="gray1" />
+			<value name="borderLeftColor_disabled" value="text_disabled" />
+			<value name="borderRightColor_disabled" value="text_disabled" />
+			<value name="borderTopColor_disabled" value="text_disabled" />
+			<value name="borderBottomColor_disabled" value="text_disabled" />
 		</template>
 		<template name="gcDynStorageBoxFillLevel" anchor="leftCenter" extends="gcBase">
 			<Value name="imageUVs" value="colorBg"/>
 			<Value name="imageColor" value="orange"/>
 			<Value name="imageColor_selected" value="0.018 0.016 0.015 0.8"/>
+			<value name="imageColor_disabled" value="text_disabled2" />
 			<value name="margin" value="1px 0px 0px 0px" />
 		</template>
 

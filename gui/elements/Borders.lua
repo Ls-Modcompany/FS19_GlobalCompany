@@ -34,7 +34,7 @@ function GC_Gui_borders:new(gui, custom_mt)
 	
 	self.borderLeftSize_disabled = 0;
 	self.borderRightSize_disabled = 0;
-	self.borderTopSiz_disablede = 0;
+	self.borderTopSize_disabled = 0;
 	self.borderBottomSize_disabled = 0;
 	
 	self.borderLeftColor = {1,1,1,1};
