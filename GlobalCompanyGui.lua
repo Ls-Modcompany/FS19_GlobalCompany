@@ -126,12 +126,13 @@ function GlobalCompanyGui:update(dt)
 			end;
 			if self.activeGui ~= nil then
 				self.guis[self.activeGui].gui:openGui();
+			else
+				for name, open in pairs(self.smallGuis) do
+					if open then
+						self.guis[name].gui:openGui();
+					end;
+				end; 
 			end;
-			for name, open in pairs(self.smallGuis) do
-				if open then
-					self.guis[name].gui:openGui();
-				end;
-			end; 
 			if self.activeGuiDialog ~= nil then
 				self.guis[self.activeGuiDialog].gui:openGui();
 			end;
@@ -186,9 +187,11 @@ end;
 function GlobalCompanyGui:draw() end;
 function GlobalCompanyGui:drawB() 
 	if GlobalCompanyGui.activeGui == nil then
-		for name, open in pairs(GlobalCompanyGui.smallGuis) do
-			if open then
-				GlobalCompanyGui.guis[name].gui:draw();
+		if g_gui.currentGui == nil then
+			for name, open in pairs(GlobalCompanyGui.smallGuis) do
+				if open then
+					GlobalCompanyGui.guis[name].gui:draw();
+				end;
 			end;
 		end;
 	else
