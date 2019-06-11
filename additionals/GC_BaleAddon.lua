@@ -75,16 +75,16 @@ function GC_BaleAddon:update(dt)
         GC_BaleAddon.enableCutBale = false;
         if g_company.settings:getSetting("cutBales", true) and g_currentMission.player.isControlled and not g_currentMission.player.isCarryingObject then
             if not self.isMultiplayer and g_currentMission.player.isObjectInRange then
-                if (g_currentMission.player.lastFoundObject ~= nil) then
-                    local foundObjectId = g_currentMission.player.lastFoundObject;
-                    if (foundObjectId ~= g_currentMission.terrainDetailId) then	
-                        if getRigidBodyType(foundObjectId) == "Dynamic" then
-                            GC_BaleAddon.object = g_currentMission:getNodeObject(foundObjectId);
-                            if (GC_BaleAddon.object~= nil) then
-                                if (GC_BaleAddon.object.typeName == nil) and (GC_BaleAddon.object.fillType ~= nil) and (GC_BaleAddon.object.fillLevel ~= nil) then
-                                    -- gc_debugPrint(GC_BaleAddon.object.typeName, nil, nil, "GC_BaleAddon - GC_BaleAddon.object.typename");
-                                    GC_BaleAddon.enableCutBale = GC_BaleAddon:getCanCutBale(GC_BaleAddon.object);
-                                end;
+                local foundObjectId = g_currentMission.player.lastFoundObject;
+                if (foundObjectId ~= nil) and (foundObjectId ~= g_currentMission.terrainDetailId) then
+                    -- local locRigidBodyType = getRigidBodyType(foundObjectId);
+                    local object = g_currentMission:getNodeObject(foundObjectId);                    
+                    -- if (locRigidBodyType == "Dynamic") then
+                    if (object~= nil) then 
+                        if object:isa(Bale) then
+                            if (object.typeName == nil) and (object.fillType ~= nil) and (object.fillLevel ~= nil) then
+                                GC_BaleAddon.object = object;
+                                GC_BaleAddon.enableCutBale = GC_BaleAddon:getCanCutBale(GC_BaleAddon.object);
                             end;
                         end;
                     end;
