@@ -68,20 +68,20 @@ function GC_ObjectInfo:update(dt)
 			self.showInfo = false;
 			GC_ObjectInfo.foundBale = nil;
 		end;
-			
-		if self.showInfo then
-			if self.gui == nil then
-				self.gui = g_company.gui:openGuiWithData("gcObjectInfo", false, self.displayLine1, self.displayLine2, self.displayLine3);
-			else
-				self.gui.classGui:setData(self.displayLine1, self.displayLine2, self.displayLine3);
-			end;
-		elseif self.gui ~= nil then			
-			g_company.gui:closeGui("gcObjectInfo");
-			self.gui = nil;
-		end;
 	else
 		self.showInfo = false;
 		GC_ObjectInfo.foundBale = nil;
+	end;
+
+	if self.showInfo then
+		if self.gui == nil then
+			self.gui = g_company.gui:openGuiWithData("gcObjectInfo", false, self.displayLine1, self.displayLine2, self.displayLine3);
+		else
+			self.gui.classGui:setData(self.displayLine1, self.displayLine2, self.displayLine3);
+		end;
+	elseif self.gui ~= nil then			
+		g_company.gui:closeGui("gcObjectInfo");
+		self.gui = nil;
 	end;
 end;
 
