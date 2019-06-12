@@ -149,7 +149,11 @@ function GlobalCompanyGui:update(dt)
 			end;
 		end;
 	else
-		self.guis[self.activeGui].gui:update(dt);
+		if g_gui:getIsGuiVisible() then
+			self:closeGui(self.activeGui);
+		else
+			self.guis[self.activeGui].gui:update(dt);
+		end;
 	end;
 	for _, name in pairs(GlobalCompanyGui.activeGuiDialogs) do
 		GlobalCompanyGui.guis[name].gui:update(dt);
