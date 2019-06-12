@@ -34,21 +34,21 @@
 --
 --
 
-GC_PlayerTrigger = {};
+GC_PlayerTrigger = {}
 
-local GC_PlayerTrigger_mt = Class(GC_PlayerTrigger, Object);
-InitObjectClass(GC_PlayerTrigger, "GC_PlayerTrigger");
+local GC_PlayerTrigger_mt = Class(GC_PlayerTrigger, Object)
+InitObjectClass(GC_PlayerTrigger, "GC_PlayerTrigger")
 
-GC_PlayerTrigger.debugIndex = g_company.debug:registerScriptName("GC_PlayerTrigger");
+GC_PlayerTrigger.debugIndex = g_company.debug:registerScriptName("GC_PlayerTrigger")
 
-g_company.playerTrigger = GC_PlayerTrigger;
+g_company.playerTrigger = GC_PlayerTrigger
 
 function GC_PlayerTrigger:new(isServer, isClient, customMt)
-	local self = Object:new(isServer, isClient, customMt or GC_PlayerTrigger_mt);
+	local self = Object:new(isServer, isClient, customMt or GC_PlayerTrigger_mt)
+	
+	self.registerTriggerInStream = false
 
-	self.triggerManagerRegister = true; -- 'GC_TriggerManager' Requirement.
-
-	return self;
+	return self
 end
 
 -- Load player trigger.
@@ -63,124 +63,124 @@ end
 -- @return boolean true/false = load success or fail.
 function GC_PlayerTrigger:load(nodeId, target, xmlFile, xmlKey, triggerReference, isActivatable, activateText, removeAfterActivated)
 	if nodeId == nil or target == nil then
-		return false;
-	end;
+		return false
+	end
 
-	self.debugData = g_company.debug:getDebugData(GC_PlayerTrigger.debugIndex, target);
+	self.debugData = g_company.debug:getDebugData(GC_PlayerTrigger.debugIndex, target)
 
-	self.rootNode = nodeId;
-	self.target = target;
-	self.triggerReference = triggerReference;
+	self.rootNode = nodeId
+	self.target = target
+	self.triggerReference = triggerReference
 
-	self.playerInTrigger = false;
-	self.isActivatable = Utils.getNoNil(isActivatable, false);
+	self.playerInTrigger = false
+	self.isActivatable = Utils.getNoNil(isActivatable, false)
 
 	if xmlFile ~= nil and xmlKey ~= nil then
-		local playerTriggerNode = getXMLString(xmlFile, xmlKey .. "#playerTriggerNode");
+		local playerTriggerNode = getXMLString(xmlFile, xmlKey .. "#playerTriggerNode")
 		if not self:setTriggerNode(playerTriggerNode) then
-			g_company.debug:logWrite(self.debugData, GC_DebugUtils.MODDING, "Error loading 'playerTriggerNode' %s!", playerTriggerNode);
-		end;
-	end;
+			g_company.debug:logWrite(self.debugData, GC_DebugUtils.MODDING, "Error loading 'playerTriggerNode' %s!", playerTriggerNode)
+		end
+	end
 
 	if self.isActivatable then
 		if self.target.playerTriggerActivated ~= nil then
-			self.removeAfterActivated = Utils.getNoNil(removeAfterActivated, false);
-			self.activateText = Utils.getNoNil(activateText, g_i18n:getText("input_ACTIVATE_OBJECT"));
+			self.removeAfterActivated = Utils.getNoNil(removeAfterActivated, false)
+			self.activateText = Utils.getNoNil(activateText, g_i18n:getText("input_ACTIVATE_OBJECT"))
 		else
-			g_company.debug:logWrite(self.debugData, GC_DebugUtils.DEV, "function 'playerTriggerActivated' does not exist. 'isActivatable' is not an option.");
-			self.isActivatable = false;
-		end;
-	end;
+			g_company.debug:logWrite(self.debugData, GC_DebugUtils.DEV, "function 'playerTriggerActivated' does not exist. 'isActivatable' is not an option.")
+			self.isActivatable = false
+		end
+	end
 
-	return true;
-end;
+	return true
+end
 
 function GC_PlayerTrigger:setTriggerNode(playerTriggerNode)
 	if playerTriggerNode ~= nil then
-		self.playerTriggerNode = I3DUtil.indexToObject(self.rootNode, playerTriggerNode, self.target.i3dMappings);
+		self.playerTriggerNode = I3DUtil.indexToObject(self.rootNode, playerTriggerNode, self.target.i3dMappings)
 		if self.playerTriggerNode ~= nil then
-			addTrigger(self.playerTriggerNode, "playerTriggerCallback", self);
-			return true;
-		end;
-	end;
+			addTrigger(self.playerTriggerNode, "playerTriggerCallback", self)
+			return true
+		end
+	end
 
-	return false;
-end;
+	return false
+end
 
 function GC_PlayerTrigger:delete()
 	if self.isActivatable and self.playerInTrigger then
-		g_currentMission:removeActivatableObject(self);
-	end;
+		g_currentMission:removeActivatableObject(self)
+	end
 
-	self.playerInTrigger = false;
+	self.playerInTrigger = false
 
 	if self.playerTriggerNode ~= nil then
-		removeTrigger(self.playerTriggerNode);
-	end;
+		removeTrigger(self.playerTriggerNode)
+	end
 	
-	GC_PlayerTrigger:superClass().delete(self);
-end;
+	GC_PlayerTrigger:superClass().delete(self)
+end
 
 function GC_PlayerTrigger:update(dt)
 	if self.target.playerTriggerUpdate ~= nil then
-		self.target:playerTriggerUpdate(dt, self.playerInTrigger, self.triggerReference);
-	end;
+		self.target:playerTriggerUpdate(dt, self.playerInTrigger, self.triggerReference)
+	end
 
 	if self.playerInTrigger then
 		if self:getIsActivatable() then
 			if self.isActivatable and self.target.playerTriggerGetActivateText ~= nil then
-				local text = self.target:playerTriggerGetActivateText(self.triggerReference);
-				self:setActivateText(text);
-			end;
+				local text = self.target:playerTriggerGetActivateText(self.triggerReference)
+				self:setActivateText(text)
+			end
 
-			self:raiseActive();
+			self:raiseActive()
 		else
-			self.playerInTrigger = false;
+			self.playerInTrigger = false
 
 			if self.isActivatable then
-				g_currentMission:removeActivatableObject(self);
-			end;
-		end;
-	end;
-end;
+				g_currentMission:removeActivatableObject(self)
+			end
+		end
+	end
+end
 
 function GC_PlayerTrigger:getIsActivatable()
-	return g_currentMission.controlPlayer and g_currentMission.controlledVehicle == nil;
-end;
+	return g_currentMission.controlPlayer and g_currentMission.controlledVehicle == nil
+end
 
 function GC_PlayerTrigger:onActivateObject()
-	self.target:playerTriggerActivated(self.triggerReference);
-end;
+	self.target:playerTriggerActivated(self.triggerReference)
+end
 
 function GC_PlayerTrigger:shouldRemoveActivatable()
-	return self.removeAfterActivated;
-end;
+	return self.removeAfterActivated
+end
 
 function GC_PlayerTrigger:setActivateText(text)
-	self.activateText = tostring(text);
-end;
+	self.activateText = tostring(text)
+end
 
 function GC_PlayerTrigger:getPlayerInTrigger()
-	return self.playerInTrigger;
-end;
+	return self.playerInTrigger
+end
 
 function GC_PlayerTrigger:drawActivate()
 	if self.target.playerTriggerDrawActivate ~= nil then
-		self.target:playerTriggerDrawActivate(self.triggerReference);
-	end;
-end;
+		self.target:playerTriggerDrawActivate(self.triggerReference)
+	end
+end
 
 function GC_PlayerTrigger:canAddActivatable()
 	if self.isActivatable then
 		if self.target.playerTriggerCanAddActivatable ~= nil then
-			return self.target:playerTriggerCanAddActivatable(self.triggerReference);
-		end;
+			return self.target:playerTriggerCanAddActivatable(self.triggerReference)
+		end
 	
-		return true;
-	end;
+		return true
+	end
 	
-	return false;
-end;
+	return false
+end
 
 function GC_PlayerTrigger:playerTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay)
 	if g_currentMission.controlPlayer and (g_currentMission.player ~= nil and otherId == g_currentMission.player.rootNode) then		
@@ -188,33 +188,29 @@ function GC_PlayerTrigger:playerTriggerCallback(triggerId, otherId, onEnter, onL
 			if onEnter then
 				if not self.playerInTrigger then
 					if g_currentMission.accessHandler:canFarmAccess(g_currentMission:getFarmId(), self.target) then				
-						self.playerInTrigger = true;
+						self.playerInTrigger = true
 						if self:canAddActivatable() then
-							g_currentMission:addActivatableObject(self);
-						end;
-					end;
-				end;
+							g_currentMission:addActivatableObject(self)
+						end
+					end
+				end
 				if self.target.playerTriggerOnEnter ~= nil then
-					self.target:playerTriggerOnEnter(self.triggerReference);
-				end;
+					self.target:playerTriggerOnEnter(self.triggerReference)
+				end
 			else
 				if self.playerInTrigger then
-					self.playerInTrigger = false;
+					self.playerInTrigger = false
 	
 					if self.isActivatable then
-						g_currentMission:removeActivatableObject(self);
-					end;
-				end;
+						g_currentMission:removeActivatableObject(self)
+					end
+				end
 				if self.target.playerTriggerOnLeave ~= nil then
-					self.target:playerTriggerOnLeave(self.triggerReference);
-				end;
-			end;
-			self:raiseActive();
-		end;
-	end;
-end;
-
-
-
-
-
+					self.target:playerTriggerOnLeave(self.triggerReference)
+				end
+			end
+			
+			self:raiseActive()
+		end
+	end
+end

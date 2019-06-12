@@ -36,7 +36,7 @@ function GC_BaleTrigger:new(isServer, isClient, customMt)
 
 	local self = Object:new(isServer, isClient, customMt);
 
-	self.triggerManagerRegister = true;
+	self.registerTriggerInStream = false;
 
 	return self;
 end

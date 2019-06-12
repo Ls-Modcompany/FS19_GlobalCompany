@@ -42,7 +42,7 @@ function GC_WoodTrigger:new(isServer, isClient, customMt)
 	self.isServer = isServer;
 	self.isClient = isClient;
 	
-	self.triggerManagerRegister = false;  -- 'GC_TriggerManager' Requirement.	
+	self.registerTriggerInStream = false;
 	self.extraParamater = nil;
 
 	return self;
