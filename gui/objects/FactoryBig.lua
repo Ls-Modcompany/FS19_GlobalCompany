@@ -282,7 +282,7 @@ end
 
 function Gc_Gui_FactoryBig:onCreateDetailInputBar(element)
     if self.tmp_input ~= nil then
-        element:setScale(self.tmp_input.fillLevel / self.tmp_input.capacity);
+        element:setScale(math.min(math.max(self.tmp_input.fillLevel / self.tmp_input.capacity, 0), 1));
     end;
 end
 
@@ -361,7 +361,7 @@ end
 
 function Gc_Gui_FactoryBig:onCreateDetailOutputBar(element)
     if self.tmp_output ~= nil then
-        element:setScale(self.tmp_output.fillLevel / self.tmp_output.capacity);
+        element:setScale(math.min(math.max(self.tmp_output.fillLevel / self.tmp_output.capacity, 0), 1));
     end;
 end
 
