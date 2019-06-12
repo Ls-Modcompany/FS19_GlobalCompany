@@ -501,14 +501,14 @@
 			<value name="canDeactivable" value="false" />
 			<value name="hasOverlay" value="true" />
 			<value name="hasBorders" value="true" />
-			<value name="borderLeftSize" value="1px" />
-			<value name="borderRightSize" value="1px" />
-			<value name="borderTopSize" value="1px" />
-			<value name="borderBottomSize" value="1px" />
-			<value name="borderLeftSize_selected" value="1px" />
-			<value name="borderRightSize_selected" value="1px" />
-			<value name="borderTopSize_selected" value="1px" />
-			<value name="borderBottomSize_selected" value="1px" />
+			<value name="borderLeftSize" value="2px" />
+			<value name="borderRightSize" value="2px" />
+			<value name="borderTopSize" value="2px" />
+			<value name="borderBottomSize" value="2px" />
+			<value name="borderLeftSize_selected" value="2px" />
+			<value name="borderRightSize_selected" value="2px" />
+			<value name="borderTopSize_selected" value="2px" />
+			<value name="borderBottomSize_selected" value="2px" />
 			<value name="borderLeftColor" value="gray2" />
 			<value name="borderRightColor" value="gray2" />
 			<value name="borderTopColor" value="gray2" />
@@ -651,14 +651,14 @@
 			<Value name="imageColor" value="transparent"/>
 			<Value name="imageColor_selected" value="transparent"/>
 			<value name="hasBorders" value="true" />
-			<value name="borderLeftSize" value="1px" />
-			<value name="borderRightSize" value="1px" />
-			<value name="borderTopSize" value="1px" />
-			<value name="borderBottomSize" value="1px" />
-			<value name="borderLeftSize_selected" value="1px" />
-			<value name="borderRightSize_selected" value="1px" />
-			<value name="borderTopSize_selected" value="1px" />
-			<value name="borderBottomSize_selected" value="1px" />
+			<value name="borderLeftSize" value="2px" />
+			<value name="borderRightSize" value="2px" />
+			<value name="borderTopSize" value="2px" />
+			<value name="borderBottomSize" value="2px" />
+			<value name="borderLeftSize_selected" value="2px" />
+			<value name="borderRightSize_selected" value="2px" />
+			<value name="borderTopSize_selected" value="2px" />
+			<value name="borderBottomSize_selected" value="2px" />
 			<value name="borderLeftColor" value="gray1" />
 			<value name="borderRightColor" value="gray1" />
 			<value name="borderTopColor" value="gray1" />
@@ -907,14 +907,14 @@
 			<Value name="imageColor_selected" value="transparent"/>
 			<value name="imageColor_disabled" value="text_disabled" />
 			<value name="hasBorders" value="true" />
-			<value name="borderLeftSize" value="1px" />
-			<value name="borderRightSize" value="1px" />
-			<value name="borderTopSize" value="1px" />
-			<value name="borderBottomSize" value="1px" />
-			<value name="borderLeftSize_selected" value="1px" />
-			<value name="borderRightSize_selected" value="1px" />
-			<value name="borderTopSize_selected" value="1px" />
-			<value name="borderBottomSize_selected" value="1px" />
+			<value name="borderLeftSize" value="2px" />
+			<value name="borderRightSize" value="2px" />
+			<value name="borderTopSize" value="2px" />
+			<value name="borderBottomSize" value="2px" />
+			<value name="borderLeftSize_selected" value="2px" />
+			<value name="borderRightSize_selected" value="2px" />
+			<value name="borderTopSize_selected" value="2px" />
+			<value name="borderBottomSize_selected" value="2px" />
 			<value name="borderLeftColor" value="gray1" />
 			<value name="borderRightColor" value="gray1" />
 			<value name="borderTopColor" value="gray1" />

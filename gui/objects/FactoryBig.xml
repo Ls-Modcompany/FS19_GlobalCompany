@@ -55,7 +55,7 @@
                     <GuiElement type="text" template="gcFactoryBigRightOverviewText11" position="300px -70px" onCreate="onCreateDetailInputFillLevel" />
                     
                     <GuiElement type="image" template="gcFactoryRightTableItemBarBg" size="202px 25px" position="-89px -9px" />
-                    <GuiElement type="image" template="gcFactoryRightTableItemBar" size="200px 23px" position="210px -10px" onCreate="onCreateDetailInputBar" />
+                    <GuiElement type="image" template="gcFactoryRightTableItemBar" size="196px 21px" position="212px -11px" onCreate="onCreateDetailInputBar" />
                     <GuiElement type="text" template="gcFactoryBigRightOverviewText11" position="430px -5px" onCreate="onCreateDetailInputPercent" />
                     
                     <GuiElement type="text" template="gcFactoryBigRightOverviewText12" position="20px -110px" onCreate="onCreateDetailInputBuyText" />
@@ -78,7 +78,7 @@
                     <GuiElement type="text" template="gcFactoryBigRightOverviewText11" position="300px -70px" onCreate="onCreateDetailOutputFillLevel" />
                     
                     <GuiElement type="image" template="gcFactoryRightTableItemBarBg" size="202px 25px" position="-89px -9px" />
-                    <GuiElement type="image" template="gcFactoryRightTableItemBar" size="200px 23px" position="210px -10px" onCreate="onCreateDetailOutputBar" />
+                    <GuiElement type="image" template="gcFactoryRightTableItemBar" size="196px 21px" position="212px -10px" onCreate="onCreateDetailOutputBar" />
                     <GuiElement type="text" template="gcFactoryBigRightOverviewText11" position="430px -5px" onCreate="onCreateDetailOutputPercent" />
                     
                     
