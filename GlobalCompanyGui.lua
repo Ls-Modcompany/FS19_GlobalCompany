@@ -149,7 +149,7 @@ function GlobalCompanyGui:update(dt)
 			end;
 		end;
 	else
-		if g_gui:getIsGuiVisible() then
+		if g_gui:getIsDialogVisible() then
 			self:closeGui(self.activeGui);
 		else
 			self.guis[self.activeGui].gui:update(dt);
