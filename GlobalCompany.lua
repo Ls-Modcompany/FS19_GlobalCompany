@@ -23,11 +23,10 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.0.0.0"; -- Release Version.
-GlobalCompany.versionDate = "04.05.2019"; -- Release Date ??
+GlobalCompany.version = "1.0.0.0";
+GlobalCompany.versionDate = "06.07.2019"; -- Release Date ??
 GlobalCompany.currentVersionId = 1000; -- Mod Manager ID. (Version number without periods.)
 GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
-
 
 function GlobalCompany.initialLoad()
 	if GlobalCompany.initialLoadComplete ~= nil then

@@ -1,14 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="40">
-	<author>Ls-Modcompany - kevink98</author>
-    <version>0.1.0.0</version>
+	<author>Ls-Modcompany</author>
+    <version>1.0.0.0</version>
     <title>
-        <en>GlobalCompany</en>
+        <en><![CDATA[GlobalCompany]]></en>
     </title>
     <description>
-        <de><![CDATA[GlobalCompany]]></de>
-		<en><![CDATA[GlobalCompany]]></en>
+        <de><![CDATA[GlobalCompany - Die größte Scripterweiterung für den Landwirtschaft Simulator!
 
+GlobalCompany ist die Grundlage für viele Scripte. Egal ob Produktionen, Lager oder was auch immer - hiermit lässt es sich einfach umsetzen.]]></de>
+		<en><![CDATA[GlobalCompany - The biggest scriptextension for the Farming simulator!
+
+GlobalCompany is the base for many scripts. No matter if production, warehouse or whatever - with this it is easy to implement.]]></en>
     </description>
     <iconFilename>globalCompany.dds</iconFilename>
     <multiplayer supported="true"/>
@@ -60,7 +63,4 @@
             <binding device="KB_MOUSE_DEFAULT" input="KEY_t" axisComponent="+" neutralInput="0" index="1"/>
         </actionBinding>		
     </inputBinding>
-    
-    
-
 </modDesc>
