@@ -377,12 +377,12 @@ function GlobalCompanyGui:closeGui(name)
 			end;
 		end;
 		self.activeGui = nil;
+		self.fakeGui:setExit(true);
+		self.guis[name].gui:closeGui();
+		g_gui:showGui("");
 	else
 		self.smallGuis[name] = false;
 	end;	
-	self.fakeGui:setExit(true);
-	self.guis[name].gui:closeGui();
-	g_gui:showGui("");
 end;
 
 function GlobalCompanyGui:closeActiveGui()
