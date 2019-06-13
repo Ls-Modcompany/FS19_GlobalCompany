@@ -1218,10 +1218,8 @@ function GC_ProductionFactory:loadFromXMLFile(xmlFile, key)
 				if self.productLines[lineId].autoStart then
 					local state = Utils.getNoNil(getXMLBool(xmlFile, productLineKey .. "#state"), false)
 					local userStopped = Utils.getNoNil(getXMLBool(xmlFile, productLineKey .. "#userStopped"), false)
-
-					if state and not userStopped then
-						self:setFactoryState(lineId, state, false)
-					end
+					
+					self:setFactoryState(lineId, state, userStopped, true)
 				end
 			end
 
