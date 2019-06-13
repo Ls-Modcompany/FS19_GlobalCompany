@@ -331,7 +331,46 @@ function GlobalCompanyUtils.getCorrectNumberValue(value, newValue, minValue, max
 	return value
 end
 
+-- Part code from http://lua-users.org/wiki/StringRecipes
+-- GtX add insert to table option and first line indent matching.
+function GlobalCompanyUtils.stringWrap(str, limit, indent, returnTable)
+	if str == nil then
+		if returnTable then
+			return {}
+		end
+		
+		return ""
+	end
+	
+	limit = limit or 140
+	indent = indent or ""
 
-
-
-
+	local start, _ = string.find(str, "%w")
+	if start > 1 then
+		for i = 1, start - 1 do
+			indent = indent .. " "
+		end
+	end
+	
+	local position = 1 - #indent
+	local function check(sp, st, word, fi)
+		if fi - position > limit then
+			position = st - #indent
+			
+			return "\n" .. indent .. word
+		end
+	end
+	
+	local newString, _ = str:gsub("(%s+)()(%S+)()", check)
+	
+	if returnTable == true then
+		local stringTable = {}
+		for line in string.gmatch(newString, "[^\r\n]+") do
+			table.insert(stringTable, line)
+		end
+		
+		return stringTable
+	else
+		return newString
+	end
+end

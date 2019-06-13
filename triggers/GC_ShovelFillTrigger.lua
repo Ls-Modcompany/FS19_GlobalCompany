@@ -57,7 +57,6 @@ function GC_ShovelFillTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTy
 	self.rootNode = nodeId
 	self.source = source
 
-	local returnValue = false
 	if self.isServer then
 		local triggerNode = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, xmlKey .. "#node"), self.source.i3dMappings)
 		if triggerNode ~= nil then
@@ -76,8 +75,6 @@ function GC_ShovelFillTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTy
 
 					g_company.addRaisedUpdateable(self)
 					g_currentMission:addNodeObject(self.triggerNode, self)
-
-					returnValue = true
 				end
 			else
 				if source.removeFillLevel == nil then
@@ -90,7 +87,7 @@ function GC_ShovelFillTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTy
 		end
 	end
 
-	return returnValue
+	return true
 end
 
 function GC_ShovelFillTrigger:delete()
