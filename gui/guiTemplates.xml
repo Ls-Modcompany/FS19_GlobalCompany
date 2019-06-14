@@ -779,8 +779,9 @@
 			<value name="textSize" value="18px" />
 			<value name="textAlignment" value="left" />	
 			<value name="margin" value="10px 5px 0px 0px" />	
-			<value name="textWrapWidth" value="1700px" />
-			<value name="textMaxNumLines" value="200" />		
+			<value name="textMaxWidth" value="1700px" />	
+			<!-- <value name="textWrapWidth" value="1700px" /> -->
+			<!-- <value name="textMaxNumLines" value="200" /> -->
 		</template>	
 
 		<!-- Factory Small -->		

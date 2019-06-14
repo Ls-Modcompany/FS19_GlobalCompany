@@ -28,14 +28,25 @@ end;
 function Gc_Gui_Errors:onOpen() 
     self.gui_errorsTable:removeElements();
 
-    for _,text in pairs(g_company.debug.savedErrors) do
-        self.tmp_error = text;
-        self.gui_errorsTable:createItem();
+	for _,text in pairs(g_company.debug.savedErrors) do
+        if #text > 110 then
+			local textTable = g_company.utils.stringWrap(text, 110, "", true)
+			for _, lineText in pairs (textTable) do
+				self.tmp_error = lineText
+				self.gui_errorsTable:createItem();
+			end
+		else
+			self.tmp_error = text
+			self.gui_errorsTable:createItem();
+		end
 
-        while self.textForNextLine ~= nil do
-            self.tmp_error = "        " .. self.textForNextLine;
-            self.gui_errorsTable:createItem();
-        end;
+		-- self.tmp_error = text;
+        -- self.gui_errorsTable:createItem();
+
+        -- while self.textForNextLine ~= nil do
+            -- self.tmp_error = "        " .. self.textForNextLine;
+            -- self.gui_errorsTable:createItem();
+        -- end;
 
     end;
     self.tmp_error = nil;       
