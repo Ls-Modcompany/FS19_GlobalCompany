@@ -32,7 +32,7 @@ function GlobalCompanySettings:load()
     local self = setmetatable({}, GlobalCompanySettings_mt);
 
 	self.isServer = g_server ~= nil;
-	self.isClient = g_client ~= nil;    
+	--self.isClient = g_client ~= nil;    
     
 	self.debugData = g_company.debug:getDebugData(GlobalCompanySettings.debugIndex, g_company);
 
@@ -43,8 +43,8 @@ function GlobalCompanySettings:load()
     g_company.addUpdateable(self, self.update);	
 
 	self.eventId_setSetting = g_company.eventManager:registerEvent(self, self.setSettingEvent);
-	self.eventId_loadSettings = g_company.eventManager:registerEvent(self, self.loadSettingsEvent);
-	self.eventId_loadSettings2 = g_company.eventManager:registerEvent(self, self.loadSettingsEvent2);
+	self.eventId_loadSettings = g_company.eventManager:registerEvent(self, self.loadSettingsEvent, true);
+	self.eventId_loadSettings2 = g_company.eventManager:registerEvent(self, self.loadSettingsEvent2, true);
     return self;
 end
 
@@ -84,7 +84,7 @@ function GlobalCompanySettings:loadSettings()
         self.needSynch = true;
         return;
     end;
-
+    
 	if g_server ~= nil then 	
 		local savegameIndex = g_currentMission.missionInfo.savegameIndex;
 		local savegameFolderPath = g_currentMission.missionInfo.savegameDirectory;
@@ -113,17 +113,17 @@ function GlobalCompanySettings:loadSettings()
 	end;
 end
 
-function GlobalCompanySettings:loadSettingsEvent()   
+function GlobalCompanySettings:loadSettingsEvent(data, noEventSend)   
     if g_server == nil then
-        g_company.eventManager:createEvent(self.eventId_loadSettings, {}, false, nil);
+        g_company.eventManager:createEvent(self.eventId_loadSettings, {}, false, noEventSend);
     else
         self:loadSettingsEvent2();
     end;
 end;
 
-function GlobalCompanySettings:loadSettingsEvent2(data)   
+function GlobalCompanySettings:loadSettingsEvent2(data, noEventSend)   
     if g_server ~= nil then
-        g_company.eventManager:createEvent(self.eventId_loadSettings2, self.settings, true, nil);
+        g_company.eventManager:createEvent(self.eventId_loadSettings2, self.settings, true, noEventSend);
     else
         self.settings = data;
     end;

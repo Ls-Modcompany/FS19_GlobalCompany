@@ -41,7 +41,7 @@ function GC_EventManager:new()
     local self = setmetatable({}, GC_EventManager_mt);	
     
 	self.isServer = g_server ~= nil;
-    self.isClient = g_client ~= nil;
+    --self.isClient = g_client ~= nil;
 
     self.id = -1;
     self.events = {};
@@ -54,9 +54,9 @@ function GC_EventManager:getNextEventId()
     return self.id;
 end;
 
-function GC_EventManager:registerEvent(target, func)
+function GC_EventManager:registerEvent(target, func, clientToServer)
     local id = self:getNextEventId();
-    self.events[id] = {target=target, func=func};
+    self.events[id] = {target=target, func=func, clientToServer=Utils.getNoNil(clientToServer, false)};
     return id;
 end;
 
@@ -234,7 +234,7 @@ function GC_DefaultEvent:readStream(streamId, connection)
         end;
     end;
 
-    if not connection:getIsServer() then
+    if not connection:getIsServer() and not g_company.eventManager.events[self.targetId].clientToServer then
         g_server:broadcastEvent(self, false, connection, nil);
     end;        
     g_company.eventManager:raiseSynch(self.targetId, self.data);
