@@ -145,7 +145,7 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
     local unloadingTriggerKey = string.format("%s.unloadingTrigger", xmlKey);
     local name = getXMLString(xmlFile, unloadingTriggerKey .. "#name");
     if name ~= nil then
-        local unloadingTrigger = self.triggerManager:loadTrigger(GC_UnloadingTrigger, self.rootNode, xmlFile, unloadingTriggerKey, self.fillTypes);
+        local unloadingTrigger = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.rootNode, xmlFile, unloadingTriggerKey, self.fillTypes);
         if unloadingTrigger ~= nil then
             self.unloadingTrigger = unloadingTrigger;
         end;
@@ -154,7 +154,7 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
     local loadingTriggerKey = string.format("%s.loadingTrigger", xmlKey);
     local name = getXMLString(xmlFile, loadingTriggerKey .. "#name");
     if name ~= nil then
-        local loadingTrigger = self.triggerManager:loadTrigger(GC_LoadingTrigger, self.rootNode, xmlFile, loadingTriggerKey, {}, false, true);
+        local loadingTrigger = self.triggerManager:addTrigger(GC_LoadingTrigger, self.rootNode, xmlFile, loadingTriggerKey, {}, false, true);
         if loadingTrigger ~= nil then
             
             loadingTrigger.onActivateObject = function() self:loadingTriggerOnActivateObject() end;
@@ -212,7 +212,7 @@ function GC_DynamicStorage:delete()
 		g_currentMission:removeOnCreateLoadedObjectToSave(self);
 	end;
 	if self.triggerManager ~= nil then
-		self.triggerManager:unregisterAllTriggers();
+		self.triggerManager:removeAllTriggers();
     end;
 	if self.vehicleInteractionActivation ~= nil then
         self.vehicleInteractionActivation:delete();
