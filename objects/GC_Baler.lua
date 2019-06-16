@@ -317,7 +317,13 @@ end;
 function Baler:readStream(streamId, connection)
 	Baler:superClass().readStream(self, streamId, connection);
 
-    if connection:getIsServer() then		
+	if connection:getIsServer() then		
+		if self.animationManager ~= nil then
+			local animationManagerId = NetworkUtil.readNodeObjectId(streamId);
+            self.animationManager:readStream(streamId, connection);
+            g_client:finishRegisterObject(self.animationManager, animationManagerId);
+		end;
+
 		self.state_baler = streamReadInt16(streamId);
 		self.shouldTurnOff = streamReadBool(streamId);
 		self:setFillTyp(streamReadInt16(streamId), true);
@@ -365,7 +371,13 @@ end;
 function Baler:writeStream(streamId, connection)
 	Baler:superClass().writeStream(self, streamId, connection);
 
-    if not connection:getIsServer() then	
+	if not connection:getIsServer() then	
+		if self.animationManager ~= nil then
+			NetworkUtil.writeNodeObjectId(streamId, NetworkUtil.getObjectId(self.animationManager));
+            self.animationManager:writeStream(streamId, connection);
+            g_server:registerObjectInStream(connection, self.animationManager);
+		end;
+
 		streamWriteInt16(streamId, self.state_baler);
 		streamWriteBool(streamId, self.shouldTurnOff);
 		streamWriteInt16(streamId, self.activeFillTypeIndex);
@@ -388,7 +400,7 @@ function Baler:writeStream(streamId, connection)
 		self.dirtyObject:writeStream(streamId, connection);
 	end;
 end;
-
+--[[
 function Baler:readUpdateStream(streamId, timestamp, connection)
 	Baler:superClass().readUpdateStream(self, streamId, timestamp, connection);
 
@@ -411,7 +423,7 @@ function Baler:writeUpdateStream(streamId, connection, dirtyMask)
 		end;
 	end;
 end;
-
+]]--
 function Baler:loadFromXMLFile(xmlFile, key)	
 	self.state_baler = getXMLInt(xmlFile, key..".baler#state");
 	self.shouldTurnOff = getXMLBool(xmlFile, key..".baler#shouldTurnOff");
