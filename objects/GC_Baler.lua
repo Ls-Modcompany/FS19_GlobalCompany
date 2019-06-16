@@ -218,7 +218,7 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		self.stackBalesTarget = 3;
 		self.stackBales = {};
 		
-		self.forkNode = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, stackPartKey .. "#forkNode"), self.i3dMappings);		
+		--self.forkNode = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, stackPartKey .. "#forkNode"), self.i3dMappings);		
 		
 		self.stackerBaleTrigger = self.triggerManager:addTrigger(GC_BaleTrigger, self.nodeId, self , xmlFile, string.format("%s.baleTrigger", stackPartKey), Baler.BALETRIGGER_MAIN, GC_BaleTrigger.MODE_COUNTER);
 				
@@ -276,6 +276,7 @@ function Baler:finalizePlacement()
 	self.eventId_setBaleObjectToFork = g_company.eventManager:registerEvent(self, self.setBaleObjectToForkEvent);
 	self.eventId_removeBaleObjectFromForkEvent = g_company.eventManager:registerEvent(self, self.removeBaleObjectFromForkEvent);
 	self.eventId_removeBaleObjectFromAnimationEvent = g_company.eventManager:registerEvent(self, self.removeBaleObjectFromAnimationEvent);
+	self.eventId_resetBaleTrigger = g_company.eventManager:registerEvent(self, self.resetBaleTrigger);
 end
 
 function Baler:delete()
@@ -327,7 +328,7 @@ function Baler:readStream(streamId, connection)
 
 		self.state_baler = streamReadInt16(streamId);
 		self.shouldTurnOff = streamReadBool(streamId);
-		self:setFillTyp(streamReadInt16(streamId), true);
+		self:setFillTyp(streamReadInt16(streamId), false);
 		self:setFillLevel(streamReadFloat32(streamId), true);
 		self:setFillLevelBunker(streamReadFloat32(streamId), true, true);
 		self.baleCounter = streamReadInt16(streamId);
@@ -335,7 +336,7 @@ function Baler:readStream(streamId, connection)
 		self.animationManager:setAnimationTime("baleAnimation", streamReadFloat32(streamId));
 		if self.animationManager:getAnimationTime("baleAnimation") > 0 then	
 			self:setBaleObjectToAnimation(true);	
-			self.animationManager:setAnimationByState("baleAnimation", true);
+			self.animationManager:setAnimationByState("baleAnimation", true, true);
 		end;
 		
 		if self.hasStack then
@@ -350,7 +351,7 @@ function Baler:readStream(streamId, connection)
 						local newBale = clone(info.node, false, false, false);
 						setVisibility(newBale, true);
 						setTranslation(newBale, 0.015, 0.958 + (i-1)*0.8,-0.063);
-						link(self.forkNode, newBale);		
+						link(self.animationManager:getPartsOfAnimation("stackAnimation")[1].node, newBale);		
 					end;
 					break;
 				end;
@@ -359,7 +360,7 @@ function Baler:readStream(streamId, connection)
 			self.animationManager:setAnimationTime("stackAnimation", streamReadFloat32(streamId));
 			local time = self.animationManager:getAnimationTime("stackAnimation");
 			if time > 0  and time < 1 then		
-				self.animationManager:setAnimationByState("stackAnimation", true);
+				self.animationManager:setAnimationByState("stackAnimation", true, true);
 			end;
 		end;
 
@@ -392,7 +393,7 @@ function Baler:writeStream(streamId, connection)
 			streamWriteInt16(streamId, self.state_stacker);
 			streamWriteInt16(streamId, self.stackBalesTarget);
 			streamWriteInt16(streamId, self.animationState);
-			streamWriteInt16(streamId, getNumOfChildren(self.forkNode));
+			streamWriteInt16(streamId, getNumOfChildren(self.animationManager:getPartsOfAnimation("stackAnimation")[1].node));
 			streamWriteFloat32(streamId, self.animationManager:getAnimationTime("stackAnimation"));
 		end;
 
@@ -428,7 +429,7 @@ end;
 function Baler:loadFromXMLFile(xmlFile, key)	
 	self.state_baler = getXMLInt(xmlFile, key..".baler#state");
 	self.shouldTurnOff = getXMLBool(xmlFile, key..".baler#shouldTurnOff");
-	self:setFillTyp(getXMLInt(xmlFile, key..".baler#fillType"), true);
+	self:setFillTyp(getXMLInt(xmlFile, key..".baler#fillType"), false);
 	self:setFillLevel(getXMLFloat(xmlFile, key..".baler#fillLevel"), true);
 	self:setFillLevelBunker(getXMLFloat(xmlFile, key..".baler#fillLevelBunker"), true, true);
 	self.baleCounter = getXMLFloat(xmlFile, key..".baler#counter");
@@ -451,7 +452,7 @@ function Baler:loadFromXMLFile(xmlFile, key)
 				local newBale = clone(info.node, false, false, false);
 				setVisibility(newBale, true);
 				setTranslation(newBale, 0.015, 0.958 + (i-1)*0.8,-0.063);
-				link(self.forkNode, newBale);		
+				link(self.animationManager:getPartsOfAnimation("stackAnimation")[1].node, newBale);		
 			end;
 			break;
 		end;
@@ -483,7 +484,7 @@ function Baler:saveToXMLFile(xmlFile, key, usedModNames)
 	setXMLInt(xmlFile, key .. ".stacker#state", self.state_stacker);
 	setXMLInt(xmlFile, key .. ".stacker#stackBalesTarget", self.stackBalesTarget);
 	setXMLInt(xmlFile, key .. ".stacker#animationState", self.animationState);
-	setXMLInt(xmlFile, key .. ".stacker#forkNodeNums", getNumOfChildren(self.forkNode));	
+	setXMLInt(xmlFile, key .. ".stacker#forkNodeNums", getNumOfChildren(self.animationManager:getPartsOfAnimation("stackAnimation")[1].node));	
 	setXMLFloat(xmlFile, key .. ".stacker#stackAnimation", self.animationManager:getAnimationTime("stackAnimation"));
 
 	setXMLInt(xmlFile, key .. ".mover#state", self.state_balerMove);
@@ -518,7 +519,6 @@ function Baler:update(dt)
 				setCollisionMask(self.moveCollisionAnimationNode, 0);
 			end;
 			self:createBale(self.animationManager:getPartsOfAnimation("baleAnimation")[1].node);
-			self.animationManager:setAnimationTime("baleAnimation", 0);
 			self:removeBaleObjectFromAnimation();
 		end;
 		
@@ -545,7 +545,7 @@ function Baler:update(dt)
 				if self.state_balerMove == Baler.STATE_ON then
 					if self.movedMeters >= 2.6 then
 						self.movedMeters = 0;
-						self.stackerBaleTrigger:reset();
+						self:resetBaleTrigger();
 						self:onTurnOffBaleMover();
 						if self.state_baler == Baler.STATE_OFF then
 							self:onTurnOffStacker();
@@ -557,8 +557,8 @@ function Baler:update(dt)
 			elseif self.animationState == Baler.ANIMATION_ISSTACKING then
 				if self.animationManager:getRealAnimationTimeSeconds("stackAnimation") >= 2 and self.raisedAnimationKeys["2"] == nil then
 					self.animationState = Baler.ANIMATION_CANSTACKEND;
-					self.animationManager:stopAnimation("stackAnimation")
-					self.stackerBaleTrigger:reset();
+					self.animationManager:stopAnimation("stackAnimation");
+					self:resetBaleTrigger();
 					self.raisedAnimationKeys["2"] = true;
 				elseif self.animationManager:getRealAnimationTimeSeconds("stackAnimation") >= 1 and self.raisedAnimationKeys["1"] == nil then
 					self:setBaleObjectToFork();
@@ -675,18 +675,21 @@ end;
 function Baler:setFillTypEvent(data, noEventSend)    
 	g_company.eventManager:createEvent(self.eventId_setFillTyp, data, false, noEventSend);
 	if data[2] == nil or not data[2] then
+		print("set trigger at set filltype")
 		self.unloadTrigger.fillTypes = nil;
 		self.unloadTrigger:setAcceptedFillTypeState(data[1], true);
 		
 		if self.stackerBaleTrigger:getNum() > 0 and self.state_balerMove == Baler.STATE_OFF and self.moverBaleTrigger:getTriggerEmpty() then
-			self:onTurnOnBaleMover();
+			self:onTurnOnBaleMover(true);
 			self.stackBales = {};
 			setCollisionMask(self.moveCollisionAnimationNode, self.moveCollisionAnimationColliMask);
-			self.animationManager:setAnimationByState("moveCollisionAnimation", true)
+			if self.isServer then
+				self.animationManager:setAnimationByState("moveCollisionAnimation", true);
+			end;
 		end;
 	end;
 	self.activeFillTypeIndex = data[1]; 
-	print("setFilltype " .. self.activeFillTypeIndex)
+	print("setFilltype " .. g_fillTypeManager:getFillTypeNameByIndex(self.activeFillTypeIndex))
 end;
 
 function Baler:setBaleObjectToAnimation(noEventSend)
@@ -719,8 +722,8 @@ end;
 function Baler:removeBaleObjectFromForkEvent(data, noEventSend)
 	print("removeBaleObjectFromForkEvent")
 	g_company.eventManager:createEvent(self.eventId_removeBaleObjectFromForkEvent, data, false, noEventSend);
-	for i=1, getNumOfChildren(self.forkNode) do
-		local child = getChildAt(self.forkNode, 0);
+	for i=1, getNumOfChildren(self.animationManager:getPartsOfAnimation("stackAnimation")[1].node) do
+		local child = getChildAt(self.animationManager:getPartsOfAnimation("stackAnimation")[1].node, 0);
 		print("remove bale object")
 		if self.isServer then
 			print("create bale on server")
@@ -731,12 +734,12 @@ function Baler:removeBaleObjectFromForkEvent(data, noEventSend)
 end;
 
 function Baler:removeBaleObjectFromAnimation(noEventSend)
-	self:removeBaleObjectFromForkEvent({}, noEventSend);   
+	self:removeBaleObjectFromAnimationEvent({}, noEventSend);   
 end;
 
--- data is empty table
 function Baler:removeBaleObjectFromAnimationEvent(data, noEventSend)
-	g_company.eventManager:createEvent(self.eventId_removeBaleObjectFromForkEvent, data, false, noEventSend);	
+	g_company.eventManager:createEvent(self.eventId_removeBaleObjectFromAnimationEvent, data, false, noEventSend);	
+	self.animationManager:setAnimationTime("baleAnimation", 0);
 	if getNumOfChildren(self.animationManager:getPartsOfAnimation("baleAnimation")[1].node) > 0 then
 		delete(getChildAt(self.animationManager:getPartsOfAnimation("baleAnimation")[1].node, 0));
 	end;
@@ -746,7 +749,6 @@ function Baler:setBaleObjectToFork(noEventSend)
 	self:setBaleObjectToForkEvent({}, noEventSend);   
 end;
 
--- data is empty table
 function Baler:setBaleObjectToForkEvent(data, noEventSend)
 	g_company.eventManager:createEvent(self.eventId_setBaleObjectToFork, data, false, noEventSend);
 	for _,info in pairs (self.baleAnimationObjects) do
@@ -755,7 +757,7 @@ function Baler:setBaleObjectToForkEvent(data, noEventSend)
 				local newBale = clone(info.node, false, false, false);
 				setVisibility(newBale, true);
 				setTranslation(newBale, 0.015, 0.958 + (i-1)*0.8,-0.063);
-				link(self.forkNode, newBale);		
+				link(self.animationManager:getPartsOfAnimation("stackAnimation")[1].node, newBale);		
 			end;
 			break;
 		end;
@@ -949,3 +951,13 @@ end;
 function Baler:getIsOn()
 	return self.state_baler == Baler.STATE_ON;
 end;
+
+function Baler:resetBaleTrigger(noEventSend)
+	self:resetBaleTriggerEvent({}, noEventSend);  	
+end
+
+-- data is empty table
+function Baler:resetBaleTriggerEvent(data, noEventSend)	
+	g_company.eventManager:createEvent(self.eventId_resetBaleTrigger, data, false, noEventSend);	
+	self.stackerBaleTrigger:reset();
+end
