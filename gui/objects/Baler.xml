@@ -29,9 +29,9 @@
           </GuiElement>
         </GuiElement>
         
-        <GuiElement type="text" template="gcBalerFillTypesText" text="$l10n_GC_baler_canStack" />
+        <GuiElement type="text" template="gcBalerFillTypesText" text="$l10n_GC_baler_canStack" id="gui_stack_header" />
         
-        <GuiElement type="flowLayout" template="gcBalerNumLayout">
+        <GuiElement type="flowLayout" template="gcBalerNumLayout" id="gui_stack">
           <GuiElement type="image" template="gcBalerNumBackground">    
             <GuiElement type="text" template="gcBalerNumText" id="gui_text_num" />
           </GuiElement> 

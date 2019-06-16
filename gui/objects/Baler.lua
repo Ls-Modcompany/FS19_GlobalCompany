@@ -24,6 +24,9 @@ function Gc_Gui_Baler:onCreate() end;
 function Gc_Gui_Baler:setData(baler)
     self.baler = baler;
     self:updateButtons();
+
+    self.gui_stack_header:setVisible(self.baler.hasStack)
+    self.gui_stack:setVisible(self.baler.hasStack)
     
     self.gui_txt_title:setText(g_company.languageManager:getText(self.baler.title));
     self.gui_text_num:setText(self.baler.stackBalesTarget);

@@ -111,7 +111,7 @@ function GC_Conveyor:update(dt)
 end;
 
 function GC_Conveyor:start(shader)
-	if self.isServer then
+	--if self.isServer then
 		if shader ~= nil then
 			self:startShader(shader);
 		else
@@ -119,11 +119,11 @@ function GC_Conveyor:start(shader)
 				self:startShader(shader);
 			end;
 		end;
-	end;
+	--end;
 end;
 
 function GC_Conveyor:stop(shader)
-	if self.isServer then
+	--if self.isServer then
 		if shader ~= nil then
 			self:stopShader(shader);
 		else
@@ -131,7 +131,7 @@ function GC_Conveyor:stop(shader)
 				self:stopShader(shader);
 			end;
 		end;
-	end;
+	--end;
 end;
 
 --Dont call from outside!! Only form GC_Conveyor.start!
