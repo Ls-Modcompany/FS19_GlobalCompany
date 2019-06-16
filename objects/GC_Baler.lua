@@ -275,6 +275,7 @@ function Baler:finalizePlacement()
 	self.eventId_setBaleObjectToAnimation = g_company.eventManager:registerEvent(self, self.setBaleObjectToAnimationEvent);
 	self.eventId_setBaleObjectToFork = g_company.eventManager:registerEvent(self, self.setBaleObjectToForkEvent);
 	self.eventId_removeBaleObjectFromForkEvent = g_company.eventManager:registerEvent(self, self.removeBaleObjectFromForkEvent);
+	self.eventId_removeBaleObjectFromAnimationEvent = g_company.eventManager:registerEvent(self, self.removeBaleObjectFromAnimationEvent);
 end
 
 function Baler:delete()
@@ -518,9 +519,7 @@ function Baler:update(dt)
 			end;
 			self:createBale(self.animationManager:getPartsOfAnimation("baleAnimation")[1].node);
 			self.animationManager:setAnimationTime("baleAnimation", 0);
-			if getNumOfChildren(self.animationManager:getPartsOfAnimation("baleAnimation")[1].node) > 0 then
-				delete(getChildAt(self.animationManager:getPartsOfAnimation("baleAnimation")[1].node, 0));
-			end;
+			self:removeBaleObjectFromAnimation();
 		end;
 		
 		if self.hasStack and self.state_stacker == Baler.STATE_ON then
@@ -718,11 +717,28 @@ end;
 
 -- data is empty table
 function Baler:removeBaleObjectFromForkEvent(data, noEventSend)
+	print("removeBaleObjectFromForkEvent")
 	g_company.eventManager:createEvent(self.eventId_removeBaleObjectFromForkEvent, data, false, noEventSend);
 	for i=1, getNumOfChildren(self.forkNode) do
 		local child = getChildAt(self.forkNode, 0);
-		self:createBale(child);
-		delete(child);
+		print("remove bale object")
+		if self.isServer then
+			print("create bale on server")
+			self:createBale(child);
+		end;
+		delete(child);	
+	end;
+end;
+
+function Baler:removeBaleObjectFromAnimation(noEventSend)
+	self:removeBaleObjectFromForkEvent({}, noEventSend);   
+end;
+
+-- data is empty table
+function Baler:removeBaleObjectFromAnimationEvent(data, noEventSend)
+	g_company.eventManager:createEvent(self.eventId_removeBaleObjectFromForkEvent, data, false, noEventSend);	
+	if getNumOfChildren(self.animationManager:getPartsOfAnimation("baleAnimation")[1].node) > 0 then
+		delete(getChildAt(self.animationManager:getPartsOfAnimation("baleAnimation")[1].node, 0));
 	end;
 end;
 
