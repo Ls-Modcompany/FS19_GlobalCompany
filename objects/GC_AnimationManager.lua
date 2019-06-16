@@ -988,3 +988,7 @@ function GC_AnimationManager:loadAnimationNamesFromXML(xmlFile, xmlKey, warningE
 
 	return;
 end;
+
+function GC_AnimationManager:getPartsOfAnimation(name)
+	return self.animations[name].parts;
+end

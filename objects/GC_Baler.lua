@@ -171,11 +171,11 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	end;
 
 	if self.isClient then
-		self.unloadTrigger = self.triggerManager:loadTrigger(GC_UnloadingTrigger, self.nodeId , xmlFile, string.format("%s.unloadTrigger", mainPartKey), {[1] = self.fillTypes[self.activeFillTypeIndex].index}, {[1] = "DISCHARGEABLE"});
-		self.cleanHeap = self.triggerManager:loadTrigger(GC_DynamicHeap, self.nodeId , xmlFile, string.format("%s.cleanHeap", mainPartKey), self.fillTypes[self.activeFillTypeIndex].name, nil, false);
+		self.unloadTrigger = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.nodeId, self, xmlFile, string.format("%s.unloadTrigger", mainPartKey), {[1] = self.fillTypes[self.activeFillTypeIndex].index}, {[1] = "DISCHARGEABLE"});
+		self.cleanHeap = self.triggerManager:addTrigger(GC_DynamicHeap, self.nodeId, self , xmlFile, string.format("%s.cleanHeap", mainPartKey), self.fillTypes[self.activeFillTypeIndex].name, nil, false);
 		
-		self.playerTrigger = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.nodeId , xmlFile, string.format("%s.playerTrigger", mainPartKey), Baler.PLAYERTRIGGER_MAIN, true, g_company.languageManager:getText("GC_baler_openGui"));
-		self.playerTriggerClean = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.nodeId , xmlFile, string.format("%s.playerTriggerClean", mainPartKey), Baler.PLAYERTRIGGER_CLEAN, true, g_company.languageManager:getText("GC_baler_cleaner"), true);
+		self.playerTrigger = self.triggerManager:addTrigger(GC_PlayerTrigger, self.nodeId, self , xmlFile, string.format("%s.playerTrigger", mainPartKey), Baler.PLAYERTRIGGER_MAIN, true, g_company.languageManager:getText("GC_baler_openGui"));
+		self.playerTriggerClean = self.triggerManager:addTrigger(GC_PlayerTrigger, self.nodeId, self , xmlFile, string.format("%s.playerTriggerClean", mainPartKey), Baler.PLAYERTRIGGER_CLEAN, true, g_company.languageManager:getText("GC_baler_cleaner"), true);
 		
 		self.movers = GC_Movers:new(self.isServer, self.isClient);
 		self.movers:load(self.nodeId , self, xmlFile, mainPartKey, self.baseDirectory, capacities);
@@ -220,7 +220,7 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		
 		self.forkNode = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, stackPartKey .. "#forkNode"), self.i3dMappings);		
 		
-		self.stackerBaleTrigger = self.triggerManager:loadTrigger(GC_BaleTrigger, self.nodeId , xmlFile, string.format("%s.baleTrigger", stackPartKey), Baler.BALETRIGGER_MAIN, GC_BaleTrigger.MODE_COUNTER);
+		self.stackerBaleTrigger = self.triggerManager:addTrigger(GC_BaleTrigger, self.nodeId, self , xmlFile, string.format("%s.baleTrigger", stackPartKey), Baler.BALETRIGGER_MAIN, GC_BaleTrigger.MODE_COUNTER);
 				
 		self.conveyorStacker = GC_Conveyor:new(self.isServer, self.isClient);
 		self.conveyorStacker:load(self.nodeId, self, xmlFile, string.format("%s.conveyor", stackPartKey));
@@ -249,7 +249,7 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	self.moveCollisionAnimationColliMask = getCollisionMask(self.moveCollisionAnimationNode);
 	setCollisionMask(self.moveCollisionAnimationNode, 0);
 		
-	self.moverBaleTrigger = self.triggerManager:loadTrigger(GC_BaleTrigger, self.nodeId , xmlFile, string.format("%s.baleTriggerMover", baleMoverKey), Baler.BALETRIGGER_MOVER, GC_BaleTrigger.MODE_COUNTER);
+	self.moverBaleTrigger = self.triggerManager:addTrigger(GC_BaleTrigger, self.nodeId, self , xmlFile, string.format("%s.baleTriggerMover", baleMoverKey), Baler.BALETRIGGER_MOVER, GC_BaleTrigger.MODE_COUNTER);
 	
 	if self.isClient then
 		self.soundMover = g_company.sounds:new(self.isServer, self.isClient);
@@ -281,7 +281,7 @@ function Baler:delete()
 	g_currentMission:removeOnCreateLoadedObjectToSave(self)
 
 	if self.triggerManager ~= nil then
-		self.triggerManager:unregisterAllTriggers();
+		self.triggerManager:removeAllTriggers();
 	end;
 	if self.conveyorFillType ~= nil then
 		self.conveyorFillType:delete();
@@ -506,8 +506,8 @@ function Baler:update(dt)
 			end;
 			self:createBale(self.animationManager:getPartsOfAnimation("baleAnimation")[1].node);
 			self.animationManager:setAnimationTime("baleAnimation", 0);
-			if not self.isServer and getNumOfChildren(self.animationManager:getPartsOfAnimation("baleAnimation")[1]) > 0 then
-				delete(getChildAt(self.animationManager:getPartsOfAnimation("baleAnimation")[1], 0));
+			if getNumOfChildren(self.animationManager:getPartsOfAnimation("baleAnimation")[1].node) > 0 then
+				delete(getChildAt(self.animationManager:getPartsOfAnimation("baleAnimation")[1].node, 0));
 			end;
 		end;
 		
@@ -649,7 +649,7 @@ end;
 function Baler:setFillLevelEvent(data, noEventSend)     
 	g_company.eventManager:createEvent(self.eventId_setFillLevel, data, false, noEventSend);
 	self.fillLevel = data[1];
-	if g_client ~= nil then
+	if g_dedicatedServerInfo == nil then
 		self.movers:updateMovers(data[1], self.activeFillTypeIndex);    
 		g_company.gui:updateGuiData("gcPlaceable_baler");
 	end;	
@@ -686,7 +686,7 @@ end;
 function Baler:setBaleObjectToAnimationEvent(data, noEventSend)
 	g_company.eventManager:createEvent(self.eventId_setBaleObjectToAnimation, data, false, noEventSend);
 	print("setBaleObjectToAnimationEvent")
-	if not self.isServer then
+	if g_dedicatedServerInfo == nil then
 		print("setBaleObjectToAnimationEvent isClient")
 		for _,info in pairs (self.baleAnimationObjects) do
 			print(info.fillTypeIndex .. "  " .. self.activeFillTypeIndex)
@@ -772,7 +772,7 @@ function Baler:onTurnOnBalerEvent(data, noEventSend)
 		self:raiseActive();
 	end;
 
-	if g_client ~= nil then
+	if g_dedicatedServerInfo == nil then
 		self.conveyorFillTypeEffect:setFillType(self.activeFillTypeIndex);
 		self.conveyorFillTypeEffect:start();
 		self.conveyorFillType:start();
@@ -788,7 +788,7 @@ function Baler:onTurnOffBalerEvent(data, noEventSend)
 	g_company.eventManager:createEvent(self.eventId_onTurnOffBaler, data, false, noEventSend);
 	self.state_baler = Baler.STATE_OFF;
 
-	if g_client ~= nil then
+	if g_dedicatedServerInfo == nil then
 		self.conveyorFillTypeEffect:stop();
 		self.conveyorFillType:stop();
 	end;
