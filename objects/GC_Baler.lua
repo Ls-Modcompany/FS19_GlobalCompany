@@ -354,6 +354,7 @@ function Baler:readStream(streamId, connection)
 
 		self.state_baler = streamReadInt16(streamId);
 		self.shouldTurnOff = streamReadBool(streamId);
+		self.needMove = streamReadBool(streamId);
 		self:setFillTyp(streamReadInt16(streamId), false);
 		self:setFillLevel(streamReadFloat32(streamId), true);
 		self:setFillLevelBunker(streamReadFloat32(streamId), true, true);
@@ -414,6 +415,7 @@ function Baler:writeStream(streamId, connection)
 
 		streamWriteInt16(streamId, self.state_baler);
 		streamWriteBool(streamId, self.shouldTurnOff);
+		streamWriteBool(streamId, self.needMove);
 		streamWriteInt16(streamId, self.activeFillTypeIndex);
 		streamWriteFloat32(streamId, self.fillLevel);
 		streamWriteFloat32(streamId, self.fillLevelBunker);
@@ -438,6 +440,7 @@ end;
 function Baler:loadFromXMLFile(xmlFile, key)	
 	self.state_baler = getXMLInt(xmlFile, key..".baler#state");
 	self.shouldTurnOff = getXMLBool(xmlFile, key..".baler#shouldTurnOff");
+	self.needMove = Utils.getNoNil(getXMLBool(xmlFile, key..".baler#needMove"), false);
 	self:setFillTyp(getXMLInt(xmlFile, key..".baler#fillType"), false);
 	self:setFillLevel(getXMLFloat(xmlFile, key..".baler#fillLevel"), true);
 	self:setFillLevelBunker(getXMLFloat(xmlFile, key..".baler#fillLevelBunker"), true, true);
@@ -491,6 +494,7 @@ end;
 function Baler:saveToXMLFile(xmlFile, key, usedModNames)
 	setXMLInt(xmlFile, key .. ".baler#state", self.state_baler);
 	setXMLBool(xmlFile, key .. ".baler#shouldTurnOff", self.shouldTurnOff);
+	setXMLBool(xmlFile, key .. ".baler#needMove", self.needMove);
 	setXMLFloat(xmlFile, key .. ".baler#fillLevel", self.fillLevel);
 	setXMLFloat(xmlFile, key .. ".baler#fillLevelBunker", self.fillLevelBunker);
 	setXMLInt(xmlFile, key .. ".baler#fillType", self.activeFillTypeIndex);
@@ -538,6 +542,19 @@ function Baler:update(dt)
 				self:setFillLevelBunker(math.min(dt / 1000 * self.pressPerSecond, 4000 - self.fillLevelBunker, self.fillLevel));
 			elseif self.animationManager:getAnimationTime("baleAnimation") == 0 then
 				self:onTurnOffBaler();
+			end;
+		end;
+		if self.needMove then			
+			local canMove = self.state_balerMove == Baler.STATE_OFF and self.moverBaleTrigger:getTriggerEmpty();		
+
+			if canMove then		
+				self:onTurnOnBaleMover(true);
+				self.stackBales = {};
+				setCollisionMask(self.moveCollisionAnimationNode, self.moveCollisionAnimationColliMask);
+				if self.isServer then
+					self.animationManager:setAnimationByState("moveCollisionAnimation", true);
+				end;
+				self.needMove = false;
 			end;
 		end;
 		if not self.hasStack and self.state_balerMove == Baler.STATE_ON then
@@ -715,21 +732,11 @@ function Baler:setFillTypEvent(data, noEventSend)
 	if data[2] == nil or not data[2] then
 		self.unloadTrigger.fillTypes = nil;
 		self.unloadTrigger:setAcceptedFillTypeState(data[1], true);
-		
-		local doMove = self.state_balerMove == Baler.STATE_OFF and self.moverBaleTrigger:getTriggerEmpty();
-		if self.hasStack then
-			doMove = self.stackerBaleTrigger:getNum() > 0 and doMove;
-		else
-			doMove = not self.mainBaleTrigger:getTriggerEmpty() and doMove;
-		end;
 
-		if doMove then		
-			self:onTurnOnBaleMover(true);
-			self.stackBales = {};
-			setCollisionMask(self.moveCollisionAnimationNode, self.moveCollisionAnimationColliMask);
-			if self.isServer then
-				self.animationManager:setAnimationByState("moveCollisionAnimation", true);
-			end;
+		if self.hasStack then
+			self.needMove = self.stackerBaleTrigger:getNum() > 0;
+		else
+			self.needMove = not self.mainBaleTrigger:getTriggerEmpty();
 		end;
 	end;
 	self.activeFillTypeIndex = data[1]; 
