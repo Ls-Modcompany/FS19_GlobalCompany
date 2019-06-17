@@ -259,7 +259,7 @@
 		<!-- Baler -->
 		<template name="gcBalerBackground" anchor="middleCenter" extends="gcBase gcBorder">
 			<value name="size" value="1000px 700px" />
-			<value name="imageColor" value="glass1_50" />
+			<value name="imageColor" value="glass0_1" />
 			<value name="hasBorders" value="true" />
 			<value name="borderBottomSize" value="6px" />
 			<value name="borderBottomColor" value="orange" />
@@ -367,7 +367,7 @@
 		</template>	
 		<template name="gcBalerInfoBackground" anchor="rightTop" extends="gcBase">
 			<value name="size" value="300px 400px" />
-			<value name="imageColor" value="glass1_80" />
+			<value name="imageColor" value="glass0_1" />
 			<value name="position" value="-50px -20px" />
 		</template>
 		<template name="gcBalerInfoHeader" anchor="leftTop" extends="gcBase_text">

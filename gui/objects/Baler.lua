@@ -87,6 +87,14 @@ function Gc_Gui_Baler:updateButtons()
     self.gui_btn_removeBale:setDisabled(self.baler.stackBalesTarget == 1);
 end
 
+function Gc_Gui_Baler:onOpen()
+	g_depthOfFieldManager:setBlurState(true);
+end;
+
+function Gc_Gui_Baler:onClose()
+	g_depthOfFieldManager:setBlurState(false);
+end;
+
 function Gc_Gui_Baler:onClickClose()
     g_company.gui:closeActiveGui();
 end;
