@@ -580,7 +580,7 @@ function Baler:update(dt)
 		
 		if self.hasStack and self.state_stacker == Baler.STATE_ON then
 			if self.animationState == Baler.ANIMATION_CANSTACK then
-				if self.stackerBaleTrigger:getTriggerNotEmpty() and self.fillLevelBunker > 0 then	
+				if self.stackerBaleTrigger:getTriggerNotEmpty() and self.fillLevelBunker > 0 and not self.needMove then	
 					if self.stackerBaleTrigger:getNum() < self.stackBalesTarget and self.state_balerMove == Baler.STATE_OFF then
 						self.animationState = Baler.ANIMATION_ISSTACKING;
 						self.raisedAnimationKeys = {};
