@@ -139,6 +139,30 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
     self.capacity = Utils.getNoNil(getXMLInt(xmlFile, mainPartKey .. "#capacity"), 50000);
 	self.pressPerSecond = Utils.getNoNil(getXMLInt(xmlFile, mainPartKey .. "#pressPerSecond"), 400);
 	self.baleCounter = 0;
+	
+	if hasXMLProperty(xmlFile, mainPartKey .. ".digitalDisplayLevel") then
+		local digitalDisplays = GC_DigitalDisplays:new(self.isServer, self.isClient);
+		if digitalDisplays:load(self.nodeId, self, xmlFile, mainPartKey, "digitalDisplayLevel", true) then
+			self.digitalDisplayLevel = digitalDisplays;
+			self.digitalDisplayLevel:updateLevelDisplays(self.fillLevel, self.capacity);
+		end;
+	end;
+
+	if hasXMLProperty(xmlFile, mainPartKey .. ".digitalDisplayBunker") then
+		local digitalDisplays = GC_DigitalDisplays:new(self.isServer, self.isClient);
+		if digitalDisplays:load(self.nodeId, self, xmlFile, mainPartKey, "digitalDisplayBunker", true) then
+			self.digitalDisplayBunker = digitalDisplays;
+			self.digitalDisplayBunker:updateLevelDisplays(self.fillLevel, 4000);
+		end;
+	end;
+
+	if hasXMLProperty(xmlFile, mainPartKey .. ".digitalDisplayNum") then
+		local digitalDisplays = GC_DigitalDisplays:new(self.isServer, self.isClient);
+		if digitalDisplays:load(self.nodeId, self, xmlFile, mainPartKey, "digitalDisplayNum", true) then
+			self.digitalDisplayNum = digitalDisplays;
+			self.digitalDisplayNum:updateLevelDisplays(self.baleCounter, 9999999999);
+		end;
+	end;
     
     local capacities = {};
 	self.fillTypes = {};
@@ -206,6 +230,7 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		self.soundMain = g_company.sounds:new(self.isServer, self.isClient);
 		self.soundMain:load(self.nodeId, self, xmlFile, string.format("%s", mainPartKey), self.basedirectory);
 	end;
+
 	
 	
 	---------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -276,7 +301,8 @@ function Baler:finalizePlacement()
 	self.eventId_setBaleObjectToFork = g_company.eventManager:registerEvent(self, self.setBaleObjectToForkEvent);
 	self.eventId_removeBaleObjectFromForkEvent = g_company.eventManager:registerEvent(self, self.removeBaleObjectFromForkEvent);
 	self.eventId_removeBaleObjectFromAnimationEvent = g_company.eventManager:registerEvent(self, self.removeBaleObjectFromAnimationEvent);
-	self.eventId_resetBaleTrigger = g_company.eventManager:registerEvent(self, self.resetBaleTrigger);
+	self.eventId_resetBaleTrigger = g_company.eventManager:registerEvent(self, self.resetBaleTriggerEvent);
+	self.eventId_inkBaleCounter = g_company.eventManager:registerEvent(self, self.inkBaleCounterEvent);
 end
 
 function Baler:delete()
@@ -363,6 +389,12 @@ function Baler:readStream(streamId, connection)
 				self.animationManager:setAnimationByState("stackAnimation", true, true);
 			end;
 		end;
+	
+		if g_dedicatedServerInfo == nil then		
+			self.digitalDisplayLevel:updateLevelDisplays(self.fillLevel, self.capacity);
+			self.digitalDisplayBunker:updateLevelDisplays(self.fillLevelBunker, 4000);
+			self.digitalDisplayNum:updateLevelDisplays(self.baleCounter, 9999999999);
+		end;
 
 		self.state_balerMove = streamReadInt16(streamId);
 		
@@ -442,6 +474,12 @@ function Baler:loadFromXMLFile(xmlFile, key)
 			self.animationManager:setAnimationByState("stackAnimation", true);
 		end;
 	end;
+	
+	if g_dedicatedServerInfo == nil then		
+		self.digitalDisplayLevel:updateLevelDisplays(self.fillLevel, self.capacity);
+		self.digitalDisplayBunker:updateLevelDisplays(self.fillLevelBunker, 4000);
+		self.digitalDisplayNum:updateLevelDisplays(self.baleCounter, 9999999999);
+	end;
 
 	self.state_balerMove = getXMLInt(xmlFile, key..".mover#state");
 	
@@ -475,13 +513,12 @@ end;
 
 function Baler:update(dt)
 	if self.isServer then
-
 		if self.state_baler == Baler.STATE_ON then
 			if self.fillLevelBunker >= 4000 then
 				if self:canUnloadBale() then					
 					self:setBaleObjectToAnimation();
 					self.animationManager:setAnimationByState("baleAnimation", true);
-					self.baleCounter = self.baleCounter + 1;
+					self:inkBaleCounter();
 					self:setFillLevelBunker(self.fillLevelBunker * -1, true);
 					if self.shouldTurnOff then
 						self:onTurnOffBaler();
@@ -496,19 +533,23 @@ function Baler:update(dt)
 						self.animationManager:setAnimationTime("moveCollisionAnimation", 0);
 						setCollisionMask(self.moveCollisionAnimationNode, 0);
 					end;
-					if self.state_balerMove == Baler.STATE_ON then
-						if self.movedMeters >= 2.6 then
-							self.movedMeters = 0;
-							self:onTurnOffBaleMover();
-						else
-							self.movedMeters = self.movedMeters + (dt / 1000 * 0.8);
-						end;
-					end;
 				end;
 			elseif self.fillLevel + self.fillLevelBunker >= 4000 then
 				self:setFillLevelBunker(math.min(dt / 1000 * self.pressPerSecond, 4000 - self.fillLevelBunker, self.fillLevel));
 			elseif self.animationManager:getAnimationTime("baleAnimation") == 0 then
 				self:onTurnOffBaler();
+			end;
+		end;
+		if not self.hasStack and self.state_balerMove == Baler.STATE_ON then
+			if self.animationManager:getAnimationTime("moveCollisionAnimation") == 1 then
+				self.animationManager:setAnimationTime("moveCollisionAnimation", 0);
+				setCollisionMask(self.moveCollisionAnimationNode, 0);
+			end;
+			if self.movedMeters >= 2.6 then
+				self.movedMeters = 0;
+				self:onTurnOffBaleMover();
+			else
+				self.movedMeters = self.movedMeters + (dt / 1000 * 0.8);
 			end;
 		end;
 		if self.animationManager:getAnimationTime("baleAnimation") == 1 then
@@ -645,6 +686,10 @@ function Baler:setFillLevelBunkerEvent(data, noEventSend)
 		end;
 		g_company.gui:updateGuiData("gcPlaceable_baler");
 	end;
+
+	if g_dedicatedServerInfo == nil then		
+		self.digitalDisplayBunker:updateLevelDisplays(self.fillLevelBunker, 4000);
+	end;
 end;
 
 function Baler:setFillLevel(level, noEventSend)   
@@ -657,6 +702,7 @@ function Baler:setFillLevelEvent(data, noEventSend)
 	if g_dedicatedServerInfo == nil then
 		self.movers:updateMovers(data[1], self.activeFillTypeIndex);    
 		g_company.gui:updateGuiData("gcPlaceable_baler");
+		self.digitalDisplayLevel:updateLevelDisplays(self.fillLevel, self.capacity);
 	end;	
 end;
 
@@ -950,3 +996,18 @@ function Baler:resetBaleTriggerEvent(data, noEventSend)
 	g_company.eventManager:createEvent(self.eventId_resetBaleTrigger, data, false, noEventSend);	
 	self.stackerBaleTrigger:reset();
 end
+
+function Baler:inkBaleCounter(noEventSend)
+	self:inkBaleCounterEvent({}, noEventSend);  	
+end
+
+function Baler:inkBaleCounterEvent(data, noEventSend)	
+	g_company.eventManager:createEvent(self.eventId_inkBaleCounter, data, false, noEventSend);	
+	self.baleCounter = self.baleCounter + 1;
+	if g_dedicatedServerInfo == nil then		
+		self.digitalDisplayNum:updateLevelDisplays(self.baleCounter, 9999999999);
+	end;
+end
+
+
+
