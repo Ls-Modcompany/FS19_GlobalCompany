@@ -29,9 +29,9 @@ function GC_FillTypeManager:new()
     local self = {};
 	setmetatable(self, GC_FillTypeManager_mt);
 
-    self.fillTypes = {};
-    self.fillTypesById = {};
-    self.fillTypesByName = {};
+    --self.fillTypes = {};
+    --self.fillTypesById = {};
+    --self.fillTypesByName = {};
     
 
 	self.debugData = g_company.debug:getDebugData(GC_FillTypeManager.debugIndex);
@@ -39,6 +39,30 @@ function GC_FillTypeManager:new()
 	return self;
 end;
 
+function GC_FillTypeManager:loadFromXML(modName, xmlFile)
+
+    local key = "globalCompany.fillTypeManager";
+    if hasXMLProperty(xmlFile, key) then
+        return;
+    end;
+    
+    local filename = getXMLString(xmlFile, key .. "#filename");
+    if filename == nil or filename == "" then
+        return;
+    end;
+
+    local path = g_company.utils.createModPath(modName, filename);
+
+    if not fileExists(path) then
+        return;
+    end;
+
+    local xmlFile = loadXMLFile("map", path);
+
+    XMLUtil.loadDataFromMapXML(xmlFile, "fillTypes", g_modsDirectory .. modFileName, g_fillTypeManager, g_fillTypeManager.loadFillTypes, nil, g_modsDirectory .. modFileName)
+end
+
+--[[
 function GC_FillTypeManager:getNextId()
     if self.fillTypeId == nil then
         self.fillTypeId = -1;
@@ -132,6 +156,4 @@ function GC_FillTypeManager:getFillTypeIdByName(name)
         return "Not found"
     end;
 end;
-
-
-
+]]--
