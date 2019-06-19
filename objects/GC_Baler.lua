@@ -108,8 +108,8 @@ function Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		self.saveId = "baler_" .. indexName;
 	end;
 
-	self.dirtyObject = GC_DirtyObjects:new(self.isServer, self.isClient, nil, self.baseDirectory, self.customEnvironment);
-	self.dirtyObject:load(self.nodeId);
+	--self.dirtyObject = GC_DirtyObjects:new(self.isServer, self.isClient, nil, self.baseDirectory, self.customEnvironment);
+	--self.dirtyObject:load(self.nodeId);
 
 	self.title = Utils.getNoNil(getXMLString(xmlFile, xmlKey .. "#title"), true);
 	self.autoOn = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. "#autoOn"), true);
@@ -335,9 +335,9 @@ function Baler:delete()
 	if self.conveyorMover ~= nil then
 		self.conveyorMover:delete();
 	end;
-	if self.dirtyObject ~= nil then
-		self.dirtyObject:delete();
-	end;
+	--if self.dirtyObject ~= nil then
+	--	self.dirtyObject:delete();
+	--end;
 	
 	Baler:superClass().delete(self)
 end;
@@ -386,7 +386,7 @@ function Baler:readStream(streamId, connection)
 
 			self.animationManager:setAnimationTime("stackAnimation", streamReadFloat32(streamId));
 			local time = self.animationManager:getAnimationTime("stackAnimation");
-			if time > 0  and time < 1 then		
+			if self.animationState == Baler.ANIMATION_ISSTACKING or self.animationState == Baler.ANIMATION_ISSTACKINGEND then		
 				self.animationManager:setAnimationByState("stackAnimation", true, true);
 			end;
 		end;
@@ -397,9 +397,15 @@ function Baler:readStream(streamId, connection)
 			self.digitalDisplayNum:updateLevelDisplays(self.baleCounter, 9999999999);
 		end;
 
+		if self.state_baler == Bale.STATE_ON then
+			self.conveyorFillTypeEffect:setFillType(self.activeFillTypeIndex);
+			self.conveyorFillTypeEffect:start();
+			self.conveyorFillType:start();
+		end;
+
 		self.state_balerMove = streamReadInt16(streamId);
 		
-		self.dirtyObject:readStream(streamId, connection);		
+		--self.dirtyObject:readStream(streamId, connection);		
 	end;
 end;
 
@@ -433,7 +439,7 @@ function Baler:writeStream(streamId, connection)
 
 		streamWriteInt16(streamId, self.state_balerMove);
 		
-		self.dirtyObject:writeStream(streamId, connection);
+		--self.dirtyObject:writeStream(streamId, connection);
 	end;
 end;
 
@@ -473,7 +479,8 @@ function Baler:loadFromXMLFile(xmlFile, key)
 	
 		self.animationManager:setAnimationTime("stackAnimation", getXMLFloat(xmlFile, key..".stacker#stackAnimation"));
 		local time = self.animationManager:getAnimationTime("stackAnimation");
-		if time > 0  and time < 1 then		
+		
+		if self.animationState == Baler.ANIMATION_ISSTACKING or self.animationState == Baler.ANIMATION_ISSTACKINGEND then		
 			self.animationManager:setAnimationByState("stackAnimation", true);
 		end;
 	end;
@@ -482,11 +489,17 @@ function Baler:loadFromXMLFile(xmlFile, key)
 		self.digitalDisplayLevel:updateLevelDisplays(self.fillLevel, self.capacity);
 		self.digitalDisplayBunker:updateLevelDisplays(self.fillLevelBunker, 4000);
 		self.digitalDisplayNum:updateLevelDisplays(self.baleCounter, 9999999999);
+
+		if self.state_baler == Baler.STATE_ON then
+			self.conveyorFillTypeEffect:setFillType(self.activeFillTypeIndex);
+			self.conveyorFillTypeEffect:start();
+			self.conveyorFillType:start();
+		end;
 	end;
 
 	self.state_balerMove = getXMLInt(xmlFile, key..".mover#state");
 	
-	self.dirtyObject:loadFromXMLFile(xmlFile, key..".dirtNodes");
+	--self.dirtyObject:loadFromXMLFile(xmlFile, key..".dirtNodes");
 
 	return true;
 end;
@@ -512,7 +525,7 @@ function Baler:saveToXMLFile(xmlFile, key, usedModNames)
 
 	setXMLInt(xmlFile, key .. ".mover#state", self.state_balerMove);
 
-	self.dirtyObject:saveToXMLFile(xmlFile, key..".dirtNodes", usedModNames);
+	--self.dirtyObject:saveToXMLFile(xmlFile, key..".dirtNodes", usedModNames);
 end;
 
 function Baler:update(dt)
@@ -524,7 +537,7 @@ function Baler:update(dt)
 					self.animationManager:setAnimationByState("baleAnimation", true);
 					self:inkBaleCounter();
 					self:setFillLevelBunker(self.fillLevelBunker * -1, true);
-					if self.shouldTurnOff then
+					if self.shouldTurnOff or self.fillLevel + self.fillLevelBunker < 4000 then
 						self:onTurnOffBaler();
 						self.shouldTurnOff = false;
 					end;
@@ -540,7 +553,7 @@ function Baler:update(dt)
 				end;
 			elseif self.fillLevel + self.fillLevelBunker >= 4000 then
 				self:setFillLevelBunker(math.min(dt / 1000 * self.pressPerSecond, 4000 - self.fillLevelBunker, self.fillLevel));
-			elseif self.animationManager:getAnimationTime("baleAnimation") == 0 then
+			else --if self.animationManager:getAnimationTime("baleAnimation") == 0 then
 				self:onTurnOffBaler();
 			end;
 		end;
@@ -823,7 +836,7 @@ end;
 function Baler:createBale(ref)
 	local t = self.fillTypeToBaleType[self.activeFillTypeIndex];
 	local baleType = g_baleTypeManager:getBale(self.activeFillTypeIndex, false, t.width, t.height, t.length, t.diameter);	
-	local filename = Utils.getFilename(baleType.filename, self.baseDirectory);
+	local filename = Utils.getFilename(baleType.filename, "");
 	local baleObject = Bale:new(self.isServer, g_client ~= nil);
 	local x,y,z = getWorldTranslation(ref);
 	local rx,ry,rz = getWorldRotation(ref);
@@ -848,11 +861,11 @@ function Baler:onTurnOnBalerEvent(data, noEventSend)
 		self:raiseActive();
 	end;
 
-	if g_dedicatedServerInfo == nil then
+	--if g_dedicatedServerInfo == nil then
 		self.conveyorFillTypeEffect:setFillType(self.activeFillTypeIndex);
 		self.conveyorFillTypeEffect:start();
 		self.conveyorFillType:start();
-	end;
+	--end;
 end
 
 function Baler:onTurnOffBaler(noEventSend)	
@@ -863,10 +876,10 @@ function Baler:onTurnOffBalerEvent(data, noEventSend)
 	g_company.eventManager:createEvent(self.eventId_onTurnOffBaler, data, false, noEventSend);
 	self.state_baler = Baler.STATE_OFF;
 
-	if g_dedicatedServerInfo == nil then
+	--if g_dedicatedServerInfo == nil then
 		self.conveyorFillTypeEffect:stop();
 		self.conveyorFillType:stop();
-	end;
+	--end;
 end
 
 function Baler:onTurnOnStacker(noEventSend)
