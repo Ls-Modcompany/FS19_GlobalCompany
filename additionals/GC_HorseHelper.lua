@@ -38,7 +38,7 @@ function GC_HorseHelper:init()
 	local self = setmetatable({}, GC_HorseHelper_mt);
 
 	self.isServer = g_server ~= nil;
-	self.isClient = g_client ~= nil;	
+	--self.isClient = g_client ~= nil;	
 	
 	self.debugData = g_company.debug:getDebugData(GC_HorseHelper.debugIndex, g_company);
 
@@ -47,26 +47,26 @@ function GC_HorseHelper:init()
 end;
 
 function GC_HorseHelper:hourChanged()
-	if g_company.settings:getSetting("horseHelper", true) and g_currentMission.environment.currentHour == 23 then		
-		local moneyToOwner = {};
-		for _,husbandry in pairs(g_currentMission.husbandries) do
-			for _,animal in pairs(husbandry:getAnimals()) do
-				if animal.module.animalType == "HORSE" then
-					local farmId = animal.owner.ownerFarmId;
-					if moneyToOwner[farmId] == nil then
-						moneyToOwner[farmId] = 0;
-					end;				
-					moneyToOwner[farmId] = moneyToOwner[farmId] + ((animal.DAILY_TARGET_RIDING_TIME - animal.ridingTimer) / animal.DAILY_TARGET_RIDING_TIME);
+	if g_server ~= nil then
+		if g_company.settings:getSetting("horseHelper", true) and g_currentMission.environment.currentHour == 23 then		
+			local moneyToOwner = {};
+			for _,husbandry in pairs(g_currentMission.husbandries) do
+				for _,animal in pairs(husbandry:getAnimals()) do
+					if animal.module.animalType == "HORSE" then
+						local farmId = animal.owner.ownerFarmId;
+						if moneyToOwner[farmId] == nil then
+							moneyToOwner[farmId] = 0;
+						end;				
+						moneyToOwner[farmId] = moneyToOwner[farmId] + ((animal.DAILY_TARGET_RIDING_TIME - animal.ridingTimer) / animal.DAILY_TARGET_RIDING_TIME);
 
-					animal.ridingTimerSent  = animal.DAILY_TARGET_RIDING_TIME;
-					animal.ridingTimer  = animal.DAILY_TARGET_RIDING_TIME;
-				end;
-			end;	
-		end;
-		for farmId, factor in pairs(moneyToOwner) do
-			if g_server ~= nil then
-				local price = factor * GC_HorseHelper.price;
-				g_currentMission:addMoney(-price, farmId, MoneyType.ANIMAL_UPKEEP, true, true);
+						animal.ridingTimerSent  = animal.DAILY_TARGET_RIDING_TIME;
+						animal.ridingTimer  = animal.DAILY_TARGET_RIDING_TIME;
+					end;
+				end;	
+			end;
+			for farmId, factor in pairs(moneyToOwner) do
+					local price = factor * GC_HorseHelper.price;
+					g_currentMission:addMoney(-price, farmId, MoneyType.ANIMAL_UPKEEP, true, true);
 			end;
 		end;	
 	end;
