@@ -26,7 +26,7 @@ GlobalCompany.dir = g_currentModDirectory;
 GlobalCompany.version = "1.0.0.0";
 GlobalCompany.versionDate = "06.07.2019"; -- Release Date ??
 GlobalCompany.currentVersionId = 1000; -- Mod Manager ID. (Version number without periods.)
-GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
+GlobalCompany.isDevelopmentVersion = false; -- This is for versions loaded from GIT.
 
 function GlobalCompany.initialLoad()
 	if GlobalCompany.initialLoadComplete ~= nil then
@@ -97,7 +97,7 @@ function GlobalCompany.initialLoad()
 		local xmlFileCurrentMod = nil;
 		for modName, xmlFile in pairs(GlobalCompany.environments) do
 			g_company.shopManager:loadFromXML(modName, xmlFile);
-			g_company.fillTypeManager:loadFromXML(xmlFile);
+			g_company.fillTypeManager:loadFromXML(modName, xmlFile);
 
 			if modName == modNameCurrent then
 				xmlFileCurrentMod = xmlFile;
