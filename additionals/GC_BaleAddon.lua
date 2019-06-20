@@ -12,12 +12,13 @@
 --
 -- 	v1.0.2.0 (20.06.2019)/(aPuehri):
 -- 		- changed client detection
+-- 		- added Multiplayer-Support
 --
 -- 	v1.0.1.0 (01.06.2019)/(aPuehri):
 -- 		- smaler changes
 --
 -- 	v1.0.0.0 (29.03.2019):
--- 			- initial fs19 (aPuehri)
+-- 		- initial fs19 (aPuehri)
 --
 --
 -- Notes:
@@ -35,6 +36,7 @@ InitObjectClass(GC_BaleAddon, "GC_BaleAddon");
 GC_BaleAddon.debugIndex = g_company.debug:registerScriptName("GC_BaleAddon");
 GC_BaleAddon.enableCutBale = false;
 GC_BaleAddon.object = nil;
+GC_BaleAddon.eventId = nil;
 
 function GC_BaleAddon:load()
     Player.registerActionEvents = Utils.appendedFunction(Player.registerActionEvents, GC_BaleAddon.registerActionEvents);
@@ -52,8 +54,7 @@ function GC_BaleAddon:init()
     
     self.debugData = g_company.debug:getDebugData(GC_BaleAddon.debugIndex, g_company);
 
-    self.eventId_setCutBale = g_company.eventManager:registerEvent(self, self.setCutBaleEvent);
-    gc_debugPrint(self.eventId_setCutBale, nil, nil, "GC_BaleAddon - self.eventId_setCutBale");
+    self.eventId_CutBale = g_company.eventManager:registerEvent(self, self.cutBaleEvent);
     
     if self.isClient then
         g_company.addUpdateable(self, self.update);			
@@ -79,6 +80,7 @@ end;
 function GC_BaleAddon:update(dt)
     if self.isClient then
         GC_BaleAddon.enableCutBale = false;
+        GC_BaleAddon.eventId = self.eventId_CutBale;
         if g_company.settings:getSetting("cutBales", true) and g_currentMission.player.isControlled and not g_currentMission.player.isCarryingObject then
             if not self.isMultiplayer and g_currentMission.player.isObjectInRange then
                 local foundObjectId = g_currentMission.player.lastFoundObject;
@@ -109,23 +111,8 @@ function GC_BaleAddon:update(dt)
     end;
 end;
 
-function GC_BaleAddon:actionCut(actionName, keyStatus, arg3, arg4, arg5)
-    if GC_BaleAddon.enableCutBale and (GC_BaleAddon.object ~= nil) then
-        GC_BaleAddon:cutBale(GC_BaleAddon.object, self.isServer, self.isClient);
-        GC_BaleAddon:setCutBale(GC_BaleAddon.object.nodeId, false);
-    end;
-end;
-
-function GC_BaleAddon:displayHelp(state)
-    for i=1, #GC_BaleAddon.eventName, 1 do
-        if (GC_BaleAddon.eventName[i] ~= nil) then
-            g_inputBinding:setActionEventTextVisibility(GC_BaleAddon.eventName[i], state);
-        end;	
-    end;
-end;
-
 function GC_BaleAddon:getCanCutBale(foundObject)
-    if (foundObject.fillLevel ~= nil) and (foundObject.fillType ~= nil) then
+    if (foundObject.fillLevel ~= nil) and (foundObject.fillType ~= nil) and (foundObject.nodeId ~= nil) and (foundObject.nodeId ~= 0) then
         local testDrop = g_densityMapHeightManager:getMinValidLiterValue(foundObject.fillType);
         local sx,sy,sz = getWorldTranslation(foundObject.nodeId);
         local radius = (DensityMapHeightUtil.getDefaultMaxRadius(foundObject.fillType) / 2);
@@ -138,7 +125,36 @@ function GC_BaleAddon:getCanCutBale(foundObject)
     return false;
 end;
 
-function GC_BaleAddon:cutBale(foundObject, isServer, isClient)
+function GC_BaleAddon:displayHelp(state)
+    for i=1, #GC_BaleAddon.eventName, 1 do
+        if (GC_BaleAddon.eventName[i] ~= nil) then
+            g_inputBinding:setActionEventTextVisibility(GC_BaleAddon.eventName[i], state);
+        end;	
+    end;
+end;
+
+function GC_BaleAddon:actionCut(actionName, keyStatus, arg3, arg4, arg5)
+    if GC_BaleAddon.enableCutBale and (GC_BaleAddon.object ~= nil) then
+        GC_BaleAddon:cutBale(GC_BaleAddon.object, self.isServer, self.isClient, GC_BaleAddon.eventId, false);
+    end;
+end;
+
+function GC_BaleAddon:cutBale(foundObject, isServer, isClient, eventId, noEventSend)   
+    self.isServer = isServer;
+    self.isClient = isClient;
+    self.eventId = eventId;
+    self.foundObjectNetworkId = NetworkUtil.getObjectId(foundObject);
+    -- gc_debugPrint(self.foundObjectNetworkId, nil, nil, "GC_BaleAddon:setCutBale - self.foundObjectNetworkId");
+    self:cutBaleEvent({self.foundObjectNetworkId}, foundObject, noEventSend);
+end;
+
+function GC_BaleAddon:cutBaleEvent(data, foundObject, noEventSend)    
+    -- gc_debugPrint(data, nil, nil, "GC_BaleAddon:cutBaleEvent - data");
+    -- gc_debugPrint(self.isServer, nil, nil, "GC_BaleAddon:cutBaleEvent - self.isServer");
+    -- gc_debugPrint(self.isClient, nil, nil, "GC_BaleAddon:cutBaleEvent - self.isClient");
+    -- gc_debugPrint(self.eventId, nil, nil, "GC_BaleAddon:cutBaleEvent - self.eventId");
+    
+    g_company.eventManager:createEvent(self.eventId, data, false, noEventSend);
     -- Arguments
     -- table	vehicle	vehicle that is tipping
     -- float	delta	delta to tip
@@ -159,145 +175,32 @@ function GC_BaleAddon:cutBale(foundObject, isServer, isClient)
     -- float	dropped	real fill level dropped
     -- float	lineOffset	line offset
     
-    if (foundObject.fillLevel ~= nil) and (foundObject.fillType ~= nil) then
-        local sx,sy,sz = getWorldTranslation(foundObject.nodeId);
-        local radius = (DensityMapHeightUtil.getDefaultMaxRadius(foundObject.fillType) / 2);
-        local minLevel = g_densityMapHeightManager:getMinValidLiterValue(foundObject.fillType);
+    local object = nil;
+    if self.isClient then
+        object = foundObject;
+    else
+        object = NetworkUtil.getObject(data[1]);
+    end;
+
+    -- gc_debugPrint(object, nil, nil, "GC_BaleAddon:cutBaleEvent - object");
+    if (object~= nil) then
+        if object:isa(Bale) then
+            if (object.fillLevel ~= nil) and (object.fillType ~= nil) then
+                local sx,sy,sz = getWorldTranslation(object.nodeId);
+                local radius = (DensityMapHeightUtil.getDefaultMaxRadius(object.fillType) / 2);
+                local minLevel = g_densityMapHeightManager:getMinValidLiterValue(object.fillType);
+                
+                local dropped, lineOffset = DensityMapHeightUtil.tipToGroundAroundLine(nil, object.fillLevel, object.fillType, sx, sy, sz, (sx + 0.1), (sy - 0.1), (sz + 0.1), 0, radius, 3, false, nil, false);
+                object:setFillLevel(object:getFillLevel() - dropped);
         
-        local dropped, lineOffset = DensityMapHeightUtil.tipToGroundAroundLine(nil, foundObject.fillLevel, foundObject.fillType, sx, sy, sz, (sx + 0.1), (sy - 0.1), (sz + 0.1), 0, radius, 3, false, nil, false);
-        foundObject:setFillLevel(foundObject:getFillLevel() - dropped);
-        
-        if isServer then
-            if (foundObject:getFillLevel() <= minLevel) then
-                foundObject:delete();
+                if self.isServer then
+                    if (object:getFillLevel() <= minLevel) then
+                        object:delete();
+                    end;
+                end;
             end;
         end;
-    end;
-end
-
-function GC_BaleAddon:readStream(streamId, connection)
-	GC_BaleAddon:superClass().readStream(self, streamId, connection);
-
-    if connection:getIsServer() then
-        print ("GC_BaleAddon:readStream");
-        self:setCutBale(streamReadInt16(streamId), false);		
-		-- if self.animationManager ~= nil then
-		-- 	local animationManagerId = NetworkUtil.readNodeObjectId(streamId);
-        --     self.animationManager:readStream(streamId, connection);
-        --     g_client:finishRegisterObject(self.animationManager, animationManagerId);
-		-- end;
-
-		-- self.state_baler = streamReadInt16(streamId);
-		-- self.shouldTurnOff = streamReadBool(streamId);
-		-- self.needMove = streamReadBool(streamId);
-		-- self:setFillTyp(streamReadInt16(streamId), false);
-		-- self:setFillLevel(streamReadFloat32(streamId), true);
-		-- self:setFillLevelBunker(streamReadFloat32(streamId), true, true);
-		-- self.baleCounter = streamReadInt16(streamId);
-		-- self.autoOn = streamReadBool(streamId);
-		-- self.animationManager:setAnimationTime("baleAnimation", streamReadFloat32(streamId));
-		-- if self.animationManager:getAnimationTime("baleAnimation") > 0 then	
-		-- 	self:setBaleObjectToAnimation(true);	
-		-- 	self.animationManager:setAnimationByState("baleAnimation", true, true);
-		-- end;
-		
-		-- if self.hasStack then
-		-- 	self.state_stacker = streamReadInt16(streamId);
-		-- 	self.stackBalesTarget = streamReadInt16(streamId);
-		-- 	self.animationState = streamReadInt16(streamId);
-
-		-- 	local forkNodeNums = streamReadInt16(streamId);
-		-- 	for _,info in pairs (self.baleAnimationObjects) do
-		-- 		if info.fillTypeIndex == self.activeFillTypeIndex then
-		-- 			for i=1, forkNodeNums do
-		-- 				local newBale = clone(info.node, false, false, false);
-		-- 				setVisibility(newBale, true);
-		-- 				setTranslation(newBale, 0.015, 0.958 + (i-1)*0.8,-0.063);
-		-- 				link(self.animationManager:getPartsOfAnimation("stackAnimation")[1].node, newBale);		
-		-- 			end;
-		-- 			break;
-		-- 		end;
-		-- 	end;
-
-		-- 	self.animationManager:setAnimationTime("stackAnimation", streamReadFloat32(streamId));
-		-- 	local time = self.animationManager:getAnimationTime("stackAnimation");
-		-- 	if self.animationState == Baler.ANIMATION_ISSTACKING or self.animationState == Baler.ANIMATION_ISSTACKINGEND then		
-		-- 		self.animationManager:setAnimationByState("stackAnimation", true, true);
-		-- 	end;
-		-- end;
-	
-		-- if g_dedicatedServerInfo == nil then		
-		-- 	self.digitalDisplayLevel:updateLevelDisplays(self.fillLevel, self.capacity);
-		-- 	self.digitalDisplayBunker:updateLevelDisplays(self.fillLevelBunker, 4000);
-		-- 	self.digitalDisplayNum:updateLevelDisplays(self.baleCounter, 9999999999);
-		-- end;
-
-		-- if self.state_baler == Bale.STATE_ON then
-		-- 	self.conveyorFillTypeEffect:setFillType(self.activeFillTypeIndex);
-		-- 	self.conveyorFillTypeEffect:start();
-		-- 	self.conveyorFillType:start();
-		-- end;
-
-		-- self.state_balerMove = streamReadInt16(streamId);
-		
-		-- --self.dirtyObject:readStream(streamId, connection);		
-	end;
-end;
-
-function GC_BaleAddon:writeStream(streamId, connection)
-	GC_BaleAddon:superClass().writeStream(self, streamId, connection);
-
-    if not connection:getIsServer() then
-        print ("GC_BaleAddon:writeStream");
-        streamWriteInt16(streamId, GC_BaleAddon.object.nodeId);
-		-- if self.animationManager ~= nil then
-		-- 	NetworkUtil.writeNodeObjectId(streamId, NetworkUtil.getObjectId(self.animationManager));
-        --     self.animationManager:writeStream(streamId, connection);
-        --     g_server:registerObjectInStream(connection, self.animationManager);
-		-- end;
-
-		-- streamWriteInt16(streamId, self.state_baler);
-		-- streamWriteBool(streamId, self.shouldTurnOff);
-		-- streamWriteBool(streamId, self.needMove);
-		-- streamWriteInt16(streamId, self.activeFillTypeIndex);
-		-- streamWriteFloat32(streamId, self.fillLevel);
-		-- streamWriteFloat32(streamId, self.fillLevelBunker);
-		-- streamWriteInt16(streamId, self.baleCounter);
-		-- streamWriteBool(streamId, self.autoOn);
-		-- streamWriteFloat32(streamId, self.animationManager:getAnimationTime("baleAnimation"));
-		
-		-- if self.hasStack then
-		-- 	streamWriteInt16(streamId, self.state_stacker);
-		-- 	streamWriteInt16(streamId, self.stackBalesTarget);
-		-- 	streamWriteInt16(streamId, self.animationState);
-		-- 	streamWriteInt16(streamId, getNumOfChildren(self.animationManager:getPartsOfAnimation("stackAnimation")[1].node));
-		-- 	streamWriteFloat32(streamId, self.animationManager:getAnimationTime("stackAnimation"));
-		-- end;
-
-		-- streamWriteInt16(streamId, self.state_balerMove);
-		
-		-- --self.dirtyObject:writeStream(streamId, connection);
-	end;
-end;
-
-function GC_BaleAddon:setCutBale(objectId, noEventSend)   
-	self:setCutBaleEvent({objectId}, noEventSend);   	
-end;
-
-function GC_BaleAddon:setCutBaleEvent(data, noEventSend)    
-    gc_debugPrint(data, nil, nil, "GC_BaleAddon - GC_BaleAddon:setCutBaleEvent");
-    g_company.eventManager:createEvent(self.eventId_setCutBale, data, false, noEventSend);
-	-- if data[2] == nil or not data[2] then
-	-- 	self.unloadTrigger.fillTypes = nil;
-	-- 	self.unloadTrigger:setAcceptedFillTypeState(data[1], true);
-
-	-- 	if self.hasStack then
-	-- 		self.needMove = self.stackerBaleTrigger:getNum() > 0;
-	-- 	else
-	-- 		self.needMove = not self.mainBaleTrigger:getTriggerEmpty();
-	-- 	end;
-	-- end;
-	-- self.activeFillTypeIndex = data[1]; 
+    end;    
 end;
 
 g_company.addInit(GC_BaleAddon, GC_BaleAddon.init);
