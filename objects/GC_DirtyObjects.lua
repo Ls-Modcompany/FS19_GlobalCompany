@@ -73,6 +73,9 @@ function DirtObjects:load(nodeId, isOnCreate)
 	
 	self.dirtNodes = {};
 	I3DUtil.getNodesByShaderParam(self.nodeId, "RDT", self.dirtNodes);
+	for i,dirtNode in pairs (self.dirtNodes) do	
+		print(getName(dirtNode))
+	end;
 
 	self.factorPerHour = Utils.getNoNil(getUserAttribute(nodeId, "factorPerHour"), 0.01);
 
@@ -95,9 +98,11 @@ function DirtObjects:readStream(streamId, connection)
 	DirtObjects:superClass().readStream(self, streamId, connection);
 	if connection:getIsServer() then
 		for i,dirtNode in pairs (self.dirtNodes) do	
-			local dirtLevel = streamReadFloat32(streamId)
-			local x, _, z, w = getShaderParameter(dirtNode, "RDT");
-			setShaderParameter(dirtNode, "RDT", x, dirtLevel, z, w, false);
+			if getHasShaderParameter(dirtNode, "RDT") then		
+				local dirtLevel = streamReadFloat32(streamId)
+				local x, _, z, w = getShaderParameter(dirtNode, "RDT");
+				setShaderParameter(dirtNode, "RDT", x, dirtLevel, z, w, false);
+			end;
 		end;
 	end;
 end;
@@ -106,8 +111,10 @@ function DirtObjects:writeStream(streamId, connection)
 	DirtObjects:superClass().writeStream(self, streamId, connection);
 	if not connection:getIsServer() then	
 		for _,dirtNode in pairs (self.dirtNodes) do	
-			local _, dirtLevel, _, _ = getShaderParameter(dirtNode, "RDT");
-			streamWriteFloat32(streamId, dirtLevel);
+			if getHasShaderParameter(dirtNode, "RDT") then		
+				local _, dirtLevel, _, _ = getShaderParameter(dirtNode, "RDT");
+				streamWriteFloat32(streamId, dirtLevel);
+			end;
 		end;
 	end;
 end;
@@ -117,9 +124,11 @@ function DirtObjects:readUpdateStream(streamId, timestamp, connection)
 	if connection:getIsServer() then
 		if streamReadBool(streamId) then
 			for i,dirtNode in pairs (self.dirtNodes) do	
-				local dirtLevel = streamReadFloat32(streamId)
-				local x, _, z, w = getShaderParameter(dirtNode, "RDT");
-				setShaderParameter(dirtNode, "RDT", x, dirtLevel, z, w, false);
+				if getHasShaderParameter(dirtNode, "RDT") then		
+					local dirtLevel = streamReadFloat32(streamId)
+					local x, _, z, w = getShaderParameter(dirtNode, "RDT");
+					setShaderParameter(dirtNode, "RDT", x, dirtLevel, z, w, false);
+				end;
 			end;
 		end;
 	end;
@@ -130,8 +139,10 @@ function DirtObjects:writeUpdateStream(streamId, connection, dirtyMask)
 	if not connection:getIsServer() then
 		if streamWriteBool(streamId, bitAND(dirtyMask, self.DirtObjectsDirtyFlag) ~= 0) then
 			for _,dirtNode in pairs (self.dirtNodes) do	
-				local _, dirtLevel, _, _ = getShaderParameter(dirtNode, "RDT");
-				streamWriteFloat32(streamId, dirtLevel);
+				if getHasShaderParameter(dirtNode, "RDT") then		
+					local _, dirtLevel, _, _ = getShaderParameter(dirtNode, "RDT");
+					streamWriteFloat32(streamId, dirtLevel);
+				end;
 			end;
 		end;
 	end;
@@ -159,8 +170,10 @@ function DirtObjects:loadFromXMLFile(xmlFile, key)
 		if dirtValues[i] == nil then
 			return true;
 		end;
-		local x, _, z, w = getShaderParameter(dirtNode, "RDT");
-		setShaderParameter(dirtNode, "RDT", x, dirtValues[i], z, w, false);
+		if getHasShaderParameter(dirtNode, "RDT") then		
+			local x, _, z, w = getShaderParameter(dirtNode, "RDT");
+			setShaderParameter(dirtNode, "RDT", x, dirtValues[i], z, w, false);
+		end;
 		i = i + 1;
 	end;
 
@@ -170,9 +183,11 @@ end;
 function DirtObjects:saveToXMLFile(xmlFile, key, usedModNames)	
 	local i = 0;
 	for _,dirtNode in pairs (self.dirtNodes) do	
-		local dirtNodeKey = string.format("%s.dirtNode(%d)", key, i);
-		local _, dirtLevel, _, _ = getShaderParameter(dirtNode, "RDT");
-		setXMLFloat(xmlFile, string.format("%s#dirtLevel", dirtNodeKey), dirtLevel);
+		if getHasShaderParameter(dirtNode, "RDT") then		
+			local dirtNodeKey = string.format("%s.dirtNode(%d)", key, i);
+			local _, dirtLevel, _, _ = getShaderParameter(dirtNode, "RDT");
+			setXMLFloat(xmlFile, string.format("%s#dirtLevel", dirtNodeKey), dirtLevel);
+		end;
 		i = i + 1;
 	end;
 end;
@@ -187,12 +202,14 @@ function DirtObjects:hourChanged()
 	if g_currentMission ~= nil and g_currentMission.environment ~= nil and g_currentMission.environment.weather:getIsRaining() then
 		factor = -2;
 	end;
-	for _,dirtNode in pairs(self.dirtNodes) do			
-		local x, y, z, w = getShaderParameter(dirtNode, "RDT");
-		local newY = math.max(math.min(y + self.factorPerHour * factor, 1), 0);
-		if y ~= newY then
-			setShaderParameter(dirtNode, "RDT", x, newY, z, w, false);
-			needRaise = true;
+	for _,dirtNode in pairs(self.dirtNodes) do	
+		if getHasShaderParameter(dirtNode, "RDT") then		
+			local x, y, z, w = getShaderParameter(dirtNode, "RDT");
+			local newY = math.max(math.min(y + self.factorPerHour * factor, 1), 0);
+			if y ~= newY then
+				setShaderParameter(dirtNode, "RDT", x, newY, z, w, false);
+				needRaise = true;
+			end;
 		end;
 	end;
 	if needRaise then

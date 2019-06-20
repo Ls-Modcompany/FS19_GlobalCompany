@@ -145,7 +145,7 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
     local unloadingTriggerKey = string.format("%s.unloadingTrigger", xmlKey);
     local name = getXMLString(xmlFile, unloadingTriggerKey .. "#name");
     if name ~= nil then
-        local unloadingTrigger = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.rootNode, xmlFile, unloadingTriggerKey, self.fillTypes);
+        local unloadingTrigger = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.rootNode, self, xmlFile, unloadingTriggerKey, self.fillTypes);
         if unloadingTrigger ~= nil then
             self.unloadingTrigger = unloadingTrigger;
         end;
@@ -154,7 +154,7 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
     local loadingTriggerKey = string.format("%s.loadingTrigger", xmlKey);
     local name = getXMLString(xmlFile, loadingTriggerKey .. "#name");
     if name ~= nil then
-        local loadingTrigger = self.triggerManager:addTrigger(GC_LoadingTrigger, self.rootNode, xmlFile, loadingTriggerKey, {}, false, true);
+        local loadingTrigger = self.triggerManager:addTrigger(GC_LoadingTrigger, self.rootNode, self, xmlFile, loadingTriggerKey, {}, false, true);
         if loadingTrigger ~= nil then
             
             loadingTrigger.onActivateObject = function() self:loadingTriggerOnActivateObject() end;
@@ -175,6 +175,9 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
         place.capacity = getXMLInt(xmlFile, placeKey .. "#capacity");
         place.activeFillTypeIndex = -1;
 
+        place.shovelTrigger = self.triggerManager:addTrigger(GC_ShovelFillTrigger, self.rootNode, self, xmlFile, placeKey .. ".shovelFillTrigger");
+        place.shovelTrigger.extraParamater = place.number;
+        
         if hasXMLProperty(xmlFile, placeKey .. ".movers") then
             local movers = GC_Movers:new(self.isServer, self.isClient);
             if movers:load(self.rootNode, self, xmlFile, placeKey, self.baseDirectory, place.capacity, true) then
@@ -190,6 +193,7 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
                 place.digitalDisplays:updateLevelDisplays(place.fillLevel, place.capacity);
             end;
         end;
+
         table.insert(self.places, place);
         i = i + 1;
     end;
@@ -217,6 +221,7 @@ function GC_DynamicStorage:delete()
 	if self.vehicleInteractionActivation ~= nil then
         self.vehicleInteractionActivation:delete();
     end;   
+    removeTrigger(self.vehicleInteractionNode);
 	GC_DynamicStorage:superClass().delete(self);
 end;
 
@@ -282,6 +287,7 @@ function GC_DynamicStorage:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, t
         if place.fillLevel == 0 then
             
             place.activeFillTypeIndex = fillTypeIndex;
+            place.shovelFillTrigger.fillTypeIndex = fillTypeIndex;
             local material = self.materials[g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex):lower()];            
             if material ~= nil then
                 for _,mover in pairs(place.movers.movers) do
@@ -325,7 +331,10 @@ function GC_DynamicStorage:getAllProvidedFillLevels(farmId)
 	return {}, 0;
 end;
 
-function GC_DynamicStorage:getProvidedFillLevel(fillTypeIndex, farmId, triggerId)
+function GC_DynamicStorage:getProvidedFillLevel(fillTypeIndex, farmId, extraParamater)
+    if extraParamater ~= nil then
+        return self.places[extraParamater].fillLevel;
+    end;
 	return self.places[self.activeLoadingBox].fillLevel;
 end;
 
