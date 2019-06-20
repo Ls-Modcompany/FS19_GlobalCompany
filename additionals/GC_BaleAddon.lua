@@ -10,6 +10,9 @@
 --
 -- Changelog:
 --
+-- 	v1.0.2.0 (20.06.2019)/(aPuehri):
+-- 		- changed client detection
+--
 -- 	v1.0.1.0 (01.06.2019)/(aPuehri):
 -- 		- smaler changes
 --
@@ -44,7 +47,7 @@ function GC_BaleAddon:init()
     local self = setmetatable({}, GC_BaleAddon_mt);
 
     self.isServer = g_server ~= nil;
-    self.isClient = g_client ~= nil;
+    self.isClient = g_dedicatedServerInfo == nil;
     self.isMultiplayer = g_currentMission.missionDynamicInfo.isMultiplayer;
     
     self.debugData = g_company.debug:getDebugData(GC_BaleAddon.debugIndex, g_company);
@@ -89,16 +92,16 @@ function GC_BaleAddon:update(dt)
                         end;
                     end;
                 end;
-            -- elseif g_company.settings:getSetting("objectInfo", true) then
-            --     if (GC_ObjectInfo.foundBale~= nil) then
-            --         if GC_BaleAddon.object ~= GC_ObjectInfo.foundBale then
-            --             GC_BaleAddon.object = GC_ObjectInfo.foundBale;
-            --             gc_debugPrint(GC_ObjectInfo.foundBale, nil, nil, "GC_BaleAddon - GC_ObjectInfo.foundBale");
-            --         end;
-            --         if (GC_BaleAddon.object.typeName == nil) and (GC_BaleAddon.object.fillType ~= nil) and (GC_BaleAddon.object.fillLevel ~= nil) then
-            --             GC_BaleAddon.enableCutBale = GC_BaleAddon:getCanCutBale(GC_BaleAddon.object);
-            --         end;
-            --     end;
+            elseif self.isMultiplayer and g_company.settings:getSetting("objectInfo", true) then
+                if (GC_ObjectInfo.foundBale~= nil) then
+                    if GC_BaleAddon.object ~= GC_ObjectInfo.foundBale then
+                        GC_BaleAddon.object = GC_ObjectInfo.foundBale;
+                        -- gc_debugPrint(GC_ObjectInfo.foundBale, nil, nil, "GC_BaleAddon - GC_ObjectInfo.foundBale");
+                    end;
+                    if (GC_BaleAddon.object.typeName == nil) and (GC_BaleAddon.object.fillType ~= nil) and (GC_BaleAddon.object.fillLevel ~= nil) then
+                        GC_BaleAddon.enableCutBale = GC_BaleAddon:getCanCutBale(GC_BaleAddon.object);
+                    end;
+                end;
             end;	
         end;
         GC_BaleAddon:displayHelp(GC_BaleAddon.enableCutBale);
