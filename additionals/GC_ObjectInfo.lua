@@ -4,11 +4,14 @@
 -- @Interface: --
 -- @Author: LS-Modcompany / aPuehri
 -- @Date: 31.05.2019
--- @Version: 1.0.1.0
+-- @Version: 1.0.2.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+--
+-- 	v1.0.2.0 (20.06.2019)/(aPuehri):
+-- 		- changed client detection
 --
 -- 	v1.0.1.0 (31.05.2019)/(aPuehri):
 -- 		- changed debugPrint
@@ -38,7 +41,7 @@ function GC_ObjectInfo:init()
 	local self = setmetatable({}, GC_ObjectInfo_mt);
 
 	self.isServer = g_server ~= nil;
-	self.isClient = g_client ~= nil;
+	self.isClient = g_dedicatedServerInfo == nil;
 	self.isMultiplayer = g_currentMission.missionDynamicInfo.isMultiplayer;	
 
 	self.debugPrintObjectId = 0;
@@ -55,7 +58,7 @@ function GC_ObjectInfo:init()
 end;
 
 function GC_ObjectInfo:update(dt)
-	if self.isClient and not (self.isServer and self.isMultiplayer) and g_company.settings:getSetting("objectInfo", true) then
+	if self.isClient and g_company.settings:getSetting("objectInfo", true) then				
 		if g_currentMission.player.isControlled and not g_currentMission.player.isCarryingObject then
 			self.showInfo = false;
 			GC_ObjectInfo.foundBale = nil;
