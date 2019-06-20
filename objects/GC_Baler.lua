@@ -549,7 +549,11 @@ function Baler:update(dt)
 					elseif self.animationManager:getAnimationTime("moveCollisionAnimation") == 1 then
 						self.animationManager:setAnimationTime("moveCollisionAnimation", 0);
 						setCollisionMask(self.moveCollisionAnimationNode, 0);
+					elseif self.animationManager:getAnimationTime("moveCollisionAnimation") == 0 and not self.moverBaleTrigger:getTriggerEmpty() and self.state_balerMove == Baler.STATE_OFF then	
+						self:onTurnOffBaler();
 					end;
+				else
+					self:onTurnOffBaler();
 				end;
 			elseif self.fillLevel + self.fillLevelBunker >= 4000 then
 				self:setFillLevelBunker(math.min(dt / 1000 * self.pressPerSecond, 4000 - self.fillLevelBunker, self.fillLevel));
