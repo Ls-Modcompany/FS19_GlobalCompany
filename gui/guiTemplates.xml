@@ -624,7 +624,15 @@
 			<value name="position" value="0px 0px" />
 			<value name="orientation" value="y" />
 			<value name="maxItemsX" value="1" />
-			<value name="maxItemsY" value="4" />							
+			<value name="maxItemsY" value="4" />	
+			<value name="hasSlider" value="true" />							
+		</template>	
+		<template name="gcFactoryRightTableSlider" anchor="rightTop" extends="gcBase">
+			<value name="size" value="20px 620px" />
+			<value name="position" value="20px 0px" />	
+			<value name="hasOverlay" value="true" />
+			<value name="imageColor" value="buttonMain" />
+			<value name="imageColor_selected" value="buttonMainSelected" />	
 		</template>	
 		<template name="gcFactoryRightTableItem" anchor="middleCenter" extends="gcBase gcBorder">
 			<value name="size" value="500px 150px" />

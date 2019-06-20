@@ -83,11 +83,16 @@ end;
 
 function GC_Gui_slider:updateItems()
 	if self.controller ~= nil then
-		self.stepsize = self.size[2] / ( 1 + (#self.controller.items - (self.controller.maxItemsX * self.controller.maxItemsY)));
-		local size = math.max(self.stepsize, self.minHeight[1]);
-		self.buttonElement.size[2] = size;
-		if self.buttonElement.overlayElement ~= nil then
-			self.buttonElement.overlayElement.size[2] = size;
+		if #self.controller.items <= self.controller.maxItemsX * self.controller.maxItemsY then
+			self:setVisible(false);
+		else
+			self:setVisible(true);
+			self.stepsize = self.size[2] / ( 1 + (#self.controller.items - (self.controller.maxItemsX * self.controller.maxItemsY)));
+			local size = math.max(self.stepsize, self.minHeight[1]);
+			self.buttonElement.size[2] = size;
+			if self.buttonElement.overlayElement ~= nil then
+				self.buttonElement.overlayElement.size[2] = size;
+			end;
 		end;
 	end;
 end;
