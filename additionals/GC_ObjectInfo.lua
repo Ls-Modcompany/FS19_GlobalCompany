@@ -106,6 +106,11 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 							self.showInfo = true;
 						end;
 					end;
+				elseif object.isPalletExtended then					
+					self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(Utils.getNoNil(object:getFillTypeName(),"unknown"));
+					self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level'):format(object:getFillLevel());
+					self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object.ownerFarmId));
+					self.showInfo = true;	
 				elseif (object.typeName == nil) and (object.fillType ~= nil) and (object.fillLevel ~= nil) then
 					if object:isa(Bale) then
 						GC_ObjectInfo.foundBale = object;						

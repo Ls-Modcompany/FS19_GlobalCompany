@@ -10,10 +10,10 @@
         </sortCategories>
     </shopManager>
 
-    <!--specializations>
+    <specializations>
         <registerSpecializations>
             <specialization name="palletExtended" className="PalletExtended" filename="specializations/PalletExtended.lua" onlyLoad="true" />
         </registerSpecializations>
-    </specializations-->
+    </specializations>
 
 </globalCompany>

@@ -29,10 +29,9 @@ function GC_FillTypeManager:new()
     local self = {};
 	setmetatable(self, GC_FillTypeManager_mt);
 
-    --self.fillTypes = {};
-    --self.fillTypesById = {};
-    --self.fillTypesByName = {};
-    
+    self.fillTypes = {};
+    self.fillTypesById = {};
+    self.fillTypesByName = {};    
 
 	self.debugData = g_company.debug:getDebugData(GC_FillTypeManager.debugIndex);
 
@@ -42,10 +41,12 @@ end;
 function GC_FillTypeManager:loadFromXML(modName, xmlFile)
 
     local key = "globalCompany.fillTypeManager";
-    if hasXMLProperty(xmlFile, key) then
+    if not hasXMLProperty(xmlFile, key) then
         return;
     end;
     
+    self:loadGcFillTypes(xmlFile);
+
     local filename = getXMLString(xmlFile, key .. "#filename");
     if filename == nil or filename == "" then
         return;
@@ -57,12 +58,12 @@ function GC_FillTypeManager:loadFromXML(modName, xmlFile)
         return;
     end;
 
-    local xmlFile = loadXMLFile("map", path);
+    local mapXmlFile = loadXMLFile("map", path);
 
-    XMLUtil.loadDataFromMapXML(xmlFile, "fillTypes", g_modsDirectory .. modFileName, g_fillTypeManager, g_fillTypeManager.loadFillTypes, nil, g_modsDirectory .. modFileName)
+    XMLUtil.loadDataFromMapXML(mapXmlFile, "fillTypes", g_modsDirectory .. modFileName, g_fillTypeManager, g_fillTypeManager.loadFillTypes, nil, g_modsDirectory .. modFileName);
+
 end
 
---[[
 function GC_FillTypeManager:getNextId()
     if self.fillTypeId == nil then
         self.fillTypeId = -1;
@@ -76,7 +77,7 @@ function GC_FillTypeManager:registerFillType(name, lang)
         --debug
         return;
     end;
-
+    
     local newFillType = {};
     newFillType.id = self:getNextId();
     newFillType.name = name;
@@ -88,11 +89,11 @@ function GC_FillTypeManager:registerFillType(name, lang)
     return newFillType.id;
 end;
 
-function GC_FillTypeManager:loadFromXML(xmlFile)
+function GC_FillTypeManager:loadGcFillTypes(xmlFile)
     local insertFillTypes = {};
     local i = 0;
     while true do
-        local key = string.format("globalCompany.registerFillTypes.fillType(%d)", i);
+        local key = string.format("globalCompany.fillTypeManager.fillType(%d)", i);
         if not hasXMLProperty(xmlFile, key) then
             break;
         end;
@@ -105,6 +106,7 @@ function GC_FillTypeManager:loadFromXML(xmlFile)
     return insertFillTypes;
 end
 
+--[[
 function GC_FillTypeManager:readFillTypesFromXML(xmlFile, xmlKey)
     local fillTypes = {};
     local i = 0;
@@ -120,8 +122,10 @@ function GC_FillTypeManager:readFillTypesFromXML(xmlFile, xmlKey)
     end;
     return fillTypes;
 end
+]]--
 
 function GC_FillTypeManager:getFillTypeLangNameById(id)
+    print(id)
     if self.fillTypesById[id] ~= nil then
         return self.fillTypesById[id].langName;
     else
@@ -156,4 +160,3 @@ function GC_FillTypeManager:getFillTypeIdByName(name)
         return "Not found"
     end;
 end;
-]]--

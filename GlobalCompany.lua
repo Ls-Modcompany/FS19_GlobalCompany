@@ -267,7 +267,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "triggers/GC_LoadingTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_UnloadingTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_ShovelFillTrigger.lua");
-	--source(GlobalCompany.dir .. "triggers/GC_PalletExtendedTrigger.lua");
+	source(GlobalCompany.dir .. "triggers/GC_PalletExtendedTrigger.lua");
 
 	--|| Placeables ||--
 	source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
@@ -294,7 +294,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryProductPurchaseEvent.lua");
 
 	--|| Specializations ||--
-	--source(GlobalCompany.dir .. "specializations/PalletExtended.lua");
+	source(GlobalCompany.dir .. "specializations/PalletExtended.lua");
 	
 end;
 

@@ -33,7 +33,7 @@ GC_Greenhouse.DOORTRIGGER = 0;
 GC_Greenhouse.GREENHOUSETRIGGER = 1;
 GC_Greenhouse.PALLETEXTENDEDTRIGGER = 2;
 GC_Greenhouse.VENTILATOR = 3;
-GC_Greenhouse.SELECTEDFILLTYP = 4;
+GC_Greenhouse.SELECTFILLTYPE = 4;
 GC_Greenhouse.PLANT = 5;
 
 GC_Greenhouse.STATE_PREPERATION = 1;
@@ -133,13 +133,13 @@ function GC_Greenhouse:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 
 	local doorKey = string.format("%s.door", xmlKey);
 	if hasXMLProperty(xmlFile, doorKey) then
-		self.doorTrigger = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.rootNode, xmlFile, doorKey, GC_Greenhouse.DOORTRIGGER, true);
+		self.doorTrigger = self.triggerManager:addTrigger(GC_PlayerTrigger, self.rootNode, self, xmlFile, doorKey, GC_Greenhouse.DOORTRIGGER, true);
 		self.doorAnimationName = getXMLString(xmlFile, doorKey .. "#animationName");
 	end;
 
 	local greenhouseTriggerKey = string.format("%s.greenhouseTrigger", xmlKey);
 	if hasXMLProperty(xmlFile, greenhouseTriggerKey) then
-		self.greenhouseTrigger = self.triggerManager:loadTrigger(GC_PlayerTrigger, self.rootNode, xmlFile, greenhouseTriggerKey, GC_Greenhouse.GREENHOUSETRIGGER);
+		self.greenhouseTrigger = self.triggerManager:addTrigger(GC_PlayerTrigger, self.rootNode, self, xmlFile, greenhouseTriggerKey, GC_Greenhouse.GREENHOUSETRIGGER);
 	end;
 	
 	self.activableObjects = {};
@@ -148,10 +148,10 @@ function GC_Greenhouse:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	self.activableObjects[GC_Greenhouse.VENTILATOR]:loadFromXML(xmlFile, greenhouseTriggerKey .. ".ventilator");
 	self.activableObjects[GC_Greenhouse.VENTILATOR].canActivable = function (g) return true; end
 	
-	self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP] = g_company.activableObject:new(self.isServer, self.isClient);
-	self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP]:load(self, GC_Greenhouse.SELECTEDFILLTYP);
-	self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP]:loadFromXML(xmlFile, greenhouseTriggerKey .. ".selectFilltype");
-	self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP].canActivable = function (g) return g.state == GC_Greenhouse.STATE_PREPERATION or g.state == GC_Greenhouse.STATE_CANPLANT end
+	self.activableObjects[GC_Greenhouse.SELECTFILLTYPE] = g_company.activableObject:new(self.isServer, self.isClient);
+	self.activableObjects[GC_Greenhouse.SELECTFILLTYPE]:load(self, GC_Greenhouse.SELECTFILLTYPE);
+	self.activableObjects[GC_Greenhouse.SELECTFILLTYPE]:loadFromXML(xmlFile, greenhouseTriggerKey .. ".selectFilltype");
+	self.activableObjects[GC_Greenhouse.SELECTFILLTYPE].canActivable = function (g) return g.state == GC_Greenhouse.STATE_PREPERATION or g.state == GC_Greenhouse.STATE_CANPLANT end
 	
 	self.activableObjects[GC_Greenhouse.PLANT] = g_company.activableObject:new(self.isServer, self.isClient);
 	self.activableObjects[GC_Greenhouse.PLANT]:load(self, GC_Greenhouse.PLANT);
@@ -171,27 +171,45 @@ function GC_Greenhouse:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		local fillType = {};
 		fillType.fillType = g_company.fillTypeManager:getFillTypeByName(name);
 		fillType.needSeed = Utils.getNoNil(getXMLInt(xmlFile, key .. "#needSeed"), 50);
+		fillType.growHour = Utils.getNoNil(getXMLInt(xmlFile, key .. "#growHour"), 72);
+		fillType.harvestHour = Utils.getNoNil(getXMLInt(xmlFile, key .. "#harvestHour"), 72);
+
+		fillType.growObject = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, key .. "#tomatos"), self.i3dMappings);
+		
+		local fruits = getXMLString(xmlFile, key .. "#fruits");
+		if fruits ~= nil and fruits ~= "" then
+			fillType.fruitsObject = I3DUtil.indexToObject(self.nodeId, fruits, self.i3dMappings);
+		end;
+		local dead = getXMLString(xmlFile, key .. "#dead");
+		if fruits ~= nil and fruits ~= "" then
+			fillType.deadObject = I3DUtil.indexToObject(self.nodeId, dead, self.i3dMappings);
+		end;
+
+		fillType.movers = GC_Movers:new(self.isServer, self.isClient);
+		fillType.movers:load(self.nodeId , self, xmlFile, key, self.baseDirectory, fillType.growHour);
 
         table.insert(self.fillTypes, fillType);
         i = i + 1;
     end;
 
 	self.activeFillType = self.fillTypes[1].fillType.id;
-	self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP]:setActivateText(string.format(g_company.languageManager:getText("GlobalCompanyPlaceable_Greenhouses_selectSeed"), g_company.fillTypeManager:getFillTypeLangNameById(self.activeFillType)));
+	self.activableObjects[GC_Greenhouse.SELECTFILLTYPE]:setActivateText(string.format(g_company.languageManager:getText("GlobalCompanyPlaceable_Greenhouses_selectSeed"), g_company.fillTypeManager:getFillTypeLangNameById(self.activeFillType)));
 	
 	local palletExtendedTriggerKey = string.format("%s.palletExtendedTrigger", xmlKey);
 	if hasXMLProperty(xmlFile, palletExtendedTriggerKey) then
-		self.palletExtendedTrigger = self.triggerManager:loadTrigger(GC_PalletExtendedTrigger, self.rootNode, xmlFile, palletExtendedTriggerKey, GC_Greenhouse.PALLETEXTENDEDTRIGGER);
-	end;
-	
+		self.palletExtendedTrigger = self.triggerManager:addTrigger(GC_PalletExtendedTrigger, self.rootNode, self, xmlFile, palletExtendedTriggerKey, GC_Greenhouse.PALLETEXTENDEDTRIGGER);
+	end;	
 
 	local waterTriggerKey = string.format("%s.watertrigger", xmlKey);
 	if hasXMLProperty(xmlFile, palletExtendedTriggerKey) then
-		self.waterTrigger = self.triggerManager:loadTrigger(GC_UnloadingTrigger, self.rootNode, xmlFile, waterTriggerKey);
+		self.waterTrigger = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.rootNode, self, xmlFile, waterTriggerKey);
 	end;
 	
 	self.waterFillLevel = 0;
 	self.waterCapacity = getXMLFloat(xmlFile, waterTriggerKey .. "#capacity");
+
+	self.growTime = 0;
+	self.harvestHour = 0;
 	
 	self.currentTemperature = 15;
 	self.targetTemperature = 15;
@@ -222,7 +240,7 @@ function GC_Greenhouse:delete()
 	end;
 
 	if self.triggerManager ~= nil then
-		self.triggerManager:unregisterAllTriggers();
+		self.triggerManager:removeAllTriggers();
 	end;
 
 	if self.animationManager ~= nil then
@@ -242,6 +260,11 @@ function GC_Greenhouse:readStream(streamId, connection)
 	GC_Greenhouse:superClass().readStream(self, streamId, connection);
 
 	if connection:getIsServer() then
+		if self.animationManager ~= nil then
+			local animationManagerId = NetworkUtil.readNodeObjectId(streamId);
+            self.animationManager:readStream(streamId, connection);
+            g_client:finishRegisterObject(self.animationManager, animationManagerId);
+		end;
 		
 		
 	end;
@@ -251,33 +274,17 @@ function GC_Greenhouse:writeStream(streamId, connection)
 	GC_Greenhouse:superClass().writeStream(self, streamId, connection);
 
 	if not connection:getIsServer() then
-		
-		
-	end;
-end;
-
-function GC_Greenhouse:readUpdateStream(streamId, timestamp, connection)
-	GC_Greenhouse:superClass().readUpdateStream(self, streamId, timestamp, connection);
-
-	if connection:getIsServer() then
-		
-		
-	end;
-end;
-
-function GC_Greenhouse:writeUpdateStream(streamId, connection, dirtyMask)
-	GC_Greenhouse:superClass().writeUpdateStream(self, streamId, connection, dirtyMask);
-
-	if not connection:getIsServer() then
+		if self.animationManager ~= nil then
+			NetworkUtil.writeNodeObjectId(streamId, NetworkUtil.getObjectId(self.animationManager));
+            self.animationManager:writeStream(streamId, connection);
+            g_server:registerObjectInStream(connection, self.animationManager);
+		end;
 		
 		
 	end;
 end;
 
 function GC_Greenhouse:loadFromXMLFile(xmlFile, key)
-	
-	
-	
 	
 
 	return true;
@@ -292,11 +299,10 @@ function GC_Greenhouse:update(dt)
 
 end;
 
-
 function GC_Greenhouse:onActivableObject(ref, isOn)
 	if GC_Greenhouse.VENTILATOR == ref then
 		self.state_ventilator = not self.state_ventilator;
-	elseif GC_Greenhouse.SELECTEDFILLTYP == ref then		
+	elseif GC_Greenhouse.SELECTFILLTYPE == ref then		
 		local takeNext = false;
 		for key, fillType in pairs(self.fillTypes) do
 			if takeNext then
@@ -310,7 +316,7 @@ function GC_Greenhouse:onActivableObject(ref, isOn)
 		if takeNext then
 			self.activeFillType = self.fillTypes[1].fillType.id;
 		end;
-		self.activableObjects[GC_Greenhouse.SELECTEDFILLTYP]:setActivateText(string.format(g_company.languageManager:getText("GlobalCompanyPlaceable_Greenhouses_selectSeed"), g_company.fillTypeManager:getFillTypeLangNameById(self.activeFillType)));
+		self.activableObjects[GC_Greenhouse.SELECTFILLTYPE]:setActivateText(string.format(g_company.languageManager:getText("GlobalCompanyPlaceable_Greenhouses_selectSeed"), g_company.fillTypeManager:getFillTypeLangNameById(self.activeFillType)));
 		self:controlState();
 	elseif GC_Greenhouse.PLANT == ref then	
 		self:startGrow();
@@ -417,6 +423,20 @@ function GC_Greenhouse:hourChanged()
 	if self.ventilatorRunningMinutes > 0 then
 		g_currentMission:addMoney(self.ventilatorRunningMinutes * self.ventilatorCostPerMinute * -1, self:getOwnerFarmId(), MoneyType.OTHER, true, false);
 		self.ventilatorRunningMinutes = 0;
+		
+		if self.growTime > 0 then
+			self.growTime = self.growTime - 1;
+			if self.growTime == 0 then
+				self:stopGrow();
+			end;
+		end;
+
+		if self.harvestHour > 0 then
+			self.harvestHour = self.harvestHour - 1;
+			if self.harvestHour == 0 then
+				self:stopHarvest();
+			end;
+		end;
 	end;
 end;
 
@@ -431,14 +451,10 @@ end
 function GC_Greenhouse:controlState()
 	if self.isServer then
 		if self.state == GC_Greenhouse.STATE_PREPERATION then
-			print(self.palletExtendedTrigger:getFullFillLevelByFillType(self.activeFillType))
-			print(self:getNeedSeedFromActiveFillType())
 			if self.waterFillLevel > 0 and self.palletExtendedTrigger:getFullFillLevelByFillType(self.activeFillType) >= self:getNeedSeedFromActiveFillType() then
 				self:setState(GC_Greenhouse.STATE_CANPLANT);
 			end;
 		elseif self.state == GC_Greenhouse.STATE_CANPLANT then
-			print(self.palletExtendedTrigger:getFullFillLevelByFillType(self.activeFillType))
-			print(self:getNeedSeedFromActiveFillType())
 			if self.palletExtendedTrigger:getFullFillLevelByFillType(self.activeFillType) < self:getNeedSeedFromActiveFillType() then
 				self:setState(GC_Greenhouse.STATE_PREPERATION);
 			end;
@@ -469,15 +485,41 @@ end
 function GC_Greenhouse:startGrow(noEventSend)
 	-- event
 	if self.isServer then
-		local delta = self:getNeedSeedFromActiveFillType();
+		local fillType = self:getActiveFillType();
+		local delta = fillType.needSeed;
 		while delta > 0 do
 			local _,object = next(self.palletExtendedTrigger:getObjectsByFillType(self.activeFillType));
 			local neddLevel = math.min(object:getFillLevel(), delta);
 			object:addFillLevel(neddLevel * -1);
 			delta = delta - neddLevel;
 		end;
+		self.growTime = fillType.growHour;
 	end;
 	self:setState(GC_Greenhouse.STATE_GROW);
+end
+
+function GC_Greenhouse:stopGrow(noEventSend)
+	-- event
+	if self.isServer then
+
+	end;
+	self:setState(GC_Greenhouse.STATE_HARVEST);
+end
+
+function GC_Greenhouse:stopHarvest(noEventSend)
+	-- event
+	if self.isServer then
+
+	end;
+	self:setState(GC_Greenhouse.STATE_DEATH);
+end
+
+function GC_Greenhouse:getActiveFillType()
+	for _, fillType in pairs(self.fillTypes) do
+		if fillType.fillType.id == self.activeFillType then
+			return fillType.needSeed;
+		end;
+	end;
 end
 
 function GC_Greenhouse:getNeedSeedFromActiveFillType()
