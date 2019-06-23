@@ -560,8 +560,12 @@ function Baler:update(dt)
 			else --if self.animationManager:getAnimationTime("baleAnimation") == 0 then
 				self:onTurnOffBaler();
 			end;
-		elseif not self.hasStack and self.fillLevelBunker >= 4000 and self.mainBaleTrigger:getTriggerEmpty() then
-			self:onTurnOnBaler();			
+		elseif self.fillLevelBunker >= 4000 then
+			if self:canUnloadBale() then
+				self:onTurnOnBaler();			
+			elseif self.moverBaleTrigger:getTriggerEmpty() then
+				self.needMove = true;
+			end;
 		end;
 		if self.needMove then			
 			local canMove = self.state_balerMove == Baler.STATE_OFF and self.moverBaleTrigger:getTriggerEmpty();		
