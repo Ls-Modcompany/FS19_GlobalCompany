@@ -31,10 +31,11 @@ GC_Greenhouse.debugIndex = g_company.debug:registerScriptName("GC_Greenhouse");
 
 GC_Greenhouse.DOORTRIGGER = 0;
 GC_Greenhouse.GREENHOUSETRIGGER = 1;
-GC_Greenhouse.PALLETEXTENDEDTRIGGER = 2;
+GC_Greenhouse.PALLETEXTENDEDUNLOADTRIGGER = 2;
 GC_Greenhouse.VENTILATOR = 3;
 GC_Greenhouse.SELECTFILLTYPE = 4;
 GC_Greenhouse.PLANT = 5;
+GC_Greenhouse.PALLETEXTENDEDLOADTRIGGER = 6;
 
 GC_Greenhouse.STATE_PREPERATION = 1;
 GC_Greenhouse.STATE_CANPLANT = 2;
@@ -203,13 +204,18 @@ function GC_Greenhouse:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	self.activeFillType = self.fillTypes[1].fillType.id;
 	self.activableObjects[GC_Greenhouse.SELECTFILLTYPE]:setActivateText(string.format(g_company.languageManager:getText("GlobalCompanyPlaceable_Greenhouses_selectSeed"), g_company.fillTypeManager:getFillTypeLangNameById(self.activeFillType)));
 	
-	local palletExtendedTriggerKey = string.format("%s.palletExtendedTrigger", xmlKey);
-	if hasXMLProperty(xmlFile, palletExtendedTriggerKey) then
-		self.palletExtendedTrigger = self.triggerManager:addTrigger(GC_PalletExtendedTrigger, self.rootNode, self, xmlFile, palletExtendedTriggerKey, GC_Greenhouse.PALLETEXTENDEDTRIGGER);
+	local palletExtendedUnloadTriggerKey = string.format("%s.palletExtendedUnloadTrigger", xmlKey);
+	if hasXMLProperty(xmlFile, palletExtendedUnloadTriggerKey) then
+		self.PALLETEXTENDEDUNLOADTRIGGER = self.triggerManager:addTrigger(GC_PALLETEXTENDEDUNLOADTRIGGER, self.rootNode, self, xmlFile, palletExtendedUnloadTriggerKey, GC_Greenhouse.PALLETEXTENDEDUNLOADTRIGGER);
+	end;	
+
+	local palletExtendedLoadTriggerKey = string.format("%s.palletExtendedLoadTrigger", xmlKey);
+	if hasXMLProperty(xmlFile, palletExtendedLoadTriggerKey) then
+		self.PALLETEXTENDEDUNLOADTRIGGER = self.triggerManager:addTrigger(GC_PALLETEXTENDEDUNLOADTRIGGER, self.rootNode, self, xmlFile, palletExtendedLoadTriggerKey, GC_Greenhouse.PALLETEXTENDEDLOADTRIGGER);
 	end;	
 
 	local waterTriggerKey = string.format("%s.watertrigger", xmlKey);
-	if hasXMLProperty(xmlFile, palletExtendedTriggerKey) then
+	if hasXMLProperty(xmlFile, waterTriggerKey) then
 		self.waterTrigger = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.rootNode, self, xmlFile, waterTriggerKey);
 	end;
 	
@@ -367,14 +373,14 @@ function GC_Greenhouse:playerTriggerOnLeave(ref)
 	end;
 end;
 
-function GC_Greenhouse:onEnterPalletExtendedTrigger(ref)
-	if ref == GC_Greenhouse.PALLETEXTENDEDTRIGGER then
+function GC_Greenhouse:onEnterPALLETEXTENDEDUNLOADTRIGGER(ref)
+	if ref == GC_Greenhouse.PALLETEXTENDEDUNLOADTRIGGER then
 		self:controlState();
 	end;
 end;
 
-function GC_Greenhouse:onLeavePalletExtendedTrigger(ref)
-	if ref == GC_Greenhouse.PALLETEXTENDEDTRIGGER then
+function GC_Greenhouse:onLeavePALLETEXTENDEDUNLOADTRIGGER(ref)
+	if ref == GC_Greenhouse.PALLETEXTENDEDUNLOADTRIGGER then
 		self:controlState();
 	end;
 end;
@@ -498,11 +504,11 @@ end
 function GC_Greenhouse:controlState()
 	if self.isServer then
 		if self.state == GC_Greenhouse.STATE_PREPERATION then
-			if self.waterFillLevel > 0 and self.palletExtendedTrigger:getFullFillLevelByFillType(self.activeFillType) >= self:getNeedSeedFromActiveFillType() then
+			if self.waterFillLevel > 0 and self.PALLETEXTENDEDUNLOADTRIGGER:getFullFillLevelByFillType(self.activeFillType) >= self:getNeedSeedFromActiveFillType() then
 				self:setState(GC_Greenhouse.STATE_CANPLANT);
 			end;
 		elseif self.state == GC_Greenhouse.STATE_CANPLANT then
-			if self.palletExtendedTrigger:getFullFillLevelByFillType(self.activeFillType) < self:getNeedSeedFromActiveFillType() then
+			if self.PALLETEXTENDEDUNLOADTRIGGER:getFullFillLevelByFillType(self.activeFillType) < self:getNeedSeedFromActiveFillType() then
 				self:setState(GC_Greenhouse.STATE_PREPERATION);
 			end;
 		elseif self.state == GC_Greenhouse.STATE_GROW then
@@ -535,7 +541,7 @@ function GC_Greenhouse:startGrow(noEventSend)
 	if self.isServer then
 		local delta = fillType.needSeed;
 		while delta > 0 do
-			local _,object = next(self.palletExtendedTrigger:getObjectsByFillType(self.activeFillType));
+			local _,object = next(self.PALLETEXTENDEDUNLOADTRIGGER:getObjectsByFillType(self.activeFillType));
 			local neddLevel = math.min(object:getFillLevel(), delta);
 			object:addFillLevel(neddLevel * -1);
 			delta = delta - neddLevel;
