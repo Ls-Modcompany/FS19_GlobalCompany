@@ -171,22 +171,30 @@ function GC_Greenhouse:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		local fillType = {};
 		fillType.fillType = g_company.fillTypeManager:getFillTypeByName(name);
 		fillType.needSeed = Utils.getNoNil(getXMLInt(xmlFile, key .. "#needSeed"), 50);
-		fillType.growHour = Utils.getNoNil(getXMLInt(xmlFile, key .. "#growHour"), 72);
-		fillType.harvestHour = Utils.getNoNil(getXMLInt(xmlFile, key .. "#harvestHour"), 72);
+		fillType.growTime = Utils.getNoNil(getXMLInt(xmlFile, key .. "#growHour"), 72) * 60;
+		fillType.growTemperature = Utils.getNoNil(getXMLFloat(xmlFile, key .. "#growTemperature"), 25);
+		fillType.harvestTime = Utils.getNoNil(getXMLInt(xmlFile, key .. "#harvestHour"), 72) * 60;
 
-		fillType.growObject = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, key .. "#tomatos"), self.i3dMappings);
+		local plant = getXMLString(xmlFile, key .. "#plant");
+		if plant ~= nil and plant ~= "" then
+			fillType.growObject = I3DUtil.indexToObject(self.rootNode, plant, self.i3dMappings);
+			setVisibility(fillType.growObject, false);
+		end;
 		
 		local fruits = getXMLString(xmlFile, key .. "#fruits");
 		if fruits ~= nil and fruits ~= "" then
-			fillType.fruitsObject = I3DUtil.indexToObject(self.nodeId, fruits, self.i3dMappings);
+			fillType.fruitsObject = I3DUtil.indexToObject(self.rootNode, fruits, self.i3dMappings);
+			setVisibility(fillType.fruitsObject, false);
 		end;
+
 		local dead = getXMLString(xmlFile, key .. "#dead");
-		if fruits ~= nil and fruits ~= "" then
-			fillType.deadObject = I3DUtil.indexToObject(self.nodeId, dead, self.i3dMappings);
+		if dead ~= nil and dead ~= "" then
+			fillType.deadObject = I3DUtil.indexToObject(self.rootNode, dead, self.i3dMappings);
+			setVisibility(fillType.deadObject, false);
 		end;
 
 		fillType.movers = GC_Movers:new(self.isServer, self.isClient);
-		fillType.movers:load(self.nodeId , self, xmlFile, key, self.baseDirectory, fillType.growHour);
+		fillType.movers:load(self.rootNode, self, xmlFile, key, self.baseDirectory, fillType.growTime, true);
 
         table.insert(self.fillTypes, fillType);
         i = i + 1;
@@ -209,7 +217,9 @@ function GC_Greenhouse:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	self.waterCapacity = getXMLFloat(xmlFile, waterTriggerKey .. "#capacity");
 
 	self.growTime = 0;
-	self.harvestHour = 0;
+	self.growTimeTarget = 0;
+	self.harvestTime = 0;
+	self.harvestTimeTarget = 0;
 	
 	self.currentTemperature = 15;
 	self.targetTemperature = 15;
@@ -406,6 +416,40 @@ function GC_Greenhouse:minuteChanged()
 		if self.state_ventilator then
 			self.ventilatorRunningMinutes = self.ventilatorRunningMinutes + 1;
 		end;
+
+		local fillType = self:getActiveFillType();
+		if self.growTimeTarget > 0 then
+			local factor, shouldDead = self:getTemperatureFactorGrow(fillType);
+			if shouldDead then
+				self.harvestTime = 0;
+				self.harvestTimeTarget = 0;
+				self:stopHarvest();
+			else
+				self.growTime = self.growTime + factor;
+				fillType.movers:updateMovers(self.growTime);
+				if self.growTime >= self.growTimeTarget then
+					self.growTime = 0;
+					self.growTimeTarget = 0;
+					self:stopGrow();
+				end;
+			end;
+		end;
+
+		if self.harvestTimeTarget > 0 then
+			local factor, shouldDead = self:getTemperatureFactorGrow(fillType);
+			if shouldDead then
+				self.harvestTime = 0;
+				self.harvestTimeTarget = 0;
+				self:stopHarvest();
+			else
+				self.harvestTime = self.harvestTime + factor;
+				if self.harvestTime >= self.harvestTimeTarget then
+					self.harvestTime = 0;
+					self.harvestTimeTarget = 0;
+					self:stopHarvest();
+				end;
+			end;
+		end;
 	end;
 end
 
@@ -419,24 +463,27 @@ function GC_Greenhouse:getVentilatorTempChange()
 	end;
 end
 
+function GC_Greenhouse:getTemperatureFactorGrow(fillType)	
+	local diff = self.currentTemperature - fillType.growTemperature;
+	local f = 0;
+	if math.abs(diff) > 4 then
+		f = 0.2;
+	elseif math.abs(diff) > 7 then
+		f = 0.5;
+	end;
+	if diff >= 0 then
+		return 1 + f;
+	else
+		return 1 - f;
+	end;
+end
+
 function GC_Greenhouse:hourChanged()
 	if self.ventilatorRunningMinutes > 0 then
 		g_currentMission:addMoney(self.ventilatorRunningMinutes * self.ventilatorCostPerMinute * -1, self:getOwnerFarmId(), MoneyType.OTHER, true, false);
 		self.ventilatorRunningMinutes = 0;
 		
-		if self.growTime > 0 then
-			self.growTime = self.growTime - 1;
-			if self.growTime == 0 then
-				self:stopGrow();
-			end;
-		end;
-
-		if self.harvestHour > 0 then
-			self.harvestHour = self.harvestHour - 1;
-			if self.harvestHour == 0 then
-				self:stopHarvest();
-			end;
-		end;
+		
 	end;
 end;
 
@@ -484,8 +531,8 @@ end
 
 function GC_Greenhouse:startGrow(noEventSend)
 	-- event
+	local fillType = self:getActiveFillType();
 	if self.isServer then
-		local fillType = self:getActiveFillType();
 		local delta = fillType.needSeed;
 		while delta > 0 do
 			local _,object = next(self.palletExtendedTrigger:getObjectsByFillType(self.activeFillType));
@@ -493,17 +540,27 @@ function GC_Greenhouse:startGrow(noEventSend)
 			object:addFillLevel(neddLevel * -1);
 			delta = delta - neddLevel;
 		end;
-		self.growTime = fillType.growHour;
+		self.growTimeTarget = fillType.growTime;		
+		setVisibility(fillType.growObject, true);
 	end;
-	self:setState(GC_Greenhouse.STATE_GROW);
+	self:setState(GC_Greenhouse.STATE_GROW, true);
 end
 
 function GC_Greenhouse:stopGrow(noEventSend)
 	-- event
+	local fillType = self:getActiveFillType();
 	if self.isServer then
-
+		self.harvestTimeTarget = fillType.harvestTime;
 	end;
-	self:setState(GC_Greenhouse.STATE_HARVEST);
+
+	if g_dedicatedServerInfo == nil then
+		if fillType.fruitsObject ~= nil then
+			setVisibility(fillType.growObject, false);
+			setVisibility(fillType.fruitsObject, true);
+		end;
+	end;
+
+	self:setState(GC_Greenhouse.STATE_HARVEST, true);
 end
 
 function GC_Greenhouse:stopHarvest(noEventSend)
@@ -511,13 +568,26 @@ function GC_Greenhouse:stopHarvest(noEventSend)
 	if self.isServer then
 
 	end;
-	self:setState(GC_Greenhouse.STATE_DEATH);
+
+	if g_dedicatedServerInfo == nil then
+		local fillType = self:getActiveFillType();
+
+		if fillType.fruitsObject ~= nil then
+			setVisibility(fillType.fruitsObject, false);
+		end;
+		if fillType.deadObject ~= nil then
+			setVisibility(fillType.growObject, false);
+			setVisibility(fillType.deadObject, true);
+		end;
+	end;
+
+	self:setState(GC_Greenhouse.STATE_DEATH, true);
 end
 
 function GC_Greenhouse:getActiveFillType()
 	for _, fillType in pairs(self.fillTypes) do
 		if fillType.fillType.id == self.activeFillType then
-			return fillType.needSeed;
+			return fillType;
 		end;
 	end;
 end
