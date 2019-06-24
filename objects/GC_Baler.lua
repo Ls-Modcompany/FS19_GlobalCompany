@@ -562,7 +562,8 @@ function Baler:update(dt)
 			end;
 		elseif self.fillLevelBunker >= 4000 then
 			if self:canUnloadBale() then
-				self:onTurnOnBaler();			
+				self:onTurnOnBaler();	
+				self:onTurnOnStacker();
 			elseif self.moverBaleTrigger:getTriggerEmpty() then
 				self.needMove = true;
 			end;
