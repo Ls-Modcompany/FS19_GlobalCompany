@@ -228,7 +228,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "GlobalCompanyGui.lua");
 
 	--|| Objects ||--
-	source(GlobalCompany.dir .. "objects/GC_Clock.lua");
+	-- source(GlobalCompany.dir .. "objects/GC_Clock.lua");
 	source(GlobalCompany.dir .. "objects/GC_Baler.lua");
 	source(GlobalCompany.dir .. "objects/GC_Sounds.lua");
 	source(GlobalCompany.dir .. "objects/GC_Movers.lua");

@@ -60,11 +60,12 @@ function GC_ProductionFactoryStateEvent:writeStream(streamId, connection)
 end
 
 function GC_ProductionFactoryStateEvent:run(connection)
-	self.factory:setFactoryState(self.lineId, self.state, self.userStopped, true)
-
 	if not connection:getIsServer() then
-		g_server:broadcastEvent(GC_ProductionFactoryStateEvent:new(self.factory, self.lineId, self.state, self.userStopped), nil, connection, self.factory)
+		g_server:broadcastEvent(self, false, connection, self.factory)
+		-- g_server:broadcastEvent(GC_ProductionFactoryStateEvent:new(self.factory, self.lineId, self.state, self.userStopped), nil, connection, self.factory)
 	end
+
+	self.factory:setFactoryState(self.lineId, self.state, self.userStopped, true)
 end
 
 function GC_ProductionFactoryStateEvent.sendEvent(factory, lineId, state, userStopped, noEventSend)

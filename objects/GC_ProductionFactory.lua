@@ -164,7 +164,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 	}
 
 	self.disableAllOutputGUI = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. ".operation#disableAllOutputGUI"), false)
-
+	self.showInGlobalGUI = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. ".operation#showInGlobalGUI"), false) -- Possible future use.
 	self.updateDelay = math.max(Utils.getNoNil(getXMLInt(xmlFile, xmlKey .. ".operation#updateDelayMinutes"), 10), 1)
 	self.updateCounter = self.updateDelay
 
@@ -2116,8 +2116,8 @@ function GC_ProductionFactory:setOwnerFarmId(ownerFarmId, noEventSend)
 		self.currentFarmOwnerId = ownerFarmId
 	else
 		for lineId, productLine in pairs (self.productLines) do
-			self:setFactoryState(lineId, false, false)
-			
+			self:setFactoryState(lineId, false, false, true)
+
 			if self.isServer and self.currentFarmOwnerId ~= nil then
 				if productLine.outputs ~= nil then
 					for _, output in pairs (productLine.outputs) do
