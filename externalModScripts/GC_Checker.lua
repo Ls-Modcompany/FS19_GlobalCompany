@@ -1,12 +1,12 @@
 --
 -- GC_Checker
 --
--- @Interface: --
--- @Author: LS-Modcompany
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany / GtX
 -- @Date: 24.04.2019
 -- @Version: 1.1.0.0
 --
--- @Support: LS-Modcompany
+-- @Support: https://ls-modcompany.com
 --
 -- Changelog:
 --
