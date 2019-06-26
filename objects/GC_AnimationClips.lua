@@ -1,12 +1,12 @@
 --
 -- GlobalCompany - Objects - GC_AnimationClips
 --
--- @Interface: --
--- @Author: LS-Modcompany / GtX
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany
 -- @Date: 03.04.2019
 -- @Version: 1.1.1.0
 --
--- @Support: LS-Modcompany
+-- @Support: https://ls-modcompany.com
 --
 -- Changelog:
 --
@@ -16,7 +16,7 @@
 --		- add interval option
 --
 -- 	v1.0.0.0 (22.04.2018):
--- 		- initial fs17 (GtX)
+-- 		- initial fs17
 --
 -- Notes:
 --
@@ -51,18 +51,11 @@ function GC_AnimationClips:new(isServer, isClient, customMt)
 end;
 
 function GC_AnimationClips:load(nodeId, target, xmlFile, xmlKey)
-	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
-		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s";
-		g_company.debug:logWrite(GC_AnimationClips.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil);
-		return false;
-	end;
-
 	self.rootNode = nodeId;
 	self.target = target;
 
 	self.debugData = g_company.debug:getDebugData(GC_AnimationClips.debugIndex, target);
 
-	local returnValue = false;
 	if self.isClient then
 		local i = 0;
 		while true do
@@ -133,14 +126,12 @@ function GC_AnimationClips:load(nodeId, target, xmlFile, xmlKey)
 
 							if self.intervalAnimationClips == nil then
 								self.intervalAnimationClips = {};
-								returnValue = true;
 							end;
 
 							table.insert(self.intervalAnimationClips, entry);
 						else
 							if self.standardAnimationClips == nil then
 								self.standardAnimationClips = {};
-								returnValue = true;
 							end;
 
 							table.insert(self.standardAnimationClips, entry);
@@ -159,12 +150,9 @@ function GC_AnimationClips:load(nodeId, target, xmlFile, xmlKey)
 		end;
 
 		self:setAnimationClipsState(false, true);
-	else
-		g_company.debug:writeDev(self.debugData, "Failed to load 'CLIENT ONLY' script on server!");
-		returnValue = true; -- Send true so we can also print 'function' warnings if called by server.
 	end;
 
-	return returnValue;
+	return true;
 end;
 
 function GC_AnimationClips:delete()
@@ -241,8 +229,6 @@ function GC_AnimationClips:setAnimationClipsState(state, forceState)
 				self:raiseUpdate();
 			end;
 		end;
-	else
-		g_company.debug:writeDev(self.debugData, "'setAnimationClipsState' is a client only function!");
 	end;
 end;
 
@@ -292,8 +278,3 @@ end;
 function GC_AnimationClips:getAnimationClipActive()
 	return self.animationClipsActive;
 end;
-
-
-
-
-

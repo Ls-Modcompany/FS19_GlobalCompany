@@ -1,23 +1,21 @@
 --
 -- GlobalCompany - Objects - GC_Sounds
 --
--- @Interface: --
--- @Author: LS-Modcompany / GtX
--- @Date: 06.02.2019
--- @Version: 1.1.1.0
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany
+-- @Date: 28.01.2019
+-- @Version: 1.1.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
 --
--- 	v1.1.1.0 (06.02.2019):
--- 		- change to 'raiseUpdate' Updateable instead of using 'Object' class as this is a client side script only.
 --
 -- 	v1.1.0.0 (28.01.2019):
 -- 		- convert to fs19
 --
 -- 	v1.0.0.0 (26.05.2018):
--- 		- initial fs17 (GtX)
+-- 		- initial fs17
 --
 -- Notes:
 --		- Client Side Only.
@@ -51,20 +49,13 @@ function GC_Sounds:new(isServer, isClient, customMt)
 end;
 
 function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
-	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
-		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s";
-		g_company.debug:logWrite(GC_Sounds.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil);
-		return false;
-	end;
-
-	self.debugData = g_company.debug:getDebugData(GC_Sounds.debugIndex, target);
-
 	self.rootNode = nodeId;
 	self.target = target;
 
+	self.debugData = g_company.debug:getDebugData(GC_Sounds.debugIndex, target);
+
 	self.baseDirectory = GlobalCompanyUtils.getParentBaseDirectory(target, baseDirectory);
 
-	local returnValue = false;
 	if self.isClient then
 		if hasXMLProperty(xmlFile, xmlKey .. ".sounds") then
 			local i = 0;
@@ -110,14 +101,12 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
 
 						if self.intervalSounds == nil then
 							self.intervalSounds = {};
-							returnValue = true;
 						end;
 
 						table.insert(self.intervalSounds, sound);						
 					else
 						if self.standardSounds == nil then
 							self.standardSounds = {};
-							returnValue = true;
 						end;
 
 						table.insert(self.standardSounds, sound);
@@ -136,20 +125,15 @@ function GC_Sounds:load(nodeId, target, xmlFile, xmlKey, baseDirectory)
 			self.operateSamples.start = g_soundManager:loadSampleFromXML(xmlFile, key, "start", self.baseDirectory, self.rootNode, 1, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
 			self.operateSamples.run = g_soundManager:loadSampleFromXML(xmlFile, key, "run", self.baseDirectory, self.rootNode, 0, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
 			self.operateSamples.stop = g_soundManager:loadSampleFromXML(xmlFile, key, "stop", self.baseDirectory, self.rootNode, 1, AudioGroup.ENVIRONMENT, self.target.i3dMappings, self);
-
-			returnValue = true;
 		end;
 
 		if self.intervalSounds ~= nil then
 			self.numIntervalSounds = #self.intervalSounds;
 			g_company.addRaisedUpdateable(self);
 		end;
-	else
-		g_company.debug:writeDev(self.debugData, "Failed to load 'CLIENT ONLY' script on server!");
-		returnValue = true; -- Send true so we can also print 'function' warnings if called by server.
 	end;
 
-	return returnValue;
+	return true;
 end;
 
 function GC_Sounds:delete()
@@ -280,8 +264,6 @@ function GC_Sounds:setSoundsState(state, forceState)
 				self:raiseUpdate();
 			end;
 		end;
-	else
-		g_company.debug:writeDev(self.debugData, "'setSoundsState' is a client only function!");
 	end;
 end;
 

@@ -1,8 +1,8 @@
 --
 -- GlobalCompany - Triggers - GC_DynamicHeap
 --
--- @Interface: --
--- @Author: LS-Modcompany / kevink98 / GtX
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany
 -- @Date: 14.01.2019
 -- @Version: 1.1.0.0
 --
@@ -10,8 +10,7 @@
 --
 -- Changelog:
 -- 	v1.1.0.0 (14.01.2019):
--- 		- convert to fs19 (GtX)
---		- New functions and XML support (GtX / kevink98)
+-- 		- convert to fs19
 --
 -- 	v1.0.0.0 (19.05.2018):
 -- 		- initial fs17 (kevink98)
@@ -28,7 +27,7 @@ GC_DynamicHeap = {}
 local GC_DynamicHeap_mt = Class(GC_DynamicHeap)
 InitObjectClass(GC_DynamicHeap, "GC_DynamicHeap")
 
-GC_DynamicHeap.debugIndex = g_company.debug:registerScriptName("DynamicHeap")
+GC_DynamicHeap.debugIndex = g_company.debug:registerScriptName("GC_DynamicHeap")
 
 g_company.dynamicHeap = GC_DynamicHeap
 
@@ -51,19 +50,12 @@ function GC_DynamicHeap:new(isServer, isClient, customMt)
 	return self
 end
 
-function GC_DynamicHeap:load(nodeId, target, xmlFile, xmlKey, fillTypeName, fixedFillTypes, isFixedFillTypeArea)
-	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
-		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s"
-		g_company.debug:logWrite(GC_DynamicHeap.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil)
-		return false
-	end
-
-	self.debugData = g_company.debug:getDebugData(GC_DynamicHeap.debugIndex, target)
-
+function GC_DynamicHeap:load(nodeId, target, xmlFile, xmlKey, fillTypeName, fixedFillTypes, isFixedFillTypeArea)	
 	self.rootNode = nodeId
 	self.target = target
 
-	-- Take the Parameter first if it is NOT nil.
+	self.debugData = g_company.debug:getDebugData(GC_DynamicHeap.debugIndex, target)
+
 	local userFillTypeName = getXMLString(xmlFile, xmlKey .. "#fillTypeName")
 	local fillTypeNameToUse = fillTypeName or userFillTypeName
 	self.fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillTypeNameToUse)
@@ -295,7 +287,6 @@ function GC_DynamicHeap:vehicleInteractionTriggerCallback(triggerId, otherId, on
 							self.numVehiclesInRange = self.numVehiclesInRange + 1
 
 							self:raiseUpdate()
-							--vehicle:setBunkerSiloInteractorCallback(GC_DynamicHeap.onChangedFillLevelCallback, self)
 						end
 					end
 				end
@@ -305,15 +296,8 @@ function GC_DynamicHeap:vehicleInteractionTriggerCallback(triggerId, otherId, on
 					self.numVehiclesInRange = self.numVehiclesInRange - 1
 
 					self:raiseUpdate()
-					--vehicle:setBunkerSiloInteractorCallback(nil)
 				end
 			end
 		end
 	end
 end
-
--- Removed as this is only updated when the shovel is removing!
--- function GC_DynamicHeap.onChangedFillLevelCallback(self, vehicle, fillDelta, fillTypeIndex)
-	-- local heapLevel = self:getHeapLevel()
-	-- self.target:vehicleChangedHeapLevel(heapLevel, fillTypeIndex, self.extraParamater)
--- end

@@ -1,8 +1,8 @@
 --
 -- GlobalCompany - Objects - GC_ObjectSpawner
 --
--- @Interface: --
--- @Author: LS-Modcompany / GtX 
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany 
 -- @Date: 06.03.2018
 -- @Version: 1.0.0.0
 --
@@ -43,16 +43,10 @@ function GC_ObjectSpawner:new(isServer, isClient, customMt)
 end
 
 function GC_ObjectSpawner:load(nodeId, target, xmlFile, xmlKey, keyName)
-	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
-		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s"
-		g_company.debug:logWrite(GC_ObjectSpawner.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil)
-		return false
-	end
-
-	self.debugData = g_company.debug:getDebugData(GC_ObjectSpawner.debugIndex, target)
-
 	self.rootNode = nodeId
 	self.target = target
+
+	self.debugData = g_company.debug:getDebugData(GC_ObjectSpawner.debugIndex, target)
 
 	local key = xmlKey .. Utils.getNoNil(keyName, ".objectSpawner")
 

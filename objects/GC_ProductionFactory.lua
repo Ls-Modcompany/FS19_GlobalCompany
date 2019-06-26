@@ -163,9 +163,6 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 		factoryDescription = factoryDescription,
 	}
 
-	self.showInTablet = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. ".operation#showInTablet"), false) -- FUTURE USE ??
-	self.showInGlobalGUI = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. ".operation#showInGlobalGUI"), false) -- FUTURE USE ??
-
 	self.disableAllOutputGUI = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. ".operation#disableAllOutputGUI"), false)
 
 	self.updateDelay = math.max(Utils.getNoNil(getXMLInt(xmlFile, xmlKey .. ".operation#updateDelayMinutes"), 10), 1)
@@ -809,15 +806,6 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			i = i + 1
 		end
 
-		if self.isClient then
-			if hasXMLProperty(xmlFile, xmlKey .. ".operation.clocks") then
-				local clocks = GC_Clock:new(self.isServer, self.isClient)
-				if clocks:load(self.rootNode, self, xmlFile, xmlKey .. ".operation") then
-					self.operationClocks = clocks
-				end
-			end
-		end
-
 		if #self.productLines > 1 then
 			local sharedOperatingPartsKey = xmlKey .. ".sharedOperatingParts"
 			if hasXMLProperty(xmlFile, sharedOperatingPartsKey) then
@@ -981,10 +969,6 @@ function GC_ProductionFactory:delete()
 
 		if self.sharedOperatingParts ~= nil then
 			self:deleteOperatingParts(self.sharedOperatingParts)
-		end
-
-		if self.operationClocks ~= nil then
-			self.operationClocks:delete()
 		end
 	end
 

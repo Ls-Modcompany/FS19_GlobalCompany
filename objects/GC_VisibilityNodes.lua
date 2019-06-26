@@ -1,8 +1,8 @@
 --
 -- GlobalCompany - Objects - GC_VisibilityNodes
 --
--- @Interface: --
--- @Author: LS-Modcompany / GtX / kevink98
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany
 -- @Date: 06.02.2019
 -- @Version: 1.1.0.0
 --
@@ -31,7 +31,7 @@ GC_VisibilityNodes = {};
 GC_VisibilityNodes_mt = Class(GC_VisibilityNodes);
 InitObjectClass(GC_VisibilityNodes, "GC_VisibilityNodes");
 
-GC_VisibilityNodes.debugIndex = g_company.debug:registerScriptName("VisibilityNodes");
+GC_VisibilityNodes.debugIndex = g_company.debug:registerScriptName("GC_VisibilityNodes");
 
 g_company.visibilityNodes = GC_VisibilityNodes;
 
@@ -47,33 +47,17 @@ function GC_VisibilityNodes:new(isServer, isClient, customMt)
 	return self;
 end;
 
--- Load instance.
--- @param table triggerClass = trigger class you want to load.
--- @param integer nodeId = root node.
--- @param table target = parent object.
--- @param integer xmlFile = xmlFile to use.
--- @param string xmlKey = xmlKey to use.
--- @param string baseDirectory = baseDirectory to use.
--- @param float capacities = [disableFillType = true] - capacity of parent.
--- OR
--- @param table capacities = [disableFillType = false / nil] - All fillType capacities of parent. Table structure = (key = fillTypeIndex, variable = capacity).
--- @param boolan disableFillType = If 'true' fillTypeIndexing will be ignored.
--- @return instance loaded correctly.
 function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capacities, disableFillType)
-	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil or capacities == nil then
-		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s, 'capacities' parameter = %s";
-		g_company.debug:logWrite(GC_Movers.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil, capacities ~= nil);
+	if capacities == nil then
 		return false;
 	end;
-
-	self.debugData = g_company.debug:getDebugData(GC_VisibilityNodes.debugIndex, target);
-
+	
 	self.rootNode = nodeId;
 	self.target = target;
 
+	self.debugData = g_company.debug:getDebugData(GC_VisibilityNodes.debugIndex, target);
 	self.baseDirectory = GlobalCompanyUtils.getParentBaseDirectory(target, baseDirectory);
 
-	local returnValue = false;
 	if self.isClient then
 		self.disableFillType = Utils.getNoNil(disableFillType, false);
 
@@ -174,26 +158,21 @@ function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, baseDirectory,
 
 					if self.disableFillType then
 						table.insert(self.visNodes, visNodes);
-						returnValue = true;
 					else
 						if self.visNodes[fillTypeIndex] == nil then
 							self.visNodes[fillTypeIndex] = {};
 						end;
 
 						table.insert(self.visNodes[fillTypeIndex], visNodes);
-						returnValue = true;
 					end;
 				end;
 			end;
 
 			i = i + 1;
 		end;
-	else
-		g_company.debug:writeDev(self.debugData, "Failed to load 'CLIENT ONLY' script on server!");
-		returnValue = true; -- Send true so we can also print 'function' warnings if called by server.
 	end;
 
-	return returnValue;
+	return true;
 end;
 
 function GC_VisibilityNodes:loadVisibilityNode(node, loadedNodes, hasChildCollisions, nodeType, filename, sharedI3dNode, key)
@@ -274,8 +253,6 @@ function GC_VisibilityNodes:updateNodes(fillLevel, fillTypeIndex)
 				end;
 			end;
 		end;
-	else
-		g_company.debug:writeDev(self.debugData, "'updateNodes' is a client only function!");
 	end;
 end;
 
@@ -339,8 +316,6 @@ function GC_VisibilityNodes:updateVisNodesEndLevel(value, fillTypeIndex)
 				end;
 			end;
 		end;
-	else
-		g_company.debug:writeDev(self.debugData, "'updateVisNodesEndLevel' is a client only function!");
 	end;
 end;
 

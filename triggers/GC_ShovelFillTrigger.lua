@@ -1,8 +1,8 @@
 --
 -- GlobalCompany - Triggers - GC_ShovelFillTrigger
 --
--- @Interface: --
--- @Author: LS-Modcompany / GtX
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany
 -- @Date: 12.06.2019
 -- @Version: 1.0.0.0
 --
@@ -48,16 +48,10 @@ function GC_ShovelFillTrigger:new(isServer, isClient, customMt)
 end
 
 function GC_ShovelFillTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillType)
-	if nodeId == nil or source == nil or xmlFile == nil or xmlKey == nil then
-		local text = "Loading failed! 'nodeId' parameter = %s, 'source' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s"
-		g_company.debug:logWrite(GC_ShovelFillTrigger.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, source ~= nil, xmlFile ~= nil, xmlKey ~= nil)
-		return false
-	end
-
-	self.debugData = g_company.debug:getDebugData(GC_ShovelFillTrigger.debugIndex, source)
-
 	self.rootNode = nodeId
 	self.source = source
+
+	self.debugData = g_company.debug:getDebugData(GC_ShovelFillTrigger.debugIndex, source)
 
 	if self.isServer then
 		local triggerNode = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, xmlKey .. "#node"), self.source.i3dMappings)

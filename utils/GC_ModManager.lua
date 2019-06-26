@@ -1,8 +1,8 @@
 --
 -- GlobalCompany - Utils - GC_ModManager
 --
--- @Interface: --
--- @Author: LS-Modcompany / GtX
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany
 -- @Date: 05.03.2018
 -- @Version: 1.0.0.0
 --
@@ -11,7 +11,7 @@
 -- Changelog:
 --
 --  v1.0.0.0 ():
---      - initial fs19 (GtX)
+--      - initial fs19
 --
 -- Notes:
 --

@@ -1,8 +1,8 @@
 --
 -- GlobalCompany - utils - GC_DebugUtils
 --
--- @Interface: --
--- @Author: LS-Modcompany / kevink98 / GtX
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany
 -- @Date: 27.01.2019
 -- @Version: 1.2.0.0
 --
@@ -450,6 +450,7 @@ end;
 ------------------------------------
 -- Print Debug (For Testing Only) --
 ------------------------------------
+
 function debugPrint(name, text, depth, referenceText, isExtraPrintText)
 	if isExtraPrintText == true then
 		if text ~= nil then	
@@ -492,8 +493,7 @@ function debugPrint(name, text, depth, referenceText, isExtraPrintText)
 		end;
 	end;
 end;
-getfenv(0)["gc_debugPrint"] = debugPrint; -- Maybe to make global?
 
-
-
-
+if GC_DebugUtils.setDevLevelMax then
+	getfenv(0)["gc_debugPrint"] = debugPrint;
+end

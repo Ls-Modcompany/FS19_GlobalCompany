@@ -1,7 +1,7 @@
 --
 -- GlobalCompany - Objects - GC_AnimationManager
 --
--- @Interface: --
+-- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany
 -- @Date: 02.01.2019
 -- @Version: 1.0.0.0
@@ -11,7 +11,7 @@
 -- Changelog:
 --
 -- 	v1.0.0.0 (02.01.2019):
--- 		- initial fs19 (Giants, GtX, kevink98)
+-- 		- initial fs19
 --		- Original code by 'Giants GMBH' from AnimatedVehicle.lua
 --		- https://gdn.giants-software.com/documentation_scripting_fs19.php?version=script&category=70&class=8762
 --		- Adapted for use with Global Company. All Rights Giants GMBH.
@@ -25,7 +25,7 @@
 --
 --
 -- ToDo:
---		- Save game support need testing or we remove it??!!
+--		- Save game support need testing!!
 --
 --
 
@@ -53,12 +53,6 @@ function GC_AnimationManager:new(isServer, isClient, customMt)
 end;
 
 function GC_AnimationManager:load(nodeId, target, xmlFile, xmlKey, allowLooping, baseDirectory)
-	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
-		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s";
-		g_company.debug:logWrite(GC_AnimationManager.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil);
-		return false;
-	end;
-
 	self.rootNode = nodeId;
 	self.target = target;
 

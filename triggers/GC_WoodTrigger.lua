@@ -1,8 +1,8 @@
 ﻿-- 
 -- GlobalCompany - Triggers - GC_WoodTrigger
 -- 
--- @Interface: --
--- @Author: LS-Modcompany / GtX
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany
 -- @Date: 19.12.2018
 -- @Version: 1.0.0.0
 -- 
@@ -11,7 +11,7 @@
 -- Changelog:
 --		
 -- 	v1.0.0.0 (19.12.2018):
--- 		- initial fs19 (GtX)
+-- 		- initial fs19
 -- 
 -- Notes:
 -- 		
@@ -27,7 +27,7 @@ GC_WoodTrigger = {}
 local GC_WoodTrigger_mt = Class(GC_WoodTrigger)
 InitObjectClass(GC_WoodTrigger, "GC_WoodTrigger")
 
-GC_WoodTrigger.debugIndex = g_company.debug:registerScriptName("WoodTrigger")
+GC_WoodTrigger.debugIndex = g_company.debug:registerScriptName("GC_WoodTrigger")
 
 g_company.woodTrigger = GC_WoodTrigger
 
@@ -49,16 +49,10 @@ function GC_WoodTrigger:new(isServer, isClient, customMt)
 end
 
 function GC_WoodTrigger:load(nodeId, target, xmlFile, xmlKey, fillTypeName)
-	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
-		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s"
-		g_company.debug:logWrite(GC_WoodTrigger.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil)
-		return false
-	end
-	
-	self.debugData = g_company.debug:getDebugData(GC_WoodTrigger.debugIndex, target)
-	
 	self.rootNode = nodeId
 	self.target = target
+	
+	self.debugData = g_company.debug:getDebugData(GC_WoodTrigger.debugIndex, target)
 
 	local woodTriggerNode = getXMLString(xmlFile, xmlKey .. "#triggerNode")		
 	if woodTriggerNode ~= nil then
@@ -70,10 +64,6 @@ function GC_WoodTrigger:load(nodeId, target, xmlFile, xmlKey, fillTypeName)
 				self.maxAllowedAttachments = getXMLFloat(xmlFile, xmlKey.."#maxAllowedAttachments")
 		
 				self.allowOverfill = Utils.getNoNil(getXMLBool(xmlFile, xmlKey.."#allowTimberOverfill"), true)
-		
-				self.showLengthWarnings = Utils.getNoNil(getXMLBool(xmlFile, xmlKey.."#showLengthWarnings"), false) -- Not Done Yet.
-				self.showAttachmentsWarning = Utils.getNoNil(getXMLBool(xmlFile, xmlKey.."#showAttachmentsWarning"), false) -- Not Done Yet.
-				self.showNoCapacityWarning = Utils.getNoNil(getXMLBool(xmlFile, xmlKey.."#showNoCapacityWarning"), true) -- Not Done Yet.
 		
 				if fillTypeName == nil then					
 					fillTypeName = getXMLString(xmlFile, xmlKey .. "#convertedFillType")
@@ -122,8 +112,6 @@ function GC_WoodTrigger:woodTriggerCallback(triggerId, otherActorId, onEnter, on
 					if self.maxAllowedLength > 0 then
 						if maxSize > (self.maxAllowedLength + 0.2) then -- Increased by 0.2 to allow for imperfections.
 							isAccepted = false
-							--print(string.format("Log length is greater than set limit of %s  (%s)", self.maxAllowedLength, maxSize)) -- Just for testing until warning is done -)
-							-- Maybe added a flashing warning we send to the clients in the trigger area??
 						end
 					end
 
@@ -133,13 +121,10 @@ function GC_WoodTrigger:woodTriggerCallback(triggerId, otherActorId, onEnter, on
 						end
 						if numAttachments > self.maxAllowedAttachments then
 							isAccepted = false
-							--print(string.format("Number of attachments is greater than set limit of %s  (%s)", self.maxAllowedAttachments, numAttachments))  -- Just for testing until warning is done -)
-							-- Maybe added a flashing warning we send to the clients in the trigger area??
 						end
 					end
 
 					if isAccepted then
-						local farmId = nil -- Maybe?? Need to see if splitShapes store this like 'nodeObjects'
 						local fillLevelDelta = volume * 1000 * splitType.woodChipsPerLiter
 						local freeSpace = self:getFreeCapacity(self.fillTypeIndex, farmId)
 						local canAdd = (freeSpace >= fillLevelDelta)
@@ -148,7 +133,7 @@ function GC_WoodTrigger:woodTriggerCallback(triggerId, otherActorId, onEnter, on
 						end
 
 						if canAdd then
-							self:addFillLevel(farmId, fillLevelDelta, self.fillTypeIndex)
+							self:addFillLevel(nil, fillLevelDelta, self.fillTypeIndex)
 							delete(otherActorId)
 						end
 					end

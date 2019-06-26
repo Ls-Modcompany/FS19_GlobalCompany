@@ -1,8 +1,8 @@
 --
 -- GlobalCompany - Objects - GC_Shaders
 --
--- @Interface: --
--- @Author: LS-Modcompany / GtX
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany
 -- @Date: 06.02.2019
 -- @Version: 1.1.1.0
 --
@@ -15,7 +15,7 @@
 -- 		- convert to fs19
 --
 -- 	v1.0.0.0 (29.04.2018):
--- 		- initial fs17 (GtX)
+-- 		- initial fs17
 --
 -- Notes:
 --
@@ -49,18 +49,11 @@ function GC_Shaders:new(isServer, isClient, customMt)
 end;
 
 function GC_Shaders:load(nodeId, target, xmlFile, xmlKey, groupKey)
-	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
-		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s";
-		g_company.debug:logWrite(GC_Shaders.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil);
-		return false;
-	end;
-
-	self.debugData = g_company.debug:getDebugData(GC_Shaders.debugIndex, target);
-
 	self.rootNode = nodeId;
 	self.target = target;
 
-	local returnValue = false;
+	self.debugData = g_company.debug:getDebugData(GC_Shaders.debugIndex, target);	
+
 	if self.isClient then
 		if groupKey == nil then
 			groupKey = "shaders";
@@ -108,14 +101,12 @@ function GC_Shaders:load(nodeId, target, xmlFile, xmlKey, groupKey)
 
 						if self.intervalShaders == nil then
 							self.intervalShaders = {};
-							returnValue = true;
 						end;
 
 						table.insert(self.intervalShaders, shader);
 					else
 						if self.standardShaders == nil then
 							self.standardShaders = {};
-							returnValue = true;
 						end;
 
 						table.insert(self.standardShaders, shader);
@@ -132,12 +123,9 @@ function GC_Shaders:load(nodeId, target, xmlFile, xmlKey, groupKey)
 			self.numIntervalShaders = #self.intervalShaders;
 			g_company.addRaisedUpdateable(self);
 		end;
-	else
-		g_company.debug:writeDev(self.debugData, "Failed to load 'CLIENT ONLY' script on server!");
-		returnValue = true; -- Send true so we can also print 'function' warnings if called by server.
 	end;
 
-	return returnValue;
+	return true;
 end;
 
 function GC_Shaders:delete()
@@ -217,8 +205,6 @@ function GC_Shaders:setShadersState(state, forceState)
 				self:raiseUpdate();
 			end;
 		end;
-	else
-		g_company.debug:writeDev(self.debugData, "'setShadersState' is a client only function!");
 	end;
 end;
 

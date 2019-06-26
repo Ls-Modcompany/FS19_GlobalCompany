@@ -1,8 +1,8 @@
 --
 -- GlobalCompany
 --
--- @Interface: --
--- @Author: LS-Modcompany / kevink98 / GtX
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany
 -- @Date: 11.05.2018
 -- @Version: 1.1.1.0
 --
@@ -68,9 +68,7 @@ function GlobalCompany.initialLoad()
 		g_company.debug:singleLogWrite(GC_DebugUtils.BLANK, "Loading Version: %s (%s)", GlobalCompany.version, GlobalCompany.versionDate);
 		addModEventListener(GlobalCompany);
 
-		-- @kevink98 @aPuehri If you have another idea let me know ;-)
 		Mission00.load = Utils.prependedFunction(Mission00.load, GlobalCompany.initModClasses);
-
 		Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, GlobalCompany.init);
 
 		GlobalCompany.inits = {};
@@ -126,7 +124,6 @@ function GlobalCompany.loadEnviroment(modName, path, isMod)
 	g_company.modManager:loadInitInvalidModsByXml(xmlFile, "globalCompany");
 end;
 
--- @kevink98 @aPuehri
 -- Using the following in a mod's 'modDesc' you can init GC functions or addModEventListeners after GC loads.
 -- Script still needs to be loaded from modDesc using 'extraSourceFiles'.
 -- <globalCompany minimumVersion="1.0.0.0"> <customClasses> <customClass name="MyAddonScript"/> </customClasses> </globalCompany>
@@ -144,7 +141,6 @@ function GlobalCompany:initModClasses()
 				end;
 			end;
 
-			-- Delete XML to cleanup correctly.
 			if GlobalCompany.environments[modName] ~= nil then
 				delete(GlobalCompany.environments[modName]);
 				GlobalCompany.environments[modName] = nil;
@@ -257,7 +253,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_AnimationManager.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
 	--source(GlobalCompany.dir .. "objects/GC_DynamicPalletAreas.lua");
-	-- source(GlobalCompany.dir .. "objects/GC_FillTypeConstructor.lua");
+	--source(GlobalCompany.dir .. "objects/GC_FillTypeConstructor.lua");
 	--source(GlobalCompany.dir .. "objects/GC_Greenhouse.lua");
 	--source(GlobalCompany.dir .. "objects/GC_FuelStation.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicStorage.lua");
@@ -351,8 +347,7 @@ function GlobalCompany:loadMap()
 	-- end;
 
 	g_company.settings = GlobalCompanySettings:load();
-	-- g_currentMission.saveSavegame = Utils.appendedFunction(g_currentMission.saveSavegame, g_company.settings.saveSettings); 
-	FSBaseMission.saveSavegame = Utils.appendedFunction(FSBaseMission.saveSavegame, g_company.settings.saveSettings); --@KevinK98 changed due to savegame problems with other mods
+	FSBaseMission.saveSavegame = Utils.appendedFunction(FSBaseMission.saveSavegame, g_company.settings.saveSettings);
     g_company.settings:loadSettings();
 
 	for _,loadable in pairs(GlobalCompany.loadables) do
@@ -443,13 +438,11 @@ function GlobalCompany:addPlaceableType(name, className, filename)
 end;
 
 function GlobalCompany.loadBaseGameGuiFiles(directory)
-	-- Same location so load also.
 	source(directory .. "GC_FillLevelsDisplay.lua")
 	
 	g_gui:loadProfiles(directory .. "GC_GuiProfiles.xml")
 	
 	if g_gui ~= nil then
-		-- Factory GUI
 		if g_company.productionFactoryDialog == nil then
 			source(directory .. "GC_ProductionFactoryGui.lua")
 			

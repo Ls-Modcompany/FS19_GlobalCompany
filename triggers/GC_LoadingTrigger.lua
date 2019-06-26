@@ -1,8 +1,8 @@
 --
 -- GlobalCompany - Triggers - GC_LoadingTrigger
 --
--- @Interface: --
--- @Author: LS-Modcompany / GtX
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany
 -- @Date: 11.03.2019
 -- @Version: 1.1.0.0
 --
@@ -14,7 +14,7 @@
 -- 		- fix i3dMappings support for effects
 --
 -- 	v1.0.0.0 (12.02.2019):
--- 		- initial fs19 (GtX)
+-- 		- initial fs19
 --
 -- Notes:
 --		- Some script functions part referenced - https://gdn.giants-software.com/documentation_scripting_fs19.php?version=script&category=67&class=10416
@@ -55,17 +55,11 @@ function GC_LoadingTrigger:new(isServer, isClient, customMt)
 end
 
 function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes, infiniteCapacity, blockUICapacity)
-	if nodeId == nil or source == nil or xmlFile == nil or xmlKey == nil then
-		local text = "Loading failed! 'nodeId' parameter = %s, 'source' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s"
-		g_company.debug:logWrite(GC_LoadingTrigger.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, source ~= nil, xmlFile ~= nil, xmlKey ~= nil)
-		return false
-	end
-
-	self.debugData = g_company.debug:getDebugData(GC_LoadingTrigger.debugIndex, source)
-
 	self.rootNode = nodeId
 	self.source = source
 
+	self.debugData = g_company.debug:getDebugData(GC_LoadingTrigger.debugIndex, source)
+	
 	local xmlUtils = g_company.xmlUtils
 
 	local triggerNode = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, xmlKey .. "#triggerNode"), source.i3dMappings)

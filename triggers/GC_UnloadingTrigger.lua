@@ -1,8 +1,8 @@
 --
 -- GlobalCompany - Triggers - GC_UnloadingTrigger
 --
--- @Interface: --
--- @Author: LS-Modcompany / GtX
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany
 -- @Date: 09.02.2019
 -- @Version: 1.1.0.0
 --
@@ -15,7 +15,7 @@
 --		- add 'GC_DebugUtils' support.
 --
 -- 	v1.0.0.0 (19.12.2018):
--- 		- initial fs19 (GtX)
+-- 		- initial fs19
 --
 -- Notes:
 --		- Some script functions part referenced - https://gdn.giants-software.com/documentation_scripting_fs19.php?version=script&category=67&class=7186
@@ -59,16 +59,10 @@ function GC_UnloadingTrigger:new(isServer, isClient, customMt)
 end
 
 function GC_UnloadingTrigger:load(nodeId, target, xmlFile, xmlKey, forcedFillTypes, forcedToolTypes)
-	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
-		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s"
-		g_company.debug:logWrite(GC_UnloadingTrigger.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil)
-		return false
-	end
-
-	self.debugData = g_company.debug:getDebugData(GC_UnloadingTrigger.debugIndex, target)
-
 	self.rootNode = nodeId
 	self.target = target
+
+	self.debugData = g_company.debug:getDebugData(GC_UnloadingTrigger.debugIndex, target)	
 
 	local exactFillRootNode = getXMLString(xmlFile, xmlKey .. "#exactFillRootNode")
 	if exactFillRootNode ~= nil then

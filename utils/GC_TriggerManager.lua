@@ -1,8 +1,8 @@
 --
 -- GlobalCompany - Triggers - GC_TriggerManager
 --
--- @Interface: --
--- @Author: LS-Modcompany / GtX
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany
 -- @Date: 11.01.2019
 -- @Version: 1.0.0.0
 --
@@ -11,7 +11,7 @@
 -- Changelog:
 --
 -- 	v1.0.0.0 (11.01.2019):
--- 		- initial fs19 (GtX)
+-- 		- initial fs19
 --
 -- Notes:
 --
@@ -29,10 +29,6 @@ GC_TriggerManager.debugIndex = g_company.debug:registerScriptName("GC_TriggerMan
 
 g_company.triggerManager = GC_TriggerManager
 
--- Create trigger manager object.
--- @param table parent = parent object.
--- @param table customMt = custom metatable. (optional)
--- @return table instance = instance of trigger manager if parent is found.
 function GC_TriggerManager:new(parent, customMt)
 	if parent == nil then
 		g_company.debug:logWrite(GC_TriggerManager.debugIndex, GC_DebugUtils.DEV, "No 'PARENT' was given, unable to create trigger manager instance!")
@@ -51,13 +47,6 @@ function GC_TriggerManager:new(parent, customMt)
 	return self
 end
 
--- Load and add triggers with a single line.
--- @param table triggerClass = trigger class you want to load.
--- @param integer rootNode = rootNode to send to trigger.
--- @param integer xmlFile = xmlFile to send to trigger.
--- @param string keyNode = keyNode to send to trigger.
--- @param ______ ... = extra trigger paramaters if needed.
--- @return trigger object if loaded correctly.
 function GC_TriggerManager:addTrigger(triggerClass, ...)
 	if triggerClass ~= nil then
 		local trigger = triggerClass:new(g_server ~= nil, g_client ~= nil)
@@ -82,14 +71,11 @@ function GC_TriggerManager:addTrigger(triggerClass, ...)
 	return nil
 end
 
--- Unregister and delete single trigger attached to the mod. To be called on when needed.
--- @param table trigger = trigger that is being unregistered / deleted.
 function GC_TriggerManager:removeTrigger(trigger)
 	if self:getHasTriggers() then
 		for key, registeredTrigger in ipairs(self.registeredTriggers) do
 			if registeredTrigger == trigger then
 				table.remove(self.registeredTriggers, key)
-				-- Call in case the trigger:delete() does not call the superClass
 				if trigger.isRegistered then
 					trigger:unregister(true)
 				end
@@ -101,10 +87,8 @@ function GC_TriggerManager:removeTrigger(trigger)
 	end
 end
 
--- Unregister and delete all triggers attached to the mod. To be called on 'mod:delete()'
 function GC_TriggerManager:removeAllTriggers()
 	for _, trigger in ipairs(self.registeredTriggers) do
-		-- Call in case the trigger:delete() does not call the superClass
 		if trigger.isRegistered then
 			trigger:unregister(true)
 		end
@@ -194,28 +178,4 @@ function GC_TriggerManager:writeStream(streamId, connection)
 			end
 		end
     end
-end
-
-
----------------------------
--- DEPRECIATED FUNCTIONS --
----------------------------
-
-function GC_TriggerManager:loadTrigger(triggerClass, rootNode, xmlFile, keyNode, ...)
-	if self.loadTriggerWarning == nil then
-		self.loadTriggerWarning = true
-		g_company.debug:writeDev(self.debugData, "'loadTrigger' is depreciated! These needs to be changed to 'addTrigger([class], [...])'. Check 'GC_TriggerManager' for more info.")
-		g_company.debug:writeDev(self.debugData, "'unregisterAllTriggers' is depreciated! These needs to be changed to 'removeAllTriggers()'. Check 'GC_TriggerManager' for more info.")
-	end
-	
-	return self:addTrigger(triggerClass, rootNode, self.parent, xmlFile, keyNode, ...)
-end
-
-function GC_TriggerManager:unregisterAllTriggers()
-	if self.unregisterAllTriggersWarning == nil then
-		self.unregisterAllTriggersWarning = true
-		g_company.debug:writeDev(self.debugData, "'unregisterAllTriggers' is depreciated! These needs to be changed to 'removeAllTriggers()'. Check 'GC_TriggerManager' for more info.");
-	end
-	
-	self:removeAllTriggers()
 end

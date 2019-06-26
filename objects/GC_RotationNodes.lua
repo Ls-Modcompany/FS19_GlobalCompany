@@ -1,8 +1,8 @@
 --
 -- GlobalCompany - Objects - GC_RotationNodes
 --
--- @Interface: --
--- @Author: LS-Modcompany / GtX
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany
 -- @Date: 06.02.2019
 -- @Version: 1.1.1.0
 --
@@ -10,10 +10,8 @@
 --
 -- Changelog:
 --
--- 	v1.1.1.0 (06.02.2019):
--- 		- change to 'raiseUpdate' Updateable instead of using 'Object' class as this is a client side script only.
 --
--- 	v1.1.0.0 (03.02.2019):
+-- 	v1.1.0.0 (06.02.2019):
 -- 		- convert to fs19
 --
 -- 	v1.0.0.0 (26.05.2018):
@@ -56,18 +54,11 @@ function GC_RotationNodes:new(isServer, isClient, customMt)
 end;
 
 function GC_RotationNodes:load(nodeId, target, xmlFile, xmlKey, groupKey, rotationNodes)
-	if nodeId == nil or target == nil then
-		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s";
-		g_company.debug:logWrite(GC_RotationNodes.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil);
-		return false;
-	end;
-
 	self.rootNode = nodeId;
 	self.target = target;
 	
 	self.debugData = g_company.debug:getDebugData(GC_RotationNodes.debugIndex, target);
-	
-	local returnValue = false;
+
 	if self.isClient then
 		if rotationNodes == nil then
 			rotationNodes = {};
@@ -106,25 +97,23 @@ function GC_RotationNodes:load(nodeId, target, xmlFile, xmlKey, groupKey, rotati
 			else
 				local text = "Loading failed! 'xmlFile' parameter = %s, 'xmlKey' parameter = %s";
 				g_company.debug:logWrite(GC_RotationNodes.debugIndex, GC_DebugUtils.DEV, text, xmlFile ~= nil, xmlKey ~= nil);
-				returnValue = false;
 			end;
 		end;
 	
 		if self:loadRotationNodes(rotationNodes) then
 			self.numRotationNodes = #self.rotationNodes;
-			g_company.addRaisedUpdateable(self);
-			returnValue = true;
+			
+			if self.numRotationNodes > 0 then
+				g_company.addRaisedUpdateable(self);
+			end
 		end;
-	else
-		g_company.debug:writeDev(self.debugData, "Failed to load 'CLIENT ONLY' script on server!");
-		returnValue = true; -- Send true so we can also print 'function' warnings if called by server.
 	end;
 
-	return returnValue;
+	return true;
 end;
 
 function GC_RotationNodes:delete()
-	if self.isClient then
+	if self.isClient and self.numRotationNodes > 0 then
 		g_company.removeRaisedUpdateable(self);
 	end;
 end;
@@ -237,13 +226,14 @@ end;
 
 function GC_RotationNodes:getCanUpdateRotation()
 	if self.rotationActive == false and self.rotationsRunning == false then
-		return false;
+		return self.numRotationNodes > 0;
 	end;
+	
 	return true;
 end;
 
 function GC_RotationNodes:setRotationNodesState(state, forceState)
-	if self.isClient then
+	if self.isClient and self.numRotationNodes > 0 then
 		local setState = Utils.getNoNil(state, not self.rotationActive);
 		
 		if self.rotationActive ~= setState or forceState == true then
@@ -251,8 +241,6 @@ function GC_RotationNodes:setRotationNodesState(state, forceState)
 		end;
 
 		self:raiseUpdate();
-	else
-		g_company.debug:writeDev(self.debugData, "'setRotationNodesState' is a client only function!");
 	end;
 end;
 

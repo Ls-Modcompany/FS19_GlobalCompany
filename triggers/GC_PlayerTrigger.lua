@@ -1,8 +1,8 @@
 --
 -- GlobalCompany - Triggers - GC_PlayerTrigger
 --
--- @Interface: --
--- @Author: LS-Modcompany / kevink98 / GtX
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany / kevink98
 -- @Date: 26.01.2019
 -- @Version: 1.1.1.0
 --
@@ -17,7 +17,7 @@
 --		- add TriggerManager support,
 --		- add FS19 class update support,
 --		- add new target update functions,
---		- add option to use as activatable (GtX)
+--		- add option to use as activatable
 --
 -- 	v1.0.0.0 (19.05.2018):
 -- 		- initial fs17 (kevink98)
@@ -51,25 +51,16 @@ function GC_PlayerTrigger:new(isServer, isClient, customMt)
 	return self
 end
 
--- Load player trigger.
--- @param integer nodeId = id of node.
--- @param table target = target object (self).
--- @param integer xmlFile = id of xml object.
--- @param string xmlKey = xml key to load.
--- @param ______ triggerReference = reference [string], [integer], [table] or [float] value to send to target with functions.
--- @param boolean isActivatable = use activatable feature of trigger.
--- @param string activateText = text that will be displayed when player is in trigger. (Activatable Only)
--- @param boolean removeAfterActivated = remove activatable after input is pressed. (Activatable Only)
--- @return boolean true/false = load success or fail.
 function GC_PlayerTrigger:load(nodeId, target, xmlFile, xmlKey, triggerReference, isActivatable, activateText, removeAfterActivated)
 	if nodeId == nil or target == nil then
 		return false
 	end
+	
+	self.rootNode = nodeId
+	self.target = target
 
 	self.debugData = g_company.debug:getDebugData(GC_PlayerTrigger.debugIndex, target)
 
-	self.rootNode = nodeId
-	self.target = target
 	self.triggerReference = triggerReference
 
 	self.playerInTrigger = false

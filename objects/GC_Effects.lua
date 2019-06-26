@@ -1,8 +1,8 @@
 --
 -- GlobalCompany - Objects - GC_Effects
 --
--- @Interface: --
--- @Author: LS-Modcompany / GtX / kevink98
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany
 -- @Date: 24.02.2019
 -- @Version: 1.2.0.0
 --
@@ -15,10 +15,10 @@
 --		- add 'exhaustSystems'.
 --
 -- 	v1.1.0.0 (13.12.2018):
---		- convert in fs19 (kevink98)
+--		- convert in fs19
 --
 -- 	v1.0.0.0 (20.11.2018):
--- 		- initial fs17 (GtX)
+-- 		- initial fs17
 --
 -- Notes:
 --		- Client Side Only.
@@ -26,7 +26,7 @@
 --
 --
 -- ToDo:
---		- May add sounds option for 'materialHolder.effects' e.g Silo flowing sound.
+--
 --
 
 
@@ -67,20 +67,13 @@ function GC_Effects:new(isServer, isClient, customMt)
 end;
 
 function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKey)
-	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
-		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s";
-		g_company.debug:logWrite(GC_Effects.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil);
-		return false;
-	end;
-
-	self.debugData = g_company.debug:getDebugData(GC_Effects.debugIndex, target);
-
 	self.rootNode = nodeId;
 	self.target = target;
 
+	self.debugData = g_company.debug:getDebugData(GC_Effects.debugIndex, target);
+
 	self.baseDirectory = GlobalCompanyUtils.getParentBaseDirectory(target, baseDirectory);
 
-	local returnValue = false;
 	if self.isClient then
 		if groupKey == nil then
 			groupKey = "effectTypes";
@@ -120,7 +113,6 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 
 								table.insert(self.exhaustSystems, {node = node, linkNode = linkNode, filename = filename});
 
-								returnValue = true;
 								delete(i3dNode);
 							else
 								g_company.debug:writeModding(self.debugData, "shaderParameter 'exhaustColor' does not exist on node '%s' in I3DFile '%s'", getName(node), filename);
@@ -172,14 +164,12 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 
 						if self.intervalParticleSystems == nil then
 							self.intervalParticleSystems = {};
-							returnValue = true;
 						end;
 
 						table.insert(self.intervalParticleSystems, particleSystem);
 					else
 						if self.standardParticleSystems == nil then
 							self.standardParticleSystems = {};
-							returnValue = true;
 						end;
 
 						table.insert(self.standardParticleSystems, particleSystem);
@@ -267,14 +257,12 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 
 						if self.intervalEffects == nil then
 							self.intervalEffects = {};
-							returnValue = true;
 						end;
 
 						table.insert(self.intervalEffects, effects);
 					else
 						if self.standardEffects == nil then
 							self.standardEffects = {};
-							returnValue = true;
 						end;
 
 						table.insert(self.standardEffects, effects);
@@ -338,12 +326,9 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 
 			g_company.addRaisedUpdateable(self);
 		end;
-	else
-		g_company.debug:writeDev(self.debugData, "Failed to load 'CLIENT ONLY' script on server!");
-		returnValue = true; -- Send true so we can also print 'function' warnings if called by server.
 	end;
 
-	return returnValue;
+	return true;
 end;
 
 function GC_Effects:delete()
@@ -596,8 +581,6 @@ function GC_Effects:setCustomMaterialToPS(fillTypeIndex)
 				setMaterial(nodeEffect.shape, material, 0);
 			end;
 		end;
-	else
-		g_company.debug:writeDev(self.debugData, "'setCustomMaterialToPS' is a client only function!");
 	end;
 end;
 

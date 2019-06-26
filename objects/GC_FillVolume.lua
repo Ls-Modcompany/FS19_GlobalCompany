@@ -1,8 +1,8 @@
 --
 -- GlobalCompany - Objects - GC_FillVolume
 --
--- @Interface: --
--- @Author: LS-Modcompany / kevink98 / GtX
+-- @Interface: 1.4.0.0 b5007
+-- @Author: LS-Modcompany
 -- @Date: 15.02.2019
 -- @Version: 1.1.0.0
 --
@@ -30,7 +30,7 @@ GC_FillVolume = {};
 local GC_FillVolume_mt = Class(GC_FillVolume);
 InitObjectClass(GC_FillVolume, "GC_FillVolume");
 
-GC_FillVolume.debugIndex = g_company.debug:registerScriptName("FillVolume");
+GC_FillVolume.debugIndex = g_company.debug:registerScriptName("GC_FillVolume");
 
 g_company.fillVolume = GC_FillVolume;
 
@@ -47,18 +47,11 @@ function GC_FillVolume:new(isServer, isClient, customMt)
 end;
 
 function GC_FillVolume:load(nodeId, target, xmlFile, xmlKey, capacity, forceCapacity, defaultFillType)
-	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil or capacity == nil then
-		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s, 'capacity' parameter = %s";
-		g_company.debug:logWrite(GC_FillVolume.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil, capacity ~= nil);
-		return false;
-	end;
-
-	self.debugData = g_company.debug:getDebugData(GC_FillVolume.debugIndex, target);
-
 	self.rootNode = nodeId;
 	self.target = target;
 
-	local returnValue = false;
+	self.debugData = g_company.debug:getDebugData(GC_FillVolume.debugIndex, target);	
+
 	if self.isClient then
 		self.fillVolumes = {};
 
@@ -117,7 +110,6 @@ function GC_FillVolume:load(nodeId, target, xmlFile, xmlKey, capacity, forceCapa
 					setVisibility(volume.volume, false);
 
 					if volume.volume ~= nil and volume.volume ~= 0 then
-						returnValue = true;
 						link(volume.node, volume.volume);
 						table.insert(self.fillVolumes, volume);
 					end;
@@ -126,12 +118,9 @@ function GC_FillVolume:load(nodeId, target, xmlFile, xmlKey, capacity, forceCapa
 
 			i = i + 1;
 		end;
-	else
-		g_company.debug:writeDev(self.debugData, "Failed to load 'CLIENT ONLY' script on server!");
-		returnValue = true; -- Send true so we can also print 'function' warnings if called by server.
 	end;
 
-	return returnValue;
+	return true;
 end;
 
 function GC_FillVolume:delete()
@@ -175,8 +164,6 @@ function GC_FillVolume:addFillLevel(fillLevel, volume)
 				deltaTable[i] = delta;
 			end;
 		end;
-	else
-		g_company.debug:writeDev(self.debugData, "'addFillLevel' is a client only function!");
 	end;
 
 	return deltaTable;
