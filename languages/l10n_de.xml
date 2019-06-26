@@ -62,6 +62,24 @@
 		
 		<e k="GC_Open_Product_Menu" v="Öffne Produktmenü"/>
 		<e k="GC_Open_Overview_Menu" v="Öffne Übersichtsmenü"/>
+		
+		<e k="GC_gui_disabled" v="Deaktiviert"/>
+		<e k="GC_gui_add" v="Hinzufügen"/>
+		<e k="GC_gui_remove" v="Löschen"/>
+		<e k="GC_gui_max" v="Maximum"/>
+		<e k="GC_gui_percent" v="Prozent"/>
+		<e k="GC_gui_lifeTimeIncome" v="Bisheriger Verdienst"/>
+		
+		<!-- Formatting required -->
+		<e k="GC_Factory_Sell_Warning" v="Es sind noch Produkte in der Fabrik. Diese werden als loses Schüttgut für den folgenden Betrag verkauft:
+
+Mengenpreis:  %s"/>
+
+		<e k="GC_Factory_Purchase_Warning" v="Bitte bestätigen Sie den folgenden Produktkauf.
+
+Rohstoff:  %s
+Volumen:  %s
+Kosten:  %s"/>
 
 		<!-- BaleShreader -->
 		<e k="GC_baleShreader_openSteer" v="Steuerung öffnen"/>

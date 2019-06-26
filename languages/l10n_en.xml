@@ -26,11 +26,11 @@
 
 		<!-- Settings -->
 		<e k="GC_settings_header" v="GlobalCompany - Settings"/>
-		<e k="GC_settings1_title" v="Activate placeable anywhere"/>
-		<e k="GC_settings2_title" v="Show object info"/>
-		<e k="GC_settings3_title" v="Horsehelper (300€ / Horse / Day)"/>
-		<e k="GC_settings4_title" v="Activate more trees"/>
-		<e k="GC_settings5_title" v="Activate cut bales"/>
+		<e k="GC_settings1_title" v="Activate Place Anywhere"/>
+		<e k="GC_settings2_title" v="Show Object Info"/>
+		<e k="GC_settings3_title" v="Horse Helper ($300 / Horse / Day)"/>
+		<e k="GC_settings4_title" v="Activate More Trees"/>
+		<e k="GC_settings5_title" v="Activate Cut Bales"/>
 		
 		<!-- Factory -->
 		<e k="GC_gui_buttons_back" v="Back"/>
@@ -64,6 +64,25 @@
 		<e k="GC_Open_Product_Menu" v="Open product menu"/>
 		<e k="GC_Open_Overview_Menu" v="Open overview menu"/>
 
+		<e k="GC_gui_disabled" v="Disabled"/>
+		<e k="GC_gui_add" v="Add"/>
+		<e k="GC_gui_remove" v="Remove"/>
+		<e k="GC_gui_max" v="Maximum"/>
+		<e k="GC_gui_percent" v="Percent"/>
+		<e k="GC_gui_lifeTimeIncome" v="Lifetime Income"/>
+		
+		<!-- Formatting required -->
+		<e k="GC_Factory_Sell_Warning" v="This factory still contains products. These will be sold in bulk for the following amount:
+
+Bulk Price:  %s"/>		
+		
+		<e k="GC_Factory_Purchase_Warning" v="Please confirm the following product purchase.
+
+Input Product:  %s
+Volume:  %s
+Cost:  %s"/>
+
+
 		<!-- BaleShreader -->
 		<e k="GC_baleShreader_openSteer" v="Open Steer"/>
 		<e k="GC_baleShreader_closeSteer" v="Close Steer"/>
@@ -78,21 +97,21 @@
 		<e k="GC_baler_cleaner" v="Clean Baler"/>
 		<e k="GC_baler_openGui" v="Open Hud"/>
 		<e k="GC_baler_closeGui" v="Close Hud"/>
-		<e k="GC_baler_makeEmpty" v="empty"/>
+		<e k="GC_baler_makeEmpty" v="Empty"/>
 		<e k="GC_baler_turnOn" v="Switch on"/>
 		<e k="GC_baler_turnOff" v="Switch on"/>
-		<e k="GC_baler_info_machineData" v="Plant data"/>
+		<e k="GC_baler_info_machineData" v="Plant Data"/>
 		<e k="GC_baler_info_fillLevel" v="Fill Level"/>
-		<e k="GC_baler_info_fillLevelBunker" v="Bunker fill Level"/>
+		<e k="GC_baler_info_fillLevelBunker" v="Bunker Fill Level"/>
 		<e k="GC_baler_info_counter" v="Bale Counter"/>
 		<e k="GC_baler_info_automatic" v="Automatic Start"/>
 		<e k="GC_baler_actualTyp" v="Actual Fill type:"/>
 		<e k="GC_baler_canStack" v="Number of bales to stack:"/>
 
 		<!-- ObjectInfo -->
-		<e k="GC_ObjectInfo_filltype" v="Filltype: %s"/>
-		<e k="GC_ObjectInfo_level" v="Filltyp: %s Litres"/>
-		<e k="GC_ObjectInfo_level2" v="Filltyp: %s Litres (%s%%)"/>
+		<e k="GC_ObjectInfo_filltype" v="FillType: %s"/>
+		<e k="GC_ObjectInfo_level" v="FillType: %s Litres"/>
+		<e k="GC_ObjectInfo_level2" v="FillType: %s Litres (%s%%)"/>
 		<e k="GC_ObjectInfo_owner" v="Owner: %s"/>
 
 	</elements>

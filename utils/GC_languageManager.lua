@@ -11,7 +11,7 @@
 -- Changelog:
 --
 -- 	v1.1.0.0 (24.04.2019):
--- 		- update consoleCommand
+-- 		- update consoleCommand (GtX)
 --
 --
 -- 	v1.0.0.0 ():
@@ -167,9 +167,9 @@ function GC_languageManager:checkEnglishBackupExists(fullPath, modName)
 	return false;
 end;
 
-function GC_languageManager:getText(textName, endText)
+function GC_languageManager:getText(textName, endText, backup)
 	if textName ~= nil then
-		local text = "";
+		local text = backup or "" -- Allow raw text otherwise return the standard warning so it is obvious a l10n is missing.
 
 		if textName:sub(1, 6) == "$l10n_" then
 			local subText = textName:sub(7);
@@ -188,7 +188,8 @@ function GC_languageManager:getText(textName, endText)
 			return text;
 		end;
 
-		return textName;
+		-- If all fail's and there is no 'backup' we need to provide the default warning so texts are entered correctly by modders. 
+		return g_i18n:getText(textName);
 	end;
 
 	return "";

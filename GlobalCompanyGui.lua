@@ -65,8 +65,8 @@ source(g_currentModDirectory .. "gui/MultiDialog.lua");
 source(g_currentModDirectory .. "gui/objects/Baler.lua");
 source(g_currentModDirectory .. "gui/objects/ObjectInfo.lua");
 source(g_currentModDirectory .. "gui/objects/GcMain.lua");
-source(g_currentModDirectory .. "gui/objects/FactoryBig.lua");
-source(g_currentModDirectory .. "gui/objects/FactorySmall.lua");
+-- source(g_currentModDirectory .. "gui/objects/FactoryBig.lua");
+-- source(g_currentModDirectory .. "gui/objects/FactorySmall.lua");
 source(g_currentModDirectory .. "gui/objects/DynamicStorage.lua");
 
 function GlobalCompanyGui:init()	
@@ -104,8 +104,8 @@ function GlobalCompanyGui:load()
 	
 	self.mainGui = g_company.gui:registerGui("gc_main", InputAction.GC_MAIN, Gc_Gui_MainGui, true, true, true).classGui;
 	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
-	g_company.gui:registerGui("gc_factoryBig", nil, Gc_Gui_FactoryBig, true, true, true);
-	g_company.gui:registerGui("gc_factorySmall", nil, Gc_Gui_FactorySmall, false, false);
+	-- g_company.gui:registerGui("gc_factoryBig", nil, Gc_Gui_FactoryBig, true, true, true);
+	-- g_company.gui:registerGui("gc_factorySmall", nil, Gc_Gui_FactorySmall, false, false);
 	g_company.gui:registerGui("gcPlaceable_baler", nil, Gc_Gui_Baler, true, true);
 	g_company.gui:registerGui("gcObjectInfo", nil, Gc_Gui_ObjectInfo, false, false);
 	g_company.gui:registerGui("gc_dynamicStorage", nil, Gc_Gui_DynamicStorage, true, true);
@@ -189,9 +189,10 @@ function GlobalCompanyGui:keyEvent(unicode, sym, modifier, isDown)
 end;
 
 function GlobalCompanyGui:draw() end;
-function GlobalCompanyGui:drawB() 
+function GlobalCompanyGui:drawB()
 	if GlobalCompanyGui.activeGui == nil then
-		if g_gui.currentGui == nil then
+		-- if g_gui.currentGui == nil then
+		if not g_gui:getIsGuiVisible() then
 			for name, open in pairs(GlobalCompanyGui.smallGuis) do
 				if open then
 					GlobalCompanyGui.guis[name].gui:draw();

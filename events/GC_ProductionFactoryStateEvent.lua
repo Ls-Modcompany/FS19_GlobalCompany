@@ -1,12 +1,12 @@
 --
 -- GlobalCompany - Events - GC_ProductionFactoryStateEvent
 --
--- @Interface: --
+-- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany / GtX
 -- @Date: 09.03.2019
 -- @Version: 1.1.0.0
 --
--- @Support: LS-Modcompany
+-- @Support: https://ls-modcompany.com
 --
 -- Changelog:
 --
@@ -23,61 +23,56 @@
 --
 --
 
-GC_ProductionFactoryStateEvent = {};
-GC_ProductionFactoryStateEvent_mt = Class(GC_ProductionFactoryStateEvent, Event);
+GC_ProductionFactoryStateEvent = {}
+GC_ProductionFactoryStateEvent_mt = Class(GC_ProductionFactoryStateEvent, Event)
 
-InitEventClass(GC_ProductionFactoryStateEvent, "GC_ProductionFactoryStateEvent");
+InitEventClass(GC_ProductionFactoryStateEvent, "GC_ProductionFactoryStateEvent")
 
 function GC_ProductionFactoryStateEvent:emptyNew()
-	local self = Event:new(GC_ProductionFactoryStateEvent_mt);
-	return self;
-end;
+	local self = Event:new(GC_ProductionFactoryStateEvent_mt)
+	return self
+end
 
 function GC_ProductionFactoryStateEvent:new(factory, lineId, state, userStopped)
 	local self = GC_ProductionFactoryStateEvent:emptyNew()
-	self.factory = factory;
-	self.lineId = lineId;
-	self.state = state;
-	self.userStopped = userStopped;
+	self.factory = factory
+	self.lineId = lineId
+	self.state = state
+	self.userStopped = userStopped
 
-	return self;
-end;
+	return self
+end
 
 function GC_ProductionFactoryStateEvent:readStream(streamId, connection)
-	self.factory = NetworkUtil.readNodeObject(streamId);
-	self.lineId = streamReadUInt8(streamId);
-	self.state = streamReadBool(streamId);
-	self.userStopped = streamReadBool(streamId);
+	self.factory = NetworkUtil.readNodeObject(streamId)
+	self.lineId = streamReadUInt8(streamId)
+	self.state = streamReadBool(streamId)
+	self.userStopped = streamReadBool(streamId)
 
-	self:run(connection);
-end;
+	self:run(connection)
+end
 
 function GC_ProductionFactoryStateEvent:writeStream(streamId, connection)
-	NetworkUtil.writeNodeObject(streamId, self.factory);
-	streamWriteUInt8(streamId, self.lineId);
-	streamWriteBool(streamId, self.state);
-	streamWriteBool(streamId, self.userStopped);
-end;
+	NetworkUtil.writeNodeObject(streamId, self.factory)
+	streamWriteUInt8(streamId, self.lineId)
+	streamWriteBool(streamId, self.state)
+	streamWriteBool(streamId, self.userStopped)
+end
 
 function GC_ProductionFactoryStateEvent:run(connection)
-	self.factory:setFactoryState(self.lineId, self.state, self.userStopped, true);
+	self.factory:setFactoryState(self.lineId, self.state, self.userStopped, true)
 
 	if not connection:getIsServer() then
-		g_server:broadcastEvent(GC_ProductionFactoryStateEvent:new(self.factory, self.lineId, self.state, self.userStopped), nil, connection, self.factory);
-	end;
-end;
+		g_server:broadcastEvent(GC_ProductionFactoryStateEvent:new(self.factory, self.lineId, self.state, self.userStopped), nil, connection, self.factory)
+	end
+end
 
 function GC_ProductionFactoryStateEvent.sendEvent(factory, lineId, state, userStopped, noEventSend)
     if noEventSend == nil or noEventSend == false then
         if g_server ~= nil then
-            g_server:broadcastEvent(GC_ProductionFactoryStateEvent:new(factory, lineId, state, userStopped), nil, nil, factory);
+            g_server:broadcastEvent(GC_ProductionFactoryStateEvent:new(factory, lineId, state, userStopped), nil, nil, factory)
         else
-            g_client:getServerConnection():sendEvent(GC_ProductionFactoryStateEvent:new(factory, lineId, state, userStopped));
-        end;
-    end;
-end;
-
-
-
-
-
+            g_client:getServerConnection():sendEvent(GC_ProductionFactoryStateEvent:new(factory, lineId, state, userStopped))
+        end
+    end
+end

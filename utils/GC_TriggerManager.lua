@@ -172,7 +172,7 @@ function GC_TriggerManager:readStream(streamId, connection)
 	if connection:getIsServer() then
 		if self:getHasTriggers() then
 			for _, trigger in ipairs(self.registeredTriggers) do
-				if trigger.registerInStream == true then
+				if trigger.registerTriggerInStream == true then
 					local triggerId = NetworkUtil.readNodeObjectId(streamId)
 					trigger:readStream(streamId, connection)
 					g_client:finishRegisterObject(trigger, triggerId)
@@ -186,7 +186,7 @@ function GC_TriggerManager:writeStream(streamId, connection)
     if not connection:getIsServer() then
 		if self:getHasTriggers() then
 			for _, trigger in ipairs(self.registeredTriggers) do
-				if trigger.registerInStream == true then
+				if trigger.registerTriggerInStream == true then
 					NetworkUtil.writeNodeObjectId(streamId, NetworkUtil.getObjectId(trigger))
 					trigger:writeStream(streamId, connection)
 					g_server:registerObjectInStream(connection, trigger)

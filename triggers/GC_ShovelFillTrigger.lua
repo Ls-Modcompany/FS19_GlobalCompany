@@ -35,6 +35,8 @@ function GC_ShovelFillTrigger:new(isServer, isClient, customMt)
 
 	self.isServer = isServer
 	self.isClient = isClient
+	
+	self.registerTriggerInStream = false
 
 	self.isEnabled = true
 	self.extraParamater = nil

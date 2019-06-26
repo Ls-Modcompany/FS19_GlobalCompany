@@ -84,6 +84,8 @@ function GlobalCompany.initialLoad()
 
 		g_company.modManager:initDevelopmentWarning(GlobalCompany.isDevelopmentVersion);
 
+		GlobalCompany.loadBaseGameGuiFiles(GlobalCompany.dir .. "gui/baseGame/");
+		
 		GlobalCompany.loadSourceFiles();
 		GlobalCompany.loadPlaceables();
 
@@ -255,7 +257,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_AnimationManager.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
 	--source(GlobalCompany.dir .. "objects/GC_DynamicPalletAreas.lua");
-	source(GlobalCompany.dir .. "objects/GC_FillTypeConstructor.lua");
+	-- source(GlobalCompany.dir .. "objects/GC_FillTypeConstructor.lua");
 	--source(GlobalCompany.dir .. "objects/GC_Greenhouse.lua");
 	--source(GlobalCompany.dir .. "objects/GC_FuelStation.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicStorage.lua");
@@ -273,7 +275,6 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
 	--source(GlobalCompany.dir .. "placeables/GC_BaleShreaderPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");
-	source(GlobalCompany.dir .. "placeables/GC_FillTypeConstructorPlaceable.lua");
 	--source(GlobalCompany.dir .. "placeables/GC_GreenhousePlaceable.lua");
 	--source(GlobalCompany.dir .. "placeables/GC_FuelStationPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_DynamicStoragePlaceable.lua");
@@ -307,12 +308,12 @@ function GlobalCompany.loadPlaceables()
 	local placeablesDir = GlobalCompany.dir .. "placeables/";
 
 	GlobalCompany:addPlaceableType("GC_BalerPlaceable", "GC_BalerPlaceable", placeablesDir .. "GC_BalerPlaceable.lua");
-	--GlobalCompany:addPlaceableType("GC_BaleShreaderPlaceable", "GC_BaleShreaderPlaceable", placeablesDir .. "GC_BaleShreaderPlaceable.lua");
+	GlobalCompany:addPlaceableType("GC_DynamicStoragePlaceable", "GC_DynamicStoragePlaceable", placeablesDir .. "GC_DynamicStoragePlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_ProductionFactoryPlaceable", "GC_ProductionFactoryPlaceable", placeablesDir .. "GC_ProductionFactoryPlaceable.lua");
-	GlobalCompany:addPlaceableType("GC_FillTypeConstructor", "GC_FillTypeConstructorPlaceable", placeablesDir .. "GC_FillTypeConstructorPlaceable.lua");
+	
 	--GlobalCompany:addPlaceableType("GC_GreenhousePlaceable", "GC_GreenhousePlaceable", placeablesDir .. "GC_GreenhousePlaceable.lua");
 	--GlobalCompany:addPlaceableType("GC_FuelStationPlaceable", "GC_FuelStationPlaceable", placeablesDir .. "GC_FuelStationPlaceable.lua");
-	GlobalCompany:addPlaceableType("GC_DynamicStoragePlaceable", "GC_DynamicStoragePlaceable", placeablesDir .. "GC_DynamicStoragePlaceable.lua");
+	--GlobalCompany:addPlaceableType("GC_BaleShreaderPlaceable", "GC_BaleShreaderPlaceable", placeablesDir .. "GC_BaleShreaderPlaceable.lua");
 end;
 
 --| Main |--
@@ -326,6 +327,18 @@ function GlobalCompany:loadMap()
 	g_company.debug:loadConsoleCommands();
 
 	g_company.gui:load();
+
+	local fillLevelsDisplay = GC_FillLevelsDisplay.new(g_baseHUDFilename)
+	if fillLevelsDisplay ~= nil then
+		if g_company.fillLevelsDisplay == nil then
+			fillLevelsDisplay:setVisible(false, false)
+			local uiScale = Utils.getNoNil(g_gameSettings:getValue("uiScale"), 1.0)
+			fillLevelsDisplay:setScale(uiScale)
+			g_company.fillLevelsDisplay = fillLevelsDisplay
+		else
+			fillLevelsDisplay:delete()
+		end
+	end	
 
 	-- for modName, xmlFile in pairs(GlobalCompany.environments) do
 		-- for xmlLoad, _ in pairs(GlobalCompany.xmlLoads) do
@@ -347,6 +360,14 @@ function GlobalCompany:loadMap()
 	end;
 end;
 
+function GlobalCompany:getIsServer()
+	return g_server ~= nil
+end
+
+function GlobalCompany:getIsClient()
+	return g_dedicatedServerInfo == nil
+end
+
 function GlobalCompany:update(dt)
 	for _, updateable in pairs(GlobalCompany.updateables) do
 		updateable.update(updateable.target, dt);
@@ -358,6 +379,12 @@ function GlobalCompany:update(dt)
 			raisedUpdateable:update(dt);
 		end;
 	end;
+	
+	if g_dedicatedServerInfo == nil and g_company.fillLevelsDisplay ~= nil then
+		if not g_gui:getIsGuiVisible() and g_currentMission.controlledVehicle == nil then
+			g_company.fillLevelsDisplay:update(dt)
+		end
+	end
 
 	--can enable for testing!
 	--if g_currentMission.missionInfo.timeScale >= 120 then
@@ -365,7 +392,21 @@ function GlobalCompany:update(dt)
 	--end;
 end;
 
+function GlobalCompany:draw()
+	if g_dedicatedServerInfo == nil and g_company.fillLevelsDisplay ~= nil then
+		if not g_gui:getIsGuiVisible() and g_currentMission.controlledVehicle == nil then
+			g_company.fillLevelsDisplay:draw()
+		end
+	end
+end
+
 function GlobalCompany:delete()
+	if g_company.fillLevelsDisplay ~= nil then
+		g_company.fillLevelsDisplay:setVisible(false, false)
+		g_company.fillLevelsDisplay:delete()
+		g_company.fillLevelsDisplay = nil
+	end
+	
 	g_company.debug:deleteConsoleCommands();
 	g_company.languageManager:delete();
 
@@ -374,9 +415,6 @@ function GlobalCompany:delete()
 		environment.g_company = nil;
 	end;
 end;
-
--- function GlobalCompany:deleteMap()
--- end;
 
 function GlobalCompany:getLoadParameterValue(name)
 	if GlobalCompany.loadParameters[name] == nil or GlobalCompany.loadParameters[name].value == nil then
@@ -403,5 +441,23 @@ function GlobalCompany:addPlaceableType(name, className, filename)
 		g_company.debug:print("    Use prefix 'GC_' for ( GlobalCompany ) placeable mods.", "    Use prefix 'SRS_' for ( SkiRegionSimulator ) placeable mods.");
 	end;
 end;
+
+function GlobalCompany.loadBaseGameGuiFiles(directory)
+	-- Same location so load also.
+	source(directory .. "GC_FillLevelsDisplay.lua")
+	
+	g_gui:loadProfiles(directory .. "GC_GuiProfiles.xml")
+	
+	if g_gui ~= nil then
+		-- Factory GUI
+		if g_company.productionFactoryDialog == nil then
+			source(directory .. "GC_ProductionFactoryGui.lua")
+			
+			local factoryDialog = GC_ProductionFactoryGui:new(g_i18n, g_messageCenter)
+			g_gui:loadGui(directory .. "GC_ProductionFactoryGui.xml", "GC_ProductionFactoryDialog", factoryDialog)
+			g_company.productionFactoryDialog = factoryDialog
+		end
+	end
+end
 
 GlobalCompany.initialLoad();

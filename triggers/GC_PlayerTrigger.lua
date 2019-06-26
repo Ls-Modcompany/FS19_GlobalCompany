@@ -137,6 +137,10 @@ function GC_PlayerTrigger:update(dt)
 		else
 			self.playerInTrigger = false
 
+			if self.target.playerTriggerOnEnterLeave ~= nil then
+				self.target:playerTriggerOnEnterLeave(false, self.triggerReference)
+			end
+			
 			if self.isActivatable then
 				g_currentMission:removeActivatableObject(self)
 			end
@@ -192,11 +196,15 @@ function GC_PlayerTrigger:playerTriggerCallback(triggerId, otherId, onEnter, onL
 						if self:canAddActivatable() then
 							g_currentMission:addActivatableObject(self)
 						end
+						
+						if self.target.playerTriggerOnEnterLeave ~= nil then
+							self.target:playerTriggerOnEnterLeave(true, self.triggerReference)
+						end
 					end
 				end
-				if self.target.playerTriggerOnEnter ~= nil then
-					self.target:playerTriggerOnEnter(self.triggerReference)
-				end
+				-- if self.target.playerTriggerOnEnterLeve ~= nil then
+					-- self.target:playerTriggerOnEnter(self.triggerReference)
+				-- end
 			else
 				if self.playerInTrigger then
 					self.playerInTrigger = false
@@ -204,12 +212,16 @@ function GC_PlayerTrigger:playerTriggerCallback(triggerId, otherId, onEnter, onL
 					if self.isActivatable then
 						g_currentMission:removeActivatableObject(self)
 					end
+					
+					if self.target.playerTriggerOnEnterLeave ~= nil then
+						self.target:playerTriggerOnEnterLeave(false, self.triggerReference)
+					end
 				end
-				if self.target.playerTriggerOnLeave ~= nil then
-					self.target:playerTriggerOnLeave(self.triggerReference)
-				end
+				-- if self.target.playerTriggerOnLeave ~= nil then
+					-- self.target:playerTriggerOnLeave(self.triggerReference)
+				-- end
 			end
-			
+		
 			self:raiseActive()
 		end
 	end

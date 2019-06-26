@@ -1,0 +1,264 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUIProfiles>
+	<Presets>
+        <Preset name="colorTransparent" value="0 0 0 0"/>
+		<Preset name="colorDisabled" value="0.4 0.4 0.4 1"/>
+		<Preset name="colorMainUI" value="0.9910 0.3865 0.0100 1"/>
+        <Preset name="colorGlassLight_50" value="0.718 0.716 0.715 0.0625"/>
+		<Preset name="colorGlassMedium" value="0.118 0.116 0.115 0.20"/>
+		<Preset name="colorRed" value="0.8069 0.0097 0.0097 1"/>
+		<Preset name="colorDescriptionText" value="0.6 0.6 0.6 1"/>
+    </Presets>    
+	
+	<!-- Production Factory -->	
+	<Profile name="factoryListBoxLeft" extends="ingameMenuContractsListBox">
+        <Value name="size" value="455px 708px"/>
+    </Profile>
+	
+	<Profile name="productionLineList" extends="ingameMenuContractsList">
+        <Value name="size" value="425px 704px"/>
+        <Value name="updateSelectionOnOpen" value="false"/>
+		<Value name="selectOnScroll" value="false"/>
+        <Value name="rowBackgroundProfile" value="productionLineListItem"/>
+        <Value name="rowBackgroundProfileAlternate" value="productionLineListItemAlternate"/>		
+		<Value name="itemsPerCol" value="6"/>
+        <Value name="listItemHeight" value="118px"/>
+    </Profile>
+	
+	<Profile name="productionLineListItem" extends="ingameMenuContractsListItem">
+		<Value name="size" value="425px 118px"/>
+	</Profile>
+
+    <Profile name="productionLineListItemAlternate" extends="productionLineListItem" with="alternateRow"/>
+
+    <Profile name="productionLineListItemOverview" extends="textDefault" >
+        <Value name="size" value="425px 118px" />		
+		<Value name="position" value="0px 0px"/>
+        <Value name="textColor" value="1 1 1 1" />
+		<Value name="textAlignment" value="center"/>
+		<Value name="textBold" value="true"/>
+		<Value name="textSize" value="30px"/>
+		<Value name="textUpperCase" value="true"/>
+		<Value name="textColor" value="$preset_colorMainUI"/>
+    </Profile>
+	
+	<Profile name="productionLineListItemName" extends="ingameMenuContractsListItemField" >
+        <Value name="position" value="25px -5px"/>
+		<Value name="textBold" value="true"/>
+		<Value name="textSize" value="22px"/>
+    </Profile>
+	
+	<Profile name="factoryBoxRight" extends="factoryListBoxLeft" with="anchorTopRight">
+		<Value name="size" value="1175px 708px"/>
+    </Profile>
+	
+	<Profile name="factoryListInput" extends="factoryTopPanel" with="anchorBottomLeft">
+        <Value name="position" value="25px 25px" />
+        <Value name="size" value="550px 455px"/>
+    </Profile>
+
+	<Profile name="inputProductList" extends="ingameMenuContractsList" >
+        <Value name="size" value="520px 450px"/>
+        <Value name="updateSelectionOnOpen" value="false"/>
+        <Value name="selectOnScroll" value="false"/>
+        <Value name="supportsMouseScrolling" value="true"/>
+        <Value name="rowBackgroundProfile" value="inputProductListItem"/>
+        <Value name="rowBackgroundProfileAlternate" value="inputProductListItemAlternate"/>		
+		<Value name="itemsPerCol" value="2"/>
+        <Value name="listItemHeight" value="225px"/>
+    </Profile>
+	
+	<Profile name="inputProductListItem" extends="ingameMenuContractsListItem">
+		<Value name="size" value="520px 225px"/>
+        <Value name="imageSelectedColor" value="$preset_colorGlassLight_50"/>
+	</Profile>
+	
+    <Profile name="inputProductListItemAlternate" extends="inputProductListItem" with="alternateRow">
+        <Value name="imageSelectedColor" value="$preset_colorGlassMedium"/>
+	</Profile>	
+	
+	<Profile name="productStatusBarBackground" extends="ingameMenuAnimalsLargeStatusBarBackground" with="anchorMiddleRight">
+        <Value name="size" value="134px 24px"/>
+    </Profile>
+	
+    <Profile name="productStatusBarNormal" extends="ingameMenuAnimalsLargeStatusBar" with="anchorMiddleLeft">
+        <Value name="size" value="130px 20px"/>
+        <Value name="margin" value="2px 2px 2px 2px"/>
+    </Profile>
+	
+    <Profile name="productStatusBarMedium" extends="productStatusBarNormal">
+        <Value name="imageColor" value="$preset_colorMainUI"/>
+    </Profile>
+	
+    <Profile name="productStatusBarLow" extends="productStatusBarNormal">
+        <Value name="imageColor" value="$preset_colorRed"/>
+    </Profile>
+	
+	<Profile name="productListItemName" extends="productionLineListItemName">
+        <Value name="size" value="475px 35px" />
+        <Value name="margin" value="0px 0px 0px 14px"/>
+        <Value name="textUpperCase" value="true"/>
+        <Value name="textVerticalAlignment" value="middle"/>
+        <Value name="textBold" value="true"/>
+    </Profile>
+
+	<Profile name="inputProductFillTypes" extends="productLineInfoTitle">
+        <Value name="textVerticalAlignment" value="top"/>
+        <Value name="textSize" value="18px"/>
+        <Value name="textBold" value="false"/>
+        <Value name="textWrapWidth" value="400px"/>
+        <Value name="textMaxWidth" value="400px"/>
+        <Value name="textMaxNumLines" value="2"/>
+		<Value name="textUpperCase" value="false"/>
+        <Value name="textLineHeightScale" value="1.4"/>
+        <Value name="textColor" value="$preset_colorDescriptionText"/>
+        <Value name="margin" value="0px 0px 0px 10px"/>
+    </Profile>
+
+	<Profile name="smallSliderBG" extends="verticalGlassListSliderBackground">
+        <Value name="size" value="28px 454px"/>
+        <Value name="position" value="-1px -1px"/>
+    </Profile>
+    
+	<Profile name="smallSlider" extends="verticalGlassListSlider">
+        <Value name="size" value="16px 441px"/>
+    </Profile>
+
+	<Profile name="buttonBoxRightDocked" extends="buttonBox" with="anchorBottomRight">
+        <Value name="alignmentX" value="right"/>
+        <Value name="alignmentY" value="middle"/>
+        <Value name="size" value="740px 60px"/>
+        <Value name="position" value="30px -60px"/>
+        <Value name="imageColor" value="$preset_colorTransparent"/>
+    </Profile>
+	
+	<Profile name="buttonAdd" extends="wideButton" >
+        <!-- <Value name="inputAction" value="MENU_EXTRA_1"/> -->
+        <Value name="inputAction" value="MENU_PAGE_NEXT"/>
+    </Profile>
+	
+	<Profile name="buttonRemove" extends="wideButton">
+        <!-- <Value name="inputAction" value="MENU_EXTRA_2"/> -->
+        <Value name="inputAction" value="MENU_PAGE_PREV"/>
+    </Profile>
+	
+	<Profile name="factoryOverviewImagePanel" extends="baseReference" with="anchorTopLeft lightFrame">
+        <Value name="position" value="50px -50px" />
+        <Value name="size" value="600px 600px"/>
+		<Value name="imageUVs" value="0 0 1 1"/>
+		<Value name="fixedWidth" value="true"/>
+    </Profile>
+	
+	<Profile name="factoryOverviewDescPanel" extends="lightFramedEmptyPanel" with="anchorTopRight">
+        <Value name="position" value="-50px -50px" />
+        <Value name="size" value="430px 600px"/>
+		<Value name="imageColor" value="$preset_colorTransparent"/>
+    </Profile>
+	
+	<Profile name="factoryOverviewDescText" extends="textDefault" with="anchorTopCenter">
+        <Value name="position" value="0px -65px" />
+		<Value name="size" value="400px 510px"/>
+        <Value name="textVerticalAlignment" value="top"/>
+        <Value name="textSize" value="18px"/>
+        <Value name="textBold" value="false"/>
+        <Value name="textWrapWidth" value="400px"/>
+        <Value name="textMaxWidth" value="400px"/>
+        <Value name="textMaxNumLines" value="20"/>
+        <Value name="textLineHeightScale" value="1.4"/>
+        <Value name="textColor" value="$preset_colorDescriptionText"/>
+        <Value name="margin" value="0px 0px 0px 10px"/>
+    </Profile>
+
+	<Profile name="factoryTopPanel" extends="lightFramedEmptyPanel" with="anchorTopCenter">
+        <Value name="position" value="0px -25px" />
+        <Value name="size" value="1120px 115px"/>
+        <Value name="imageColor" value="$preset_colorTransparent"/>
+    </Profile>
+
+	<Profile name="factoryListOutput" extends="factoryListInput" with="anchorBottomRight">
+		<Value name="position" value="-25px 25px" />
+    </Profile>
+	
+	<Profile name="factoryNoOutput" extends="baseReference" with="anchorBottomRight lightFrame">
+		<Value name="position" value="-25px 25px" />
+        <Value name="size" value="550px 455px"/>
+		<Value name="imageColor" value="$preset_colorDisabled"/>
+		<Value name="imageUVs" value="630px 438px 372px 228px"/>
+		<Value name="fixedWidth" value="true"/>
+    </Profile>
+	
+	<Profile name="lightFramedEmptyPanel" extends="emptyPanel" with="lightFrame" />	
+	
+	<Profile name="factoryHeaderText" extends="ingameMenuFrameHeaderText" with="anchorTopLeft">
+        <Value name="position" value="5px 55px"/>
+    </Profile>	
+	
+	<Profile name="selectedProductLineHeaderText" extends="factoryHeaderText" with="anchorTopCenter">
+		<Value name="position" value="0px -5px" />
+    </Profile>
+	
+	<Profile name="balanceHeaderText" extends="factoryHeaderText" with="anchorTopRight">
+		<Value name="position" value="-5px 55px" />
+		<Value name="textAlignment" value="right"/>
+    </Profile>
+	
+	<Profile name="productLineInfoTitle" extends="textDefault" with="anchorTopLeft">
+		<Value name="textSize" value="18px"/>
+        <Value name="textBold" value="true"/>
+    </Profile>
+	
+    <Profile name="productLineInfoValue" extends="textDefault" with="anchorTopRight">
+        <Value name="textSize" value="18px"/>
+        <Value name="textBold" value="false"/>
+		<Value name="textUpperCase" value="true"/>
+        <Value name="textAlignment" value="right"/>
+		<Value name="textColor" value="$preset_colorMainUI"/>
+    </Profile>
+	
+	<Profile name="inputProductTitle" extends="textDefault">
+		<Value name="margin" value="0px 0px 20px 0px"/>
+		<Value name="textSize" value="16px"/>
+        <Value name="textBold" value="true"/>
+    </Profile>
+	
+	<Profile name="inputProductValue" extends="textDefault">
+        <Value name="textSize" value="16px"/>
+        <Value name="textBold" value="false"/>
+		<Value name="textUpperCase" value="true"/>
+        <Value name="textAlignment" value="right"/>
+		<Value name="textColor" value="$preset_colorMainUI"/>
+    </Profile>	
+	
+	<Profile name="productLineMultiHeaderText" extends="ingameMenuFrameHeaderText" with="anchorTopLeft">
+		<Value name="position" value="35px -75px" />
+		<Value name="textSize" value="20px"/>
+    </Profile>
+	
+	<Profile name="productLineMultiText" extends="productLineMultiHeaderText">
+        <Value name="position" value="35px -75px" />
+        <Value name="textBold" value="false"/>
+		<Value name="textColor" value="$preset_colorMainUI"/>
+    </Profile>
+	
+	<Profile name="productHeaderText" extends="ingameMenuFrameHeaderText" with="anchorTopCenter">
+        <Value name="position" value="5px 36px"/>
+		<Value name="textSize" value="20px"/>
+    </Profile>
+	
+	<Profile name="productLinesSliderBG" extends="verticalGlassListSliderBackground">
+        <Value name="size" value="28px 703px"/>
+        <Value name="position" value="-1px -1px"/>
+    </Profile>
+    
+	<Profile name="productLinesSlider" extends="verticalGlassListSlider">
+        <Value name="size" value="16px 691px"/>
+    </Profile>
+
+	<Profile name="buttonBoxStartStop" extends="buttonBox" with="anchorTopRight">
+        <Value name="alignmentX" value="left"/>
+        <Value name="alignmentY" value="middle"/>
+        <Value name="size" value="740px 60px"/>
+        <Value name="position" value="200px -80px"/>
+        <Value name="imageColor" value="$preset_colorTransparent"/>
+    </Profile>
+</GUIProfiles>

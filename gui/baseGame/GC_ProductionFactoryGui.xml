@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+	<GuiElement type="bitmap" profile="uiFullInGameBackground" id="fullBackgroundElement"/>
+
+	<GuiElement type="bitmap" profile="uiElementContainerFullScreen" id="fullScreenElement">
+		<GuiElement type="empty" profile="uiElementCenter" size="1660px 708px">
+
+			<GuiElement type="bitmap" profile="factoryListBoxLeft" id="factoryBoxLeft">
+				<GuiElement type="text" profile="factoryHeaderText" id="factoryNameHeaderText" text="Factory Name"/>
+				<GuiElement type="list" profile="productionLineList" id="productLineItemList" position="1px -1px" onSelectionChanged="onProductLineSelectionChanged" focusId="productLineList" focusChangeBottom="productLineList" focusChangeTop="productLineList" focusChangeLeft="productLineList" focusChangeRight="inputProductItemList">
+					<GuiElement type="listItem" profile="productionLineListItem" id="productLineItemTemplate" >
+						<GuiElement type="text" profile="productionLineListItemName" onCreate="onCreateProductLineName" />
+
+						<GuiElement type="empty" profile="productionLineListItem" onCreate="onCreateProductLineItem">
+							<GuiElement type="text"  profile="productLineInfoTitle" position="45px -55px" textSize="16px" text="$l10n_ui_missionStatusTitle:" />
+							<GuiElement type="text"  profile="productLineInfoValue" position="-45px -55px" textSize="16px" text="N/A" onCreate="onCreateProductLineStatus"/>
+
+							<GuiElement type="text"  profile="productLineInfoTitle" position="45px -85px" textSize="16px" text="$l10n_statistic_productivity:" />
+							<GuiElement type="text"  profile="productLineInfoValue" position="-45px -85px" textSize="16px" textUpperCase="false" text="N/A" onCreate="onCreateProductLineProduction"/>
+						</GuiElement>
+					</GuiElement>
+				</GuiElement>
+
+				<GuiElement type="bitmap" profile="productLinesSliderBG" >
+					<GuiElement type="slider" profile="productLinesSlider" dataElementId="productLineItemList" handleFocus="false"/>
+				</GuiElement>
+			</GuiElement>
+
+			<GuiElement type="bitmap" profile="factoryBoxRight" id="factoryBoxRight">
+				<GuiElement type="text" profile="balanceHeaderText" id="balanceText" text=" "/>
+
+				<GuiElement type="empty" profile="factoryBoxRight" id="overviewPage">
+					<GuiElement type="bitmap" profile="factoryOverviewImagePanel" id="factoryOverviewImage" />
+
+					<GuiElement type="bitmap" profile="factoryOverviewDescPanel">
+						<GuiElement type="text" profile="factoryHeaderText" position="10px -15px" textSize="30px" textBold="false" id="overviewDescHeader"/>
+						<GuiElement type="text" profile="factoryOverviewDescText" id="overviewDescText" text="N/A"/>
+					</GuiElement>
+				</GuiElement>
+
+				<GuiElement type="empty" profile="factoryBoxRight" id="productLinesPage">
+					<GuiElement type="bitmap" profile="factoryTopPanel">
+						<GuiElement type="text" profile="selectedProductLineHeaderText" textAlignment="center" id="selectedProductLineHeader"/>
+						<GuiElement type="bitmap" profile="lineSeparator" position="0px -60px" size="1050px 1dp" screenAlign="topCenter" positionOrigin="topCenter"/>
+						<GuiElement type="text"  profile="productLineInfoTitle" position="40px -75px" text="$l10n_ui_missionStatusTitle:" />
+						<GuiElement type="text"  profile="productLineInfoValue" position="-595px -75px" text="Active" id="productLineStatusText"/>
+						<GuiElement type="bitmap" profile="lineSeparator" position="0px -75px" size="1px 25dp" screenAlign="topCenter" positionOrigin="topCenter"/>
+						<GuiElement type="text"  profile="productLineInfoTitle" position="600px -75px" text="Auto Start:" />
+						<GuiElement type="text"  profile="productLineInfoValue" position="-40px -75px" text="False" id="productLineOperationText"/>
+					</GuiElement>
+
+					<GuiElement type="bitmap" profile="factoryListInput">
+						<GuiElement type="text" profile="productHeaderText" textAlignment="center" position="0px 36px" id="inputHeaderText" text="Input Products"/>
+
+						<GuiElement type="list" profile="inputProductList" id="inputProductItemList" position="1px -1px" onScroll="onScrollInputProduct" onSelectionChanged="onInputProductSelectionChanged" focusId="inputProductItemList" focusChangeLeft="productLineList" focusChangeBottom="inputProductItemList" focusChangeTop="inputProductItemList" focusChangeRight="outputProductItemList">
+							<GuiElement type="listItem" profile="inputProductListItem" id="inputProductItemTemplate" >
+								<GuiElement type="text" profile="productListItemName" textSelectedColor="0.9910 0.3865 0.0100 1" text="Product Name" onCreate="onCreateProductName" />
+
+								<GuiElement type="text"  profile="productLineInfoTitle" position="45px -55px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="$l10n_info_fillLevel:" />
+								<GuiElement type="text"  profile="productLineInfoValue" position="-20px -55px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="100,000 Litres" onCreate="onCreateProductFillLevel"/>
+
+								<GuiElement type="text"  profile="productLineInfoTitle" size="455px 16px" position="45px -90px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="Percent:">
+									<GuiElement type="text" profile="ingameMenuAnimalsRequirementsValue" textSelectedColor="0.9910 0.3865 0.0100 1" onCreate="onCreateProductPercent" text="100%" position="-140px 0px" textColor="0.6 0.6 0.6 1"/>
+									<GuiElement type="bitmap" profile="productStatusBarBackground" >
+										<GuiElement type="bitmap" profile="productStatusBarNormal" onCreate="onCreateProductStatusBar"/>
+									</GuiElement>
+								</GuiElement>
+
+								<GuiElement type="text"  profile="productLineInfoTitle" position="45px -125px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="$l10n_shop_capacity" />
+								<GuiElement type="text"  profile="productLineInfoValue" position="-20px -125px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="100,000 Litres" onCreate="onCreateProductCapacity"/>
+
+								<GuiElement type="bitmap" profile="lineSeparator" position="0px -160px" size="470px 1dp" screenAlign="topCenter" positionOrigin="topCenter"/>
+
+								<GuiElement type="text"  profile="inputProductFillTypes" position="60px -170px" text="" textSelectedColor="0.9910 0.3865 0.0100 1" onCreate="onCreateInputProductFillTypes"/>
+							</GuiElement>
+						</GuiElement>
+
+						<GuiElement type="bitmap" profile="smallSliderBG" >
+							<GuiElement type="slider" profile="smallSlider" dataElementId="inputProductItemList" handleFocus="false"/>
+						</GuiElement>
+					</GuiElement>
+
+					<GuiElement type="bitmap" profile="factoryListOutput" id="outputListBox">
+						<GuiElement type="text" profile="productHeaderText" textAlignment="center" position="0px 36px" id="outputHeaderText" text="Output Products"/>
+
+						<GuiElement type="list" profile="inputProductList" id="outputProductItemList" position="1px -1px" onSelectionChanged="onOutputProductSelectionChanged" focusId="outputProductItemList" focusChangeLeft="inputProductItemList" focusChangeBottom="outputProductItemList" focusChangeTop="outputProductItemList" focusChangeRight="outputProductItemList">
+							<GuiElement type="listItem" profile="inputProductListItem" id="outputProductItemTemplate" >
+								<GuiElement type="text" profile="productListItemName" textSelectedColor="0.9910 0.3865 0.0100 1" text="Product Name" onCreate="onCreateProductName" onCreateArgs="OUTPUT"/>
+
+								<GuiElement type="text"  profile="productLineInfoTitle" position="45px -65px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="$l10n_info_fillLevel:" onCreate="onCreateOutputFillLevelText"/>
+								<GuiElement type="text"  profile="productLineInfoValue" position="-20px -65px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="100,000 Litres" onCreate="onCreateProductFillLevel" onCreateArgs="OUTPUT"/>
+
+								<GuiElement type="text"  profile="productLineInfoTitle" size="455px 16px" position="45px -110px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="Percent:" onCreate="onCreateOutputPercentText">
+									<GuiElement type="text" profile="ingameMenuAnimalsRequirementsValue" textSelectedColor="0.9910 0.3865 0.0100 1" onCreate="onCreateProductPercent" onCreateArgs="OUTPUT" text="100%" position="-140px 0px" textColor="0.6 0.6 0.6 1"/>
+									<GuiElement type="bitmap" profile="productStatusBarBackground" >
+										<GuiElement type="bitmap" profile="productStatusBarNormal" onCreate="onCreateProductStatusBar" onCreateArgs="OUTPUT"/>
+									</GuiElement>
+								</GuiElement>
+
+								<GuiElement type="text"  profile="productLineInfoTitle" position="45px -155px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="$l10n_shop_capacity" onCreate="onCreateOutputCapacityText"/>
+								<GuiElement type="text"  profile="productLineInfoValue" position="-20px -155px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="100,000 Litres" onCreate="onCreateProductCapacity" onCreateArgs="OUTPUT"/>
+
+							</GuiElement>
+						</GuiElement>
+
+						<GuiElement type="bitmap" profile="smallSliderBG" >
+							<GuiElement type="slider" profile="smallSlider" dataElementId="outputProductItemList" handleFocus="false"/>
+						</GuiElement>
+					</GuiElement>
+
+					<GuiElement type="bitmap" profile="factoryNoOutput" id="noOutputOverlay"/>
+				</GuiElement>
+			</GuiElement>
+
+			<GuiElement type="flowLayout" profile="buttonBoxDocked">
+				<GuiElement type="button" profile="buttonBack" text="$l10n_button_back" onClick="onClickBack" />
+				<GuiElement type="button" profile="buttonOK" text="Start" onClick="onClickOk" id="buttonStart"/>
+			</GuiElement>
+
+			<GuiElement type="flowLayout" profile="buttonBoxRightDocked" id="leftButtonBox">
+				<GuiElement type="button" profile="buttonActivate" text="(0 $)" onClick="onClickActivate" id="buttonPurchase"/>
+				<GuiElement type="button" profile="buttonRemove" text="( - )" onClick="onPagePrevious" id="buttonRemove"/>
+				<GuiElement type="button" profile="buttonAdd" text="( + )" onClick="onPageNext" id="buttonAdd"/>
+			</GuiElement>
+		</GuiElement>
+	</GuiElement>
+</GUI>

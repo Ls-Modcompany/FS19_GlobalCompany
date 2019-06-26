@@ -1,12 +1,12 @@
 --
 -- GlobalCompany - Events - GC_ProductionFactoryProductPurchaseEvent
 --
--- @Interface: --
+-- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany / GtX
 -- @Date: 09.03.2019
 -- @Version: 1.0.0.0
 --
--- @Support: LS-Modcompany
+-- @Support: https://ls-modcompany.com
 --
 -- Changelog:
 --
@@ -21,55 +21,54 @@
 --
 --
 
-GC_ProductionFactoryProductPurchaseEvent = {};
-GC_ProductionFactoryProductPurchaseEvent_mt = Class(GC_ProductionFactoryProductPurchaseEvent, Event);
+GC_ProductionFactoryProductPurchaseEvent = {}
+GC_ProductionFactoryProductPurchaseEvent_mt = Class(GC_ProductionFactoryProductPurchaseEvent, Event)
 
-InitEventClass(GC_ProductionFactoryProductPurchaseEvent, "GC_ProductionFactoryProductPurchaseEvent");
+InitEventClass(GC_ProductionFactoryProductPurchaseEvent, "GC_ProductionFactoryProductPurchaseEvent")
 
 function GC_ProductionFactoryProductPurchaseEvent:emptyNew()
-	local self = Event:new(GC_ProductionFactoryProductPurchaseEvent_mt);
-	return self;
-end;
+	local self = Event:new(GC_ProductionFactoryProductPurchaseEvent_mt)
+	return self
+end
 
-function GC_ProductionFactoryProductPurchaseEvent:new(factory, lineId, inputId, litres)
+function GC_ProductionFactoryProductPurchaseEvent:new(factory, lineId, inputId, buyLiters)
 	local self = GC_ProductionFactoryProductPurchaseEvent:emptyNew()
-	self.factory = factory;
-	self.lineId = lineId;
-	self.inputId = inputId;
-	self.litres = litres;
+	self.factory = factory
+	self.lineId = lineId
+	self.inputId = inputId
+	self.buyLiters = buyLiters
 
-	return self;
-end;
+	return self
+end
 
 function GC_ProductionFactoryProductPurchaseEvent:readStream(streamId, connection)
-	assert(g_currentMission:getIsServer());
-	self.factory = NetworkUtil.readNodeObject(streamId);
-	self.lineId = streamReadUInt8(streamId);
-	self.inputId = streamReadUInt8(streamId);
-	self.litres = streamReadFloat32(streamId);
+	assert(g_currentMission:getIsServer())
+	self.factory = NetworkUtil.readNodeObject(streamId)
+	self.lineId = streamReadUInt8(streamId)
+	self.inputId = streamReadUInt8(streamId)
+	self.buyLiters = streamReadFloat32(streamId)
 
-	self:run(connection);
-end;
+	self:run(connection)
+end
 
 function GC_ProductionFactoryProductPurchaseEvent:writeStream(streamId, connection)
-	NetworkUtil.writeNodeObject(streamId, self.factory);
-	streamWriteUInt8(streamId, self.lineId);
-	streamWriteUInt8(streamId, self.inputId);
-	streamWriteFloat32(streamId, self.litres);
-end;
+	NetworkUtil.writeNodeObject(streamId, self.factory)
+	streamWriteUInt8(streamId, self.lineId)
+	streamWriteUInt8(streamId, self.inputId)
+	streamWriteFloat32(streamId, self.buyLiters)
+end
 
 function GC_ProductionFactoryProductPurchaseEvent:run(connection)
 	if not connection:getIsServer() then
-		local productLine = self.factory.productLines[self.lineId];
+		local productLine = self.factory.productLines[self.lineId]
 		if productLine ~= nil and productLine.inputs ~= nil then
-			local input =  productLine.inputs[self.inputId];
-			input.buyLiters = self.litres;
-			self.factory:doProductPurchase(input);
-		end;
+			local input =  productLine.inputs[self.inputId]
+			self.factory:doProductPurchase(input, self.buyLiters)
+		end
 	else
-		g_company.debug:print("  [LSMC - GlobalCompany > GC_ProductionFactory] ERROR: ProductPurchaseEvent is a client to server only event!");
-	end;
-end;
+		g_company.debug:print("  [LSMC - GlobalCompany > GC_ProductionFactory] ERROR: ProductPurchaseEvent is a client to server only event!")
+	end
+end
 
 
 
