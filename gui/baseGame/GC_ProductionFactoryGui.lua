@@ -250,10 +250,6 @@ function GC_ProductionFactoryGui:setProductLineListItem(productLine, lineId)
 
 	local newListItem = self.productLineItemTemplate:clone(self.productLineItemList)
 	newListItem:updateAbsolutePosition()
-	
-	-- table.insert(self.currentProductLineItemList, self.currentProductLine)
-	--self.numProductLines = self.numProductLines + 1
-	--self.currentProductLineItemList[lineId] = self.currentProductLine
 
 	self.currentProductLine = nil
 end
@@ -309,7 +305,6 @@ function GC_ProductionFactoryGui:onProductLineSelectionChanged(selectedIndex)
 		self.overviewPage:setVisible(self.overviewActive)
 		self.productLinesPage:setVisible(not self.overviewActive)
 
-		-- self.selectedProductLineId = selectedIndex - 1
 		self.selectedProductLineId = Utils.getNoNil(self.selectedIndexToLineId[selectedIndex], 0)
 
 		local leftButtonActive = true
@@ -485,7 +480,7 @@ function GC_ProductionFactoryGui:updateProductLinePage(updateListItems)
 					local inputProduct = selectedProductLine.inputs[inputId]
 					elements.fillLevel:setText(self:formatVolume(inputProduct.fillLevel, true))
 					self:updateStatusBar(elements.statusBar, elements.statusBarSize, inputProduct, true, false)
-					elements.percent:setText(MathUtil.getFlooredPercent(inputProduct.fillLevel, inputProduct.capacity) .. "%")
+					elements.percent:setText(self:getFlooredPercent(inputProduct.fillLevel, inputProduct.capacity))
 				end
 			end
 		end
@@ -502,7 +497,7 @@ function GC_ProductionFactoryGui:updateProductLinePage(updateListItems)
 						self:updateStatusBar(elements.statusBar, elements.statusBarSize, outputProduct, false, false)
 					end
 					if elements.percent ~= nil then
-						elements.percent:setText(MathUtil.getFlooredPercent(outputProduct.fillLevel, outputProduct.capacity) .. "%")
+						elements.percent:setText(self:getFlooredPercent(outputProduct.fillLevel, outputProduct.capacity))
 					end
 				end
 			end
@@ -512,7 +507,7 @@ function GC_ProductionFactoryGui:updateProductLinePage(updateListItems)
 				local productSale = selectedProductLine.productSale
 				elements.incomePerHour:setText(self.l10n:formatMoney(productSale.incomePerHour, 0, true, true))
 				self:updateStatusBar(elements.statusBar, elements.statusBarSize, productSale, true, true)
-				elements.percent:setText(MathUtil.getFlooredPercent(productSale.productivityHours, 24) .. "%")
+				elements.percent:setText(self:getFlooredPercent(productSale.productivityHours, 24))
 
 				if productSale.lifeTimeIncome < GC_ProductionFactoryGui.MAX_INT then
 					elements.lifeTimeIncome:setText(self.l10n:formatMoney(productSale.lifeTimeIncome, 0, true, true))
@@ -589,7 +584,9 @@ end
 function GC_ProductionFactoryGui:updateStatusBar(statusBar, statusBarSize, product, isInput, isProductSale)
 	local barValue = 0
 	if not isProductSale then
-		barValue = MathUtil.clamp(product.fillLevel / product.capacity, 0, 1)
+		if product.capacity > 0 then
+			barValue = MathUtil.clamp(product.fillLevel / product.capacity, 0, 1)
+		end
 	else
 		barValue = MathUtil.clamp(product.productivityHours / 24, 0, 1)
 	end
@@ -711,15 +708,15 @@ function GC_ProductionFactoryGui:onCreateProductPercent(element, argument)
 			self.outputElementMapping[self.currentOutputProductId].percent = element
 
 			if self.outputIsProductSale then
-				element:setText(MathUtil.getFlooredPercent(self.currentOutputProduct.productivityHours, 24) .. "%")
+				element:setText(self:getFlooredPercent(self.currentOutputProduct.productivityHours, 24))
 			else
-				element:setText(MathUtil.getFlooredPercent(self.currentOutputProduct.fillLevel, self.currentOutputProduct.capacity) .. "%")
+				element:setText(self:getFlooredPercent(self.currentOutputProduct.fillLevel, self.currentOutputProduct.capacity))
 			end
 		end
 	else
 		if self.currentInputProduct ~= nil then
 			self.inputElementMapping[self.currentInputProductId].percent = element
-			element:setText(MathUtil.getFlooredPercent(self.currentInputProduct.fillLevel, self.currentInputProduct.capacity) .. "%")
+			element:setText(self:getFlooredPercent(self.currentInputProduct.fillLevel, self.currentInputProduct.capacity))
 		end
 	end
 end
@@ -757,11 +754,17 @@ function GC_ProductionFactoryGui:onCreateOutputFillLevelText(element)
 	end
 end
 
-function GC_ProductionFactoryGui:onCreateOutputPercentText(element)
-	if self.currentOutputProduct ~= nil then
-		if self.outputIsProductSale then
-			element:setText(string.format(self.l10n:getText("shop_maintenanceValue"), self.l10n:getText("statistic_productivity")))
-		else
+function GC_ProductionFactoryGui:onCreatePercentText(element, argument)
+	if argument == "OUTPUT" then
+		if self.currentOutputProduct ~= nil then
+			if self.outputIsProductSale then
+				element:setText(string.format(self.l10n:getText("shop_maintenanceValue"), self.l10n:getText("statistic_productivity")))
+			else
+				element:setText(self.texts.percent)
+			end
+		end
+	else
+		if self.currentInputProduct ~= nil then
 			element:setText(self.texts.percent)
 		end
 	end
@@ -843,9 +846,7 @@ function GC_ProductionFactoryGui:onClickActivate()
 			if buyLiters > 0 then
 				self.confirmDialogLitres = buyLiters
 				local validLitres, price = self.factory:getProductBuyPrice(self.selectedInput, buyLiters)
-				--local text = string.format(self.texts.confirmPurchase, self.selectedInput.title, self:formatVolume(validLitres, true), self.l10n:formatMoney(price, 0, true, true))
-				local text = string.format("Please confirm the following purchase. \n\nInput Product:  %s\nVolume:  %s\nCost:  %s", self.selectedInput.title, self:formatVolume(validLitres, true), self.l10n:formatMoney(price, 0, true, true))
-
+				local text = string.format(self.texts.confirmPurchase, self.selectedInput.title, self:formatVolume(validLitres, true), self.l10n:formatMoney(price, 0, true, true))
 				g_gui:showYesNoDialog({text = text, title = "", callback = self.onConfirmPurchase, target = self})
 			end
 		elseif self.selectedOutput ~= nil then
@@ -1020,4 +1021,9 @@ function GC_ProductionFactoryGui:formatVolume(litres, useLongName)
 	end
 
 	return self.l10n:formatNumber(litres, 0) .. " " .. self.l10n:getVolumeUnit(useLongName)
+end
+
+function GC_ProductionFactoryGui:getFlooredPercent(level, maxLevel)
+    local value = MathUtil.getFlooredPercent(level, maxLevel)	
+	return string.format("%d%%", math.max(value, 0))
 end

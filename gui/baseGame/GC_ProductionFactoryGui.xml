@@ -59,7 +59,7 @@
 								<GuiElement type="text"  profile="productLineInfoTitle" position="45px -55px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="$l10n_info_fillLevel:" />
 								<GuiElement type="text"  profile="productLineInfoValue" position="-20px -55px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="100,000 Litres" onCreate="onCreateProductFillLevel"/>
 
-								<GuiElement type="text"  profile="productLineInfoTitle" size="455px 16px" position="45px -90px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="Percent:">
+								<GuiElement type="text"  profile="productLineInfoTitle" size="455px 16px" position="45px -90px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="Percent:" onCreate="onCreatePercentText">
 									<GuiElement type="text" profile="ingameMenuAnimalsRequirementsValue" textSelectedColor="0.9910 0.3865 0.0100 1" onCreate="onCreateProductPercent" text="100%" position="-140px 0px" textColor="0.6 0.6 0.6 1"/>
 									<GuiElement type="bitmap" profile="productStatusBarBackground" >
 										<GuiElement type="bitmap" profile="productStatusBarNormal" onCreate="onCreateProductStatusBar"/>
@@ -90,7 +90,7 @@
 								<GuiElement type="text"  profile="productLineInfoTitle" position="45px -65px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="$l10n_info_fillLevel:" onCreate="onCreateOutputFillLevelText"/>
 								<GuiElement type="text"  profile="productLineInfoValue" position="-20px -65px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="100,000 Litres" onCreate="onCreateProductFillLevel" onCreateArgs="OUTPUT"/>
 
-								<GuiElement type="text"  profile="productLineInfoTitle" size="455px 16px" position="45px -110px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="Percent:" onCreate="onCreateOutputPercentText">
+								<GuiElement type="text"  profile="productLineInfoTitle" size="455px 16px" position="45px -110px" textSelectedColor="0.9910 0.3865 0.0100 1" textColor="0.6 0.6 0.6 1" textSize="16px" text="Percent:" onCreateArgs="OUTPUT" onCreate="onCreatePercentText">
 									<GuiElement type="text" profile="ingameMenuAnimalsRequirementsValue" textSelectedColor="0.9910 0.3865 0.0100 1" onCreate="onCreateProductPercent" onCreateArgs="OUTPUT" text="100%" position="-140px 0px" textColor="0.6 0.6 0.6 1"/>
 									<GuiElement type="bitmap" profile="productStatusBarBackground" >
 										<GuiElement type="bitmap" profile="productStatusBarNormal" onCreate="onCreateProductStatusBar" onCreateArgs="OUTPUT"/>

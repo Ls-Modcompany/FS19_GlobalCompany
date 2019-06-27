@@ -362,12 +362,12 @@ function GC_FillLevelsDisplay:updateFillLevelFrames()
 
 		local fillBar = self.rightListLevelBars[i]
 		local _, yScale = fillBar:getScale()
-		fillBar:setScale(value * self.uiScale, yScale)
+		fillBar:setScale(MathUtil.clamp(value, 0, 1) * self.uiScale, yScale)
 
 		local posX, posY = frame:getPosition()
 		frame:setPosition(posX, yOffset)
 
-		local fillText = string.format("%d (%d%%)", MathUtil.round(fillLevelInformation.fillLevel), 100 * value)
+		local fillText = string.format("%d (%d%%)", MathUtil.round(fillLevelInformation.fillLevel), math.max(100 * value, 0))
 		self.rightFillLevelTextBuffer[i] = fillText
 
 		self.rightFillTypeTextBuffer[i] = fillLevelInformation.title
@@ -390,12 +390,12 @@ function GC_FillLevelsDisplay:updateFillLevelFrames()
 
 			local fillBar = self.leftListLevelBars[i]
 			local _, yScale = fillBar:getScale()
-			fillBar:setScale(value * self.uiScale, yScale)
+			fillBar:setScale(MathUtil.clamp(value, 0, 1) * self.uiScale, yScale)
 
 			local posX, posY = frame:getPosition()
 			frame:setPosition(posX, yOffset)
 
-			local fillText = string.format("%d (%d%%)", MathUtil.round(fillLevelInformation.fillLevel), 100 * value)
+			local fillText = string.format("%d (%d%%)", MathUtil.round(fillLevelInformation.fillLevel), math.max(100 * value, 0))
 			self.leftFillLevelTextBuffer[i] = fillText
 
 			self.leftFillTypeTextBuffer[i] = fillLevelInformation.title
