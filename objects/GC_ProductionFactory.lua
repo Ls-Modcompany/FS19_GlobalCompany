@@ -168,8 +168,6 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 	self.updateDelay = math.max(Utils.getNoNil(getXMLInt(xmlFile, xmlKey .. ".operation#updateDelayMinutes"), 10), 1)
 	self.updateCounter = self.updateDelay
 
-	self.canPurchaseInputs = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. ".operation#canPurchaseInputProducts"), true)
-
 	if hasXMLProperty(xmlFile, xmlKey .. ".registerAnimations") then
 		local animationManager = GC_AnimationManager:new(self.isServer, self.isClient)
 		if animationManager:load(self.rootNode, self, xmlFile, xmlKey, true) then
@@ -223,7 +221,8 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			local concatTitles = {}
 			local usedFillTypeNames = {}
 
-			inputProduct.name = inputProductName
+			inputProduct.name = inputProductName			
+			inputProduct.canPurchaseProduct = false
 
 			local j = 0
 			while true do
@@ -272,33 +271,20 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				inputProduct.concatedFillTypeTitles = table.concat(concatTitles, " | ")
 				inputProduct.capacity = Utils.getNoNil(getXMLInt(xmlFile, inputProductKey .. "#capacity"), 1000)
 
-				if self.canPurchaseInputs then
-					-- This should be set manually for a realistic price. Worst case backup will be used.
-					-- Price should be more than the cost of a pallet of the same volume and fillType.
-					local pricePerLiter = getXMLFloat(xmlFile, inputProductKey .. "#purchasePricePerLiter")
-					if pricePerLiter == nil or pricePerLiter <= 0.0 then
-						pricePerLiter = 0
-						for fTypeIndex, _ in pairs (inputProduct.fillTypes) do
-							local fillType = g_fillTypeManager:getFillTypeByIndex(fTypeIndex)
-							if fillType ~= nil then
-								local currentPricePerLiter = fillType.pricePerLiter
-								if currentPricePerLiter > pricePerLiter then
-									pricePerLiter = currentPricePerLiter
-								end
-							end
-						end
-
-						if pricePerLiter <= 0 then
-							local fillType = g_fillTypeManager:getFillTypeByName("DIESEL")
-							pricePerLiter = fillType.pricePerLiter
-						end
-
-						pricePerLiter = pricePerLiter * 2.5
+				-- 'fixedPricePerLitre' This is the price per litre to purchase the product.
+				-- 'useSellPointPrice' The highest sell point price for the given fillType will be used. 
+				-- 'purchaseMultiplier' (Default = 1.1) The multiplier to allow for transport and so it is not a easy cheat. (Min Value: 1)
+				local fixedPricePerLitre = getXMLFloat(xmlFile, inputProductKey .. ".purchase#fixedPricePerLitre")	
+				if fixedPricePerLitre == nil or fixedPricePerLitre <= 0.0 then
+					local sellPointFillType = g_fillTypeManager:getFillTypeIndexByName(getXMLString(xmlFile, inputProductKey .. ".purchase#useSellPointPrice"))
+					if sellPointFillType ~= nil then
+						inputProduct.canPurchaseProduct = true
+						inputProduct.sellPointFillType = sellPointFillType
+						inputProduct.purchaseMultiplier = math.max(Utils.getNoNil(getXMLFloat(xmlFile, inputProductKey .. ".purchase#purchaseMultiplier"), 1.1), 1)
 					end
-
-					inputProduct.pricePerLiter = pricePerLiter * math.max(Utils.getNoNil(getXMLFloat(xmlFile, inputProductKey .. "#deliveryCostMultiplier"), 1), 1)
 				else
-					inputProduct.pricePerLiter = 0
+					inputProduct.canPurchaseProduct = true
+					inputProduct.fixedPricePerLitre = fixedPricePerLitre
 				end
 
 				local productTitle = getXMLString(xmlFile, inputProductKey .. "#title")
@@ -312,6 +298,11 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 
 				if hasXMLProperty(xmlFile, inputProductKey .. ".inputMethods") then
 					if self.isServer then
+						-- This is the lifetime limit for the inputProduct if maximumAccepted > 0
+						-- When 'totalDelivered' >= this limit then it will never be accepted again. Nice option for building with a factory.
+						inputProduct.maximumAccepted = Utils.getNoNil(getXMLInt(xmlFile, inputProductKey .. "#maximumAccepted"), 0)						
+						inputProduct.totalDelivered = 0						
+						
 						if hasXMLProperty(xmlFile, inputProductKey .. ".inputMethods.rainWaterCollector") then
 							if inputProduct.fillTypes[FillType.WATER] ~= nil then
 								local litresPerHour = getXMLString(xmlFile, inputProductKey .. ".inputMethods.rainWaterCollector#litresPerHour")
@@ -471,6 +462,8 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 						outputProduct.fillTypeIndex = fillTypeIndex
 						outputProduct.lastFillTypeIndex = fillTypeIndex
 						outputProduct.capacity = Utils.getNoNil(getXMLInt(xmlFile, outputProductKey .. "#capacity"), 1000)
+						
+						outputProduct.removeFillLevelOnSell = Utils.getNoNil(getXMLBool(xmlFile, outputProductKey .. "#removeFillLevelOnSell"), true)
 
 						local productTitle = getXMLString(xmlFile, outputProductKey .. "#title")
 						if productTitle ~= nil then
@@ -663,6 +656,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			productLine.outputPerHour = Utils.getNoNil(getXMLInt(xmlFile, productLineKey .. "#outputPerHour"), 1000)
 
 			productLine.showInGUI = Utils.getNoNil(getXMLBool(xmlFile, productLineKey .. "#showInGUI"), true)
+			productLine.disableOutputGUI = Utils.getNoNil(getXMLBool(xmlFile, productLineKey .. "#disableOutputGUI"), false)
 
 			local productLineTitle = getXMLString(xmlFile, productLineKey .. "#title")
 			if productLineTitle ~= nil then
@@ -1014,7 +1008,13 @@ function GC_ProductionFactory:readStream(streamId, connection)
 			if streamReadBool(streamId) then
 				fillLevel = streamReadFloat32(streamId)
 			end
+			
 			self:updateFactoryLevels(fillLevel, inputProduct, nil, false)
+
+			-- Only on join.
+			if streamReadBool(streamId) then
+				inputProduct.totalDelivered = streamReadFloat32(streamId)
+			end
 		end
 
 		if self.outputProducts ~= nil then
@@ -1052,6 +1052,12 @@ function GC_ProductionFactory:writeStream(streamId, connection)
 			local fillLevel = inputProduct.fillLevel
 			if streamWriteBool(streamId, fillLevel > 0) then
 				streamWriteFloat32(streamId, fillLevel)
+			end
+			
+			-- Only on join.
+			local totalDelivered = inputProduct.totalDelivered
+			if streamWriteBool(streamId, totalDelivered > 0) then
+				streamWriteFloat32(streamId, totalDelivered)
 			end
 		end
 
@@ -1175,6 +1181,12 @@ function GC_ProductionFactory:loadFromXMLFile(xmlFile, key)
 
 			local fillLevel = math.max(Utils.getNoNil(getXMLFloat(xmlFile, inputProductKey .. "#fillLevel"), 0), 0)
 			self:updateFactoryLevels(fillLevel, inputProduct, lastFillTypeIndex, false)
+			
+			-- Do this now so we can correct the value before updating players when joining.
+			-- After this we can update without any extra data ;-)
+			if inputProduct.maximumAccepted > 0 then
+				inputProduct.totalDelivered = math.min(math.max(Utils.getNoNil(getXMLFloat(xmlFile, inputProductKey .. "#totalDelivered"), 0), 0), inputProduct.maximumAccepted)
+			end
 		end
 
 		i = i + 1
@@ -1258,10 +1270,6 @@ function GC_ProductionFactory:loadFromXMLFile(xmlFile, key)
 		end
 	end
 
-	--if self.animationManager ~= nil then
-		--self.animationManager:loadFromXMLFile(xmlFile, factoryKey)
-	--end
-
 	return true
 end
 
@@ -1279,12 +1287,21 @@ function GC_ProductionFactory:saveToXMLFile(xmlFile, key, usedModNames)
 	local index = 0
 	for _, inputProduct in ipairs(self.inputProducts) do
 		local fillLevel = inputProduct.fillLevel
+		
+		local totalDelivered = 0
+		if inputProduct.maximumAccepted > 0 then
+			totalDelivered = inputProduct.totalDelivered
+		end
 
-		if fillLevel > 0 then
+		if fillLevel > 0 or totalDelivered > 0 then
 			local inputProductKey = string.format("%s.inputProducts.inputProduct(%d)", factoryKey, index)
 
 			setXMLString(xmlFile, inputProductKey .. "#name", inputProduct.name)
 			setXMLFloat(xmlFile, inputProductKey .. "#fillLevel", fillLevel)
+			
+			if totalDelivered > 0 then
+				setXMLFloat(xmlFile, inputProductKey .. "#totalDelivered", totalDelivered)
+			end
 
 			local lastFillTypeName = g_fillTypeManager:getFillTypeNameByIndex(inputProduct.lastFillTypeIndex)
 			if lastFillTypeName ~= nil then
@@ -1301,7 +1318,6 @@ function GC_ProductionFactory:saveToXMLFile(xmlFile, key, usedModNames)
 			local fillLevel = outputProduct.fillLevel
 			if fillLevel > 0 then
 				local outputProductKey = string.format("%s.outputProducts.outputProduct(%d)", factoryKey, index)
-
 
 				setXMLString(xmlFile, outputProductKey .. "#name", outputProduct.name)
 				setXMLFloat(xmlFile, outputProductKey .. "#fillLevel", outputProduct.fillLevel)
@@ -1339,10 +1355,6 @@ function GC_ProductionFactory:saveToXMLFile(xmlFile, key, usedModNames)
 			index = index + 1
 		end
 	end
-
-	--if self.animationManager ~= nil then
-		--self.animationManager:saveToXMLFile(xmlFile, factoryKey, usedModNames)
-	--end
 end
 
 function GC_ProductionFactory:update(dt)
@@ -1622,6 +1634,15 @@ function GC_ProductionFactory:updateFactoryLevels(fillLevel, product, fillTypeIn
 		return
 	end
 
+	if product.maximumAccepted ~= nil and product.maximumAccepted > 0 then
+		if product.totalDelivered <= product.maximumAccepted then	
+			local levelToAdd = fillLevel - product.fillLevel
+			if levelToAdd > 0 then
+				product.totalDelivered = product.totalDelivered + levelToAdd
+			end
+		end
+	end
+	
 	product.fillLevel = fillLevel
 
 	if self.isClient then
@@ -1841,10 +1862,16 @@ end
 function GC_ProductionFactory:getFreeCapacity(fillTypeIndex, farmId, triggerId)
 	local fillLevel, capacity = 0, 0
 
+	-- This is ONLY used for input triggers!
 	local product = self:getProductFromTriggerId(triggerId, fillTypeIndex, true)
 	if product ~= nil then
-		fillLevel = product.fillLevel
-		capacity = product.capacity
+		if product.maximumAccepted <= 0 then
+			fillLevel = product.fillLevel
+			capacity = product.capacity
+		else
+			fillLevel = product.totalDelivered
+			capacity = product.maximumAccepted
+		end
 	end
 
 	return capacity - fillLevel
@@ -1880,19 +1907,18 @@ end
 
 function GC_ProductionFactory:getAllProvidedFillLevels(farmId, triggerId)
 	local fillLevels = {}
-	local capacity = 0
 
 	if self.providedFillTypes[triggerId] ~= nil then
 		for fillTypeIndex, _ in pairs(self.providedFillTypes[triggerId]) do
 			local output = self:getProductFromTriggerId(triggerId, fillTypeIndex, false)
 			if output ~= nil then
 				fillLevels[fillTypeIndex] = Utils.getNoNil(fillLevels[fillTypeIndex], 0) + output.fillLevel
-				--capacity = capacity + output.capacity
 			end
 		end
 	end
 
-	return fillLevels, capacity
+	-- I suppress the capacity in the UI so just send '0' as they are all different.
+	return fillLevels, 0
 end
 
 function GC_ProductionFactory:getProvidedFillLevel(fillTypeIndex, farmId, triggerId)
@@ -1905,9 +1931,13 @@ function GC_ProductionFactory:getProvidedFillLevel(fillTypeIndex, farmId, trigge
 end
 
 function GC_ProductionFactory:playerTriggerActivated(lineId)
-	if lineId ~= nil and self.productLines[lineId] ~= nil then
-		if not self.productLines[lineId].showInGUI then
-			return
+	if lineId ~= nil then
+		if self.productLines[lineId] ~= nil then
+			if not self.productLines[lineId].showInGUI then
+				return
+			end
+		else
+			lineId = nil
 		end
 	end
 
@@ -1942,7 +1972,7 @@ function GC_ProductionFactory:getFillLevelInformation(listRight, listLeft)
 		for id, input in pairs (inputs) do
 			listRight[id] = {title = input.title, fillLevel = input.fillLevel, capacity = input.capacity}
 
-			if id >= 10 then
+			if id >= GC_ProductionFactory.LIMIT then
 				break
 			end
 		end
@@ -1952,7 +1982,7 @@ function GC_ProductionFactory:getFillLevelInformation(listRight, listLeft)
 			for id, output in pairs (outputs) do
 				listLeft[id] = {title = output.title, fillLevel = output.fillLevel, capacity = output.capacity}
 
-				if id >= 10 then
+				if id >= GC_ProductionFactory.LIMIT then
 					break
 				end
 			end
@@ -1982,61 +2012,88 @@ function GC_ProductionFactory:getOutputs(lineId)
 	return
 end
 
-function GC_ProductionFactory:canBuyProduct()
-	local hasPermission = self.canPurchaseInputs
+function GC_ProductionFactory:getInputFreeCapacity(input)
+	local fillLevel, capacity = 0, 0
+	
+	if input.maximumAccepted <= 0 then
+		capacity = input.capacity
+		fillLevel = input.fillLevel
+	else	
+		fillLevel = input.totalDelivered
+		capacity = input.maximumAccepted
+	end
+	
+	return capacity - fillLevel
+end
 
-	if hasPermission and g_currentMission.missionDynamicInfo.isMultiplayer then
-		return g_currentMission.isMasterUser or g_currentMission:getIsServer()
+function GC_ProductionFactory:canBuyProduct(input)
+	local hasPermission = input ~= nil and input.canPurchaseProduct
+
+	if hasPermission and g_currentMission.missionDynamicInfo.isMultiplayer then		
+		local userId = g_currentMission.playerUserId
+		local permissions = g_farmManager:getFarmByUserId(userId):getUserPermissions(userId)
+		if permissions.buyVehicle or
+			permissions.transferMoney or
+			permissions.tradeAnimals or
+			permissions.buyPlaceable or
+			permissions.updateFarm then
+			
+			return true
+		else
+			return false
+		end
 	end
 
 	return hasPermission
 end
 
-function GC_ProductionFactory:changeBuyLiters(input, delta, currentBuyLiters)
+function GC_ProductionFactory:changeBuyLiters(input, delta, currentBuyLiters, purchasePrice)
 	local moneyAvailable = 0
 	if g_currentMission ~= nil and g_currentMission.player ~= nil then
 		local farm = g_farmManager:getFarmById(g_currentMission.player.farmId)
 		moneyAvailable = farm.money
 	end
 
-	if moneyAvailable > 0 then
-		local maxLitres = input.capacity - input.fillLevel
-		local maxCanBuy = math.floor(moneyAvailable / input.pricePerLiter)
+	if moneyAvailable > 0 and (purchasePrice ~= nil and purchasePrice > 0) then
+		local maxLitres = self:getInputFreeCapacity(input)
+		local maxCanBuy = moneyAvailable / purchasePrice
 		local maxToAdd = math.min(maxLitres, maxCanBuy)
 
 		local newLiters = Utils.getNoNil(currentBuyLiters, 0) + delta
 		if newLiters >= 0 then
-			if maxToAdd > newLiters then
-				return newLiters
+			if maxToAdd >= newLiters then
+				return newLiters, newLiters * purchasePrice
 			else
-				return 0
+				return 0, 0
 			end
 		else
-			return maxToAdd
+			return maxToAdd, maxToAdd * purchasePrice
 		end
 	end
 
-	return 0
+	return 0, 0
 end
 
-function GC_ProductionFactory:getProductBuyPrice(input, buyLiters)
+function GC_ProductionFactory:verifyPriceAndLitres(input, buyLiters, purchasePrice)
 	local validLitres, price = 0, 0
 
 	if input ~= nil and buyLiters ~= nil then
-		validLitres = math.min(buyLiters, math.floor(input.capacity - input.fillLevel))
+		local maxLitres = self:getInputFreeCapacity(input)
+		validLitres = math.min(buyLiters, maxLitres)
 		if validLitres > 0 then
-			price = input.pricePerLiter * validLitres
+			price = purchasePrice * validLitres
 		end
 	end
 
 	return validLitres, price
 end
 
-function GC_ProductionFactory:doProductPurchase(input, buyLiters)
-	if input ~= nil and (buyLiters ~= nil and buyLiters > 0) then
+function GC_ProductionFactory:doProductPurchase(input, buyLiters, purchasePrice)
+	if input ~= nil and (buyLiters ~= nil and buyLiters > 0) and purchasePrice ~= nil then
 		if g_currentMission:getIsServer() then
-			local validLitres = math.min(buyLiters, input.capacity - input.fillLevel)
-			local price = input.pricePerLiter * Utils.getNoNil(validLitres, 0)
+			local maxLitres = self:getInputFreeCapacity(input)
+			local validLitres = math.min(buyLiters, maxLitres)
+			local price = purchasePrice * Utils.getNoNil(validLitres, 0)
 			if price > 0 then
 				local newFillLevel = input.fillLevel + validLitres
 				g_currentMission:addMoney(-price, self:getOwnerFarmId(), MoneyType.OTHER, true, true)
@@ -2044,7 +2101,7 @@ function GC_ProductionFactory:doProductPurchase(input, buyLiters)
 				self:doAutoStart(nil, nil, true)
 			end
 		else
-			g_client:getServerConnection():sendEvent(GC_ProductionFactoryProductPurchaseEvent:new(self, input.lineId, input.id, buyLiters))
+			g_client:getServerConnection():sendEvent(GC_ProductionFactoryProductPurchaseEvent:new(self, input.lineId, input.id, buyLiters, purchasePrice))
 		end
 	end
 end
@@ -2152,46 +2209,50 @@ function GC_ProductionFactory:doBulkProductSell(getPrice)
 	local totalSellPrice = 0
 
 	for id, inputProduct in pairs (self.inputProducts) do
-		local fillLevel = inputProduct.fillLevel
-
-		if fillLevel > 100 then
-			local lowestPrice = math.huge
-
-			for fillTypeIndex, _ in pairs (inputProduct.fillTypes) do
-				local fillTypePrice = self:getFillTypePrice(fillTypeIndex, true)
-				if fillTypePrice < lowestPrice then
-					lowestPrice = fillTypePrice
+		if inputProduct.maximumAccepted <= 0 then
+			local fillLevel = inputProduct.fillLevel
+	
+			if fillLevel > 100 then
+				local lowestPrice = math.huge
+	
+				for fillTypeIndex, _ in pairs (inputProduct.fillTypes) do
+					local fillTypePrice = self:getFillTypePrice(fillTypeIndex, true)
+					if fillTypePrice < lowestPrice then
+						lowestPrice = fillTypePrice
+					end
 				end
+	
+				if lowestPrice == math.huge then
+					lowestPrice = 0.5
+				end
+	
+				local price = fillLevel * lowestPrice
+				totalSellPrice = totalSellPrice + price
 			end
-
-			if lowestPrice == math.huge then
-				lowestPrice = 0.5
+	
+			if not getPrice then
+				self:updateFactoryLevels(0.0, inputProduct, nil, false)
 			end
-
-			local price = fillLevel * lowestPrice
-			totalSellPrice = totalSellPrice + price
-		end
-
-		if not getPrice then
-			self:updateFactoryLevels(0.0, inputProduct, nil, false)
 		end
 	end
 
 	for _, outputProduct in pairs (self.outputProducts) do
-		local fillLevel = outputProduct.fillLevel
-		if fillLevel > 100 then
-			local lowestPrice = self:getFillTypePrice(outputProduct.fillTypeIndex, true)
-
-			if lowestPrice == math.huge then
-				lowestPrice = 0.5
+		if outputProduct.removeFillLevelOnSell then
+			local fillLevel = outputProduct.fillLevel
+			if fillLevel > 100 then
+				local lowestPrice = self:getFillTypePrice(outputProduct.fillTypeIndex, true)
+	
+				if lowestPrice == math.huge then
+					lowestPrice = 0.5
+				end
+	
+				local price = fillLevel * lowestPrice
+				totalSellPrice = totalSellPrice + price
 			end
-
-			local price = fillLevel * lowestPrice
-			totalSellPrice = totalSellPrice + price
-		end
-
-		if not getPrice then
-			self:updateFactoryLevels(0.0, outputProduct, nil, false)
+	
+			if not getPrice then
+				self:updateFactoryLevels(0.0, outputProduct, nil, false)
+			end
 		end
 	end
 
@@ -2211,7 +2272,7 @@ function GC_ProductionFactory:getFillTypePrice(fillTypeIndex, lowest)
 		fillTypePrice = math.huge
 	end
 
-	if (fillTypeIndex ~= FillType.UNKNOWN) and (fillTypeIndex ~= FillType.WATER) then
+	if fillTypeIndex ~= nil and (fillTypeIndex ~= FillType.UNKNOWN) and (fillTypeIndex ~= FillType.WATER) then
 		for _, unloadingStation in pairs (g_currentMission.storageSystem.unloadingStations) do
 			if unloadingStation.isSellingPoint and unloadingStation.fillTypePrices[fillTypeIndex] ~= nil and unloadingStation.fillTypePrices[fillTypeIndex] > 0 then
 				local price = unloadingStation:getEffectiveFillTypePrice(fillTypeIndex)

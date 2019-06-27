@@ -65,7 +65,7 @@
 		
 		<e k="GC_gui_disabled" v="Deaktiviert"/>
 		<e k="GC_gui_add" v="Hinzufügen"/>
-		<e k="GC_gui_remove" v="Löschen"/>
+		<e k="GC_gui_remove" v="Entfernen"/>
 		<e k="GC_gui_max" v="Maximum"/>
 		<e k="GC_gui_percent" v="Prozent"/>
 		<e k="GC_gui_lifeTimeIncome" v="Bisheriger Verdienst"/>

@@ -92,6 +92,8 @@ function GC_ProductionFactoryGui:new(l10n, messageCenter)
 
 	self.confirmDialogLitres = nil
 	self.outputIsProductSale = false
+	
+	self.productPurchasePrices = {}
 
 	self.defaultImage = g_company.dir .. "images/factoryDefault.dds"
 
@@ -394,7 +396,7 @@ function GC_ProductionFactoryGui:setProductLinePage(lineId, doPageCreate)
 		self.currentProductSaleItemList = nil
 
 		local displayOutputs = false
-		if not self.factory.disableAllOutputGUI then
+		if not self.factory.disableAllOutputGUI and not selectedProductLine.disableOutputGUI then
 			local outputProducts = selectedProductLine.outputs
 			if outputProducts == nil and selectedProductLine.productSale ~= nil then
 				self.outputIsProductSale = true
@@ -485,34 +487,36 @@ function GC_ProductionFactoryGui:updateProductLinePage(updateListItems)
 			end
 		end
 
-		if self.currentOutputItemList ~= nil then
-			for outputId, _ in pairs (self.currentOutputItemList) do
-				local elements = self.outputElementMapping[outputId]
-				if elements ~= nil then
-					local outputProduct = selectedProductLine.outputs[outputId]
-					if elements.fillLevel ~= nil then
-						elements.fillLevel:setText(self:formatVolume(outputProduct.fillLevel, true))
-					end
-					if elements.statusBar ~= nil then
-						self:updateStatusBar(elements.statusBar, elements.statusBarSize, outputProduct, false, false)
-					end
-					if elements.percent ~= nil then
-						elements.percent:setText(self:getFlooredPercent(outputProduct.fillLevel, outputProduct.capacity))
+		if not self.factory.disableAllOutputGUI and not selectedProductLine.disableOutputGUI then
+			if self.currentOutputItemList ~= nil then
+				for outputId, _ in pairs (self.currentOutputItemList) do
+					local elements = self.outputElementMapping[outputId]
+					if elements ~= nil then
+						local outputProduct = selectedProductLine.outputs[outputId]
+						if elements.fillLevel ~= nil then
+							elements.fillLevel:setText(self:formatVolume(outputProduct.fillLevel, true))
+						end
+						if elements.statusBar ~= nil then
+							self:updateStatusBar(elements.statusBar, elements.statusBarSize, outputProduct, false, false)
+						end
+						if elements.percent ~= nil then
+							elements.percent:setText(self:getFlooredPercent(outputProduct.fillLevel, outputProduct.capacity))
+						end
 					end
 				end
-			end
-		elseif self.currentProductSaleItemList ~= nil then
-			local elements = self.outputElementMapping[1]
-			if elements ~= nil then
-				local productSale = selectedProductLine.productSale
-				elements.incomePerHour:setText(self.l10n:formatMoney(productSale.incomePerHour, 0, true, true))
-				self:updateStatusBar(elements.statusBar, elements.statusBarSize, productSale, true, true)
-				elements.percent:setText(self:getFlooredPercent(productSale.productivityHours, 24))
-
-				if productSale.lifeTimeIncome < GC_ProductionFactoryGui.MAX_INT then
-					elements.lifeTimeIncome:setText(self.l10n:formatMoney(productSale.lifeTimeIncome, 0, true, true))
-				else
-					elements.lifeTimeIncome:setText(self.l10n:formatMoney(productSale.lifeTimeIncome, 0, true, true) .. " +")
+			elseif self.currentProductSaleItemList ~= nil then
+				local elements = self.outputElementMapping[1]
+				if elements ~= nil then
+					local productSale = selectedProductLine.productSale
+					elements.incomePerHour:setText(self.l10n:formatMoney(productSale.incomePerHour, 0, true, true))
+					self:updateStatusBar(elements.statusBar, elements.statusBarSize, productSale, true, true)
+					elements.percent:setText(self:getFlooredPercent(productSale.productivityHours, 24))
+	
+					if productSale.lifeTimeIncome < GC_ProductionFactoryGui.MAX_INT then
+						elements.lifeTimeIncome:setText(self.l10n:formatMoney(productSale.lifeTimeIncome, 0, true, true))
+					else
+						elements.lifeTimeIncome:setText(self.l10n:formatMoney(productSale.lifeTimeIncome, 0, true, true) .. " +")
+					end
 				end
 			end
 		end
@@ -558,8 +562,9 @@ function GC_ProductionFactoryGui:updateProductLineListItem(productLine, productL
 				self.productLineStatusText:setText(statusText)
 				self.productLineOperationText:setText(operationText)
 
-				if self.selectedInput ~= nil and self.factory:canBuyProduct() then
-					self:setButtonState(nil, (self.selectedInput.capacity - self.selectedInput.fillLevel) > 0, false)
+				if self.selectedInput ~= nil and self.factory:canBuyProduct(self.selectedInput) then
+					local freeCapacity = self.factory:getInputFreeCapacity(self.selectedInput)				
+					self:setButtonState(nil, freeCapacity > 0, false)
 				end
 			end
 		end
@@ -619,9 +624,9 @@ function GC_ProductionFactoryGui:onInputProductSelectionChanged(selectedIndex)
 		local inputs = self.factory:getInputs(self.selectedProductLineId)
 		if inputs ~= nil then
 			self.selectedInput = inputs[selectedIndex]
-
-			if self.selectedInput ~= nil and (self.selectedInput.capacity - self.selectedInput.fillLevel) > 0 then
-				buttonState = self.factory:canBuyProduct()
+	
+			if self.selectedInput ~= nil and self.factory:getInputFreeCapacity(self.selectedInput) > 0 then
+				buttonState = self.factory:canBuyProduct(self.selectedInput)
 			end
 		end
 
@@ -802,9 +807,8 @@ function GC_ProductionFactoryGui:onClose(element)
 
 	self.isOpen = false
 	self:setLiveCamera(false, true)
-
-	--g_currentMission:resetGameState()
-	--self.messageCenter:unsubscribeAll(self)
+	
+	self.productPurchasePrices = {}
 
 	g_depthOfFieldManager:setBlurState(false)
 end
@@ -844,8 +848,14 @@ function GC_ProductionFactoryGui:onClickActivate()
 		if self.selectedInput ~= nil then
 			local buyLiters = self.buyLiters
 			if buyLiters > 0 then
+				local input = self.selectedInput
 				self.confirmDialogLitres = buyLiters
-				local validLitres, price = self.factory:getProductBuyPrice(self.selectedInput, buyLiters)
+				
+				if self.productPurchasePrices[input] == nil then
+					self.productPurchasePrices[input] = self:getProductPurchasePrice(input)
+				end
+				
+				local validLitres, price = self.factory:verifyPriceAndLitres(input, buyLiters, self.productPurchasePrices[input])
 				local text = string.format(self.texts.confirmPurchase, self.selectedInput.title, self:formatVolume(validLitres, true), self.l10n:formatMoney(price, 0, true, true))
 				g_gui:showYesNoDialog({text = text, title = "", callback = self.onConfirmPurchase, target = self})
 			end
@@ -862,7 +872,7 @@ end
 function GC_ProductionFactoryGui:onConfirmPurchase(confirm)
 	if self.selectedInput ~= nil then
 		if confirm then
-			self.factory:doProductPurchase(self.selectedInput, self.buyLiters)
+			self.factory:doProductPurchase(self.selectedInput, self.buyLiters, self.productPurchasePrices[self.selectedInput])
 			self:setProductLinePage(self.selectedProductLineId, false)
 			self.buyLiters = 0
 		else
@@ -920,8 +930,13 @@ function GC_ProductionFactoryGui:setPurchaseAmount(input, litres)
 	local purchaseText, removeText = "", self.texts.max
 
 	if input ~= nil and litres ~= nil then
-		self.buyLiters = self.factory:changeBuyLiters(input, litres, self.buyLiters)
-		local validLitres, price = self.factory:getProductBuyPrice(input, self.buyLiters)
+		if self.productPurchasePrices[input] == nil then
+			self.productPurchasePrices[input] = self:getProductPurchasePrice(input)
+		end
+		
+		local validLitres, price = self.factory:changeBuyLiters(input, litres, self.buyLiters, self.productPurchasePrices[input])
+		self.buyLiters = validLitres		
+
 		purchaseText = string.format("%s ( %s ) ( %s )", self.l10n:getText("button_buy"), self:formatVolume(validLitres, false), self.l10n:formatMoney(price, 0, true, true))
 
 		if validLitres > 0 then
@@ -933,6 +948,22 @@ function GC_ProductionFactoryGui:setPurchaseAmount(input, litres)
 
 	self.buttonPurchase:setText(purchaseText)
 	self.buttonRemove:setText(removeText)
+end
+
+function GC_ProductionFactoryGui:getProductPurchasePrice(input)
+	local purchasePrice = input.fixedPricePerLitre
+	if purchasePrice == nil and input.sellPointFillType ~= nil then
+		if input.sellPointFillType == FillType.WATER then
+			return g_currentMission.economyManager:getPricePerLiter(FillType.WATER) * 0.5
+		end
+		
+		purchasePrice = self.factory:getFillTypePrice(input.sellPointFillType, false) * input.purchaseMultiplier
+		if purchasePrice <= 0 then
+			return 1.7
+		end
+	end
+
+	return purchasePrice
 end
 
 function GC_ProductionFactoryGui:setPalletSpawnAmount(output, number)

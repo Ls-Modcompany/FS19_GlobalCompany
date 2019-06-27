@@ -16,7 +16,7 @@
 --
 --
 -- Notes:
---		- Concept and some functions parts referenced from 'FillLevelsDisplay.lua'
+--		- Concept and functions parts referenced from 'FillLevelsDisplay.lua'
 --		- https://gdn.giants-software.com/documentation_scripting_fs19.php?version=engine&category=97&class=10207
 --
 --
@@ -56,10 +56,10 @@ GC_FillLevelsDisplay.SIZE = {
    FILL_TYPE_FRAME = {180, 80}
 }
 
-local function clearTable(tableToClear)
-	for i = #tableToClear, 1, -1 do
-		tableToClear[i] = nil
-	end
+local function clearTable(table)
+    for k in pairs(table) do
+        table[k] = nil
+    end
 end
 
 function GC_FillLevelsDisplay.new(hudAtlasPath)
