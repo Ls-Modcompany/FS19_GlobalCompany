@@ -13,7 +13,6 @@
 -- 	v1.1.0.0 (08.03.2019):
 -- 		- convert to fs19
 --
---
 -- 	v1.0.0.0 (26.06.2018):
 -- 		- initial fs17 (GtX)
 --
@@ -57,10 +56,14 @@ function GC_PalletCreator:new(isServer, isClient, customMt)
 end
 
 function GC_PalletCreator:load(nodeId, target, xmlFile, xmlKey, baseDirectory, permittedFillTypeIndex)
-	self.rootNode = nodeId
-	self.target = target
+	if nodeId == nil or target == nil  then
+		return false
+	end
 
 	self.debugData = g_company.debug:getDebugData(GC_PalletCreator.debugIndex, target)
+
+	self.rootNode = nodeId
+	self.target = target
 
 	self.baseDirectory = GlobalCompanyUtils.getParentBaseDirectory(target, baseDirectory)
 
@@ -74,6 +77,7 @@ function GC_PalletCreator:load(nodeId, target, xmlFile, xmlKey, baseDirectory, p
 		return false
 	end
 
+	local returnValue = false
 	local palletCreatorsKey = string.format("%s.palletCreators", xmlKey)
 
 	local fillTypeName = getXMLString(xmlFile, palletCreatorsKey .. "#fillType")
@@ -164,7 +168,7 @@ function GC_PalletCreator:load(nodeId, target, xmlFile, xmlKey, baseDirectory, p
 									self:setPalletCreatorId()
 								end
 
-								return true
+								returnValue = true
 							else
 								g_company.debug:writeModding(self.debugData, "No 'palletCreator' nodes have been found at %s", palletCreatorsKey)
 							end
@@ -181,7 +185,7 @@ function GC_PalletCreator:load(nodeId, target, xmlFile, xmlKey, baseDirectory, p
 		end
 	end
 
-	return false
+	return returnValue
 end
 
 function GC_PalletCreator:delete()
@@ -270,6 +274,8 @@ function GC_PalletCreator:updatePalletCreators(delta, includeDeltaToAdd)
 
 			return totalFillLevel, appliedDelta > 0
 		end
+	else
+		g_company.debug:writeDev(self.debugData, "'updatePalletCreators' is a client only function!")
 	end
 end
 
@@ -486,7 +492,6 @@ function GC_PalletCreator:getNumFullPallets()
 	return count
 end
 
--- This can provide data for the gui. (FillLevel, Capacity and Vehicle Store Data [if in spawn area])
 function GC_PalletCreator:getAllSpawnerData()
 	local spawnerData = {}
 

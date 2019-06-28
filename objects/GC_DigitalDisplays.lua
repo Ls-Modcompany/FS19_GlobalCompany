@@ -14,7 +14,7 @@
 -- 		- convert to fs19
 --
 -- 	v1.0.0.0 (09.06.2018):
--- 		- initial fs17
+-- 		- initial fs17 (GtX)
 --
 -- Notes:
 --
@@ -28,7 +28,6 @@
 --
 --
 -- ToDo:
---		- Add text shader support.
 --
 --
 
@@ -60,11 +59,16 @@ function GC_DigitalDisplays:new(isServer, isClient, customMt)
 end
 
 function GC_DigitalDisplays:load(nodeId, target, xmlFile, xmlKey, groupKey, disableFillType)
+	if nodeId == nil or target == nil then
+		return false
+	end
+
 	self.debugData = g_company.debug:getDebugData(GC_DigitalDisplays.debugIndex, target)
 
 	self.rootNode = nodeId
 	self.target = target
 
+	local returnValue = false
 	if self.isClient then
 		self.disableFillType = Utils.getNoNil(disableFillType, false)
 
@@ -134,6 +138,7 @@ function GC_DigitalDisplays:load(nodeId, target, xmlFile, xmlKey, groupKey, disa
 							end
 
 							table.insert(self.levelDisplays[typeIndex], display)
+							returnValue = true
 						else
 							local fillTypeName = getXMLString(xmlFile, key .. "#fillType")
 							if fillTypeName ~= nil then
@@ -148,6 +153,7 @@ function GC_DigitalDisplays:load(nodeId, target, xmlFile, xmlKey, groupKey, disa
 									end
 
 									table.insert(self.levelDisplays[fillTypeIndex][typeIndex], display)
+									returnValue = true
 								else
 									g_company.debug:writeModding(self.debugData, "fillType '%s' is not valid at %s", fillTypeName, key)
 								end
@@ -167,7 +173,7 @@ function GC_DigitalDisplays:load(nodeId, target, xmlFile, xmlKey, groupKey, disa
 		end
 	end
 
-	return true
+	return returnValue
 end
 
 function GC_DigitalDisplays:updateLevelDisplays(fillLevel, capacity, fillTypeIndex)
@@ -219,8 +225,7 @@ end
 -- IMPORTANT: Do not call this function outside this script. Use 'updateDisplays' instead.
 function GC_DigitalDisplays:setLevelDisplayValue(display, value, maxLevel)
 	local valueToSet = math.min(display.maxValue, math.max(0, value))
-	--local actualValue = tonumber(string.format("%.0f", valueToSet))
-	local actualValue = math.floor(valueToSet) -- Precision is always '0' so this will operate much faster.
+	local actualValue = math.floor(valueToSet)
 
 	if display.lastvalue ~= actualValue then
 		display.lastvalue = actualValue

@@ -43,10 +43,14 @@ function GC_ObjectSpawner:new(isServer, isClient, customMt)
 end
 
 function GC_ObjectSpawner:load(nodeId, target, xmlFile, xmlKey, keyName)
-	self.rootNode = nodeId
-	self.target = target
+	if nodeId == nil or target == nil then
+		return false
+	end
 
 	self.debugData = g_company.debug:getDebugData(GC_ObjectSpawner.debugIndex, target)
+
+	self.rootNode = nodeId
+	self.target = target
 
 	local key = xmlKey .. Utils.getNoNil(keyName, ".objectSpawner")
 

@@ -11,7 +11,7 @@
 -- Changelog:
 --
 -- 	v1.1.1.0 (06.02.2019):
--- 		- change to 'raiseUpdate' Updateable.
+-- 		- change to 'raiseUpdate'
 --
 -- 	v1.1.0.0 (28.01.2019):
 -- 		- convert to fs19
@@ -58,13 +58,20 @@ function GC_Lighting:new(isServer, isClient, customMt)
 end
 
 function GC_Lighting:load(nodeId, target, xmlFile, xmlKey, baseDirectory, allowProfileOverride, beaconKey, strobeKey, areaKey, noBeacon, noStrobe, noArea)
-	self.rootNode = nodeId
-	self.target = target
+	if nodeId == nil or target == nil or xmlFile == nil or xmlKey == nil then
+		local text = "Loading failed! 'nodeId' parameter = %s, 'target' parameter = %s 'xmlFile' parameter = %s, 'xmlKey' parameter = %s"
+		g_company.debug:logWrite(GC_Lighting.debugIndex, GC_DebugUtils.DEV, text, nodeId ~= nil, target ~= nil, xmlFile ~= nil, xmlKey ~= nil)
+		return false
+	end
 
 	self.debugData = g_company.debug:getDebugData(GC_Lighting.debugIndex, target)
+
+	self.rootNode = nodeId
+	self.target = target
 	
 	self.baseDirectory = GlobalCompanyUtils.getParentBaseDirectory(target, baseDirectory)
 
+	local returnValue = false
 	if self.isClient then
 		self.allowProfileOverride = Utils.getNoNil(allowProfileOverride, false)
 
@@ -111,10 +118,11 @@ function GC_Lighting:load(nodeId, target, xmlFile, xmlKey, baseDirectory, allowP
 
 		if self.beaconLights ~= nil or self.strobeLights ~= nil or self.areaLights ~= nil then
 			g_company.addRaisedUpdateable(self)
+			returnValue = true
 		end
 	end
 
-	return true
+	return returnValue
 end
 
 function GC_Lighting:delete()
@@ -782,7 +790,7 @@ function GC_Lighting:setLightsState(lightType, state, noEventSend)
 	end
 
 	if lightTypeId ~= nil and state ~= nil then
-		--GC_LightingEvent.sendEvent(self, lightTypeId, state, noEventSend) -- Will be added when MP works are started.
+		--GC_LightingEvent.sendEvent(self, lightTypeId, state, noEventSend)
 
 		if lightTypeId == 1 and self.beaconLights ~= nil then
 			self:setBeaconLightsState(state)
@@ -955,7 +963,3 @@ function GC_Lighting:setDirtLevel(rootNode, level)
 		setShaderParameter(dirtNode, "RDT", x, dirtLevel, z, w, false)
 	end
 end
-
-
-
-

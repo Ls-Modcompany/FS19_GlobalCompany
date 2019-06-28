@@ -2,7 +2,7 @@
 -- GlobalCompany - Triggers - GC_DynamicHeap
 --
 -- @Interface: 1.4.0.0 b5007
--- @Author: LS-Modcompany
+-- @Author: LS-Modcompany / kevink98
 -- @Date: 14.01.2019
 -- @Version: 1.1.0.0
 --
@@ -11,6 +11,7 @@
 -- Changelog:
 -- 	v1.1.0.0 (14.01.2019):
 -- 		- convert to fs19
+--		- New functions and XML support
 --
 -- 	v1.0.0.0 (19.05.2018):
 -- 		- initial fs17 (kevink98)
@@ -50,11 +51,15 @@ function GC_DynamicHeap:new(isServer, isClient, customMt)
 	return self
 end
 
-function GC_DynamicHeap:load(nodeId, target, xmlFile, xmlKey, fillTypeName, fixedFillTypes, isFixedFillTypeArea)	
-	self.rootNode = nodeId
-	self.target = target
+function GC_DynamicHeap:load(nodeId, target, xmlFile, xmlKey, fillTypeName, fixedFillTypes, isFixedFillTypeArea)
+	if nodeId == nil or target == nil then
+		return false
+	end
 
 	self.debugData = g_company.debug:getDebugData(GC_DynamicHeap.debugIndex, target)
+
+	self.rootNode = nodeId
+	self.target = target
 
 	local userFillTypeName = getXMLString(xmlFile, xmlKey .. "#fillTypeName")
 	local fillTypeNameToUse = fillTypeName or userFillTypeName
@@ -89,8 +94,7 @@ function GC_DynamicHeap:load(nodeId, target, xmlFile, xmlKey, fillTypeName, fixe
 			if vehicleInteractionTrigger ~= nil then
 				if self.target.vehicleChangedHeapLevel ~= nil then
 					self.vehicleInteractionTrigger = vehicleInteractionTrigger
-					
-					-- Do this now so we can still check these loaded on the client side.
+
 					if self.isServer then
 						self.vehiclesInRange = {}						
 						addTrigger(self.vehicleInteractionTrigger, "vehicleInteractionTriggerCallback", self)

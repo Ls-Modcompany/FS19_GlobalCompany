@@ -2,7 +2,7 @@
 -- GlobalCompany - Objects - GC_FillVolume
 --
 -- @Interface: 1.4.0.0 b5007
--- @Author: LS-Modcompany
+-- @Author: LS-Modcompany / kevink98
 -- @Date: 15.02.2019
 -- @Version: 1.1.0.0
 --
@@ -47,11 +47,16 @@ function GC_FillVolume:new(isServer, isClient, customMt)
 end;
 
 function GC_FillVolume:load(nodeId, target, xmlFile, xmlKey, capacity, forceCapacity, defaultFillType)
+	if nodeId == nil or target == nil or capacity == nil then
+		return false;
+	end;
+
+	self.debugData = g_company.debug:getDebugData(GC_FillVolume.debugIndex, target);
+
 	self.rootNode = nodeId;
 	self.target = target;
 
-	self.debugData = g_company.debug:getDebugData(GC_FillVolume.debugIndex, target);	
-
+	local returnValue = false;
 	if self.isClient then
 		self.fillVolumes = {};
 
@@ -87,7 +92,7 @@ function GC_FillVolume:load(nodeId, target, xmlFile, xmlKey, capacity, forceCapa
 					local setCapacity = capacity;
 					if forceCapacity ~= true then
 						local userCapacity = Utils.getNoNil(getXMLInt(xmlFile, key .. "#capacity"), capacity);
-						setCapacity = math.min(math.max(userCapacity, 1), capacity); -- Only allow a capacity level > 1 and <= 'capacity paramater'.
+						setCapacity = math.min(math.max(userCapacity, 1), capacity); -- Only allow a capacity level > 1 and <= 'capacity parameter'.
 					end;
 
 					local volume = {};
@@ -110,6 +115,7 @@ function GC_FillVolume:load(nodeId, target, xmlFile, xmlKey, capacity, forceCapa
 					setVisibility(volume.volume, false);
 
 					if volume.volume ~= nil and volume.volume ~= 0 then
+						returnValue = true;
 						link(volume.node, volume.volume);
 						table.insert(self.fillVolumes, volume);
 					end;
@@ -120,7 +126,7 @@ function GC_FillVolume:load(nodeId, target, xmlFile, xmlKey, capacity, forceCapa
 		end;
 	end;
 
-	return true;
+	return returnValue;
 end;
 
 function GC_FillVolume:delete()
@@ -204,7 +210,6 @@ function GC_FillVolume:addFillLevelVolume(fillLevel, volume)
 
 		setVisibility(volume.volume, volume.fillLevel > 0);
 
-		--local x,y,z = localToWorld(volume.volume, 0, 0, 0);
 		local x, y, z = getWorldTranslation(volume.volume);
 		local d1x, d1y, d1z = localDirectionToWorld(volume.volume, 5, 0, 0);
 		local d2x, d2y, d2z = localDirectionToWorld(volume.volume, 0, 0, 5);
@@ -217,8 +222,3 @@ function GC_FillVolume:addFillLevelVolume(fillLevel, volume)
 
 	return delta;
 end;
-
-
-
-
-
