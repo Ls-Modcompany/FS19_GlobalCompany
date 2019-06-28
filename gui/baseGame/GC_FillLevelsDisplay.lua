@@ -57,9 +57,9 @@ GC_FillLevelsDisplay.SIZE = {
 }
 
 local function clearTable(table)
-    for k in pairs(table) do
-        table[k] = nil
-    end
+	for k in pairs(table) do
+		table[k] = nil
+	end
 end
 
 function GC_FillLevelsDisplay.new(hudAtlasPath)
@@ -367,7 +367,8 @@ function GC_FillLevelsDisplay:updateFillLevelFrames()
 		local posX, posY = frame:getPosition()
 		frame:setPosition(posX, yOffset)
 
-		local fillText = string.format("%d (%d%%)", MathUtil.round(fillLevelInformation.fillLevel), math.max(100 * value, 0))
+		local fillLevel = math.min(fillLevelInformation.fillLevel, fillLevelInformation.capacity)
+		local fillText = string.format("%d (%d%%)", MathUtil.round(fillLevel), math.max(100 * value, 0))
 		self.rightFillLevelTextBuffer[i] = fillText
 
 		self.rightFillTypeTextBuffer[i] = fillLevelInformation.title

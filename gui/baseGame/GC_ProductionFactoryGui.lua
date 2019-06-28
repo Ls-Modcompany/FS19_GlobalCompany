@@ -92,7 +92,7 @@ function GC_ProductionFactoryGui:new(l10n, messageCenter)
 
 	self.confirmDialogLitres = nil
 	self.outputIsProductSale = false
-	
+
 	self.productPurchasePrices = {}
 
 	self.defaultImage = g_company.dir .. "images/factoryDefault.dds"
@@ -200,7 +200,7 @@ function GC_ProductionFactoryGui:setProductLines()
 
 	local productLines = self.factory.productLines
 	for lineId, productLine in pairs(productLines) do
-		if productLine.showInGUI then			
+		if productLine.showInGUI then
 			self:setProductLineListItem(productLine, lineId)
 			table.insert(self.selectedIndexToLineId, lineId)
 		end
@@ -480,9 +480,13 @@ function GC_ProductionFactoryGui:updateProductLinePage(updateListItems)
 				local elements = self.inputElementMapping[inputId]
 				if elements ~= nil then
 					local inputProduct = selectedProductLine.inputs[inputId]
-					elements.fillLevel:setText(self:formatVolume(inputProduct.fillLevel, true))
+					elements.fillLevel:setText(self:formatVolume(math.min(inputProduct.fillLevel, inputProduct.capacity), true))
 					self:updateStatusBar(elements.statusBar, elements.statusBarSize, inputProduct, true, false)
 					elements.percent:setText(self:getFlooredPercent(inputProduct.fillLevel, inputProduct.capacity))
+
+					if elements.capacity ~= nil and inputProduct.maximumAccepted > 0 then
+						elements.capacity:setText(self:formatVolume(math.max(inputProduct.maximumAccepted - inputProduct.totalDelivered, 0), true))
+					end
 				end
 			end
 		end
@@ -494,7 +498,7 @@ function GC_ProductionFactoryGui:updateProductLinePage(updateListItems)
 					if elements ~= nil then
 						local outputProduct = selectedProductLine.outputs[outputId]
 						if elements.fillLevel ~= nil then
-							elements.fillLevel:setText(self:formatVolume(outputProduct.fillLevel, true))
+							elements.fillLevel:setText(self:formatVolume(math.min(outputProduct.fillLevel, outputProduct.capacity), true))
 						end
 						if elements.statusBar ~= nil then
 							self:updateStatusBar(elements.statusBar, elements.statusBarSize, outputProduct, false, false)
@@ -511,7 +515,7 @@ function GC_ProductionFactoryGui:updateProductLinePage(updateListItems)
 					elements.incomePerHour:setText(self.l10n:formatMoney(productSale.incomePerHour, 0, true, true))
 					self:updateStatusBar(elements.statusBar, elements.statusBarSize, productSale, true, true)
 					elements.percent:setText(self:getFlooredPercent(productSale.productivityHours, 24))
-	
+
 					if productSale.lifeTimeIncome < GC_ProductionFactoryGui.MAX_INT then
 						elements.lifeTimeIncome:setText(self.l10n:formatMoney(productSale.lifeTimeIncome, 0, true, true))
 					else
@@ -563,7 +567,7 @@ function GC_ProductionFactoryGui:updateProductLineListItem(productLine, productL
 				self.productLineOperationText:setText(operationText)
 
 				if self.selectedInput ~= nil and self.factory:canBuyProduct(self.selectedInput) then
-					local freeCapacity = self.factory:getInputFreeCapacity(self.selectedInput)				
+					local freeCapacity = self.factory:getInputFreeCapacity(self.selectedInput)
 					self:setButtonState(nil, freeCapacity > 0, false)
 				end
 			end
@@ -624,7 +628,7 @@ function GC_ProductionFactoryGui:onInputProductSelectionChanged(selectedIndex)
 		local inputs = self.factory:getInputs(self.selectedProductLineId)
 		if inputs ~= nil then
 			self.selectedInput = inputs[selectedIndex]
-	
+
 			if self.selectedInput ~= nil and self.factory:getInputFreeCapacity(self.selectedInput) > 0 then
 				buttonState = self.factory:canBuyProduct(self.selectedInput)
 			end
@@ -675,13 +679,13 @@ function GC_ProductionFactoryGui:onCreateProductFillLevel(element, argument)
 				element:setText(self.l10n:formatMoney(self.currentOutputProduct.incomePerHour, 0, true, true))
 			else
 				self.outputElementMapping[self.currentOutputProductId].fillLevel = element
-				element:setText(self:formatVolume(self.currentOutputProduct.fillLevel, true))
+				element:setText(self:formatVolume(math.min(self.currentOutputProduct.fillLevel, self.currentOutputProduct.capacity), true))
 			end
 		end
 	else
 		if self.currentInputProduct ~= nil then
 			self.inputElementMapping[self.currentInputProductId].fillLevel = element
-			element:setText(self:formatVolume(self.currentInputProduct.fillLevel, true))
+			element:setText(self:formatVolume(math.min(self.currentInputProduct.fillLevel, self.currentInputProduct.capacity), true))
 		end
 	end
 end
@@ -738,7 +742,12 @@ function GC_ProductionFactoryGui:onCreateProductCapacity(element, argument)
 		end
 	else
 		if self.currentInputProduct ~= nil then
-			element:setText(self:formatVolume(self.currentInputProduct.capacity, true))
+			if self.currentInputProduct.maximumAccepted <= 0 then
+				element:setText(self:formatVolume(self.currentInputProduct.capacity, true))
+			else
+				self.inputElementMapping[self.currentInputProductId].capacity = element
+				element:setText(self:formatVolume(math.max(self.currentInputProduct.maximumAccepted - self.currentInputProduct.totalDelivered, 0), true))
+			end
 		end
 	end
 end
@@ -807,7 +816,7 @@ function GC_ProductionFactoryGui:onClose(element)
 
 	self.isOpen = false
 	self:setLiveCamera(false, true)
-	
+
 	self.productPurchasePrices = {}
 
 	g_depthOfFieldManager:setBlurState(false)
@@ -850,11 +859,11 @@ function GC_ProductionFactoryGui:onClickActivate()
 			if buyLiters > 0 then
 				local input = self.selectedInput
 				self.confirmDialogLitres = buyLiters
-				
+
 				if self.productPurchasePrices[input] == nil then
 					self.productPurchasePrices[input] = self:getProductPurchasePrice(input)
 				end
-				
+
 				local validLitres, price = self.factory:verifyPriceAndLitres(input, buyLiters, self.productPurchasePrices[input])
 				local text = string.format(self.texts.confirmPurchase, self.selectedInput.title, self:formatVolume(validLitres, true), self.l10n:formatMoney(price, 0, true, true))
 				g_gui:showYesNoDialog({text = text, title = "", callback = self.onConfirmPurchase, target = self})
@@ -933,11 +942,11 @@ function GC_ProductionFactoryGui:setPurchaseAmount(input, litres)
 		if self.productPurchasePrices[input] == nil then
 			self.productPurchasePrices[input] = self:getProductPurchasePrice(input)
 		end
-		
-		local validLitres, price = self.factory:changeBuyLiters(input, litres, self.buyLiters, self.productPurchasePrices[input])
-		self.buyLiters = validLitres		
 
-		purchaseText = string.format("%s ( %s ) ( %s )", self.l10n:getText("button_buy"), self:formatVolume(validLitres, false), self.l10n:formatMoney(price, 0, true, true))
+		local validLitres, price = self.factory:changeBuyLiters(input, litres, self.buyLiters, self.productPurchasePrices[input])
+		self.buyLiters = validLitres
+
+		purchaseText = string.format("%s ( %s ) ( %s )", self.l10n:getText("button_buy"), self:formatVolume(math.max(validLitres, 0), false), self.l10n:formatMoney(price, 0, true, true))
 
 		if validLitres > 0 then
 			removeText = self.texts.remove
@@ -956,7 +965,7 @@ function GC_ProductionFactoryGui:getProductPurchasePrice(input)
 		if input.sellPointFillType == FillType.WATER then
 			return g_currentMission.economyManager:getPricePerLiter(FillType.WATER) * 0.5
 		end
-		
+
 		purchasePrice = self.factory:getFillTypePrice(input.sellPointFillType, false) * input.purchaseMultiplier
 		if purchasePrice <= 0 then
 			return 1.7
@@ -1055,6 +1064,6 @@ function GC_ProductionFactoryGui:formatVolume(litres, useLongName)
 end
 
 function GC_ProductionFactoryGui:getFlooredPercent(level, maxLevel)
-    local value = MathUtil.getFlooredPercent(level, maxLevel)	
+	local value = MathUtil.getFlooredPercent(level, maxLevel)
 	return string.format("%d%%", math.max(value, 0))
 end
