@@ -867,10 +867,48 @@ function GC_ProductionFactory:loadProductParts(xmlFile, key, product)
 		if fillVolumes:load(self.rootNode, self, xmlFile, key, capacity, true, fillTypeName) then
 			product.fillVolumes = fillVolumes
 		end
-
+		
 		local digitalDisplays = GC_DigitalDisplays:new(self.isServer, self.isClient)
 		if digitalDisplays:load(self.rootNode, self, xmlFile, key, nil, true) then
 			product.digitalDisplays = digitalDisplays
+		end
+
+		if hasXMLProperty(xmlFile, key .. ".conveyor") then	
+			local conveyor = GC_Conveyor:new(self.isServer, self.isClient)
+			if conveyor:load(self.rootNode, self, xmlFile, key .. ".conveyor") then
+				product.conveyor = conveyor
+			end
+		end
+
+		local convEffectKey = key .. ".conveyorEffect"
+		if hasXMLProperty(xmlFile, convEffectKey) then
+			local conveyorEffect = GC_ConveyorEffekt:new(self.isServer, self.isClient)
+			if conveyorEffect:load(self.rootNode, self, xmlFile, convEffectKey) then		
+				
+				-- Override fillType changes if the input product accepts more than one or you want a different look for some reason.
+				-- FillType changes are updated when product is added only.
+				conveyorEffect.allowMaterialChange = Utils.getNoNil(getXMLBool(xmlFile, convEffectKey .. "#allowMaterialChange"), true)
+				if not conveyorEffect.allowMaterialChange then
+					local fixedFillType = FillType.WHEAT
+					
+					local fillTypeName = getXMLString(xmlFile, convEffectKey .. "#fixedFillType")				
+					if fillTypeName ~= nil then
+						local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillTypeName)
+						if fillTypeIndex ~= nil then
+							fixedFillType = fillTypeIndex
+						else	
+							g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Invalid 'fixedFillType' %s, given at %s! Using 'WHEAT' instead.", self.indexName, fillTypeName, convEffectKey)
+						end
+					else
+						g_company.debug:writeModding(self.debugData, "[FACTORY - %s] No 'fixedFillType' given at %s! Using 'WHEAT' instead.", self.indexName, convEffectKey)
+					end
+					
+					conveyorEffect.fixedFillType = fixedFillType
+					conveyorEffect:setFillType(fixedFillType)
+				end
+	
+				product.conveyorEffect = conveyorEffect
+			end
 		end
 	end
 end
@@ -954,6 +992,14 @@ function GC_ProductionFactory:delete()
 			if product.fillVolumes ~= nil then
 				product.fillVolumes:delete()
 			end
+
+			if product.conveyor ~= nil then
+				product.conveyor:delete()
+			end
+
+			if product.conveyorEffect ~= nil then
+				product.conveyorEffect:delete()
+			end
 		end
 
 		if self.outputProducts ~= nil then
@@ -964,6 +1010,14 @@ function GC_ProductionFactory:delete()
 
 				if product.fillVolumes ~= nil then
 					product.fillVolumes:delete()
+				end
+
+				if product.conveyor ~= nil then
+					product.conveyor:delete()
+				end
+
+				if product.conveyorEffect ~= nil then
+					product.conveyorEffect:delete()
 				end
 			end
 		end
@@ -1669,7 +1723,14 @@ function GC_ProductionFactory:updateFactoryLevels(fillLevel, product, fillTypeIn
 			if fillTypeIndex ~= nil and fillTypeIndex ~= product.fillVolumes.lastFillTypeIndex then
 				product.fillVolumes:setFillType(fillTypeIndex)
 			end
+			
 			product.fillVolumes:addFillLevel(fillLevel)
+		end
+
+		if product.conveyorEffect ~= nil and product.conveyorEffect.allowMaterialChange then
+			if fillTypeIndex ~= nil and fillTypeIndex ~= product.conveyorEffect.lastFillTypeIndex then
+				product.conveyorEffect:setFillType(fillTypeIndex)
+			end
 		end
 
 		if product.digitalDisplays ~= nil then
@@ -1693,6 +1754,14 @@ function GC_ProductionFactory:setFactoryState(lineId, state, userStopped, noEven
 	self.productLines[lineId].userStopped = userStopped
 
 	if self.isClient then
+		if product.conveyor ~= nil then
+			product.conveyor:setState(state)
+		end
+
+		if product.conveyorEffect ~= nil then
+			product.conveyorEffect:setState(state)
+		end
+
 		self:setOperatingParts(self.productLines[lineId], state)
 
 		if self.sharedOperatingParts ~= nil then

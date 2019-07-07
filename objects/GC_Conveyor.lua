@@ -1,7 +1,7 @@
 -- 
 -- GlobalCompany - Objects - Conveyor
 -- 
--- @Interface: --
+-- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany / kevink98
 -- @Date: 13.12.2018
 -- @Version: 1.1.0.0
@@ -18,20 +18,18 @@
 -- 
 -- 
 -- ToDo:
--- check if scripts work in fs19!
 --
 
 
 GC_Conveyor = {};
-getfenv(0)["GC_Conveyor"] = GC_Conveyor;
+GC_Conveyor_mt = Class(GC_Conveyor);
 
-GC_Conveyor.debugIndex = g_company.debug:registerScriptName("GlobalCompany-GC_Conveyor");
+GC_Conveyor.debugIndex = g_company.debug:registerScriptName("GC_Conveyor");
 
 GC_Conveyor.STATE_OFF = 0;
 GC_Conveyor.STATE_ON = 2;
 
-GC_Conveyor_mt = Class(GC_Conveyor);
-InitObjectClass(GC_Conveyor, "GC_Conveyor");
+g_company.conveyor = GC_Conveyor;
 
 function GC_Conveyor:new(isServer, isClient)
 	local self = {};
@@ -76,15 +74,20 @@ function GC_Conveyor:load(id, target, xmlFile, baseKey)
 			i = i + 1;
 		end;
 		
-		g_company.addUpdateable(self, self.update);
+		-- g_company.addUpdateable(self, self.update);
+		if #self.shaders > 0 then
+			g_company.addRaisedUpdateable(self);
+			return true;
+		end;
 	end;
 	
-	return true;
+	return false;
 end;
 
 function GC_Conveyor:delete()
 	if self.isClient then
-		g_company.removeUpdateable(self);
+		-- g_company.removeUpdateable(self);
+		g_company.removeRaisedUpdateable(self);
 	end;
 end;
 
@@ -104,14 +107,26 @@ function GC_Conveyor:update(dt)
                     else
                         setShaderParameter(shader.node, "offsetUV", 0,value,-100,100, false);
 					end;
-				end;		
+				end;
+
+				self:raiseUpdate();				
 			end;		
 		end;
 	end;
 end;
 
+function GC_Conveyor:setState(state, shader)
+	if self.isClient then
+		if state then
+			self:start(shader);
+		else
+			self:stop(shader);
+		end;
+	end;
+end;
+
 function GC_Conveyor:start(shader)
-	--if self.isServer then
+	if self.isClient then
 		if shader ~= nil then
 			self:startShader(shader);
 		else
@@ -119,11 +134,13 @@ function GC_Conveyor:start(shader)
 				self:startShader(shader);
 			end;
 		end;
-	--end;
+		
+		self:raiseUpdate();
+	end;
 end;
 
 function GC_Conveyor:stop(shader)
-	--if self.isServer then
+	if self.isClient then
 		if shader ~= nil then
 			self:stopShader(shader);
 		else
@@ -131,7 +148,9 @@ function GC_Conveyor:stop(shader)
 				self:stopShader(shader);
 			end;
 		end;
-	--end;
+		
+		self:raiseUpdate();
+	end;
 end;
 
 --Dont call from outside!! Only form GC_Conveyor.start!
@@ -155,7 +174,7 @@ function GC_Conveyor:stopShader(shader)
 end;
 
 function GC_Conveyor:resetShader(shader)
-	if self.isServer then
+	if self.isClient then
 		shader.state = GC_Conveyor.STATE_OFF;
 	end;
 end;
