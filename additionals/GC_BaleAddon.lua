@@ -81,7 +81,7 @@ function GC_BaleAddon:update(dt)
     if self.isClient then
         GC_BaleAddon.enableCutBale = false;
         GC_BaleAddon.eventId = self.eventId_CutBale;
-        if g_company.settings:getSetting("cutBales", true) and g_currentMission.player.isControlled and not g_currentMission.player.isCarryingObject then
+        if g_company.settings:getSetting("cutBales", true) and g_currentMission.player.isControlled and not g_currentMission.player.isCarryingObject and not g_currentMission.player.superStrengthEnabled then
             if not self.isMultiplayer and g_currentMission.player.isObjectInRange then
                 local foundObjectId = g_currentMission.player.lastFoundObject;
                 if (foundObjectId ~= nil) and (foundObjectId ~= g_currentMission.terrainDetailId) then
