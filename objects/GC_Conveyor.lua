@@ -44,16 +44,20 @@ function GC_Conveyor:new(isServer, isClient)
 	return self;
 end;
 
-function GC_Conveyor:load(id, target, xmlFile, baseKey)
+function GC_Conveyor:load(id, target, xmlFile, xmlKey, groupKey)
 	self.target = target;
 
 	self.debugData = g_company.debug:getDebugData(GC_Conveyor.debugIndex, target);
 
 	if self.isClient then
+		if groupKey == nil then
+			groupKey = "conveyor";
+		end;
+
 		self.shaders = {};
 		local i = 0;
 		while true do
-			local key = string.format(baseKey..".shader(%d)", i);
+			local key = string.format("%s.%s.shader(%d)", xmlKey, groupKey, i);
 			if not hasXMLProperty(xmlFile, key) then
 				break;
 			end;

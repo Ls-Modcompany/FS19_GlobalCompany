@@ -905,6 +905,16 @@ function GC_ProductionFactory:loadOperatingParts(xmlFile, key, parent)
 			parent.operateParticleEffects = particleEffects
 		end
 
+		local conveyor = GC_Conveyor:new(self.isServer, self.isClient)
+		if conveyor:load(self.rootNode, self, xmlFile, key) then
+			parent.operateConveyor = conveyor
+		end
+
+		local conveyorEffekt = GC_ConveyorEffekt:new(self.isServer, self.isClient)
+		if conveyorEffekt:load(self.rootNode, self, xmlFile, key) then
+			parent.operateConveyorEffekt = conveyorEffekt
+		end
+
 		if self.animationManager ~= nil then
 			local xmlKey = string.format("%s.animations.animation", key)
 			local warningExtra = string.format("[FACTORY - %s]", self.indexName)
@@ -999,6 +1009,14 @@ function GC_ProductionFactory:deleteOperatingParts(parent)
 
 	if parent.operateParticleEffects ~= nil then
 		parent.operateParticleEffects:delete()
+	end
+
+	if parent.operateConveyor ~= nil then
+		parent.operateConveyor:delete()
+	end
+
+	if parent.operateConveyorEffekt ~= nil then
+		parent.operateConveyorEffekt:delete()
 	end
 
 	if parent.operateAnimationClips ~= nil then
@@ -1737,6 +1755,28 @@ function GC_ProductionFactory:setOperatingParts(parent, state)
 	if parent.operateParticleEffects ~= nil then
 		parent.operateParticleEffects:setEffectsState(state)
 	end
+
+	if parent.operateConveyor ~= nil then
+		if state then
+			parent.operateConveyor:start()
+		else
+			parent.operateConveyor:stop()
+		end;
+	end
+
+	if parent.operateConveyorEffekt ~= nil then
+		if state then
+			for fillType,_ in pairs(parent.inputs[1].fillTypes) do
+				parent.operateConveyorEffekt:setFillType(fillType);
+				break;
+			end;	
+			parent.operateConveyorEffekt:start()
+		else
+			parent.operateConveyorEffekt:stop()
+		end;
+	end
+
+	
 
 	if parent.operateAnimations ~= nil then
 		for i = 1, #parent.operateAnimations do
