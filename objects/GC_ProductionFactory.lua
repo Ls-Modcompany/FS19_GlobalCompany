@@ -763,7 +763,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				outputProductNameToOutputId = nil
 			end
 
-			if productLine.outputs == nil then
+			--if productLine.outputs == nil then
 				local productSaleKey = productLineKey .. ".productSale"
 				if hasXMLProperty(xmlFile, productSaleKey) then
 					local productTitle = getXMLString(xmlFile, productSaleKey .. "#title")
@@ -778,7 +778,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 							local difficulty = math.min(math.max(g_currentMission.missionInfo.difficulty, 1), 3)
 							local productivityHours = 24 - g_currentMission.environment.currentHour
 							productLine.productSale = {title = productTitle, incomePerHour = incomeTypes[difficulty], lifeTimeIncome = 0, productivityHours = productivityHours}
-
+							
 							addHourChange = true
 							self.hasProductSale = true
 						else
@@ -787,10 +787,10 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 					else
 						g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Can not use productLine 'productSale'! 'title' is missing at %s", indexName, productSaleKey)
 					end
-				else
-					addMinuteChange = true
+				--else
+				--	addMinuteChange = true
 				end
-			end
+			--end
 
 			self:loadOperatingParts(xmlFile, productLineKey .. ".operatingParts", productLine)
 
