@@ -1,7 +1,7 @@
 -- 
 -- GlobalCompany - Objects - ConveyorEffekt
 -- 
--- @Interface: --
+-- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany / kevink98
 -- @Date: 13.12.2018
 -- @Version: 1.1.0.0
@@ -20,22 +20,20 @@
 -- 
 -- 
 -- ToDo:
--- check if scripts work in fs19!
 --
 
 
 GC_ConveyorEffekt = {};
-getfenv(0)["GC_ConveyorEffekt"] = GC_ConveyorEffekt;
+GC_ConveyorEffekt_mt = Class(GC_ConveyorEffekt);
 
-GC_ConveyorEffekt.debugIndex = g_company.debug:registerScriptName("GlobalCompany-GC_ConveyorEffekt");
+GC_ConveyorEffekt.debugIndex = g_company.debug:registerScriptName("GC_ConveyorEffekt");
 
 GC_ConveyorEffekt.STATE_OFF = 0;
 GC_ConveyorEffekt.STATE_TURNING_OFF = 1;
 GC_ConveyorEffekt.STATE_ON = 2;
 GC_ConveyorEffekt.STATE_TURNING_ON = 3;
 
-GC_ConveyorEffekt_mt = Class(GC_ConveyorEffekt);
-InitObjectClass(GC_ConveyorEffekt, "GC_ConveyorEffekt");
+g_company.conveyorEffekt = GC_ConveyorEffekt;
 
 function GC_ConveyorEffekt:new(isServer, isClient)
 	local self = {};
@@ -44,6 +42,8 @@ function GC_ConveyorEffekt:new(isServer, isClient)
 
 	self.isServer = isServer;
 	self.isClient = isClient;
+	
+	self.lastFillTypeIndex = nil;
 
 	return self;
 end;
@@ -92,15 +92,20 @@ function GC_ConveyorEffekt:load(id, target, xmlFile, xmlKey, groupKey)
 			i = i + 1;
 		end;
 		
-		g_company.addUpdateable(self, self.update);
+		-- g_company.addUpdateable(self, self.update);
+		if #self.shaders > 0 then
+			g_company.addRaisedUpdateable(self);
+			return true;
+		end;
 	end;
 	
-	return true;
+	return false;
 end;
 
 function GC_ConveyorEffekt:delete()
 	if self.isClient then
-		g_company.removeUpdateable(self);
+		-- g_company.removeUpdateable(self);
+		g_company.removeRaisedUpdateable(self);
 	end;
 end;
 
@@ -109,6 +114,7 @@ function GC_ConveyorEffekt:update(dt)
 		for _, shader in pairs(self.shaders) do 
 			if shader.state ~= GC_ConveyorEffekt.STATE_OFF then
 				shader.currentDelay = shader.currentDelay - dt;
+				
 				if shader.currentDelay <= 0 then	
 					shader.fadeCur[1] = math.max(0, math.min(1, shader.fadeCur[1] + shader.fadeDir[1] * (dt / shader.fadeTime)));
 					shader.fadeCur[2] = math.max(0, math.min(1, shader.fadeCur[2] + shader.fadeDir[2] * (dt / shader.fadeTime)));
@@ -127,8 +133,20 @@ function GC_ConveyorEffekt:update(dt)
 						isVisible = false;
 					end;
 					setVisibility(shader.node, isVisible);
-				end;		
+				end;
+
+				self:raiseUpdate();
 			end;		
+		end;
+	end;
+end;
+
+function GC_ConveyorEffekt:setState(state, shader)
+	if self.isClient then
+		if state then
+			self:start(shader);
+		else
+			self:stop(shader);
 		end;
 	end;
 end;
@@ -141,6 +159,8 @@ function GC_ConveyorEffekt:start(shader)
 			self:startShader(shader);
 		end;
 	end;
+	
+	self:raiseUpdate();
 end;
 
 function GC_ConveyorEffekt:stop(shader)
@@ -151,6 +171,8 @@ function GC_ConveyorEffekt:stop(shader)
 			self:stopShader(shader);
 		end;
 	end;
+	
+	self:raiseUpdate();
 end;
 
 --Dont call from outside!! Only form GC_ConveyorEffekt.start!
@@ -177,7 +199,7 @@ function GC_ConveyorEffekt:stopShader(shader)
 end;
 
 function GC_ConveyorEffekt:resetShader(shader)
-	if self.isServer then
+	if self.isClient then
 		shader.fadeCur = {0, 0};
 		shader.fadeDir = {0, 1};
 		setShaderParameter(shader.node, "morphPosition", shader.fadeCur[1], shader.fadeCur[2], 0.1, shader.speed, false);
@@ -237,6 +259,8 @@ function GC_ConveyorEffekt:getFadeTime(shader, index)
 end;
 
 function GC_ConveyorEffekt:setFillType(fillType)
+	self.lastFillTypeIndex = fillType
+	
 	for _,shader in pairs(self.shaders) do
 		if shader.materialType ~= nil and shader.materialTypeId ~= nil then
 			local material = g_materialManager.materials[fillType][shader.materialType][shader.materialTypeId]
