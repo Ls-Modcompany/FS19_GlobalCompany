@@ -871,22 +871,17 @@ function GC_ProductionFactory:loadProductParts(xmlFile, key, product)
 		local digitalDisplays = GC_DigitalDisplays:new(self.isServer, self.isClient)
 		if digitalDisplays:load(self.rootNode, self, xmlFile, key, nil, true) then
 			product.digitalDisplays = digitalDisplays
-		end
+		end	
 
-		if hasXMLProperty(xmlFile, key .. ".conveyor") then	
-			local conveyor = GC_Conveyor:new(self.isServer, self.isClient)
-			if conveyor:load(self.rootNode, self, xmlFile, key .. ".conveyor") then
-				product.conveyor = conveyor
-			end
+		local conveyor = GC_Conveyor:new(self.isServer, self.isClient)
+		if conveyor:load(self.rootNode, self, xmlFile, key) then
+			product.conveyor = conveyor
 		end
 
 		local convEffectKey = key .. ".conveyorEffect"
 		if hasXMLProperty(xmlFile, convEffectKey) then
 			local conveyorEffect = GC_ConveyorEffekt:new(self.isServer, self.isClient)
-			if conveyorEffect:load(self.rootNode, self, xmlFile, convEffectKey) then		
-				
-				-- Override fillType changes if the input product accepts more than one or you want a different look for some reason.
-				-- FillType changes are updated when product is added only.
+			if conveyorEffect:load(self.rootNode, self, xmlFile, key, "conveyorEffect") then						
 				conveyorEffect.allowMaterialChange = Utils.getNoNil(getXMLBool(xmlFile, convEffectKey .. "#allowMaterialChange"), true)
 				if not conveyorEffect.allowMaterialChange then
 					local fixedFillType = FillType.WHEAT
@@ -906,10 +901,9 @@ function GC_ProductionFactory:loadProductParts(xmlFile, key, product)
 					conveyorEffect.fixedFillType = fixedFillType
 					conveyorEffect:setFillType(fixedFillType)
 				end
-	
 				product.conveyorEffect = conveyorEffect
 			end
-		end
+		end	
 	end
 end
 
@@ -941,16 +935,6 @@ function GC_ProductionFactory:loadOperatingParts(xmlFile, key, parent)
 		local particleEffects = GC_Effects:new(self.isServer, self.isClient)
 		if particleEffects:load(self.rootNode, self, xmlFile, key) then
 			parent.operateParticleEffects = particleEffects
-		end
-
-		local conveyor = GC_Conveyor:new(self.isServer, self.isClient)
-		if conveyor:load(self.rootNode, self, xmlFile, key) then
-			parent.operateConveyor = conveyor
-		end
-
-		local conveyorEffekt = GC_ConveyorEffekt:new(self.isServer, self.isClient)
-		if conveyorEffekt:load(self.rootNode, self, xmlFile, key) then
-			parent.operateConveyorEffekt = conveyorEffekt
 		end
 
 		if self.animationManager ~= nil then
@@ -1025,7 +1009,7 @@ function GC_ProductionFactory:delete()
 				if product.conveyor ~= nil then
 					product.conveyor:delete()
 				end
-
+	
 				if product.conveyorEffect ~= nil then
 					product.conveyorEffect:delete()
 				end
@@ -1063,14 +1047,6 @@ function GC_ProductionFactory:deleteOperatingParts(parent)
 
 	if parent.operateParticleEffects ~= nil then
 		parent.operateParticleEffects:delete()
-	end
-
-	if parent.operateConveyor ~= nil then
-		parent.operateConveyor:delete()
-	end
-
-	if parent.operateConveyorEffekt ~= nil then
-		parent.operateConveyorEffekt:delete()
 	end
 
 	if parent.operateAnimationClips ~= nil then
@@ -1492,7 +1468,7 @@ function GC_ProductionFactory:hourChanged()
 
 						local income = math.floor(productLine.productSale.incomePerHour * (producedFactor / productPerHour))
 						productLine.productSale.lifeTimeIncome = math.min(productLine.productSale.lifeTimeIncome + income, GC_ProductionFactory.MAX_INT)
-
+						
 						g_currentMission:addMoney(income, self:getOwnerFarmId(), MoneyType.PROPERTY_INCOME, true, false)
 					else
 						stopProductLine = true
@@ -1772,15 +1748,25 @@ function GC_ProductionFactory:setFactoryState(lineId, state, userStopped, noEven
 	self.productLines[lineId].userStopped = userStopped
 
 	if self.isClient then
-		if product.conveyor ~= nil then
-			product.conveyor:setState(state)
-		end
-
-		if product.conveyorEffect ~= nil then
-			product.conveyorEffect:setState(state)
-		end
-
 		self:setOperatingParts(self.productLines[lineId], state)
+
+		for _,product in pairs(self.productLines[lineId].inputs) do
+			if product.conveyor ~= nil then
+				product.conveyor:setState(state)
+			end
+			if product.conveyorEffect ~= nil then
+				product.conveyorEffect:setState(state)
+			end
+		end;
+
+		for _,product in pairs(self.productLines[lineId].outputs) do
+			if product.conveyor ~= nil then
+				product.conveyor:setState(state)
+			end
+			if product.conveyorEffect ~= nil then
+				product.conveyorEffect:setState(state)
+			end
+		end;
 
 		if self.sharedOperatingParts ~= nil then
 			if self.sharedOperatingParts.operatingState ~= state then
@@ -1824,28 +1810,6 @@ function GC_ProductionFactory:setOperatingParts(parent, state)
 	if parent.operateParticleEffects ~= nil then
 		parent.operateParticleEffects:setEffectsState(state)
 	end
-
-	if parent.operateConveyor ~= nil then
-		if state then
-			parent.operateConveyor:start()
-		else
-			parent.operateConveyor:stop()
-		end;
-	end
-
-	if parent.operateConveyorEffekt ~= nil then
-		if state then
-			for fillType,_ in pairs(parent.inputs[1].fillTypes) do
-				parent.operateConveyorEffekt:setFillType(fillType);
-				break;
-			end;	
-			parent.operateConveyorEffekt:start()
-		else
-			parent.operateConveyorEffekt:stop()
-		end;
-	end
-
-	
 
 	if parent.operateAnimations ~= nil then
 		for i = 1, #parent.operateAnimations do

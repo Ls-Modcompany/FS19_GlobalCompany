@@ -91,7 +91,7 @@ function GC_ConveyorEffekt:load(id, target, xmlFile, xmlKey, groupKey)
 			
 			i = i + 1;
 		end;
-		
+	
 		-- g_company.addUpdateable(self, self.update);
 		if #self.shaders > 0 then
 			g_company.addRaisedUpdateable(self);
@@ -272,29 +272,3 @@ function GC_ConveyorEffekt:setFillType(fillType)
 		end;
 	end;
 end;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
