@@ -948,16 +948,16 @@ function GC_ProductionFactory:loadOperatingParts(xmlFile, key, parent, isProduct
 		end
 
 		if isProductLine then
-			if hasXMLProperty(xmlFile, key .. ".conveyor") then
+			if hasXMLProperty(xmlFile, key .. ".conveyors") then
 				local conveyor = GC_Conveyor:new(self.isServer, self.isClient)
-				if conveyor:load(self.rootNode, self, xmlFile, key, "conveyor") then
+				if conveyor:load(self.rootNode, self, xmlFile, key, "conveyors") then
 					parent.conveyor = conveyor
 				end
 			end
 
-			if hasXMLProperty(xmlFile, key .. ".conveyorEffect") then
+			if hasXMLProperty(xmlFile, key .. ".conveyorEffects") then
 				local conveyorEffect = GC_ConveyorEffekt:new(self.isServer, self.isClient)
-				if conveyorEffect:load(self.rootNode, self, xmlFile, key, "conveyorEffect") then
+				if conveyorEffect:load(self.rootNode, self, xmlFile, key, "conveyorEffects") then
 					for i, shader in pairs (conveyorEffect.shaders) do
 						if shader.productName ~= nil then
 							local product = self.productNameToProduct[shader.productName]
