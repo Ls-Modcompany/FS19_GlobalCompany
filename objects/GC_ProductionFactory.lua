@@ -791,18 +791,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				outputProductNameToOutputId = nil
 			end
 
-			if productLine.outputs ~= nil then
-				if self.isServer then
-					productLine.incomePerUpdate = 0
-
-					-- This is an extra option to use the factory as a fixed price sell point but also create output products on the same line.
-					local extraIncomePerHour = Utils.getNoNil(getXMLInt(xmlFile, productLineKey .. "#extraIncomePerHour"), 0)
-					if extraIncomePerHour > 0 then
-						productLine.incomePerUpdate = (extraIncomePerHour / 60) * self.updateDelay
-						addHourChange = true
-					end
-				end
-			else
+			if productLine.outputs == nil then
 				local productSaleKey = productLineKey .. ".productSale"
 				if hasXMLProperty(xmlFile, productSaleKey) then
 					local productTitle = getXMLString(xmlFile, productSaleKey .. "#title")
