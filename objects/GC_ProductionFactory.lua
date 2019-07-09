@@ -97,8 +97,11 @@ function GC_ProductionFactory:new(isServer, isClient, customMt, xmlFilename, bas
 
 	self.triggerIdToInputProductId = {}
 	self.triggerIdToOutputProductId = {}
-	self.triggerIdToLineId = {}
+	self.triggerIdToLineIds = {}
 	self.drawProductLineUI = {}
+
+	self.lineIdToConveyor = {}
+	self.lineIdToConveyorEffect = {}
 
 	self.productLines = {}
 	self.inputProducts = {}
@@ -111,8 +114,12 @@ function GC_ProductionFactory:new(isServer, isClient, customMt, xmlFilename, bas
 	self.inputProductNameToId = {}
 	self.outputProductNameToId = {}
 
+	self.productNameToProduct = {}
+
 	self.numInputProducts = 0
 	self.numOutputProducts = 0
+
+	self.hourlyIncomeTotal = 0
 
 	self.levelChangeTimer = -1
 
@@ -295,14 +302,15 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				end
 
 				local inputProductId = #self.inputProducts + 1
+				inputProduct.id = inputProductId
 
+				-- This is the lifetime limit for the inputProduct if maximumAccepted > 0
+				-- When 'totalDelivered' >= this limit then it will never be accepted again. Nice option for building with a factory.
+				inputProduct.maximumAccepted = Utils.getNoNil(getXMLInt(xmlFile, inputProductKey .. "#maximumAccepted"), 0)
+				inputProduct.totalDelivered = 0
+				
 				if hasXMLProperty(xmlFile, inputProductKey .. ".inputMethods") then
 					if self.isServer then
-						-- This is the lifetime limit for the inputProduct if maximumAccepted > 0
-						-- When 'totalDelivered' >= this limit then it will never be accepted again. Nice option for building with a factory.
-						inputProduct.maximumAccepted = Utils.getNoNil(getXMLInt(xmlFile, inputProductKey .. "#maximumAccepted"), 0)
-						inputProduct.totalDelivered = 0
-
 						if hasXMLProperty(xmlFile, inputProductKey .. ".inputMethods.rainWaterCollector") then
 							if inputProduct.fillTypes[FillType.WATER] ~= nil then
 								local litresPerHour = getXMLString(xmlFile, inputProductKey .. ".inputMethods.rainWaterCollector#litresPerHour")
@@ -386,9 +394,11 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				self:loadProductParts(xmlFile, inputProductKey, inputProduct)
 				self:updateFactoryLevels(0, inputProduct, nil, false)
 
-				self.inputProducts[inputProductId] = inputProduct
 				self.numInputProducts = inputProductId
+
+				self.inputProducts[inputProductId] = inputProduct
 				self.inputProductNameToId[inputProductName] = inputProductId
+				self.productNameToProduct[inputProductName] = inputProduct
 			end
 		else
 			if inputProductName == nil then
@@ -449,7 +459,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			end
 
 			local outputProductName = getXMLString(xmlFile, outputProductKey .. "#name")
-			if outputProductName ~= nil and self.outputProductNameToId[outputProductName] == nil then
+			if outputProductName ~= nil and self.outputProductNameToId[outputProductName] == nil and self.productNameToProduct[outputProductName] == nil then
 				local outputProduct = {}
 				outputProduct.name = outputProductName
 
@@ -477,6 +487,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 						end
 
 						local outputProductId = #self.outputProducts + 1
+						outputProduct.id = outputProductId
 
 						local outputMethodsKey = outputProductKey .. ".outputMethods"
 						if hasXMLProperty(xmlFile, outputMethodsKey) then
@@ -627,6 +638,8 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 						self.numOutputProducts = outputProductId
 						self.outputProductNameToId[outputProductName] = outputProductId
 
+						self.productNameToProduct[outputProductName] = outputProduct
+
 						self.factorMinuteUpdate = true
 					else
 						g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Invalid fillType '%s' given at %s", indexName, fillTypeName, outputProductKey)
@@ -656,6 +669,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 	end
 
 	if self.numInputProducts > 0 then
+
 		i = 0
 		while true do
 			local productLineKey = string.format("%s.productLines.productLine(%d)", xmlKey, i)
@@ -670,6 +684,10 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			productLine.userStopped = false
 			productLine.autoStart = Utils.getNoNil(getXMLBool(xmlFile, productLineKey .. "#autoLineStart"), false)
 			productLine.outputPerHour = Utils.getNoNil(getXMLInt(xmlFile, productLineKey .. "#outputPerHour"), 1000)
+
+			productLine.inputsPercent = {}
+			productLine.inputsIncome = {}
+			productLine.outputsPercent = {}
 
 			productLine.showInGUI = Utils.getNoNil(getXMLBool(xmlFile, productLineKey .. "#showInGUI"), true)
 			productLine.disableOutputGUI = Utils.getNoNil(getXMLBool(xmlFile, productLineKey .. "#disableOutputGUI"), false)
@@ -693,7 +711,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				if self.inputProductNameToId[name] ~= nil then
 					if inputProductNameToInputId[name] == nil then
 						local inputProductId = self.inputProductNameToId[name]
-						local percent = Utils.getNoNil(getXMLInt(xmlFile, inputKey .. "#percent"), 100) / 100
+						local inputPercent = Utils.getNoNil(getXMLInt(xmlFile, inputKey .. "#percent"), 100) / 100
 
 						if productLine.inputs == nil then
 							productLine.inputs = {}
@@ -703,10 +721,15 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 						inputProductNameToInputId[name] = inputId
 
 						productLine.inputs[inputId] = self.inputProducts[inputProductId]
-						productLine.inputs[inputId].percent = math.min(math.max(percent, 0.1), 1)
+						productLine.inputsPercent[inputId] = math.min(math.max(inputPercent, 0.1), 1)
 
-						productLine.inputs[inputId].id = inputId
-						productLine.inputs[inputId].lineId = productLineId
+						-- Allow simple income as fillType is used. This is product line specific.
+						local pricePerLiter = getXMLFloat(xmlFile, inputKey .. ".income#pricePerLiter")
+						if pricePerLiter ~= nil and pricePerLiter > 0.0 then
+							local usePriceMultiplier = Utils.getNoNil(getXMLBool(xmlFile, inputKey .. ".income#usePriceMultiplier"), true)
+							productLine.inputsIncome[inputId] = {pricePerLiter = pricePerLiter, usePriceMultiplier = usePriceMultiplier}
+							addHourChange = true
+						end
 					else
 						g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Trying to add inputProduct '%s' twice at %s!", indexName, name, inputKey)
 					end
@@ -730,7 +753,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 					if self.outputProductNameToId[name] ~= nil then
 						if outputProductNameToOutputId[name] == nil then
 							local outputProductId = self.outputProductNameToId[name]
-							local percent = Utils.getNoNil(getXMLInt(xmlFile, outputKey .. "#percent"), 100) / 100
+							local outputPercent = Utils.getNoNil(getXMLInt(xmlFile, outputKey .. "#percent"), 100) / 100
 
 							if productLine.outputs == nil then
 								productLine.outputs = {}
@@ -740,17 +763,22 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 							outputProductNameToOutputId[name] = outputId
 
 							productLine.outputs[outputId] = self.outputProducts[outputProductId]
-							productLine.outputs[outputId].percent = math.min(math.max(percent, 0.1), 1)
-
-							productLine.outputs[outputId].id = outputId
-							productLine.outputs[outputId].lineId = productLineId
+							productLine.outputsPercent[outputId] = math.min(math.max(outputPercent, 0.1), 1)
 
 							local out = productLine.outputs[outputId]
 							if out.palletCreator ~= nil then
-								self.triggerIdToLineId[out.palletCreator.extraParamater] = productLineId
+								if self.triggerIdToLineIds[out.palletCreator.extraParamater] == nil then
+									self.triggerIdToLineIds[out.palletCreator.extraParamater] = {}
+								end
+
+								table.insert(self.triggerIdToLineIds[out.palletCreator.extraParamater], productLineId)
 								out = nil
 							elseif productLine.outputs[outputId].dynamicHeap ~= nil then
-								self.triggerIdToLineId[out.dynamicHeap.extraParamater] = productLineId
+								if self.triggerIdToLineIds[out.dynamicHeap.extraParamater] == nil then
+									self.triggerIdToLineIds[out.dynamicHeap.extraParamater] = {}
+								end
+
+								table.insert(self.triggerIdToLineIds[out.dynamicHeap.extraParamater], productLineId)
 								out = nil
 							end
 						end
@@ -763,7 +791,18 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				outputProductNameToOutputId = nil
 			end
 
-			--if productLine.outputs == nil then
+			if productLine.outputs ~= nil then
+				if self.isServer then
+					productLine.incomePerUpdate = 0
+
+					-- This is an extra option to use the factory as a fixed price sell point but also create output products on the same line.
+					local extraIncomePerHour = Utils.getNoNil(getXMLInt(xmlFile, productLineKey .. "#extraIncomePerHour"), 0)
+					if extraIncomePerHour > 0 then
+						productLine.incomePerUpdate = (extraIncomePerHour / 60) * self.updateDelay
+						addHourChange = true
+					end
+				end
+			else
 				local productSaleKey = productLineKey .. ".productSale"
 				if hasXMLProperty(xmlFile, productSaleKey) then
 					local productTitle = getXMLString(xmlFile, productSaleKey .. "#title")
@@ -778,7 +817,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 							local difficulty = math.min(math.max(g_currentMission.missionInfo.difficulty, 1), 3)
 							local productivityHours = 24 - g_currentMission.environment.currentHour
 							productLine.productSale = {title = productTitle, incomePerHour = incomeTypes[difficulty], lifeTimeIncome = 0, productivityHours = productivityHours}
-							
+
 							addHourChange = true
 							self.hasProductSale = true
 						else
@@ -787,10 +826,10 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 					else
 						g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Can not use productLine 'productSale'! 'title' is missing at %s", indexName, productSaleKey)
 					end
-				--else
-				--	addMinuteChange = true
+				else
+					addMinuteChange = true
 				end
-			--end
+			end
 
 			self:loadOperatingParts(xmlFile, productLineKey .. ".operatingParts", productLine)
 
@@ -867,47 +906,15 @@ function GC_ProductionFactory:loadProductParts(xmlFile, key, product)
 		if fillVolumes:load(self.rootNode, self, xmlFile, key, capacity, true, fillTypeName) then
 			product.fillVolumes = fillVolumes
 		end
-		
+
 		local digitalDisplays = GC_DigitalDisplays:new(self.isServer, self.isClient)
 		if digitalDisplays:load(self.rootNode, self, xmlFile, key, nil, true) then
 			product.digitalDisplays = digitalDisplays
-		end	
-
-		local conveyor = GC_Conveyor:new(self.isServer, self.isClient)
-		if conveyor:load(self.rootNode, self, xmlFile, key) then
-			product.conveyor = conveyor
 		end
-
-		local convEffectKey = key .. ".conveyorEffect"
-		if hasXMLProperty(xmlFile, convEffectKey) then
-			local conveyorEffect = GC_ConveyorEffekt:new(self.isServer, self.isClient)
-			if conveyorEffect:load(self.rootNode, self, xmlFile, key, "conveyorEffect") then						
-				conveyorEffect.allowMaterialChange = Utils.getNoNil(getXMLBool(xmlFile, convEffectKey .. "#allowMaterialChange"), true)
-				if not conveyorEffect.allowMaterialChange then
-					local fixedFillType = FillType.WHEAT
-					
-					local fillTypeName = getXMLString(xmlFile, convEffectKey .. "#fixedFillType")				
-					if fillTypeName ~= nil then
-						local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillTypeName)
-						if fillTypeIndex ~= nil then
-							fixedFillType = fillTypeIndex
-						else	
-							g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Invalid 'fixedFillType' %s, given at %s! Using 'WHEAT' instead.", self.indexName, fillTypeName, convEffectKey)
-						end
-					else
-						g_company.debug:writeModding(self.debugData, "[FACTORY - %s] No 'fixedFillType' given at %s! Using 'WHEAT' instead.", self.indexName, convEffectKey)
-					end
-					
-					conveyorEffect.fixedFillType = fixedFillType
-					conveyorEffect:setFillType(fixedFillType)
-				end
-				product.conveyorEffect = conveyorEffect
-			end
-		end	
 	end
 end
 
-function GC_ProductionFactory:loadOperatingParts(xmlFile, key, parent)
+function GC_ProductionFactory:loadOperatingParts(xmlFile, key, parent, isProductLine, isInput)
 	if self.isClient then
 		local lightsKey = key .. ".lighting"
 		if hasXMLProperty(xmlFile, lightsKey) then
@@ -950,6 +957,37 @@ function GC_ProductionFactory:loadOperatingParts(xmlFile, key, parent)
 		if animationClips:load(self.rootNode, self, xmlFile, key) then
 			parent.operateAnimationClips = animationClips
 		end
+
+		if isProductLine then
+			if hasXMLProperty(xmlFile, key .. ".conveyor") then
+				local conveyor = GC_Conveyor:new(self.isServer, self.isClient)
+				if conveyor:load(self.rootNode, self, xmlFile, key, "conveyor") then
+					parent.conveyor = conveyor
+				end
+			end
+
+			if hasXMLProperty(xmlFile, key .. ".conveyorEffect") then
+				local conveyorEffect = GC_ConveyorEffekt:new(self.isServer, self.isClient)
+				if conveyorEffect:load(self.rootNode, self, xmlFile, key, "conveyorEffect") then
+					for i, shader in pairs (conveyorEffect.shaders) do
+						if shader.productName ~= nil then
+							local product = self.productNameToProduct[shader.productName]
+							if product ~= nil then
+								if product.conveyorEffects == nil then
+									product.conveyorEffects = {}
+								end
+
+								table.insert(product.conveyorEffects, shader)
+							else
+								g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Invalid productName %s given at %s.conveyorEffect! Using default 'WHEAT' for fill effect instead.", self.indexName, shader.productName, key)
+							end
+						end
+					end
+
+					parent.conveyorEffect = conveyorEffect
+				end
+			end
+		end
 	end
 end
 
@@ -987,12 +1025,8 @@ function GC_ProductionFactory:delete()
 				product.fillVolumes:delete()
 			end
 
-			if product.conveyor ~= nil then
-				product.conveyor:delete()
-			end
-
-			if product.conveyorEffect ~= nil then
-				product.conveyorEffect:delete()
+			if product.conveyorEffects ~= nil then
+				product.conveyorEffects = nil
 			end
 		end
 
@@ -1006,18 +1040,22 @@ function GC_ProductionFactory:delete()
 					product.fillVolumes:delete()
 				end
 
-				if product.conveyor ~= nil then
-					product.conveyor:delete()
-				end
-	
-				if product.conveyorEffect ~= nil then
-					product.conveyorEffect:delete()
+				if product.conveyorEffects ~= nil then
+					product.conveyorEffects = nil
 				end
 			end
 		end
 
 		for _, productLine in ipairs (self.productLines) do
 			self:deleteOperatingParts(productLine)
+
+			if productLine.conveyor ~= nil then
+				productLine.conveyor:delete()
+			end
+
+			if productLine.conveyorEffect ~= nil then
+				productLine.conveyorEffect:delete()
+			end
 		end
 
 		if self.sharedOperatingParts ~= nil then
@@ -1070,7 +1108,6 @@ function GC_ProductionFactory:readStream(streamId, connection)
 
 			self:updateFactoryLevels(fillLevel, inputProduct, nil, false)
 
-			-- Only on join.
 			if streamReadBool(streamId) then
 				inputProduct.totalDelivered = streamReadFloat32(streamId)
 			end
@@ -1113,7 +1150,6 @@ function GC_ProductionFactory:writeStream(streamId, connection)
 				streamWriteFloat32(streamId, fillLevel)
 			end
 
-			-- Only on join.
 			local totalDelivered = inputProduct.totalDelivered
 			if streamWriteBool(streamId, totalDelivered > 0) then
 				streamWriteFloat32(streamId, totalDelivered)
@@ -1434,62 +1470,69 @@ function GC_ProductionFactory:hourChanged()
 	end
 
 	if self.isServer then
-		local raiseFlags = false
-		for lineId, productLine in pairs (self.productLines) do
-			if productLine.productSale ~= nil then
+		if self.hasProductSale then
+			local raiseFlags = false
+			for lineId, productLine in pairs (self.productLines) do
+				if productLine.productSale ~= nil then
 
-				local currentHour = g_currentMission.environment.currentHour
-				if currentHour == 0 then
-					productLine.productSale.productivityHours = 24
-				else
-					if productLine.productSale.productivityHours <= 0 then
-						productLine.productSale.productivityHours = 24 - currentHour
+					local currentHour = g_currentMission.environment.currentHour
+					if currentHour == 0 then
+						productLine.productSale.productivityHours = 24
+					else
+						if productLine.productSale.productivityHours <= 0 then
+							productLine.productSale.productivityHours = 24 - currentHour
+						end
 					end
-				end
 
-				if productLine.active then
-					local stopProductLine = false
-					local productPerHour = productLine.outputPerHour
-					local hasProduct, producedFactor = self:getHasInputProducts(productLine, productPerHour)
+					if productLine.active then
+						local stopProductLine = false
+						local productPerHour = productLine.outputPerHour
+						local hasProduct, producedFactor = self:getHasInputProducts(productLine, productPerHour)
 
-					if hasProduct then
-						raiseFlags = true
+						if hasProduct then
+							raiseFlags = true
 
-						for i = 1, #productLine.inputs do
-							local input = productLine.inputs[i]
-							local amount = producedFactor * input.percent
+							for i = 1, #productLine.inputs do
+								local input = productLine.inputs[i]
+								local amount = producedFactor * productLine.inputsPercent[i]
 
-							self:updateFactoryLevels(input.fillLevel - amount, input, input.lastFillTypeIndex, false)
+								self:updateFactoryLevels(input.fillLevel - amount, input, input.lastFillTypeIndex, false)
 
-							if input.fillLevel <= 0 then
-								stopProductLine = true
+								if input.fillLevel <= 0 then
+									stopProductLine = true
+								end
 							end
+
+							local income = math.floor(productLine.productSale.incomePerHour * (producedFactor / productPerHour))
+							productLine.productSale.lifeTimeIncome = math.min(productLine.productSale.lifeTimeIncome + income, GC_ProductionFactory.MAX_INT)
+
+							g_currentMission:addMoney(income, self:getOwnerFarmId(), MoneyType.PROPERTY_INCOME, true, false)
+						else
+							stopProductLine = true
+							productLine.productSale.productivityHours = productLine.productSale.productivityHours - 1
 						end
 
-						local income = math.floor(productLine.productSale.incomePerHour * (producedFactor / productPerHour))
-						productLine.productSale.lifeTimeIncome = math.min(productLine.productSale.lifeTimeIncome + income, GC_ProductionFactory.MAX_INT)
-						
-						g_currentMission:addMoney(income, self:getOwnerFarmId(), MoneyType.PROPERTY_INCOME, true, false)
+						if stopProductLine and productLine.active then
+							self:setFactoryState(lineId, false, false)
+						end
 					else
-						stopProductLine = true
 						productLine.productSale.productivityHours = productLine.productSale.productivityHours - 1
-					end
 
-					if stopProductLine and productLine.active then
-						self:setFactoryState(lineId, false, false)
-					end
-				else
-					productLine.productSale.productivityHours = productLine.productSale.productivityHours - 1
-
-					if productLine.autoStart and not productLine.userStopped and self:getCanOperate(lineId) then
-						self:setFactoryState(lineId, true, false)
+						if productLine.autoStart and not productLine.userStopped and self:getCanOperate(lineId) then
+							self:setFactoryState(lineId, true, false)
+						end
 					end
 				end
 			end
+
+			if raiseFlags then
+				self:raiseDirtyFlags(self.productionFactoryDirtyFlag)
+			end
 		end
 
-		if raiseFlags then
-			self:raiseDirtyFlags(self.productionFactoryDirtyFlag)
+		if self.hourlyIncomeTotal > 0 then
+			g_currentMission:addMoney(self.hourlyIncomeTotal, self:getOwnerFarmId(), MoneyType.PROPERTY_INCOME, true, false)
+			self.hourlyIncomeTotal = 0
 		end
 	end
 end
@@ -1534,6 +1577,8 @@ function GC_ProductionFactory:minuteChanged()
 		end
 
 		if self.factorMinuteUpdate then
+			local totalIncomeToPay = 0
+
 			self.updateCounter = self.updateCounter + 1
 			if self.updateCounter >= self.updateDelay then
 				self.updateCounter = 0
@@ -1551,9 +1596,19 @@ function GC_ProductionFactory:minuteChanged()
 
 								for i = 1, #productLine.inputs do
 									local input = productLine.inputs[i]
-									local amount = producedFactor * input.percent
+									local amount = producedFactor * productLine.inputsPercent[i]
 
 									self:updateFactoryLevels(input.fillLevel - amount, input, input.lastFillTypeIndex, false)
+
+									local income = productLine.inputsIncome[i]
+									if income ~= nil and income.pricePerLiter > 0.0 then
+										local updateAmount = income.pricePerLiter * amount
+										if income.usePriceMultiplier then
+											updateAmount = updateAmount * EconomyManager.getPriceMultiplier()
+										end
+
+										self.hourlyIncomeTotal = self.hourlyIncomeTotal + updateAmount
+									end
 
 									if input.fillLevel <= 0 then
 										stopProductLine = true
@@ -1563,7 +1618,7 @@ function GC_ProductionFactory:minuteChanged()
 								if productLine.outputs ~= nil then
 									for i = 1, #productLine.outputs do
 										local output = productLine.outputs[i]
-										local amount = producedFactor * output.percent
+										local amount = producedFactor * productLine.outputsPercent[i]
 
 										local newFillLevel = output.fillLevel + amount
 
@@ -1591,17 +1646,17 @@ function GC_ProductionFactory:minuteChanged()
 								self:setFactoryState(lineId, false, false)
 							end
 						else
-							if productLine.autoStart and not productLine.userStopped and self:getCanOperate(lineId) then
+							if productLine.autoStart and not productLine.userStopped and self:getCanOperate(lineId, true) then
 								self:setFactoryState(lineId, true, false)
 							end
 						end
 					end
 				end
 			end
+		end
 
-			if raiseFlags then
-				self:raiseDirtyFlags(self.productionFactoryDirtyFlag)
-			end
+		if raiseFlags then
+			self:raiseDirtyFlags(self.productionFactoryDirtyFlag)
 		end
 	end
 end
@@ -1612,7 +1667,7 @@ function GC_ProductionFactory:getHasOutputSpace(productLine, factor)
 	if productLine ~= nil and productLine.outputs ~= nil and factor ~= nil then
 		for i = 1, #productLine.outputs do
 			local output = productLine.outputs[i]
-			local outputWanted = output.percent * factor
+			local outputWanted = productLine.outputsPercent[i] * factor
 			local fillLevel = output.fillLevel
 			local availableSpace = output.capacity - fillLevel
 			local outputSpace = math.min(outputWanted, availableSpace)
@@ -1640,7 +1695,7 @@ function GC_ProductionFactory:getHasInputProducts(productLine, factor)
 	if productLine ~= nil and productLine.inputs ~= nil and factor ~= nil then
 		for i = 1, #productLine.inputs do
 			local input = productLine.inputs[i]
-			local productNeeded = input.percent * factor
+			local productNeeded = productLine.inputsPercent[i] * factor
 			local productToUse = math.min(productNeeded, input.fillLevel)
 
 			if productToUse > 0 then
@@ -1662,7 +1717,7 @@ function GC_ProductionFactory:getHasInputProducts(productLine, factor)
 	return hasProduct, factor
 end
 
-function GC_ProductionFactory:getCanOperate(lineId)
+function GC_ProductionFactory:getCanOperate(lineId, checkPalletDelta)
 	if self.productLines[lineId] ~= nil and self.productLines[lineId].inputs ~= nil then
 		for i = 1, #self.productLines[lineId].inputs do
 			local input = self.productLines[lineId].inputs[i]
@@ -1678,6 +1733,12 @@ function GC_ProductionFactory:getCanOperate(lineId)
 
 				if output.fillLevel >= output.capacity then
 					return false
+				end
+
+				if checkPalletDelta and output.palletCreator ~= nil then
+					if output.palletCreator:getTotalSpace() <= 0 then
+						return false
+					end
 				end
 			end
 		end
@@ -1717,13 +1778,24 @@ function GC_ProductionFactory:updateFactoryLevels(fillLevel, product, fillTypeIn
 			if fillTypeIndex ~= nil and fillTypeIndex ~= product.fillVolumes.lastFillTypeIndex then
 				product.fillVolumes:setFillType(fillTypeIndex)
 			end
-			
+
 			product.fillVolumes:addFillLevel(fillLevel)
 		end
 
-		if product.conveyorEffect ~= nil and product.conveyorEffect.allowMaterialChange then
-			if fillTypeIndex ~= nil and fillTypeIndex ~= product.conveyorEffect.lastFillTypeIndex then
-				product.conveyorEffect:setFillType(fillTypeIndex)
+		if product.conveyorEffects ~= nil then
+			if fillTypeIndex ~= nil and fillTypeIndex ~= product.conveyorLastFillTypeIndex then
+				product.conveyorLastFillTypeIndex = fillTypeIndex
+
+				if fillTypeIndex ~= FillType.UNKNOWN then
+					for _, shader in pairs (product.conveyorEffects) do
+						if shader.materialType ~= nil and shader.materialTypeId ~= nil then
+							local material = g_materialManager:getMaterial(fillTypeIndex, shader.materialType, shader.materialTypeId)
+							if material ~= nil then
+								setMaterial(shader.node, material, 0)
+							end
+						end
+					end
+				end
 			end
 		end
 
@@ -1748,25 +1820,7 @@ function GC_ProductionFactory:setFactoryState(lineId, state, userStopped, noEven
 	self.productLines[lineId].userStopped = userStopped
 
 	if self.isClient then
-		self:setOperatingParts(self.productLines[lineId], state)
-
-		for _,product in pairs(self.productLines[lineId].inputs) do
-			if product.conveyor ~= nil then
-				product.conveyor:setState(state)
-			end
-			if product.conveyorEffect ~= nil then
-				product.conveyorEffect:setState(state)
-			end
-		end;
-
-		for _,product in pairs(self.productLines[lineId].outputs) do
-			if product.conveyor ~= nil then
-				product.conveyor:setState(state)
-			end
-			if product.conveyorEffect ~= nil then
-				product.conveyorEffect:setState(state)
-			end
-		end;
+		self:setOperatingParts(self.productLines[lineId], state, true)
 
 		if self.sharedOperatingParts ~= nil then
 			if self.sharedOperatingParts.operatingState ~= state then
@@ -1783,14 +1837,14 @@ function GC_ProductionFactory:setFactoryState(lineId, state, userStopped, noEven
 
 				if updateShared then
 					self.sharedOperatingParts.operatingState = state
-					self:setOperatingParts(self.sharedOperatingParts, state)
+					self:setOperatingParts(self.sharedOperatingParts, state, false)
 				end
 			end
 		end
 	end
 end
 
-function GC_ProductionFactory:setOperatingParts(parent, state)
+function GC_ProductionFactory:setOperatingParts(parent, state, isProductLine)
 	if parent.operateLighting ~= nil then
 		parent.operateLighting:setAllLightsState(state)
 	end
@@ -1820,6 +1874,16 @@ function GC_ProductionFactory:setOperatingParts(parent, state)
 
 	if parent.operateAnimationClips ~= nil then
 		parent.operateAnimationClips:setAnimationClipsState(state)
+	end
+
+	if isProductLine then
+		if parent.conveyor ~= nil then
+			parent.conveyor:setState(state)
+		end
+
+		if parent.conveyorEffect ~= nil then
+			parent.conveyorEffect:setState(state)
+		end
 	end
 end
 
@@ -1890,18 +1954,19 @@ function GC_ProductionFactory:palletCreatorInteraction(level, blockedLevel, delt
 		local totalLevel = level + blockedLevel
 
 		if totalLevel ~= product.fillLevel then
-			self:updateFactoryLevels(totalLevel, product, fillTypeIndex, true)
+			self:updateFactoryLevels(level, product, fillTypeIndex, true)
 		end
 
-		local lineId = self.triggerIdToLineId[triggerId]
-		if lineId ~= nil then
-			if totalLevel < product.capacity then
-				if self:getAutoStart(lineId) and self:getCanOperate(lineId) then
-					self:setFactoryState(lineId, true, false)
-				end
-			else
-				if self.productLines[lineId].active and not self:getCanOperate(lineId) then
-					self:setFactoryState(lineId, false, false)
+		if self.triggerIdToLineIds[triggerId] ~= nil then
+			for _, lineId in pairs (self.triggerIdToLineIds[triggerId]) do
+				if totalLevel < product.capacity then
+					if self:getAutoStart(lineId) and self:getCanOperate(lineId) then
+						self:setFactoryState(lineId, true, false)
+					end
+				else
+					if self.productLines[lineId].active and not self:getCanOperate(lineId, true) then
+						self:setFactoryState(lineId, false, false)
+					end
 				end
 			end
 		end
@@ -1926,17 +1991,19 @@ function GC_ProductionFactory:vehicleChangedHeapLevel(heapLevel, fillTypeIndex, 
 		end
 
 		self:updateFactoryLevels(heapLevel, product, fillTypeIndex, true)
-		local lineId = self.triggerIdToLineId[heapId]
-		if lineId ~= nil then
-			if startFactory then
-				if self:getAutoStart(lineId) and self:getCanOperate(lineId) then
-					self:setFactoryState(lineId, true, false)
-				end
-			end
 
-			if stopFactory then
-				if self.productLines[lineId].active and not self:getCanOperate(lineId) then
-					self:setFactoryState(lineId, false, false)
+		if self.triggerIdToLineIds[heapId] ~= nil then
+			for _, lineId in pairs (self.triggerIdToLineIds[heapId]) do
+				if startFactory then
+					if self:getAutoStart(lineId) and self:getCanOperate(lineId) then
+						self:setFactoryState(lineId, true, false)
+					end
+				end
+
+				if stopFactory then
+					if self.productLines[lineId].active and not self:getCanOperate(lineId) then
+						self:setFactoryState(lineId, false, false)
+					end
 				end
 			end
 		end
@@ -1944,18 +2011,12 @@ function GC_ProductionFactory:vehicleChangedHeapLevel(heapLevel, fillTypeIndex, 
 end
 
 function GC_ProductionFactory:getFreeCapacity(fillTypeIndex, farmId, triggerId)
-	--local fillLevel, capacity = 0, 0
-
 	-- This is ONLY used for input triggers!
 	local product = self:getProductFromTriggerId(triggerId, fillTypeIndex, true)
 	if product ~= nil then
 		if product.maximumAccepted <= 0 then
-			--fillLevel = product.fillLevel
-			--capacity = product.capacity
 			return product.capacity - product.fillLevel
 		else
-			--fillLevel = product.totalDelivered
-			--capacity = product.maximumAccepted
 			return math.min(product.maximumAccepted - product.totalDelivered, product.capacity - product.fillLevel)
 		end
 	end
@@ -2003,7 +2064,6 @@ function GC_ProductionFactory:getAllProvidedFillLevels(farmId, triggerId)
 		end
 	end
 
-	-- I suppress the capacity in the UI so just send '0' as they are all different.
 	return fillLevels, 0
 end
 
@@ -2201,7 +2261,7 @@ function GC_ProductionFactory:doProductPurchase(input, buyLiters, purchasePrice)
 				self:doAutoStart(nil, nil, true)
 			end
 		else
-			g_client:getServerConnection():sendEvent(GC_ProductionFactoryProductPurchaseEvent:new(self, input.lineId, input.id, buyLiters, purchasePrice))
+			g_client:getServerConnection():sendEvent(GC_ProductionFactoryProductPurchaseEvent:new(self, input.id, buyLiters, purchasePrice))
 		end
 	end
 end
@@ -2224,7 +2284,7 @@ function GC_ProductionFactory:spawnPalletFromOutput(output, numberToSpawn)
 
 			return numberSpawned
 		else
-			g_client:getServerConnection():sendEvent(GC_ProductionFactorySpawnPalletEvent:new(self, output.lineId, output.id, numberToSpawn))
+			g_client:getServerConnection():sendEvent(GC_ProductionFactorySpawnPalletEvent:new(self, output.id, numberToSpawn))
 		end
 	end
 end
@@ -2299,6 +2359,8 @@ function GC_ProductionFactory:setOwnerFarmId(ownerFarmId, noEventSend)
 
 		self.currentFarmOwnerId = nil
 	end
+
+	self.hourlyIncomeTotal = 0
 
 	if self.triggerManager ~= nil then
 		self.triggerManager:setAllOwnerFarmIds(ownerFarmId, noEventSend)

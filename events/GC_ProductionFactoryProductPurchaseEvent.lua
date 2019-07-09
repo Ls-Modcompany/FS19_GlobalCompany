@@ -31,10 +31,9 @@ function GC_ProductionFactoryProductPurchaseEvent:emptyNew()
 	return self
 end
 
-function GC_ProductionFactoryProductPurchaseEvent:new(factory, lineId, inputId, buyLiters, purchasePrice)
+function GC_ProductionFactoryProductPurchaseEvent:new(factory, inputId, buyLiters, purchasePrice)
 	local self = GC_ProductionFactoryProductPurchaseEvent:emptyNew()
 	self.factory = factory
-	self.lineId = lineId
 	self.inputId = inputId
 	self.buyLiters = buyLiters
 	self.purchasePrice = purchasePrice
@@ -45,7 +44,6 @@ end
 function GC_ProductionFactoryProductPurchaseEvent:readStream(streamId, connection)
 	assert(g_currentMission:getIsServer())
 	self.factory = NetworkUtil.readNodeObject(streamId)
-	self.lineId = streamReadUInt8(streamId)
 	self.inputId = streamReadUInt8(streamId)
 	self.buyLiters = streamReadFloat32(streamId)
 	self.purchasePrice = streamReadFloat32(streamId)
@@ -55,7 +53,6 @@ end
 
 function GC_ProductionFactoryProductPurchaseEvent:writeStream(streamId, connection)
 	NetworkUtil.writeNodeObject(streamId, self.factory)
-	streamWriteUInt8(streamId, self.lineId)
 	streamWriteUInt8(streamId, self.inputId)
 	streamWriteFloat32(streamId, self.buyLiters)
 	streamWriteFloat32(streamId, self.purchasePrice)
@@ -63,18 +60,13 @@ end
 
 function GC_ProductionFactoryProductPurchaseEvent:run(connection)
 	if not connection:getIsServer() then
-		local productLine = self.factory.productLines[self.lineId]
-		if productLine ~= nil and productLine.inputs ~= nil then
-			local input =  productLine.inputs[self.inputId]
-			self.factory:doProductPurchase(input, self.buyLiters, self.purchasePrice)
+		if self.factory.inputProducts ~= nil then
+			local inputProduct = self.factory.inputProducts[self.inputId]
+			if inputProduct ~= nil then
+				self.factory:doProductPurchase(inputProduct, self.buyLiters, self.purchasePrice)
+			end
 		end
 	else
 		g_company.debug:print("  [LSMC - GlobalCompany > GC_ProductionFactory] ERROR: ProductPurchaseEvent is a client to server only event!")
 	end
 end
-
-
-
-
-
-

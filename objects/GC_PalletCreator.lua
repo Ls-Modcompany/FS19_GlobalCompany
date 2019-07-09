@@ -274,8 +274,6 @@ function GC_PalletCreator:updatePalletCreators(delta, includeDeltaToAdd)
 
 			return totalFillLevel, appliedDelta > 0
 		end
-	else
-		g_company.debug:writeDev(self.debugData, "'updatePalletCreators' is a client only function!")
 	end
 end
 
@@ -374,22 +372,24 @@ function GC_PalletCreator:spawnAreaCallback(transformId)
 				if object.typeName == "pallet" then
 					if object:getFillUnitSupportsFillType(self.palletFillUnitIndex, self.palletFillTypeIndex) then
 						self.palletInSpawner = object
+						
 						if object:getFillUnitFillLevel(self.palletFillUnitIndex) < object:getFillUnitCapacity(self.palletFillUnitIndex) then
 							self.palletToUse = object
 						else
 							self.fullPallet = object
 						end
+						
+						return
 					end
-				else
-					self.otherObject = object -- Other Vehicles
 				end
-			else
-				self.otherObject = object -- Bales and Other.
 			end
+			
+			self.otherObject = object
 		else
 			if transformId ~= nil then
 				if g_currentMission.players[transformId] ~= nil or getHasClassId(transformId, ClassIds.MESH_SPLIT_SHAPE) then
 					self.locatedNodeId = transformId -- A player or log is in the spawn area.
+					self.otherObject = transformId
 				end
 			end
 		end
@@ -430,9 +430,13 @@ function GC_PalletCreator:getTotalSpace()
 		end
 
 		-- If we have a pallet then add it's level to total.
-		if self.palletInSpawner ~= nil and pallets[self.palletInSpawner] ~= true then
-			pallets[self.palletInSpawner] = true
-			totalLevel = totalLevel + self.palletInSpawner:getFillUnitFillLevel(self.palletFillUnitIndex)
+		if self.palletInSpawner ~= nil then
+			if pallets[self.palletInSpawner] == nil then
+				pallets[self.palletInSpawner] = true
+				totalLevel = totalLevel + self.palletInSpawner:getFillUnitFillLevel(self.palletFillUnitIndex)
+			else
+				totalCapacity = totalCapacity - self.palletCapacity
+			end
 		end
 	end
 
@@ -448,7 +452,7 @@ function GC_PalletCreator:getTotalFillLevel(getBlockedLevel, includeDeltaToAdd)
 		self:checkSpawner(self.palletSpawners[i])
 
 		if self.palletInSpawner ~= nil then
-			if pallets[self.palletInSpawner] ~= true then
+			if pallets[self.palletInSpawner] == nil then
 				pallets[self.palletInSpawner] = true
 				totalLevel = totalLevel + self.palletInSpawner:getFillUnitFillLevel(self.palletFillUnitIndex)
 			else
@@ -490,31 +494,6 @@ function GC_PalletCreator:getNumFullPallets()
 	end
 
 	return count
-end
-
-function GC_PalletCreator:getAllSpawnerData()
-	local spawnerData = {}
-
-	for i = 1, self.numberOfSpawners do
-		self.palletInSpawner = nil
-		self.otherObject = nil
-		self:checkSpawner(self.palletSpawners[i])
-
-		local spawner = {}
-		if self.palletInSpawner == nil then
-			spawner.level = 0
-			spawner.capacity = 0
-			if self.otherObject ~= nil and self.otherObject.configFileName ~= nil then
-				spawner.vehicleStoreInfo = g_storeManager:getItemByXMLFilename(self.otherObject.configFileName:lower())
-			end
-		else
-			spawner.level = self.palletInSpawner:getFillUnitFillLevel(self.palletFillUnitIndex)
-			spawner.capacity = self.palletCapacity
-		end
-		table.insert(spawnerData, spawner)
-	end
-
-	return spawnerData
 end
 
 function GC_PalletCreator:getOwnerFarmId()

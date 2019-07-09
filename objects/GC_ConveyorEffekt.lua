@@ -57,6 +57,7 @@ function GC_ConveyorEffekt:load(id, target, xmlFile, xmlKey, groupKey)
 		if groupKey == nil then
 			groupKey = "conveyorEffect";
 		end;
+		
 		self.shaders = {};
 		local i = 0;
 		while true do
@@ -64,6 +65,7 @@ function GC_ConveyorEffekt:load(id, target, xmlFile, xmlKey, groupKey)
 			if not hasXMLProperty(xmlFile, key) then
 				break;
 			end;
+			
 			local shader = {};
 			shader.node = I3DUtil.indexToObject(id, getXMLString(xmlFile, key.."#node"), self.target.i3dMappings);
 			shader.fadeTime = Utils.getNoNil(getXMLFloat(xmlFile, key.."#fadeTime"), 1) * 1000;
@@ -85,7 +87,31 @@ function GC_ConveyorEffekt:load(id, target, xmlFile, xmlKey, groupKey)
 			
 			setVisibility(shader.node, false)
 
-			setShaderParameter(shader.node, "morphPosition", 0.0, 1.0, 1.0, 0.0, false);
+			setShaderParameter(shader.node, "morphPosition", 0.0, 1.0, 1.0, 0.0, false);		
+			
+			
+			local backupFillType = FillType.WHEAT
+			
+			-- Allow a set FillType only
+			local fillTypeName = getXMLString(xmlFile, key .. "#forcedFillType")
+			if fillTypeName ~= nil then
+				local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillTypeName)
+				if fillTypeIndex ~= nil then
+					backupFillType = fillTypeIndex
+					shader.forcedFillType = fillTypeIndex
+				end
+			end
+			
+			-- For factory fillType changing
+			if shader.forcedFillType == nil then
+				shader.productName = getXMLString(xmlFile, key .. "#productName")
+			end
+			
+			-- Set a fillType as a backup or fixed.
+			local material = g_materialManager:getMaterial(backupFillType, shader.materialType, shader.materialTypeId)
+			if material ~= nil then
+				setMaterial(shader.node, material, 0)
+			end
 
 			table.insert(self.shaders, shader);
 			
@@ -259,15 +285,13 @@ function GC_ConveyorEffekt:getFadeTime(shader, index)
 end;
 
 function GC_ConveyorEffekt:setFillType(fillType)
-	self.lastFillTypeIndex = fillType
-	
 	for _,shader in pairs(self.shaders) do
 		if shader.materialType ~= nil and shader.materialTypeId ~= nil then
 			local material = g_materialManager.materials[fillType][shader.materialType][shader.materialTypeId]
 			if material ~= nil then
 				setMaterial(shader.node, material, 0);
-			else
-				Debug.write(debugIndex, Debug.ERROR, "Material can't set for fillType %s", fillType);
+			--else
+				--Debug.write(debugIndex, Debug.ERROR, "Material can't set for fillType %s", fillType);
 			end;
 		end;
 	end;
