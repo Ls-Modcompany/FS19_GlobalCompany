@@ -820,7 +820,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				end
 			end
 
-			self:loadOperatingParts(xmlFile, productLineKey .. ".operatingParts", productLine)
+			self:loadOperatingParts(xmlFile, productLineKey .. ".operatingParts", productLine, true)
 
 			-- Load player trigger for each product line. (These will show small UI (showPopupUI = true) when in trigger or open full GUI if 'productLine.showInGUI' is true).
 			local linePlayerTriggerKey = productLineKey .. ".playerTrigger"
@@ -844,7 +844,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			if hasXMLProperty(xmlFile, sharedOperatingPartsKey) then
 				self.sharedOperatingParts = {}
 				self.sharedOperatingParts.operatingState = false
-				self:loadOperatingParts(xmlFile, sharedOperatingPartsKey, self.sharedOperatingParts)
+				self:loadOperatingParts(xmlFile, sharedOperatingPartsKey, self.sharedOperatingParts, false)
 			end
 		end
 
@@ -903,7 +903,7 @@ function GC_ProductionFactory:loadProductParts(xmlFile, key, product)
 	end
 end
 
-function GC_ProductionFactory:loadOperatingParts(xmlFile, key, parent, isProductLine, isInput)
+function GC_ProductionFactory:loadOperatingParts(xmlFile, key, parent, isProductLine)
 	if self.isClient then
 		local lightsKey = key .. ".lighting"
 		if hasXMLProperty(xmlFile, lightsKey) then
