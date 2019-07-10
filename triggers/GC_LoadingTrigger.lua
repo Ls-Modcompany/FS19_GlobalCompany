@@ -54,12 +54,14 @@ function GC_LoadingTrigger:new(isServer, isClient, customMt)
 	return self
 end
 
-function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes, infiniteCapacity, blockUICapacity)
+function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes, infiniteCapacity, blockUICapacity, baseDirectory)
 	self.rootNode = nodeId
 	self.source = source
 
 	self.debugData = g_company.debug:getDebugData(GC_LoadingTrigger.debugIndex, source)
-	
+
+	self.baseDirectory = GlobalCompanyUtils.getParentBaseDirectory(target, baseDirectory)
+
 	local xmlUtils = g_company.xmlUtils
 
 	local triggerNode = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, xmlKey .. "#triggerNode"), source.i3dMappings)
@@ -127,22 +129,30 @@ function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes
 			end
 
 			local fillSoundIdentifier = getXMLString(xmlFile, xmlKey .. ".sounds#fillSoundIdentifier")
-			local xmlSoundFile = loadXMLFile("mapXML", g_currentMission.missionInfo.mapSoundXmlFilename)
-			if xmlSoundFile ~= nil and xmlSoundFile ~= 0 then
-				local directory = g_currentMission.baseDirectory
-				local modName, baseDirectory = Utils.getModNameAndBaseDirectory(g_currentMission.missionInfo.mapSoundXmlFilename)
-				if modName ~= nil then
-					directory = baseDirectory .. modName
-				end
+			if fillSoundIdentifier ~= nil then
+				local xmlSoundFile = loadXMLFile("mapXML", g_currentMission.missionInfo.mapSoundXmlFilename)
+				if xmlSoundFile ~= nil and xmlSoundFile ~= 0 then
+					-- This is map baseDirectory
+					local directory = g_currentMission.baseDirectory
+					local modName, baseDirectory = Utils.getModNameAndBaseDirectory(g_currentMission.missionInfo.mapSoundXmlFilename)
+					if modName ~= nil then
+						directory = baseDirectory .. modName
+					end
 
-				if fillSoundIdentifier ~= nil then
 					self.samples.load = g_soundManager:loadSampleFromXML(xmlSoundFile, "sound.object", fillSoundIdentifier, directory, getRootNode(), 0, AudioGroup.ENVIRONMENT, nil, nil)
 					if self.samples.load ~= nil then
 						link(fillSoundNode, self.samples.load.soundNode)
 						setTranslation(self.samples.load.soundNode, 0, 0, 0)
 					end
+
+					delete(xmlSoundFile)
 				end
-				delete(xmlSoundFile)
+			else
+				self.samples.load = g_soundManager:loadSampleFromXML(xmlFile, xmlKey .. ".sounds", "fillingSample", self.baseDirectory, getRootNode(), 0, AudioGroup.ENVIRONMENT, source.i3dMappings, nil)
+				if self.samples.load ~= nil then
+					link(fillSoundNode, self.samples.load.soundNode)
+					setTranslation(self.samples.load.soundNode, 0, 0, 0)
+				end
 			end
 
 			self.scroller = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, xmlKey .. ".scroller#node"), source.i3dMappings)
