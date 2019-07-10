@@ -108,6 +108,8 @@ function GC_FillLevelsDisplay.new(hudAtlasPath)
 
 	self:storeOriginalPosition()
 	self:storeScaledValues()
+	
+	self.lastFieldInfoState = nil
 
 	self.backupTexts = {}
 	self.backupTexts.right = g_company.languageManager:getText("GC_Input_Header_Backup", nil, "Inputs")
@@ -144,8 +146,10 @@ function GC_FillLevelsDisplay:removeCurrentObject(object, force)
 			self.object = nil
 
 			if self:getVisible() then
-				self:setVisible(false, false)
+				self:setVisible(false, false)				
 			end
+			
+			self:setFieldInfoDisplayState(true)
 
 			if self.debugActive then
 				if force then
@@ -314,13 +318,34 @@ function GC_FillLevelsDisplay:update(dt)
 			end
 
 			if not self:getVisible() and self.animation:getFinished() then
+				self:setFieldInfoDisplayState(false)				
 				self:setVisible(true, true)
 			end
 
 			self:updateFillLevelFrames()
 		elseif self:getVisible() and self.animation:getFinished() then
 			self:setVisible(false, true)
-			self.object = nil
+			self:setFieldInfoDisplayState(true)
+			self.object = nil			
+		end
+	end
+end
+
+function GC_FillLevelsDisplay:setFieldInfoDisplayState(isEnabled)
+	if g_gameSettings:getValue("showFieldInfo") then
+		local fieldInfoDisplay = g_currentMission.hud.fieldInfoDisplay
+		if fieldInfoDisplay ~= nil then
+			if isEnabled then
+				if self.lastFieldInfoState then
+					self.lastFieldInfoState = nil
+					fieldInfoDisplay:setEnabled(isEnabled)
+				end
+			else
+				if fieldInfoDisplay.isEnabled then
+					self.lastFieldInfoState = true
+					fieldInfoDisplay:setEnabled(isEnabled)
+				end
+			end
 		end
 	end
 end

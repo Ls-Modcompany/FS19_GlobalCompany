@@ -59,9 +59,11 @@ function GC_Effects:new(isServer, isClient, customMt)
 	self.customMaterialsFilename = nil
 
 	self.effectsActive = false
-	
+
 	self.numIntervalParticleSystems = 0
 	self.numIntervalEffects = 0
+
+	self.productNameEffects = {}
 
 	return self
 end
@@ -205,15 +207,23 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 					local effects = {}
 					effects.effects = effectsToLoad
 
-					local fillTypeNames = getXMLString(xmlFile, key .. "#fillTypes") -- Using 'fillTypes' with 'operatingIntervalSeconds' cycles through the fillTypes at each interval change.
-					if fillTypeNames == nil then
-						local fillTypeName = getXMLString(xmlFile, key .. "#fillType") -- Single product to use for the effect.
-						local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillTypeName)
-						if fillTypeIndex ~= nil then
-							effects.fillTypeIndex = fillTypeIndex
-							effects.backupFillTypeIndex = fillTypeIndex
-						else
-							effects.fillTypeIndex = FillType.WHEAT -- Keep 'wheat' as a backup incase nothing is listed.
+					effects.needReset = Utils.getNoNil(getXMLBool(xmlFile, key .. "#needReset"), false)
+
+					local productName = getXMLString(xmlFile, key .. "#productName")
+					if productName ~= nil then
+						effects.productName = productName
+						effects.fillTypeIndex = FillType.WHEAT
+					else
+						local fillTypeNames = getXMLString(xmlFile, key .. "#fillTypes") -- Using 'fillTypes' with 'operatingIntervalSeconds' cycles through the fillTypes at each interval change.
+						if fillTypeNames == nil then
+							local fillTypeName = getXMLString(xmlFile, key .. "#fillType") -- Single product to use for the effect.
+							local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillTypeName)
+							if fillTypeIndex ~= nil then
+								effects.fillTypeIndex = fillTypeIndex
+								effects.backupFillTypeIndex = fillTypeIndex
+							else
+								effects.fillTypeIndex = FillType.WHEAT -- Keep 'wheat' as a backup in case nothing is listed.
+							end
 						end
 					end
 
@@ -234,7 +244,7 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 						effects.intervalActive = false
 						effects.delayTime = operatingTime
 						effects.operatingTime = operatingTime
-					
+
 						if fillTypeNames ~= nil then
 							effects.fillTypes = {}
 							local splitFillTypeNames = StringUtil.splitString(" ", fillTypeNames)
@@ -276,6 +286,15 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 						end
 
 						table.insert(self.standardEffects, effects)
+					end
+
+					-- For factory updating if needed only.
+					if productName ~= nil then
+						if self.productNameEffects[productName] == nil then
+							self.productNameEffects[productName] = {}
+						end
+
+						table.insert(self.productNameEffects[productName], effects)
 					end
 
 					effects = nil
@@ -329,7 +348,7 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 			if self.intervalParticleSystems ~= nil then
 				self.numIntervalParticleSystems = #self.intervalParticleSystems
 			end
-			
+
 			if self.intervalEffects ~= nil then
 				self.numIntervalEffects = #self.intervalEffects
 			end
@@ -364,6 +383,8 @@ function GC_Effects:delete()
 			end
 			self.standardEffects = nil
 		end
+
+		self.productNameEffects = nil
 
 		if self.intervalParticleSystems ~= nil or self.intervalEffects ~= nil then
 			if self.intervalParticleSystems ~= nil then
@@ -424,10 +445,14 @@ function GC_Effects:update(dt)
 						end
 
 						effects.operatingTime = effects.operatingTime + effects.intervals[effects.intervalId]
-					
+
 						if effects.intervalActive then
 							effects.intervalActive = false
 							g_effectManager:stopEffects(effects.effects)
+
+							if effects.needReset then
+								g_effectManager:resetEffects(effects.effects)
+							end
 						else
 							effects.intervalActive = true
 							if effects.fillTypes ~= nil then
@@ -475,6 +500,11 @@ function GC_Effects:update(dt)
 					for i = 1, self.numIntervalEffects do
 						local effects = self.intervalEffects[i]
 						g_effectManager:stopEffects(effects.effects)
+
+						if effects.needReset then
+							g_effectManager:resetEffects(effects.effects)
+						end
+
 						effects.operatingTime = effects.delayTime
 						effects.intervalActive = false
 						effects.intervalId = 0
@@ -515,6 +545,10 @@ function GC_Effects:setEffectsState(state, forceState)
 						g_effectManager:startEffects(effects.effects)
 					else
 						g_effectManager:stopEffects(effects.effects)
+
+						if effects.needReset then
+							g_effectManager:resetEffects(effects.effects)
+						end
 					end
 				end
 			end
@@ -590,4 +624,12 @@ function GC_Effects:setCustomMaterialToPS(fillTypeIndex)
 			end
 		end
 	end
+end
+
+function GC_Effects:getEffectsByProductName(productName)
+	if self.productNameEffects[productName] ~= nil then
+		return self.productNameEffects[productName]
+	end
+
+	return
 end

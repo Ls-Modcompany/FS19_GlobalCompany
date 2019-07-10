@@ -308,7 +308,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				-- When 'totalDelivered' >= this limit then it will never be accepted again. Nice option for building with a factory.
 				inputProduct.maximumAccepted = Utils.getNoNil(getXMLInt(xmlFile, inputProductKey .. "#maximumAccepted"), 0)
 				inputProduct.totalDelivered = 0
-				
+
 				if hasXMLProperty(xmlFile, inputProductKey .. ".inputMethods") then
 					if self.isServer then
 						if hasXMLProperty(xmlFile, inputProductKey .. ".inputMethods.rainWaterCollector") then
@@ -923,14 +923,23 @@ function GC_ProductionFactory:loadOperatingParts(xmlFile, key, parent, isProduct
 			parent.operateShaders = shaders
 		end
 
-		local rotationNodes = GC_RotationNodes:new(self.isServer, self.isClient)
-		if rotationNodes:load(self.rootNode, self, xmlFile, key) then
-			parent.operateRotationNodes = rotationNodes
+		local animationNodes = GC_AnimationNodes:new(self.isServer, self.isClient)
+		if animationNodes:load(self.rootNode, self, xmlFile, key) then
+			parent.operateAnimationNodes = animationNodes
 		end
 
 		local particleEffects = GC_Effects:new(self.isServer, self.isClient)
 		if particleEffects:load(self.rootNode, self, xmlFile, key) then
 			parent.operateParticleEffects = particleEffects
+
+			if isProductLine and particleEffects.productNameEffects ~= nil then
+				for productName, product in pairs (self.productNameToProduct) do
+					local effects = particleEffects.productNameEffects[productName]
+					if effects ~= nil then
+						product.effects = effects
+					end
+				end
+			end
 		end
 
 		if self.animationManager ~= nil then
@@ -945,37 +954,6 @@ function GC_ProductionFactory:loadOperatingParts(xmlFile, key, parent, isProduct
 		local animationClips = GC_AnimationClips:new(self.isServer, self.isClient)
 		if animationClips:load(self.rootNode, self, xmlFile, key) then
 			parent.operateAnimationClips = animationClips
-		end
-
-		if isProductLine then
-			if hasXMLProperty(xmlFile, key .. ".conveyors") then
-				local conveyor = GC_Conveyor:new(self.isServer, self.isClient)
-				if conveyor:load(self.rootNode, self, xmlFile, key, "conveyors") then
-					parent.conveyor = conveyor
-				end
-			end
-
-			if hasXMLProperty(xmlFile, key .. ".conveyorEffects") then
-				local conveyorEffect = GC_ConveyorEffekt:new(self.isServer, self.isClient)
-				if conveyorEffect:load(self.rootNode, self, xmlFile, key, "conveyorEffects") then
-					for i, shader in pairs (conveyorEffect.shaders) do
-						if shader.productName ~= nil then
-							local product = self.productNameToProduct[shader.productName]
-							if product ~= nil then
-								if product.conveyorEffects == nil then
-									product.conveyorEffects = {}
-								end
-
-								table.insert(product.conveyorEffects, shader)
-							else
-								g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Invalid productName %s given at %s.conveyorEffect! Using default 'WHEAT' for fill effect instead.", self.indexName, shader.productName, key)
-							end
-						end
-					end
-
-					parent.conveyorEffect = conveyorEffect
-				end
-			end
 		end
 	end
 end
@@ -1014,9 +992,7 @@ function GC_ProductionFactory:delete()
 				product.fillVolumes:delete()
 			end
 
-			if product.conveyorEffects ~= nil then
-				product.conveyorEffects = nil
-			end
+			product.effects = nil
 		end
 
 		if self.outputProducts ~= nil then
@@ -1029,22 +1005,12 @@ function GC_ProductionFactory:delete()
 					product.fillVolumes:delete()
 				end
 
-				if product.conveyorEffects ~= nil then
-					product.conveyorEffects = nil
-				end
+				product.effects = nil
 			end
 		end
 
 		for _, productLine in ipairs (self.productLines) do
 			self:deleteOperatingParts(productLine)
-
-			if productLine.conveyor ~= nil then
-				productLine.conveyor:delete()
-			end
-
-			if productLine.conveyorEffect ~= nil then
-				productLine.conveyorEffect:delete()
-			end
 		end
 
 		if self.sharedOperatingParts ~= nil then
@@ -1068,8 +1034,8 @@ function GC_ProductionFactory:deleteOperatingParts(parent)
 		parent.operateShaders:delete()
 	end
 
-	if parent.operateRotationNodes ~= nil then
-		parent.operateRotationNodes:delete()
+	if parent.operateAnimationNodes ~= nil then
+		parent.operateAnimationNodes:delete()
 	end
 
 	if parent.operateParticleEffects ~= nil then
@@ -1095,7 +1061,7 @@ function GC_ProductionFactory:readStream(streamId, connection)
 				fillLevel = streamReadFloat32(streamId)
 			end
 
-			self:updateFactoryLevels(fillLevel, inputProduct, nil, false)
+			self:updateFactoryLevels(fillLevel, inputProduct, inputProduct.lastFillTypeIndex, false)
 
 			if streamReadBool(streamId) then
 				inputProduct.totalDelivered = streamReadFloat32(streamId)
@@ -1108,7 +1074,7 @@ function GC_ProductionFactory:readStream(streamId, connection)
 				if streamReadBool(streamId) then
 					fillLevel = streamReadFloat32(streamId)
 				end
-				self:updateFactoryLevels(fillLevel, outputProduct, nil, false)
+				self:updateFactoryLevels(fillLevel, outputProduct, outputProduct.fillTypeIndex, false)
 			end
 		end
 
@@ -1177,7 +1143,7 @@ function GC_ProductionFactory:readUpdateStream(streamId, timestamp, connection)
 				if streamReadBool(streamId) then
 					fillLevel = streamReadFloat32(streamId)
 				end
-				self:updateFactoryLevels(fillLevel, inputProduct, nil, false)
+				self:updateFactoryLevels(fillLevel, inputProduct, inputProduct.lastFillTypeIndex, false)
 			end
 
 			if self.outputProducts ~= nil then
@@ -1186,7 +1152,7 @@ function GC_ProductionFactory:readUpdateStream(streamId, timestamp, connection)
 					if streamReadBool(streamId) then
 						fillLevel = streamReadFloat32(streamId)
 					end
-					self:updateFactoryLevels(fillLevel, outputProduct, nil, false)
+					self:updateFactoryLevels(fillLevel, outputProduct, outputProduct.fillTypeIndex, false)
 				end
 			end
 
@@ -1299,7 +1265,7 @@ function GC_ProductionFactory:loadFromXMLFile(xmlFile, key)
 					fillLevel = math.max(Utils.getNoNil(getXMLFloat(xmlFile, outputProductKey .. "#fillLevel"), 0), 0)
 				end
 
-				self:updateFactoryLevels(fillLevel, outputProduct, nil, false)
+				self:updateFactoryLevels(fillLevel, outputProduct, outputProduct.fillTypeIndex, false)
 			end
 
 			i = i + 1
@@ -1771,18 +1737,14 @@ function GC_ProductionFactory:updateFactoryLevels(fillLevel, product, fillTypeIn
 			product.fillVolumes:addFillLevel(fillLevel)
 		end
 
-		if product.conveyorEffects ~= nil then
-			if fillTypeIndex ~= nil and fillTypeIndex ~= product.conveyorLastFillTypeIndex then
-				product.conveyorLastFillTypeIndex = fillTypeIndex
+		if fillTypeIndex ~= nil and fillTypeIndex ~= product.effectsLastFillTypeIndex then
+			product.effectsLastFillTypeIndex = fillTypeIndex
 
-				if fillTypeIndex ~= FillType.UNKNOWN then
-					for _, shader in pairs (product.conveyorEffects) do
-						if shader.materialType ~= nil and shader.materialTypeId ~= nil then
-							local material = g_materialManager:getMaterial(fillTypeIndex, shader.materialType, shader.materialTypeId)
-							if material ~= nil then
-								setMaterial(shader.node, material, 0)
-							end
-						end
+			if fillTypeIndex ~= FillType.UNKNOWN then
+				if product.effects ~= nil then
+					for _, effects in pairs (product.effects) do
+						effects.fillTypeIndex = fillTypeIndex
+						g_effectManager:setFillType(effects.effects, fillTypeIndex)
 					end
 				end
 			end
@@ -1809,7 +1771,7 @@ function GC_ProductionFactory:setFactoryState(lineId, state, userStopped, noEven
 	self.productLines[lineId].userStopped = userStopped
 
 	if self.isClient then
-		self:setOperatingParts(self.productLines[lineId], state, true)
+		self:setOperatingParts(self.productLines[lineId], state)
 
 		if self.sharedOperatingParts ~= nil then
 			if self.sharedOperatingParts.operatingState ~= state then
@@ -1826,14 +1788,14 @@ function GC_ProductionFactory:setFactoryState(lineId, state, userStopped, noEven
 
 				if updateShared then
 					self.sharedOperatingParts.operatingState = state
-					self:setOperatingParts(self.sharedOperatingParts, state, false)
+					self:setOperatingParts(self.sharedOperatingParts, state)
 				end
 			end
 		end
 	end
 end
 
-function GC_ProductionFactory:setOperatingParts(parent, state, isProductLine)
+function GC_ProductionFactory:setOperatingParts(parent, state)
 	if parent.operateLighting ~= nil then
 		parent.operateLighting:setAllLightsState(state)
 	end
@@ -1846,8 +1808,8 @@ function GC_ProductionFactory:setOperatingParts(parent, state, isProductLine)
 		parent.operateShaders:setShadersState(state)
 	end
 
-	if parent.operateRotationNodes ~= nil then
-		parent.operateRotationNodes:setRotationNodesState(state)
+	if parent.operateAnimationNodes ~= nil then
+		parent.operateAnimationNodes:setAnimationNodesState(state)
 	end
 
 	if parent.operateParticleEffects ~= nil then
@@ -1863,16 +1825,6 @@ function GC_ProductionFactory:setOperatingParts(parent, state, isProductLine)
 
 	if parent.operateAnimationClips ~= nil then
 		parent.operateAnimationClips:setAnimationClipsState(state)
-	end
-
-	if isProductLine then
-		if parent.conveyor ~= nil then
-			parent.conveyor:setState(state)
-		end
-
-		if parent.conveyorEffect ~= nil then
-			parent.conveyorEffect:setState(state)
-		end
 	end
 end
 
@@ -2246,7 +2198,7 @@ function GC_ProductionFactory:doProductPurchase(input, buyLiters, purchasePrice)
 			if price > 0 then
 				local newFillLevel = input.fillLevel + validLitres
 				g_currentMission:addMoney(-price, self:getOwnerFarmId(), MoneyType.OTHER, true, true)
-				self:updateFactoryLevels(newFillLevel, input, nil, true)
+				self:updateFactoryLevels(newFillLevel, input, input.lastFillTypeIndex, true)
 				self:doAutoStart(nil, nil, true)
 			end
 		else
@@ -2265,7 +2217,7 @@ function GC_ProductionFactory:spawnPalletFromOutput(output, numberToSpawn)
 			local numberSpawned = output.objectSpawner:spawnByObjectInfo(object, numberToSpawn)
 
 			local newFillLevel = output.fillLevel - (object.fillLevel * numberSpawned)
-			self:updateFactoryLevels(newFillLevel, output, nil, true)
+			self:updateFactoryLevels(newFillLevel, output, output.fillTypeIndex, true)
 
 			if autoStart then
 				self:doAutoStart(nil, nil, true)
@@ -2382,7 +2334,7 @@ function GC_ProductionFactory:doBulkProductSell(getPrice)
 			end
 
 			if not getPrice then
-				self:updateFactoryLevels(0.0, inputProduct, nil, false)
+				self:updateFactoryLevels(0.0, inputProduct, inputProduct.lastFillTypeIndex, false)
 			end
 		end
 	end
@@ -2402,7 +2354,7 @@ function GC_ProductionFactory:doBulkProductSell(getPrice)
 			end
 
 			if not getPrice then
-				self:updateFactoryLevels(0.0, outputProduct, nil, false)
+				self:updateFactoryLevels(0.0, outputProduct, outputProduct.fillTypeIndex, false)
 			end
 		end
 	end

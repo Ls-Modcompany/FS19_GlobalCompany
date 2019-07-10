@@ -24,7 +24,7 @@ GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
 GlobalCompany.version = "1.0.0.0";
-GlobalCompany.versionDate = "06.07.2019"; -- Release Date ??
+GlobalCompany.versionDate = "14.07.2019"; -- Release Date ??
 GlobalCompany.currentVersionId = 1000; -- Mod Manager ID. (Version number without periods.)
 GlobalCompany.isDevelopmentVersion = false; -- This is for versions loaded from GIT.
 
@@ -220,7 +220,6 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "utils/GC_shopManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_TriggerManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_specializations.lua");
-	--source(GlobalCompany.dir .. "utils/GC_densityMapHeight.lua"); --fixed with patch 1.3
 	source(GlobalCompany.dir .. "utils/GC_FarmlandOwnerListener.lua");
 	source(GlobalCompany.dir .. "utils/GC_FillTypeManager.lua");
 
@@ -228,7 +227,6 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "GlobalCompanyGui.lua");
 
 	--|| Objects ||--
-	-- source(GlobalCompany.dir .. "objects/GC_Clock.lua");
 	source(GlobalCompany.dir .. "objects/GC_Baler.lua");
 	source(GlobalCompany.dir .. "objects/GC_Sounds.lua");
 	source(GlobalCompany.dir .. "objects/GC_Movers.lua");
@@ -237,14 +235,13 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_Lighting.lua");
 	source(GlobalCompany.dir .. "objects/GC_Conveyor.lua");
 	source(GlobalCompany.dir .. "objects/GC_MovingPart.lua");
-	source(GlobalCompany.dir .. "objects/GC_Animations.lua");
 	source(GlobalCompany.dir .. "objects/GC_FillVolume.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicHeap.lua");
 	--source(GlobalCompany.dir .. "objects/GC_BaleShreader.lua");
 	source(GlobalCompany.dir .. "objects/GC_DirtyObjects.lua");
 	source(GlobalCompany.dir .. "objects/GC_PalletCreator.lua");
 	source(GlobalCompany.dir .. "objects/GC_ObjectSpawner.lua");
-	source(GlobalCompany.dir .. "objects/GC_RotationNodes.lua");
+	source(GlobalCompany.dir .. "objects/GC_AnimationNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_ConveyorEffekt.lua");
 	source(GlobalCompany.dir .. "objects/GC_AnimationClips.lua");
 	source(GlobalCompany.dir .. "objects/GC_DigitalDisplays.lua");
@@ -253,7 +250,6 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_AnimationManager.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
 	--source(GlobalCompany.dir .. "objects/GC_DynamicPalletAreas.lua");
-	--source(GlobalCompany.dir .. "objects/GC_FillTypeConstructor.lua");
 	--source(GlobalCompany.dir .. "objects/GC_Greenhouse.lua");
 	--source(GlobalCompany.dir .. "objects/GC_FuelStation.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicStorage.lua");
