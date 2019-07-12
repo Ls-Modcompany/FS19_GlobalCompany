@@ -69,6 +69,7 @@
 		<e k="GC_gui_max" v="Maximum"/>
 		<e k="GC_gui_percent" v="Prozent"/>
 		<e k="GC_gui_lifeTimeIncome" v="Bisheriger Verdienst"/>
+		<e k="GC_gui_changeFactoryTitle" v="Geben Sie unten einen neuen Fabriknamen ein."/>
 		
 		<!-- Formatting required -->
 		<e k="GC_Factory_Sell_Warning" v="Es sind noch Produkte in der Fabrik. Diese werden als loses Schüttgut für den folgenden Betrag verkauft:

@@ -29,18 +29,18 @@
 GC_DebugUtils = {};
 local GC_DebugUtils_mt = Class(GC_DebugUtils);
 
-GC_DebugUtils.setDevLevelMax = true; -- Override isDev maxLevel loading to 'false' if needed. (LSMC DEV ONLY)
+GC_DebugUtils.setDevLevelMax = false;
 
-GC_DebugUtils.defaultLevel = 5; -- Default level used on load. (TEMP SET TO '5', SHOULD BE '1')
+GC_DebugUtils.defaultLevel = 1;
 
-GC_DebugUtils.numLevels = 6; -- This is starting at `GC_DebugUtils.INFORMATIONS` as we do not disable 'ERROR' or 'WARNING' or 'MODDING'.
+GC_DebugUtils.numLevels = 6;
 GC_DebugUtils.maxLevels = 20;
 
-GC_DebugUtils.BLANK = -3; -- No 'PREFIX' and can not be disabled in console. (Used for main loading)
+GC_DebugUtils.BLANK = -3;
 GC_DebugUtils.MODDING = -2;
 GC_DebugUtils.ERROR = -1;
 GC_DebugUtils.WARNING = 0;
-GC_DebugUtils.INFORMATIONS = 1;
+GC_DebugUtils.INFORMATIONS = 1; -- Default max. Increase using 'gcSetDebugLevelState'
 GC_DebugUtils.LOAD = 2;
 GC_DebugUtils.ONCREATE = 3;
 GC_DebugUtils.TABLET = 4;
@@ -55,12 +55,8 @@ function GC_DebugUtils:new(customMt)
 		return;
 	end;
 
-	if customMt == nil then
-		customMt = GC_DebugUtils_mt;
-	end;
-
 	local self = {};
-	setmetatable(self, customMt);
+	setmetatable(self, customMt or GC_DebugUtils_mt);
 
 	self.isDev = GC_DebugUtils:getIsDev();
 	local setMax = self.isDev and GC_DebugUtils.setDevLevelMax;
@@ -76,7 +72,6 @@ function GC_DebugUtils:new(customMt)
 	self.printLevel = {};
 	self.printLevelPrefix = {};
 
-	-- Set print levels.
 	for i = -3, GC_DebugUtils.numLevels + 4 do
 		if i <= GC_DebugUtils.defaultLevel or (setMax and (i < GC_DebugUtils.DEVDEBUG)) then
 			self.printLevel[i] = true;
@@ -87,12 +82,11 @@ function GC_DebugUtils:new(customMt)
 		self.printLevelPrefix[i] = "";
 	end;
 
-	-- Set print levels prefix.
 	self.printLevelPrefix[GC_DebugUtils.BLANK] = "";
 	self.printLevelPrefix[GC_DebugUtils.MODDING] = "MODDING: ";
 	self.printLevelPrefix[GC_DebugUtils.ERROR] = "ERROR: ";
 	self.printLevelPrefix[GC_DebugUtils.WARNING] = "WARNING: ";
-	self.printLevelPrefix[GC_DebugUtils.INFORMATIONS] = "INFORMATIONS: ";
+	self.printLevelPrefix[GC_DebugUtils.INFORMATIONS] = "INFORMATION: ";
 	self.printLevelPrefix[GC_DebugUtils.LOAD] = "LOAD: ";
 	self.printLevelPrefix[GC_DebugUtils.ONCREATE] = "ONCREATE: ";
 	self.printLevelPrefix[GC_DebugUtils.TABLET] = "TABLET: ";
@@ -360,17 +354,9 @@ function GC_DebugUtils:getScriptIndexFromName(name)
 	return self.registeredScriptNames[name];
 end;
 
-function GC_DebugUtils:getPrintLevelFromParamater(level) -- another option we could use, call using printLevel name (string).
-	if type(level) == "number" then
-		return level;
-	elseif type(level) == "string" then
-		return GC_DebugUtils[level:upper()] or -10; -- printLevel[-10] does not exist so nothing will print.
-	end;
-end;
-
 function GC_DebugUtils:getIsDev(getName)
 	local isDev, name = false, "";
-	local devNames = {"kevink98", "GtX", "LSMC", "DEV", "aPuehri"};
+	local devNames = {"kevink98", "GtX_Test", "LSMC", "DEV", "aPuehri"};
 	if g_mpLoadingScreen ~= nil and g_mpLoadingScreen.missionInfo ~= nil then
 		if g_mpLoadingScreen.missionInfo.playerStyle ~= nil and g_mpLoadingScreen.missionInfo.playerStyle.playerName ~= nil then
 			for i = 1, #devNames do

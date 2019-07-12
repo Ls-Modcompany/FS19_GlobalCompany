@@ -40,23 +40,18 @@ function GlobalCompany.initialLoad()
 	if g_company == nil then
 		getfenv(0)["g_company"] = GlobalCompany;
 
-		--| Load Utils |--
 		source(GlobalCompany.dir .. "utils/GC_utils.lua");
 
-		--| Load Debug |--
 		source(GlobalCompany.dir .. "utils/GC_DebugUtils.lua");
 		g_company.debug = GC_DebugUtils:new();
 		GlobalCompany.debugIndex = g_company.debug:registerScriptName("GlobalCompany");
 
-		--| Load Language Manager |--
 		source(GlobalCompany.dir .. "utils/GC_languageManager.lua");
 		g_company.languageManager:load(GlobalCompany.dir);
 
-		--| Load Mod Manager |--
 		source(GlobalCompany.dir .. "utils/GC_ModManager.lua");
 		g_company.modManager = GC_ModManager:new();
 
-		--| Load Event Manager |--
 		source(GlobalCompany.dir .. "utils/GC_EventManager.lua");
 		g_company.eventManager = GC_EventManager:new();
 	else
@@ -67,6 +62,8 @@ function GlobalCompany.initialLoad()
 	if g_company.modManager:doLoadCheck(modNameCurrent, duplicateLoad, GlobalCompany.isDevelopmentVersion) then
 		g_company.debug:singleLogWrite(GC_DebugUtils.BLANK, "Loading Version: %s (%s)", GlobalCompany.version, GlobalCompany.versionDate);
 		addModEventListener(GlobalCompany);
+		
+		GlobalCompany.loadedFactories = {}
 
 		Mission00.load = Utils.prependedFunction(Mission00.load, GlobalCompany.initModClasses);
 		Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, GlobalCompany.init);
@@ -148,6 +145,28 @@ function GlobalCompany:initModClasses()
 		end;
 
 		g_company.modClassNames = nil;
+	end;
+end;
+
+function GlobalCompany.addFactory(factory)
+	if factory ~= nil then
+		table.insert(GlobalCompany.loadedFactories, factory);
+		return #GlobalCompany.loadedFactories;
+	end;
+end;
+
+function GlobalCompany.removeFactory(factory, index)
+	if factory ~= nil then
+		if index ~= nil and GlobalCompany.loadedFactories[index] == factory then
+			table.remove(GlobalCompany.loadedFactories, index);
+		else
+			for i, globalFactory in pairs (GlobalCompany.loadedFactories) do
+				if globalFactory == factory then
+					table.remove(GlobalCompany.loadedFactories, i);
+					break;
+				end;
+			end;
+		end;
 	end;
 end;
 
@@ -283,6 +302,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "events/GC_AnimationManagerStopEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_AnimationManagerStartEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryStateEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_ProductionFactoryCustomTitleEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactorySpawnPalletEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryProductPurchaseEvent.lua");
 

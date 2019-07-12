@@ -12,7 +12,8 @@ local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui-Slider"
 
 GC_Gui_slider = {};
 local GC_Gui_slider_mt = Class(GC_Gui_slider, GC_Gui_element);
-getfenv(0)["GC_Gui_slider"] = GC_Gui_slider;
+-- getfenv(0)["GC_Gui_slider"] = GC_Gui_slider;
+g_company.gui.sliderElement = GC_Gui_slider;
 
 function GC_Gui_slider:new(gui, custom_mt)
     if custom_mt == nil then
@@ -73,7 +74,9 @@ function GC_Gui_slider:setController(table)
 end;
 
 function GC_Gui_slider:setPosition(pos)	
-	self.buttonElement.sliderPosition[2] = self.stepsize * pos;
+	if self.stepsize ~= nil then
+		self.buttonElement.sliderPosition[2] = self.stepsize * pos;
+	end;
 end;
 
 function GC_Gui_slider:moveSlider(x, y)

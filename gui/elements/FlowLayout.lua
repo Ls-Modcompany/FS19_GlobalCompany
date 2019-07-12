@@ -23,7 +23,8 @@ GC_Gui_flowLayout.ALIGNMENT_CENTER = 5;
 GC_Gui_flowLayout.ALIGNMENT_BOTTOM = 6;
 
 local GC_Gui_flowLayout_mt = Class(GC_Gui_flowLayout, GC_Gui_element);
-getfenv(0)["GC_Gui_flowLayout"] = GC_Gui_flowLayout;
+-- getfenv(0)["GC_Gui_flowLayout"] = GC_Gui_flowLayout;
+g_company.gui.flowLayoutElement = GC_Gui_flowLayout;
 
 function GC_Gui_flowLayout:new(gui, custom_mt)
     if custom_mt == nil then

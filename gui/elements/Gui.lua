@@ -12,7 +12,8 @@ local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui-Gui");
 
 GC_Gui = {};
 GC_Gui_mt = Class(GC_Gui);
-getfenv(0)["GC_Gui"] = GC_Gui;
+-- getfenv(0)["GC_Gui"] = GC_Gui;
+g_company.gui.gui = GC_Gui;
 
 function GC_Gui:new(name)	
 	local self = setmetatable({}, GC_Gui_mt);

@@ -26,6 +26,7 @@ Gc_Gui_MainGui.debugIndex = g_company.debug:registerScriptName("Gc_Gui_MainGui")
 
 source(g_company.dir .. "gui/objects/GcMain_Errors.lua");
 source(g_company.dir .. "gui/objects/GcMain_Settings.lua");
+source(g_company.dir .. "gui/objects/GcMain_Factories.lua");
 
 local Gc_Gui_MainGui_mt = Class(Gc_Gui_MainGui);
 
@@ -36,7 +37,8 @@ function Gc_Gui_MainGui:new(target, custom_mt)
     local self = setmetatable({}, Gc_Gui_MainGui_mt);
 
     g_company.gui:loadGui(Gc_Gui_MainSettings, "gcMainSettings");
-    g_company.gui:loadGui(Gc_Gui_Errors, "gcMainErrors");
+    g_company.gui:loadGui(Gc_Gui_Errors, "gcMainErrors");    
+	g_company.gui:loadGui(Gc_Gui_Factories, "gcMainFactories");
     
     self.backupItems = {};            
 	return self;
@@ -57,6 +59,7 @@ function Gc_Gui_MainGui:onOpen()
     if self.loadSpecial then
         self:addMenuItem("g_gcUi2", "icon_errors", g_company.gui:getGui("gcMainErrors"), true);
         self:addMenuItem("g_gcUi2", "icon_settings", g_company.gui:getGui("gcMainSettings"), true);
+        self:addMenuItem("g_gcUi2", "icon_factories", g_company.gui:getGui("gcMainFactories"), true);
         self.loadSpecial = false;
     end;
     

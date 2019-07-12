@@ -13,7 +13,8 @@ local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui-Input")
 GC_Gui_input = {};
 
 local GC_Gui_input_mt = Class(GC_Gui_input, GC_Gui_element);
-getfenv(0)["GC_Gui_input"] = GC_Gui_input;
+-- getfenv(0)["GC_Gui_input"] = GC_Gui_input;
+g_company.gui.inputElement = GC_Gui_input;
 
 function GC_Gui_input:new(gui, custom_mt)
     if custom_mt == nil then

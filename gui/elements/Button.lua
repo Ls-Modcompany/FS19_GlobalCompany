@@ -13,7 +13,8 @@ local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui-Button"
 GC_Gui_button = {};
 
 local GC_Gui_button_mt = Class(GC_Gui_button, GC_Gui_element);
-getfenv(0)["GC_Gui_button"] = GC_Gui_button;
+-- getfenv(0)["GC_Gui_button"] = GC_Gui_button;
+g_company.gui.buttonElement = GC_Gui_button;
 
 function GC_Gui_button:new(gui, custom_mt)
     if custom_mt == nil then

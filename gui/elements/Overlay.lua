@@ -12,7 +12,8 @@ local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui-Overlay
 
 GC_Gui_overlay = {};
 local GC_Gui_overlay_mt = Class(GC_Gui_overlay, GC_Gui_element);
-getfenv(0)["GC_Gui_overlay"] = GC_Gui_overlay;
+-- getfenv(0)["GC_Gui_overlay"] = GC_Gui_overlay;
+g_company.gui.overlayElement = GC_Gui_overlay;
 
 function GC_Gui_overlay:new(gui, custom_mt)
     if custom_mt == nil then

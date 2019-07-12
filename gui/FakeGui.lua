@@ -12,7 +12,9 @@
 FakeGui = {};
 FakeGui.guiInformations = {};
 FakeGui.guiInformations.guiXml = "gui/FakeGui.xml";
-getfenv(0)["GC_Gui_FakeGui"] = FakeGui;
+-- getfenv(0)["GC_Gui_FakeGui"] = FakeGui;
+
+g_company.gui.fakeGui = FakeGui;
 
 local FakeGui_mt = Class(FakeGui, ScreenElement);
 

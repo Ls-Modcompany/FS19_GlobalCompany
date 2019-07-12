@@ -34,6 +34,8 @@ InitObjectClass(GC_ProductionFactory, "GC_ProductionFactory")
 GC_ProductionFactory.LIMIT = 10
 GC_ProductionFactory.MAX_INT = 2147483647
 
+GC_ProductionFactory.BACKUP_TITLE = "- - - - - -"
+
 GC_ProductionFactory.debugIndex = g_company.debug:registerScriptName("GC_ProductionFactory")
 
 getfenv(0)["GC_ProductionFactory"] = GC_ProductionFactory
@@ -168,10 +170,11 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 		factoryImage = factoryImage,
 		factoryCamera = factoryCamera,
 		factoryDescription = factoryDescription,
+		factoryCustomTitle = "- - - - - -"
 	}
 
 	self.disableAllOutputGUI = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. ".operation#disableAllOutputGUI"), false)
-	self.showInGlobalGUI = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. ".operation#showInGlobalGUI"), false) -- Possible future use.
+	self.showInGlobalGUI = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. ".operation#showInGlobalGUI"), true)
 	self.updateDelay = math.max(Utils.getNoNil(getXMLInt(xmlFile, xmlKey .. ".operation#updateDelayMinutes"), 10), 1)
 	self.updateCounter = self.updateDelay
 
@@ -857,13 +860,17 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			end
 		end
 
-		if self.isServer and canLoad then
-			if addMinuteChange then
-				g_currentMission.environment:addMinuteChangeListener(self)
-			end
+		if canLoad then
+			self.globalIndex = g_company.addFactory(self)
+			
+			if self.isServer then
+				if addMinuteChange then
+					g_currentMission.environment:addMinuteChangeListener(self)
+				end
 
-			if addHourChange then
-				g_currentMission.environment:addHourChangeListener(self)
+				if addHourChange then
+					g_currentMission.environment:addHourChangeListener(self)
+				end
 			end
 		end
 
@@ -960,6 +967,8 @@ end
 
 function GC_ProductionFactory:delete()
 	self.factoryDeleteStarted = true
+	
+	g_company.removeFactory(self, self.globalIndex)
 
 	if not self.isPlaceable then
 		g_currentMission:removeOnCreateLoadedObjectToSave(self)
@@ -1088,6 +1097,11 @@ function GC_ProductionFactory:readStream(streamId, connection)
 				productLine.productSale.lifeTimeIncome = streamReadInt32(streamId)
 			end
 		end
+		
+		if streamReadBool(streamId) then
+			local customTitle = streamReadString(streamId)
+			self:setCustomTitle(customTitle, true)
+		end
 	end
 end
 
@@ -1129,6 +1143,11 @@ function GC_ProductionFactory:writeStream(streamId, connection)
 				local lifeTimeIncome = math.max(math.min(productLine.productSale.lifeTimeIncome, GC_ProductionFactory.MAX_INT), 0)
 				streamWriteInt32(streamId, lifeTimeIncome)
 			end
+		end
+		
+		local customTitle = self:getCustomTitle()
+		if streamWriteBool(streamId, customTitle ~= GC_ProductionFactory.BACKUP_TITLE) then
+			streamWriteString(streamId, self.customTitle)
 		end
 	end
 end
@@ -1207,6 +1226,9 @@ function GC_ProductionFactory:loadFromXMLFile(xmlFile, key)
 	if not self.isPlaceable then
 		factoryKey = string.format("%s.productionFactory", key)
 	end
+	
+	local customTitle = getXMLString(xmlFile, factoryKey .. "#customTitle")
+	self:setCustomTitle(customTitle, true)
 
 	local i = 0
 	while true do
@@ -1333,6 +1355,11 @@ function GC_ProductionFactory:saveToXMLFile(xmlFile, key, usedModNames)
 	end
 
 	setXMLString(xmlFile, factoryKey .. "#indexName", self.indexName)
+	
+	local customTitle = self:getCustomTitle()
+	if customTitle ~= GC_ProductionFactory.BACKUP_TITLE then
+		setXMLString(xmlFile, factoryKey .. "#customTitle", customTitle)
+	end
 
 	local index = 0
 	for _, inputProduct in ipairs(self.inputProducts) do
@@ -2030,7 +2057,7 @@ function GC_ProductionFactory:playerTriggerActivated(lineId)
 
 	local dialog = g_gui:showDialog("GC_ProductionFactoryDialog")
 	if dialog ~= nil then
-		dialog.target:setupFactoryData(self, lineId)
+		dialog.target:setupFactoryData(self, lineId, false)
 	else
 		g_company.debug:writeError(self.debugData, "[FACTORY - %s] Failed to open 'GC_ProductionFactoryDialog'!", self.indexName)
 	end
@@ -2051,6 +2078,24 @@ function GC_ProductionFactory:playerTriggerOnEnterLeave(playerInTrigger, lineId)
 			self.guiLineId = nil
 		end
 	end
+end
+
+function GC_ProductionFactory:setCustomTitle(customTitle, noEventSend)
+	if customTitle ~= nil and customTitle ~= self:getCustomTitle() then
+		GC_ProductionFactoryCustomTitleEvent.sendEvent(self, customTitle, noEventSend)	
+		
+		self.guiData.factoryCustomTitle = customTitle
+	end
+end
+
+function GC_ProductionFactory:getCustomTitle()
+	local title = self.guiData.factoryCustomTitle
+	
+	if title == nil then
+		title = GC_ProductionFactory.BACKUP_TITLE
+	end
+
+	return title
 end
 
 function GC_ProductionFactory:getFillLevelInformation(listRight, listLeft)

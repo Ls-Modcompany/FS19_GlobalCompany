@@ -6,17 +6,18 @@
 		<color name="black" value="0 0 0 1" />
 		<color name="orange" value="0.9910 0.3865 0.0100 1" />
 		<color name="darkRed" value="0.2832 0.0091 0.0091 1" />
-		
+		<color name="blue" value="0.0742 0.4341 0.6939 1"/>
+
 		<color name="gray1" value="0.6 0.6 0.6 1" />
 		<color name="gray2" value="0.3 0.3 0.3 1" />
 		<color name="gray3" value="0.1 0.1 0.1 1" />
 
         <color name="glass1" value="0.018 0.016 0.015 0.6"/>
 
-		
+
         <color name="buttonMain" value="0.118 0.116 0.115 0.6"/>
         <color name="buttonMainSelected" value="0.9910 0.3865 0.0100 1"/>
-		
+
 
         <color name="glass0_1" value="0.018 0.016 0.015 0.65"/>
         <color name="glass0_2" value="0.718 0.716 0.715 0.04"/>
@@ -29,19 +30,19 @@
 		<color name="glass3_40" value="0.018 0.016 0.015 0.4" />
 		<color name="glass4_10" value="0.5 0.5 0.5 0.1" />
 		<color name="glass5_70" value="0.04 0.04 0.04 0.95" />
-		
+
 		<color name="image" value="1 1 1 1" />
 		<color name="image_disabled" value="0.6 0.6 0.6 0.3" />
 		<color name="image_disabled2" value="0.6 0.6 0.6 0.5" />
 		<color name="image_selected" value="1 1 1 1" />
 		<color name="image_selected2" value="0.9910 0.3865 0.0100 1" />
-		
-		<color name="text" value="1 1 1 1" />		
-		<color name="text_disabled" value="0.498 0.498 0.498 1" />		
-		<color name="text_disabled2" value="0.65 0.65 0.65 1" />		
+
+		<color name="text" value="1 1 1 1" />
+		<color name="text_disabled" value="0.498 0.498 0.498 1" />
+		<color name="text_disabled2" value="0.65 0.65 0.65 1" />
 		<color name="text_selected" value="0.9910 0.3865 0.0100 1" />
 	</colors>
-	
+
 	<uvs>
         <uv name="icon_roundBig" value="290px 385px 110px 110px"/>
         <uv name="icon_roundSmall" value="530px 385px 55px 55px"/>
@@ -54,13 +55,14 @@
 		<uv name="icon_notificationNumber" value="80px 0px 80px 80px" />
 		<uv name="icon_apps" value="240px 0px 80px 80px" />
 		<uv name="icon_settings3" value="160px 0px 80px 80px" />
-		
+
         <uv name="keyBordKey" value="96px 96px 48px 48px"/>
 
         <uv name="icon_errors" value="128px 0px 128px 128px"/>
         <uv name="icon_settings" value="0px 0px 128px 128px"/>
+        <uv name="icon_factories" value="256px 0px 128px 128px"/>
 	</uvs>
-	
+
 	<templates>
 		<template name="gcBase">
 			<value name="imageFilename" value="g_baseUIFilename" />
@@ -68,22 +70,22 @@
 			<value name="imageUVs_selected" value="colorBg" />
 			<value name="imageUVs_disabled" value="colorBg" />
 			<value name="imageUVs_disabledSelected" value="colorBg" />
-			
+
 			<value name="imageColor" value="image" />
 			<value name="imageColor_disabled" value="image_disabled" />
 			<value name="imageColor_selected" value="image_selected" />
 			<value name="imageColor_disabledSelected" value="image_disabled" />
-			
+
 			<value name="textColor" value="text" />
 			<value name="textColor_disabled" value="text_disabled" />
 			<value name="textColor_selected" value="text_selected" />
 			<value name="imageSize" value="1024 1024" />
 		</template>
-		
+
 		<template name="gcBase_text" extends="gcBase">
 			<value name="size" value="0px 0px" />
 		</template>
-		
+
 		<template name="gcBaseGuiButton" extends="gcBase">
 			<value name="size" value="65px 50px" />
 			<value name="position" value="0px 0px" />
@@ -91,19 +93,19 @@
 			<value name="hasOverlay" value="true" />
 			<Value name="imageUVs" value="keyBordKey"/>
 			<Value name="imageUVs_selected" value="keyBordKey"/>
-			<value name="textAlignment" value="center" />	
-			<value name="textSize" value="20px" />			
-			<value name="textMargin" value="0px 17px 0px 0px" />	
+			<value name="textAlignment" value="center" />
+			<value name="textSize" value="20px" />
+			<value name="textMargin" value="0px 17px 0px 0px" />
 		</template>
 		<template name="gcBaseGuiButtonNext" extends="gcBaseGuiButton">
-			<value name="position" value="50px 0px" />	
+			<value name="position" value="50px 0px" />
 		</template>
 		<template name="gcBaseGuiButtonText" extends="gcBase_text">
 			<value name="textSize" value="22px" />
-			<value name="textAlignment" value="center" />	
+			<value name="textAlignment" value="center" />
 			<value name="margin" value="10px 0px 0px 0px" />
-		</template>	
-		
+		</template>
+
 		<template name="gcBase_border" extends="">
 			<value name="borderLeftSize" value="0px" />
 			<value name="borderRightSize" value="0px" />
@@ -113,7 +115,7 @@
 			<value name="borderRightColor" value="gray1" />
 			<value name="borderTopColor" value="gray1" />
 			<value name="borderBottomColor" value="gray1" />
-			
+
 			<value name="borderLeftSize_selected" value="0px" />
 			<value name="borderRightSize_selected" value="0px" />
 			<value name="borderTopSize_selected" value="0px" />
@@ -122,7 +124,7 @@
 			<value name="borderRightColor_selected" value="gray1" />
 			<value name="borderTopColor_selected" value="gray1" />
 			<value name="borderBottomColor_selected" value="orange" />
-			
+
 			<value name="borderLeftSize_disabled" value="2px" />
 			<value name="borderRightSize_disabled" value="2px" />
 			<value name="borderTopSize_disabled" value="2px" />
@@ -131,8 +133,8 @@
 			<value name="borderRightColor_disabled" value="gray1" />
 			<value name="borderTopColor_disabled" value="gray1" />
 			<value name="borderBottomColor_disabled" value="gray1" />
-		</template>		
-		
+		</template>
+
 		<template name="gcBorder_button" extends="gcBase_border">
 			<value name="borderLeftSize" value="1px" />
 			<value name="borderRightSize" value="1px" />
@@ -149,7 +151,7 @@
 			<value name="borderBottomSize" value="4px" />
 			<value name="borderBottomColor" value="orange" />
 		</template>
-		
+
 		<template name="gcSeperator" anchor="middleCenter" extends="gcBase">
 			<Value name="imageUVs" value="colorBg"/>
 			<Value name="imageColor" value="glass1_50"/>
@@ -162,7 +164,7 @@
 			<value name="textAlignment" value="center" />
 			<value name="textSize" value="23px" />
 			<value name="textMargin" value="0px 4px 0px 0px" />
-		</template>	
+		</template>
 
 		<!-- MultiDialog -->
 		<template name="gcMdMainLayerBackground" anchor="middleCenter" extends="gcBase">
@@ -190,8 +192,8 @@
 		</template>
 		<template name="gcMdHeaderText" anchor="middleCenter" extends="gcBase_text">
 			<value name="textSize" value="25px" />
-			<value name="textAlignment" value="center" />	
-		</template>	
+			<value name="textAlignment" value="center" />
+		</template>
 		<template name="gcMdContentLayout" anchor="middleTop" extends="gcBase_text">
 			<value name="orientation" value="x" />
 			<value name="alignment" value="left" />
@@ -216,15 +218,15 @@
 		<template name="gcMdContentText" anchor="leftTop" extends="gcBase_text">
 			<value name="position" value="50px 0px" />
 			<value name="textSize" value="20px" />
-			<value name="textAlignment" value="left" />	
-			<value name="textWrapWidth" value="700px" />	
-			<value name="textMaxNumLines" value="8" />		
-		</template>	
+			<value name="textAlignment" value="left" />
+			<value name="textWrapWidth" value="700px" />
+			<value name="textMaxNumLines" value="8" />
+		</template>
 		<template name="gcMdContentTextInput" anchor="middleTop" extends="gcMdContentText">
 			<value name="position" value="0px 0px" />
-			<value name="textAlignment" value="left" />	
-			<value name="margin" value="0px 30px 0px 0px" />	
-		</template>	
+			<value name="textAlignment" value="left" />
+			<value name="margin" value="0px 30px 0px 0px" />
+		</template>
 		<template name="gcMdContentButtonsLayout" anchor="middleBottom" extends="gcBase_text">
 			<value name="orientation" value="x" />
 			<value name="alignment" value="left" />
@@ -238,9 +240,9 @@
 			<value name="textColor_selected" value="white" />
 			<value name="hasOverlay" value="true" />
 			<value name="hasText" value="true" />
-			<value name="textAlignment" value="center" />	
-			<value name="textMargin" value="0px 0px 0px 15px" />	
-		</template>	
+			<value name="textAlignment" value="center" />
+			<value name="textMargin" value="0px 0px 0px 15px" />
+		</template>
 		<template name="gcMdContentInput" anchor="middleBottom" extends="gcBase">
 			<value name="size" value="500px 50px" />
 			<value name="position" value="0px 0px" />
@@ -250,10 +252,10 @@
 			<value name="hasOverlay" value="true" />
 			<value name="isActivable" value="true" />
 			<value name="hasText" value="true" />
-			<value name="textAlignment" value="center" />	
-			<value name="textMargin" value="0px 0px 0px 12px" />	
-			<value name="margin" value="0px 50px 0px 0px" />	
-		</template>	
+			<value name="textAlignment" value="center" />
+			<value name="textMargin" value="0px 0px 0px 12px" />
+			<value name="margin" value="0px 50px 0px 0px" />
+		</template>
 
 
 		<!-- Baler -->
@@ -273,8 +275,8 @@
 		</template>
 		<template name="gcBalerHeaderText" anchor="middleCenter" extends="gcBase_text">
 			<value name="textSize" value="25px" />
-			<value name="textAlignment" value="center" />	
-		</template>	
+			<value name="textAlignment" value="center" />
+		</template>
 		<template name="gcBalerContent" anchor="middleTop" extends="gcBase">
 			<value name="size" value="1000px 646px" />
 			<value name="position" value="0px -50px" />
@@ -289,9 +291,9 @@
 		</template>
 		<template name="gcBalerFillTypesText" anchor="leftTop" extends="gcBase_text">
 			<value name="textSize" value="25px" />
-			<value name="textAlignment" value="center" />	
+			<value name="textAlignment" value="center" />
 			<value name="margin" value="50px 20px 0px 0px" />
-		</template>	
+		</template>
 		<template name="gcBalerFillTypesLayout" anchor="leftTop" extends="gcBase">
 			<value name="orientation" value="y" />
 			<value name="alignment" value="top" />
@@ -318,12 +320,12 @@
 			<value name="imageColor_disabledSelected" value="image_disabled" />
 			<value name="hasOverlay" value="true" />
 			<value name="isActivable" value="true" />
-		</template>	
+		</template>
 		<template name="gcBalerFillTypesButtonText" anchor="leftCenter" extends="gcBase_text">
 			<value name="textSize" value="25px" />
-			<value name="textAlignment" value="center" />	
+			<value name="textAlignment" value="center" />
 			<value name="margin" value="50px 0px 0px 0px" />
-		</template>	
+		</template>
 		<template name="gcBalerNumLayout" anchor="middleBottom" extends="gcBase">
 			<value name="orientation" value="x" />
 			<value name="alignment" value="left" />
@@ -336,9 +338,9 @@
 		</template>
 		<template name="gcBalerNumText" anchor="middleCenter" extends="gcBase_text">
 			<value name="textSize" value="25px" />
-			<value name="textAlignment" value="center" />	
+			<value name="textAlignment" value="center" />
 			<value name="margin" value="0px 0px 0px 0px" />
-		</template>	
+		</template>
 		<template name="gcBalerNumButton" anchor="middleBottom" extends="gcBase">
 			<value name="size" value="50px 50px" />
 			<value name="margin" value="10px 0px 0px 0px" />
@@ -346,9 +348,9 @@
 			<value name="imageColor_selected" value="gray2" />
 			<value name="hasOverlay" value="true" />
 			<value name="hasText" value="true" />
-			<value name="textAlignment" value="center" />	
-			<value name="textMargin" value="10px 0px 0px 15px" />	
-		</template>	
+			<value name="textAlignment" value="center" />
+			<value name="textMargin" value="10px 0px 0px 15px" />
+		</template>
 		<template name="gcBalerButtonLayout" anchor="middleBottom" extends="gcBase">
 			<value name="orientation" value="x" />
 			<value name="alignment" value="left" />
@@ -361,10 +363,10 @@
 			<value name="imageColor_selected" value="gray2" />
 			<value name="hasOverlay" value="true" />
 			<value name="hasText" value="true" />
-			<value name="textAlignment" value="center" />	
-			<value name="textMargin" value="0px 0px 0px 15px" />	
+			<value name="textAlignment" value="center" />
+			<value name="textMargin" value="0px 0px 0px 15px" />
 			<value name="textSize" value="23px" />
-		</template>	
+		</template>
 		<template name="gcBalerInfoBackground" anchor="rightTop" extends="gcBase">
 			<value name="size" value="300px 400px" />
 			<value name="imageColor" value="glass0_1" />
@@ -372,10 +374,10 @@
 		</template>
 		<template name="gcBalerInfoHeader" anchor="leftTop" extends="gcBase_text">
 			<value name="textSize" value="22px" />
-			<value name="textAlignment" value="center" />	
-			<value name="margin" value="15px 15px 0px 0px" />	
-			<value name="textBold" value="true" />	
-		</template>	
+			<value name="textAlignment" value="center" />
+			<value name="margin" value="15px 15px 0px 0px" />
+			<value name="textBold" value="true" />
+		</template>
 		<template name="gcBalerInfoLayout" anchor="middleBottom" extends="gcBase">
 			<value name="orientation" value="y" />
 			<value name="alignment" value="top" />
@@ -384,15 +386,15 @@
 		</template>
 		<template name="gcBalerInfoTextHeader" anchor="leftTop" extends="gcBase_text">
 			<value name="textSize" value="20px" />
-			<value name="textAlignment" value="left" />	
-			<value name="margin" value="20px 15px 0px 0px" />	
-			<value name="textBold" value="true" />	
-		</template>	
+			<value name="textAlignment" value="left" />
+			<value name="margin" value="20px 15px 0px 0px" />
+			<value name="textBold" value="true" />
+		</template>
 		<template name="gcBalerInfoText" anchor="leftTop" extends="gcBase_text">
 			<value name="textSize" value="20px" />
-			<value name="textAlignment" value="left" />	
-			<value name="margin" value="25px 15px 0px 0px" />	
-		</template>	
+			<value name="textAlignment" value="left" />
+			<value name="margin" value="25px 15px 0px 0px" />
+		</template>
 		<template name="gcBalerInfoSepBackground" anchor="middleBottom" extends="gcBase">
 			<value name="size" value="280px 2px" />
 			<value name="imageColor" value="glass5_70" />
@@ -406,9 +408,9 @@
 		</template>
 		<template name="gcBalerInfoTextAutoText" anchor="leftCenter" extends="gcBase_text">
 			<value name="textSize" value="22px" />
-			<value name="textAlignment" value="center" />	
+			<value name="textAlignment" value="center" />
 			<value name="margin" value="20px 0px 0px 0px" />
-		</template>	
+		</template>
 
 		<!-- ObjectInfo -->
 		<template name="gcObjectInfoBackground" anchor="middleCenter" extends="gcBase gcBorder">
@@ -428,9 +430,9 @@
 		<template name="gcObjectInfoText" anchor="middleCenter" extends="gcBase_text">
 			<value name="textSize" value="12px" />
 			<value name="textAlignment" value="center" />
-			<value name="textBold" value="true"/>			
-			<value name="margin" value="0px 5px 0px 5px" />	
-		</template>		
+			<value name="textBold" value="true"/>
+			<value name="margin" value="0px 5px 0px 5px" />
+		</template>
 
 
 		<!-- FactoryBig -->
@@ -441,7 +443,7 @@
 		<template name="gcFactoryBigTransparent" anchor="middleCenter" extends="gcBase">
 			<value name="size" value="1800px 950px" />
 			<value name="imageColor" value="transparent" />
-		</template>		
+		</template>
 		<template name="gcFactoryBigBackgroundLeft" anchor="middleCenter" extends="gcBase gcBorder">
 			<value name="size" value="400px 850px" />
 			<value name="position" value="-650px 20px" />
@@ -478,23 +480,23 @@
 			<value name="textAlignment" value="center" />
 			<value name="textSize" value="23px" />
 			<value name="textMargin" value="0px 6px 0px0px" />
-		</template>	
+		</template>
 		<template name="gcFactoryBigLeftPLText" anchor="middleTop" extends="gcBase_text">
 			<value name="textSize" value="24px" />
-			<value name="textAlignment" value="center" />	
+			<value name="textAlignment" value="center" />
 			<value name="position" value="0px -100px" />
-		</template>	
+		</template>
 
 		<template name="gcFactoryBigLeftPLTable" anchor="middleBottom" extends="gcBase">
 			<value name="size" value="380px 680px" />
 			<value name="position" value="0px 20px" />
 			<value name="orientation" value="y" />
 			<value name="maxItemsX" value="1" />
-			<value name="maxItemsY" value="5" />						
-		</template>	
+			<value name="maxItemsY" value="5" />
+		</template>
 		<template name="gcFactoryBigLeftPLTableItem" anchor="middleCenter" extends="gcBase">
 			<value name="size" value="380px 131px" />
-			<value name="margin" value="0px 0px 0px 5px" />	
+			<value name="margin" value="0px 0px 0px 5px" />
 			<value name="imageColor" value="glass0_1" />
 			<value name="imageColor_selected" value="glass0_2" />
 			<value name="isActivable" value="true" />
@@ -513,22 +515,22 @@
 			<value name="borderRightColor" value="gray2" />
 			<value name="borderTopColor" value="gray2" />
 			<value name="borderBottomColor" value="gray2" />
-		</template>	
+		</template>
 		<template name="gcFactoryBigLeftPLTableItemText" anchor="middleTop" extends="gcBase_text">
 			<value name="size" value="350px 131px" />
 			<value name="textSize" value="20px" />
-			<value name="textAlignment" value="left" />	
-			<value name="textBold" value="false" />	
-			<value name="margin" value="0px 8px 0px 0px" />	
-		</template>	
+			<value name="textAlignment" value="left" />
+			<value name="textBold" value="false" />
+			<value name="margin" value="0px 8px 0px 0px" />
+		</template>
 		<template name="gcFactoryBigLeftPLTableItemTextActive" anchor="middleTop" extends="gcFactoryBigLeftPLTableItemText">
 			<value name="position" value="0px 0px" />
-			<value name="textAlignment" value="right" />	
-		</template>	
+			<value name="textAlignment" value="right" />
+		</template>
 		<template name="gcFactoryBigLeftPLTableItemTextOutput" anchor="middleTop" extends="gcFactoryBigLeftPLTableItemText">
 			<value name="position" value="20px -50px" />
 			<value name="textSize" value="18px" />
-		</template>	
+		</template>
 
 
 		<template name="gcFactoryBigRightOverviewImage" anchor="middleCenter" extends="gcBase">
@@ -549,57 +551,57 @@
 		<template name="gcFactoryBigRightOverviewText1" anchor="middleTop" extends="gcBase_text">
 			<value name="size" value="0px 0px" />
 			<value name="textSize" value="40px" />
-			<value name="textAlignment" value="center" />	
-			<value name="margin" value="0px 8px 0px 0px" />	
-		</template>	
+			<value name="textAlignment" value="center" />
+			<value name="margin" value="0px 8px 0px 0px" />
+		</template>
 		<template name="gcFactoryBigRightOverviewText2" anchor="middleTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="25px" />
-		</template>	
+		</template>
 		<template name="gcFactoryBigRightOverviewText3" anchor="middleTop" extends="gcFactoryBigRightOverviewText1">
-			<value name="textAlignment" value="left" />				
-			<value name="textWrapWidth" value="350px" />	
-			<value name="textMaxNumLines" value="200" />	
+			<value name="textAlignment" value="left" />
+			<value name="textWrapWidth" value="350px" />
+			<value name="textMaxNumLines" value="200" />
 			<value name="textSize" value="20px" />
 			<value name="textLineHeightScale" value="2" />
-		</template>	
+		</template>
 		<template name="gcFactoryBigRightOverviewText4" anchor="leftTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="28px" />
-			<value name="textAlignment" value="left" />	
-		</template>	
+			<value name="textAlignment" value="left" />
+		</template>
 		<template name="gcFactoryBigRightOverviewText5" anchor="rightTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="28px" />
-		</template>	
+		</template>
 		<template name="gcFactoryBigRightOverviewText5_Red" anchor="rightTop" extends="gcFactoryBigRightOverviewText5">
 			<value name="textColor" value="darkRed" />
-		</template>	
+		</template>
 		<template name="gcFactoryBigRightOverviewText6" anchor="leftTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="19px" />
-		</template>	
+		</template>
 		<template name="gcFactoryBigRightOverviewText7" anchor="leftTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="19px" />
 			<value name="textColor" value="orange" />
-			<value name="textAlignment" value="left" />	
-		</template>	
+			<value name="textAlignment" value="left" />
+		</template>
 		<template name="gcFactoryBigRightOverviewText8" anchor="middleTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="22px" />
-		</template>	
+		</template>
 		<template name="gcFactoryBigRightOverviewText9" anchor="leftTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="19px" />
 			<value name="textAlignment" value="left" />
-		</template>	
+		</template>
 		<template name="gcFactoryBigRightOverviewText10" anchor="leftTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="16px" />
-		</template>	
+		</template>
 		<template name="gcFactoryBigRightOverviewText11" anchor="leftTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="16px" />
 			<value name="textColor" value="orange" />
 			<value name="textAlignment" value="left" />
-		</template>	
+		</template>
 		<template name="gcFactoryBigRightOverviewText12" anchor="leftTop" extends="gcFactoryBigRightOverviewText1">
 			<value name="textSize" value="19px" />
 			<value name="textColor" value="orange" />
 			<value name="textAlignment" value="left" />
-		</template>	
+		</template>
 
 		<template name="gcFactoryBigRightInput" anchor="middleCenter" extends="gcBase gcBorder">
 			<value name="size" value="500px 670px" />
@@ -608,7 +610,7 @@
 			<value name="hasBorders" value="true" />
 			<value name="borderBottomSize" value="2px" />
 			<value name="borderBottomColor" value="orange" />
-		</template>	
+		</template>
 
 		<template name="gcFactoryBigRightOutput" anchor="middleCenter" extends="gcBase gcBorder">
 			<value name="size" value="500px 670px" />
@@ -617,26 +619,26 @@
 			<value name="hasBorders" value="true" />
 			<value name="borderBottomSize" value="2px" />
 			<value name="borderBottomColor" value="orange" />
-		</template>	
+		</template>
 
 		<template name="gcFactoryRightTable" anchor="middleBottom" extends="gcBase">
 			<value name="size" value="500px 620px" />
 			<value name="position" value="0px 0px" />
 			<value name="orientation" value="y" />
 			<value name="maxItemsX" value="1" />
-			<value name="maxItemsY" value="4" />	
-			<value name="hasSlider" value="true" />							
-		</template>	
+			<value name="maxItemsY" value="4" />
+			<value name="hasSlider" value="true" />
+		</template>
 		<template name="gcFactoryRightTableSlider" anchor="rightTop" extends="gcBase">
 			<value name="size" value="20px 620px" />
-			<value name="position" value="20px 0px" />	
+			<value name="position" value="20px 0px" />
 			<value name="hasOverlay" value="true" />
 			<value name="imageColor" value="buttonMain" />
-			<value name="imageColor_selected" value="buttonMainSelected" />	
-		</template>	
+			<value name="imageColor_selected" value="buttonMainSelected" />
+		</template>
 		<template name="gcFactoryRightTableItem" anchor="middleCenter" extends="gcBase gcBorder">
 			<value name="size" value="500px 150px" />
-			<value name="margin" value="0px 0px 0px 5px" />	
+			<value name="margin" value="0px 0px 0px 5px" />
 			<value name="imageColor" value="glass0_1" />
 			<value name="imageColor_selected" value="glass0_2" />
 			<value name="hasOverlay" value="true" />
@@ -653,7 +655,7 @@
 			<value name="borderRightColor" value="gray2" />
 			<value name="borderTopColor" value="gray2" />
 			<value name="borderBottomColor" value="gray2" />
-		</template>	
+		</template>
 		<template name="gcFactoryRightTableItemBarBg" anchor="rightTop" extends="gcBase gcBorder">
 			<Value name="imageUVs" value="colorBg"/>
 			<Value name="imageColor" value="transparent"/>
@@ -679,8 +681,8 @@
 		</template>
 		<template name="gcFactoryRightTableItemBtnSml" anchor="middleCenter" extends="gcButton">
 			<value name="textSize" value="18px" />
-		</template>	
-		
+		</template>
+
 
 		<!-- GcMainScreen -->
 		<template name="gcMainBackground" anchor="middleCenter" extends="gcBase">
@@ -692,18 +694,18 @@
 			<Value name="imageUVs" value="colorBg"/>
 			<value name="imageColor" value="glass1" />
 			<value name="hasBorders" value="true" />
-			<value name="borderBottomSize" value="1px" />	
+			<value name="borderBottomSize" value="1px" />
 			<value name="borderBottomColor" value="gray2" />
 		</template>
 		<template name="gcMainMenuLayout" anchor="middleCenter" extends="gcBase">
 			<value name="size" value="1500px 100px" />
 			<value name="position" value="0px 0px" />
 			<value name="orientation" value="x" />
-			<value name="alignment" value="middle" />				
-		</template>	
+			<value name="alignment" value="middle" />
+		</template>
 		<template name="gcMainMenuItem" anchor="middleCenter" extends="gcBase gcBorder">
 			<value name="size" value="100px 100px" />
-			<value name="margin" value="0px 0px 0px 0px" />	
+			<value name="margin" value="0px 0px 0px 0px" />
 			<value name="hasOverlay" value="true" />
 			<value name="isActivable" value="true" />
 			<value name="canDeactivable" value="false" />
@@ -721,7 +723,7 @@
 			<value name="borderRightColor" value="gray2" />
 			<value name="borderBottomColor" value="gray2" />
 			<value name="borderBottomColor_selected" value="orange" />
-		</template>	
+		</template>
 		<template name="gcMainMenuItemIcon" anchor="middleCenter" extends="gcBase">
 			<value name="size" value="100px 100px" />
 		</template>
@@ -730,15 +732,15 @@
 			<value name="position" value="0px -100px" />
 			<value name="imageColor" value="transparent" />
 		</template>
-		
-		<!-- GcMainScreen - Settings -->		
+
+		<!-- GcMainScreen - Settings -->
 		<template name="gcMenuSettingsLayout1" anchor="leftTop" extends="">
 			<value name="orientation" value="y" />
 			<value name="alignment" value="top" />
 			<value name="size" value="800px 746px" />
 			<value name="position" value="50px -150px" />
 			<value name="margin" value="0px 0px 0px 0px" />
-		</template>	
+		</template>
 		<template name="gcMenuSettingsButtonLayout" anchor="leftTop" extends="gcBase">
 			<value name="orientation" value="x" />
 			<value name="alignment" value="left" />
@@ -759,13 +761,13 @@
 			<value name="imageColor_disabledSelected" value="image_disabled" />
 			<value name="hasOverlay" value="true" />
 			<value name="isActivable" value="true" />
-		</template>	
+		</template>
 		<template name="gcMenuSettingsButtonLayoutText" anchor="leftCenter" extends="gcBase_text">
 			<value name="textSize" value="22px" />
-			<value name="textAlignment" value="center" />	
+			<value name="textAlignment" value="center" />
 			<value name="margin" value="20px 0px 0px 0px" />
 			<value name="textBold" value="false" />
-		</template>	
+		</template>
 
 
 		<template name="gcMenuErrorsTable" anchor="middleCenter" extends="gcBase">
@@ -773,81 +775,26 @@
 			<value name="position" value="0px 0px" />
 			<value name="orientation" value="y" />
 			<value name="maxItemsX" value="1" />
-			<value name="maxItemsY" value="29" />								
-		</template>	
+			<value name="maxItemsY" value="29" />
+		</template>
 		<template name="gcMenuErrorsTableItem" anchor="middleCenter" extends="gcBase">
 			<value name="size" value="1800px 30px" />
 			<value name="imageColor" value="glass0_1" />
 			<value name="imageColor_selected" value="glass0_2" />
 			<value name="hasOverlay" value="true" />
-		</template>	
-	
+		</template>
+
 		<template name="gcMenuErrorsTableItemText" anchor="leftTop" extends="gcBase_text">
 			<value name="size" value="0px 0px" />
 			<value name="textSize" value="18px" />
-			<value name="textAlignment" value="left" />	
-			<value name="margin" value="10px 5px 0px 0px" />	
-			<value name="textMaxWidth" value="1700px" />	
+			<value name="textAlignment" value="left" />
+			<value name="margin" value="10px 5px 0px 0px" />
+			<value name="textMaxWidth" value="1700px" />
 			<!-- <value name="textWrapWidth" value="1700px" /> -->
 			<!-- <value name="textMaxNumLines" value="200" /> -->
-		</template>	
-
-		<!-- Factory Small -->		
-		<template name="gcFactorySmallBackground" anchor="rightCenter" extends="gcBase gcBorder">
-			<value name="imageFilename" value="g_baseUIFilename"/>
-			<value name="imageUVs" value="10px 1010px 4px 4px"/>
-			<value name="imageColor" value="0.018 0.016 0.015 0.6"/>
-			
-			
-			<value name="size" value="800px 890px" />
-			<value name="position" value="-25px -70px" />
-			<!-- <value name="imageColor" value="glass5_70" /> -->
-			<value name="hasBorders" value="true" />
-			<value name="borderTopSize" value="1px" />
-			<value name="borderTopColor" value="gray2" />
-			<value name="borderLeftSize" value="1px" />
-			<value name="borderLeftColor" value="gray2" />
-			<value name="borderRightSize" value="1px" />
-			<value name="borderRightColor" value="gray2" />
-			<value name="borderBottomSize" value="6px" />
-			<value name="borderBottomColor" value="orange" />
-		</template>		
-		
-		<template name="gcFactorySmallHeader" anchor="middleTop" extends="gcBase gcBorder">
-			<value name="size" value="750px 50px" />
-			<value name="imageColor" value="transparent" />
-			<value name="hasBorders" value="true" />
-			<value name="borderBottomSize" value="4px" />
-			<value name="borderBottomColor" value="gray2" />
-		</template>
-		
-		<template name="gcFactorySmallHeaderText" anchor="middleCenter" extends="gcBase_text">
-			<value name="textSize" value="25px" />
-			<value name="textAlignment" value="center" />	
-		</template>
-		
-		<template name="gcFactorySmallInputs" anchor="middleTop" extends="gcBase gcBorder">
-			<value name="size" value="350px 50px" />
-			<value name="position" value="-200px -60px" />
-			<value name="imageColor" value="transparent" />
-		</template>
-		
-		<template name="gcFactorySmallInputsText" anchor="leftCenter" extends="gcBase_text">
-			<value name="textSize" value="25px" />
-			<value name="textAlignment" value="center" />	
-		</template>	
-		
-		<template name="gcFactorySmallSplit" anchor="middleCenter" extends="gcBase gcBorder">
-			<value name="size" value="0px 650px" />
-			<value name="position" value="0px 30px" />
-			<value name="imageColor" value="transparent" />
-			<value name="hasBorders" value="true" />
-			<value name="borderLeftSize" value="2px" />
-			<value name="borderLeftColor" value="gray2" />
 		</template>
 
 
-	
 		<!-- DynamicStorage -->
 		<template name="gcDynStorage" anchor="middleCenter" extends="gcBase">
 			<value name="size" value="1920px 1080px" />
@@ -871,19 +818,19 @@
 		<template name="gcDynStorageTextHeader" anchor="middleTop" extends="gcBase_text">
 			<value name="textSize" value="26px" />
 			<value name="textBold" value="true" />
-			<value name="textAlignment" value="center" />	
+			<value name="textAlignment" value="center" />
 			<value name="margin" value="0px 20px 0px 0px" />
-		</template>	
+		</template>
 		<template name="gcDynStorageTextInfo" anchor="middleTop" extends="gcBase_text">
 			<value name="textSize" value="20px" />
-			<value name="textAlignment" value="center" />	
+			<value name="textAlignment" value="center" />
 			<value name="margin" value="0px 80px 0px 0px" />
 			<value name="textColor_selected" value="white" />
-		</template>	
+		</template>
 		<template name="gcDynStorageBox" anchor="middleCenter" extends="gcBase">
 			<value name="orientation" value="x" />
 			<value name="maxItemsX" value="6" />
-			<value name="maxItemsY" value="1" />	
+			<value name="maxItemsY" value="1" />
 			<value name="position" value="0px 0px" />
 			<value name="size" value="1600px 400px" />
 		</template>
@@ -894,22 +841,22 @@
 			<value name="imageColor" value="0.018 0.016 0.015 0.8" />
 			<value name="imageColor_selected" value="orange" />
 			<value name="margin" value="5px 0px 5px 0px" />
-			<value name="hasOverlay" value="true" />	
+			<value name="hasOverlay" value="true" />
 			<value name="isActivable" value="true" />
 			<value name="canDeactivable" value="false" />
 		</template>
 		<template name="gcDynStorageBoxTextNumber" anchor="middleTop" extends="gcDynStorageTextInfo">
 			<value name="textSize" value="25px" />
 			<value name="margin" value="0px 30px 0px 0px" />
-		</template>	
+		</template>
 		<template name="gcDynStorageBoxTextContent" anchor="middleTop" extends="gcDynStorageTextInfo">
 			<value name="textSize" value="20px" />
 			<value name="margin" value="0px 130px 0px 0px" />
-		</template>	
+		</template>
 		<template name="gcDynStorageBoxTextFillLevel" anchor="middleTop" extends="gcDynStorageTextInfo">
 			<value name="textSize" value="20px" />
 			<value name="margin" value="0px 180px 0px 0px" />
-		</template>	
+		</template>
 		<template name="gcDynStorageBoxFillLevelBg" anchor="middleTop" extends="gcBase gcBorder">
 			<Value name="imageUVs" value="colorBg"/>
 			<Value name="imageColor" value="transparent"/>
@@ -941,12 +888,197 @@
 			<value name="margin" value="1px 0px 0px 0px" />
 		</template>
 
+		<!-- GcMainScreen - Factories -->
+		<template name="gcMenuFactoriesTableLayout" anchor="leftTop" extends="">
+			<value name="debugEnabled" value="false" />
+			<value name="orientation" value="y" />
+			<value name="alignment" value="top" />
+			<value name="size" value="800px 700px" />
+			<value name="position" value="130px -200px" />
+			<value name="maxItemsX" value="1" />
+			<value name="maxItemsY" value="3" />
+			<value name="hasSlider" value="true" />
+		</template>
 
+		<template name="gcFactoriesSeperator" extends="gcSeperator">
+			<Value name="imageColor" value="gray2"/>
+			<value name="imageColor_selected" value="orange" />
+		</template>
 
+		<template name="gcMenuFactoriesBackgroundLeft" anchor="leftCenter" extends="gcBase">
+			<value name="size" value="848px 726px" />
+			<value name="position" value="130px 10px" />
+			<value name="imageColor" value="transparent" />
+			<value name="hasBorders" value="true" />
+			<value name="borderLeftSize" value="2px" />
+			<value name="borderRightSize" value="2px" />
+			<value name="borderTopSize" value="2px" />
+			<value name="borderBottomSize" value="6px" />
+			<value name="borderLeftColor" value="gray2" />
+			<value name="borderRightColor" value="gray2" />
+			<value name="borderTopColor" value="gray2" />
+			<value name="borderBottomColor" value="orange" />
+		</template>
 
+		<template name="gcMenuFactoriesBackgroundRight" anchor="rightCenter" extends="gcMenuFactoriesBackgroundLeft">
+			<value name="size" value="800px 724px" />
+			<value name="position" value="-120px 10px" />
+			
+		</template>
 
+		<template name="gcMenuFactoriesButtonLayoutImage" anchor="leftTop" extends="gcBase">
+			<value name="margin" value="40px 20px 0px 0px" />
+			<value name="size" value="160px 160px" />
+			<Value name="imageUVs" value="0 0 1 1"/>
+			<Value name="imageUVs_selected" value="0 0 1 1"/>
+			<Value name="imageFilename" value="g_factoryDefault"/>
+		</template>
 
+		<template name="gcMenuFactoriesLayoutButton" extends="gcBase">
+			<value name="debugEnabled" value="false" />
+			<value name="size" value="760px 200px" />
 
+			<value name="imageColor" value="buttonMain" />
+			<value name="imageColor_selected" value="buttonMain" />
+			<value name="imageColor_disabled" value="transparent" />
+			<value name="imageColor_disabledSelected" value="transparent" />
+			<value name="hasOverlay" value="true" />
+			<value name="isActivable" value="false" />
+			<value name="margin" value="15px 0px 0px 30px" />
 
-	</templates>	
+			<value name="hasBorders" value="true" />
+			<value name="borderLeftSize" value="2px" />
+			<value name="borderRightSize" value="2px" />
+			<value name="borderTopSize" value="2px" />
+			<value name="borderBottomSize" value="2px" />
+			<value name="borderLeftSize_selected" value="2px" />
+			<value name="borderRightSize_selected" value="2px" />
+			<value name="borderTopSize_selected" value="2px" />
+			<value name="borderBottomSize_selected" value="2px" />
+			<value name="borderLeftColor" value="gray2" />
+			<value name="borderRightColor" value="gray2" />
+			<value name="borderTopColor" value="gray2" />
+			<value name="borderBottomColor" value="gray2" />
+			<value name="borderLeftColor_selected" value="orange" />
+			<value name="borderRightColor_selected" value="orange" />
+			<value name="borderTopColor_selected" value="orange" />
+			<value name="borderBottomColor_selected" value="orange" />
+		</template>
+
+		<template name="gcMenuFactoriesButtonLayoutText" anchor="middleCenter" extends="gcBase_text">
+			<value name="textSize" value="30px" />
+			<value name="textAlignment" value="center" />
+			<value name="margin" value="110px 40px 0px 0px" />
+			<value name="textBold" value="true" />
+			<value name="textBold_selected" value="true" />			
+			<value name="textMaxWidth" value="500px"/>
+		</template>
+
+		<template name="gcMenuFactoriesButtonLayoutIdText" anchor="middleCenter" extends="gcBase_text">
+			<value name="textSize" value="28px" />
+			<value name="textAlignment" value="center" />
+			<value name="margin" value="110px -40px 0px 0px" />
+			<value name="textBold" value="false" />
+		</template>
+
+		<template name="gcMenuFactoriesTableLayoutSlider" anchor="rightTop" extends="gcBase">
+			<value name="size" value="20px 660px" />
+			<value name="position" value="22px 0px" />
+			<value name="hasOverlay" value="true" />
+			<value name="imageColor" value="buttonMain" />
+			<value name="imageColor_selected" value="buttonMainSelected" />
+		</template>
+
+		<template name="gcMenuFactoriesOverviewImage" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="440px 440px" />
+			<value name="position" value="0px 30px" />
+			<Value name="imageUVs" value="0 0 1 1"/>
+			<Value name="imageFilename" value="g_factoryDefault"/>
+		</template>
+
+		<template name="gcMenuFactoriesOverviewImageBackground" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="740px 550px" />
+			<value name="position" value="0px 55px" />
+			<value name="imageColor" value="buttonMain" />
+			<value name="hasBorders" value="true" />
+			<value name="borderLeftSize" value="2px" />
+			<value name="borderRightSize" value="2px" />
+			<value name="borderTopSize" value="2px" />
+			<value name="borderBottomSize" value="2px" />
+			<value name="borderLeftSize_selected" value="2px" />
+			<value name="borderRightSize_selected" value="2px" />
+			<value name="borderTopSize_selected" value="2px" />
+			<value name="borderBottomSize_selected" value="2px" />
+			<value name="borderLeftColor" value="gray2" />
+			<value name="borderRightColor" value="gray2" />
+			<value name="borderTopColor" value="gray2" />
+			<value name="borderBottomColor" value="gray2" />
+		</template>
+
+		<template name="gcMenuFactoriesOverviewTitleText" anchor="middleCenter" extends="gcBase_text">
+			<value name="textSize" value="30px" />
+			<value name="textAlignment" value="center" />
+			<value name="margin" value="0px -230px 0px 0px" />
+			<value name="textBold" value="true" />
+			<value name="textMaxWidth" value="730px"/>
+		</template>
+
+		<template name="gcMenuFactoriesVisitButton" anchor="leftBottom" extends="gcBase">
+			<value name="position" value="0px -100px" />
+			<value name="size" value="400px 60px" />
+			<value name="imageColor" value="buttonMain" />
+			<value name="imageColor_selected" value="buttonMain" />
+			<value name="hasOverlay" value="true" />
+			<value name="hasText" value="true" />
+			<value name="textUpperCase" value="true" />
+			<value name="textAlignment" value="center" />
+			<value name="textSize" value="24px" />
+			<value name="textMargin" value="0px 0px 0px 20px" />
+			<value name="hasBorders" value="true" />
+			<value name="borderLeftSize" value="2px" />
+			<value name="borderRightSize" value="2px" />
+			<value name="borderTopSize" value="2px" />
+			<value name="borderBottomSize" value="2px" />
+			<value name="borderLeftSize_selected" value="2px" />
+			<value name="borderRightSize_selected" value="2px" />
+			<value name="borderTopSize_selected" value="2px" />
+			<value name="borderBottomSize_selected" value="2px" />
+			<value name="borderLeftColor" value="gray2" />
+			<value name="borderRightColor" value="gray2" />
+			<value name="borderTopColor" value="gray2" />
+			<value name="borderBottomColor" value="gray2" />
+			<value name="borderLeftColor_selected" value="orange" />
+			<value name="borderRightColor_selected" value="orange" />
+			<value name="borderTopColor_selected" value="orange" />
+			<value name="borderBottomColor_selected" value="orange" />
+			<value name="textMaxWidth" value="390px"/>
+		</template>
+
+		<template name="gcMenuFactoriesRenameButton" anchor="rightBottom" extends="gcMenuFactoriesVisitButton">
+			<value name="size" value="300px 60px" />
+			<value name="textMaxWidth" value="290px"/>
+		</template>
+
+		<template name="gcMenuFactoriesButtonBack" anchor="leftBottom" extends="gcBaseGuiButton">
+			<value name="size" value="53px 43px" />
+			<value name="position" value="124px 134px"/>
+			<value name="clickZone" value="-2px 48px 120px -2px 120px 48px -4px -4px" />
+			<value name="textMargin" value="0px 0px 0px 14px" />
+			<value name="textUpperCase" value="true" />
+			<value name="textSize" value="19px" />
+			<value name="textBold" value="false" />
+			<value name="textColor_selected" value="text" />			
+			<value name="inputAction" value="MENU_BACK"/>
+		</template>
+		
+		<template name="gcMenuFactoriesButtonBackText" anchor="leftBottom" extends="gcBase">
+			<value name="textAlignment" value="left"/>
+			<value name="size" value="200px 60px"/>
+			<value name="textMargin" value="54px 0px 0px 14px" />
+			<value name="textUpperCase" value="true" />
+			<value name="textSize" value="20px" />
+			<value name="textBold" value="true" />
+			<value name="textBold_selected" value="true" />				
+		</template>
+	</templates>
 </guiTemplates>

@@ -2,7 +2,7 @@
 -- GlobalCompany 
 -- 
 -- @Interface: --
--- @Author: LS-Modcompany / kevink98, GtX
+-- @Author: LS-Modcompany / kevink98
 -- @Date: 26.01.2019
 -- @Version: 1.0.0.0
 -- 
@@ -18,13 +18,12 @@
 -- 
 -- ToDo:
 -- 		xmlIinformations at fakegui (kevin)
---		debug is wrong
 -- 
 
 GlobalCompanyGui = {};
 g_company.gui = GlobalCompanyGui;
 
-GlobalCompanyGui.debugIndex = g_company.debug:registerScriptName("GlobalCompanyGui");
+GlobalCompanyGui.debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui");
 GlobalCompanyGui.debugData = g_company.debug:getDebugData(GlobalCompanyGui.debugIndex, g_company);
 
 GlobalCompanyGui.DevelopementVersionTemplatesFilename = {};
@@ -65,8 +64,6 @@ source(g_currentModDirectory .. "gui/MultiDialog.lua");
 source(g_currentModDirectory .. "gui/objects/Baler.lua");
 source(g_currentModDirectory .. "gui/objects/ObjectInfo.lua");
 source(g_currentModDirectory .. "gui/objects/GcMain.lua");
--- source(g_currentModDirectory .. "gui/objects/FactoryBig.lua");
--- source(g_currentModDirectory .. "gui/objects/FactorySmall.lua");
 source(g_currentModDirectory .. "gui/objects/DynamicStorage.lua");
 
 function GlobalCompanyGui:init()	
@@ -96,7 +93,8 @@ function GlobalCompanyGui:loadMap()
 end;
 
 function GlobalCompanyGui:load()	
-	self.fakeGui = GC_Gui_FakeGui:new();
+	-- self.fakeGui = GC_Gui_FakeGui:new();
+	self.fakeGui = g_company.gui.fakeGui:new();
 	g_gui:loadGui(g_company.dir .. self.fakeGui.guiInformations.guiXml, "gc_fakeGui", self.fakeGui);
 	
 	g_company.gui:registerUiElements("g_factoryDefault", g_company.dir .. "images/factoryDefault.dds");
@@ -104,8 +102,6 @@ function GlobalCompanyGui:load()
 	
 	self.mainGui = g_company.gui:registerGui("gc_main", InputAction.GC_MAIN, Gc_Gui_MainGui, true, true, true).classGui;
 	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
-	-- g_company.gui:registerGui("gc_factoryBig", nil, Gc_Gui_FactoryBig, true, true, true);
-	-- g_company.gui:registerGui("gc_factorySmall", nil, Gc_Gui_FactorySmall, false, false);
 	g_company.gui:registerGui("gcPlaceable_baler", nil, Gc_Gui_Baler, true, true);
 	g_company.gui:registerGui("gcObjectInfo", nil, Gc_Gui_ObjectInfo, false, false);
 	g_company.gui:registerGui("gc_dynamicStorage", nil, Gc_Gui_DynamicStorage, true, true);

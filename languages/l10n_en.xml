@@ -70,6 +70,7 @@
 		<e k="GC_gui_max" v="Maximum"/>
 		<e k="GC_gui_percent" v="Percent"/>
 		<e k="GC_gui_lifeTimeIncome" v="Lifetime Income"/>
+		<e k="GC_gui_changeFactoryTitle" v="Enter new factory reference name below."/>
 		
 		<!-- Formatting required -->
 		<e k="GC_Factory_Sell_Warning" v="This factory still contains products. These will be sold in bulk for the following amount:
@@ -114,5 +115,15 @@ Cost:  %s"/>
 		<e k="GC_ObjectInfo_level2" v="FillType: %s Litres (%s%%)"/>
 		<e k="GC_ObjectInfo_owner" v="Owner: %s"/>
 
+		<!-- DynamicStorage -->
+		<e k="GC_dynamicStorage_unloadSettings" v="Unload Settings"/>
+		<e k="GC_dynamicStorage_gui_header_unloading" v="Select unloading position"/>
+		<e k="GC_dynamicStorage_gui_header_loading" v="Select charging box"/>
+		<e k="GC_dynamicStorage_gui_info_unloading" v="Choose in which box should be unloaded. Note that in each box only one fruit can be unloaded."/>
+		<e k="GC_dynamicStorage_gui_info_loading" v="Choose from which box to load."/>
+		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s Liter"/>
+		<e k="GC_dynamicStorage_gui_empty" v="empty"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Confirm unloading position"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Confirm charging box"/>
 	</elements>
 </l10n>

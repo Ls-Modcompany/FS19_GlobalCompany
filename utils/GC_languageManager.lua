@@ -63,7 +63,7 @@ function GC_languageManager:loadModLanguageFiles(modLanguageFiles)
 	end;
 
 	if fullPathCount > 0 then
-		g_company.debug:writeLoad(GC_languageManager.debugData, "'%d' mod language XML files have been loaded successfully.", fullPathCount);
+		g_company.debug:writeInformations(GC_languageManager.debugData, "'%d' mod language XML files have been loaded successfully.", fullPathCount);
 	end;
 end;
 

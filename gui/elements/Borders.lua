@@ -12,7 +12,8 @@ local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui-Borders
 
 GC_Gui_borders = {};
 local GC_Gui_borders_mt = Class(GC_Gui_borders, GC_Gui_element);
-getfenv(0)["GC_Gui_borders"] = GC_Gui_borders;
+-- getfenv(0)["GC_Gui_borders"] = GC_Gui_borders;
+g_company.gui.bordersElement = GC_Gui_borders;
 
 function GC_Gui_borders:new(gui, custom_mt)
     if custom_mt == nil then

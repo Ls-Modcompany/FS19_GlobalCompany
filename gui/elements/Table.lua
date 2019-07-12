@@ -12,7 +12,8 @@ local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui-Table")
 
 GC_Gui_table = {};
 local GC_Gui_table_mt = Class(GC_Gui_table, GC_Gui_element);
-getfenv(0)["GC_Gui_table"] = GC_Gui_table;
+-- getfenv(0)["GC_Gui_table"] = GC_Gui_table;
+g_company.gui.tableElement = GC_Gui_table;
 
 GC_Gui_table.ORIENTATION_X = 1;
 GC_Gui_table.ORIENTATION_Y = 2;

@@ -12,7 +12,8 @@ local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui-Element
 
 GC_Gui_element = {};
 local GC_Gui_element_mt = Class(GC_Gui_element);
-getfenv(0)["GC_Gui_element"] = GC_Gui_element;
+-- getfenv(0)["GC_Gui_element"] = GC_Gui_element;
+g_company.gui.elementElement = GC_Gui_element;
 
 function GC_Gui_element:new(gui, custom_mt, isOnlyElement)	
 	if custom_mt == nil then

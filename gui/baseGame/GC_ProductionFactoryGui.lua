@@ -94,6 +94,8 @@ function GC_ProductionFactoryGui:new(l10n, messageCenter)
 	self.outputIsProductSale = false
 
 	self.productPurchasePrices = {}
+	
+	self.openedFromGUI = false
 
 	self.defaultImage = g_company.dir .. "images/factoryDefault.dds"
 
@@ -127,9 +129,11 @@ function GC_ProductionFactoryGui:new(l10n, messageCenter)
 	return self
 end
 
-function GC_ProductionFactoryGui:setupFactoryData(factory, lineId)
+function GC_ProductionFactoryGui:setupFactoryData(factory, lineId, openedFromGUI)
 	self.factory = factory
 	self.lineId = lineId
+	
+	self.openedFromGUI = Utils.getNoNil(openedFromGUI, false)
 
 	self:setupOverviewAndTexts(self.factory.guiData)
 	if not self:setProductLines() then
@@ -175,7 +179,7 @@ function GC_ProductionFactoryGui:onOpen()
 	self.isOpen = true
 	self.isUpdating = false
 
-	self.pageSelector = {} -- Pretend to be 'TabbedMenu' to use input's.
+	self.pageSelector = {}
 	self.lastMoney = nil
 
 	g_depthOfFieldManager:setBlurState(true)
@@ -824,7 +828,13 @@ end
 
 function GC_ProductionFactoryGui:onClickBack()
 	GC_ProductionFactoryGui:superClass().onClickBack(self)
+	
 	self:changeScreen()
+	
+	if self.openedFromGUI then
+		-- Try and open the GC GUI only if this was the origin.
+		g_company.gui:openGui("gc_main")
+	end
 end
 
 function GC_ProductionFactoryGui:onClickOk()

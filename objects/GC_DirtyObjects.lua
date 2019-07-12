@@ -31,7 +31,7 @@ local function GetNextSaveId() saveId = saveId + 1; return saveId; end;
 
 DirtObjects.debugIndex = g_company.debug:registerScriptName("DirtObjects");
 
-getfenv(0)["GC_DirtyObjects"] = DirtObjects;
+g_company.dirtObjects = DirtObjects
 
 function DirtObjects:onCreate(id)
 	local customEnvironment = g_currentMission.loadingMapModName;
