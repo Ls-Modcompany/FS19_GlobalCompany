@@ -2347,6 +2347,7 @@ function GC_ProductionFactory:setOwnerFarmId(ownerFarmId, noEventSend)
 	end
 
 	self.hourlyIncomeTotal = 0
+	self:setCustomTitle(GC_ProductionFactory.BACKUP_TITLE, true)
 
 	if self.triggerManager ~= nil then
 		self.triggerManager:setAllOwnerFarmIds(ownerFarmId, noEventSend)
