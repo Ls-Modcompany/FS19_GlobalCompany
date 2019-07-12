@@ -133,6 +133,7 @@ function Gc_Gui_Factories:onClickRenameFactory()
 	
 	if self.canChangeName and factory ~= nil then
 		local defaultText = factory:getCustomTitle()
+		local confirmText = g_i18n:getText("button_confirm")
 		
 		-- Close GC GUI first so we can open the Giants one.
 		self.doSelectedReset = false
@@ -144,6 +145,7 @@ function Gc_Gui_Factories:onClickRenameFactory()
 			defaultText = defaultText,
 			maxCharacters = 20,
 			disableFilter = false,
+			confirmText = confirmText,
 			callback = self.setCustomTitle,
 			target = self
 		})
