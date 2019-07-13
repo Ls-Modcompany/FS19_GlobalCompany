@@ -70,7 +70,15 @@ end
 function Gc_Gui_Factories:onCreateFactoryTitle1(element)
     if self.currentSetupFactory ~= nil then
 		if self.currentSetupFactory.guiData.factoryTitle ~= nil then
-			element:setText(self.currentSetupFactory.guiData.factoryTitle)
+			local factory = self.currentSetupFactory
+			
+			element:setText(factory.guiData.factoryTitle)
+			
+			if factory.owningPlaceable ~= nil and not factory.owningPlaceable.boughtWithFarmland then
+				element:setTextColor(1, 1, 1, 1)
+			else
+				element:setTextColor(0.0742, 0.4341, 0.6939, 1)
+			end
 		end
     end
 end
@@ -103,10 +111,9 @@ function Gc_Gui_Factories:setOverviewBox()
 		if factory.guiData.factoryTitle ~= nil then
 			self.gui_factoryTitleText:setText(factory.guiData.factoryTitle)
 			
-			if factory.isPlaceable then
+			if factory.owningPlaceable ~= nil and not factory.owningPlaceable.boughtWithFarmland then
 				self.gui_factoryTitleText:setTextColor(1, 1, 1, 1)
 			else
-				-- Set 'onCreate' blue so it is easy to tell the difference. This will also be top of list.
 				self.gui_factoryTitleText:setTextColor(0.0742, 0.4341, 0.6939, 1)
 			end
 		end
@@ -116,11 +123,9 @@ end
 function Gc_Gui_Factories:onClickOpenOverview()
 	local factory = self.currentSelectedFactory
 	if factory ~= nil then
-		-- Close GC GUI first so we can open the Giants one.
 		self.doSelectedReset = false
 		g_company.gui:closeActiveGui()
-		
-		-- Try and open the Factory GUI.
+
 		local dialog = g_gui:showDialog("GC_ProductionFactoryDialog")
 		if dialog ~= nil then
 			dialog.target:setupFactoryData(factory, nil, true)
@@ -134,12 +139,10 @@ function Gc_Gui_Factories:onClickRenameFactory()
 	if self.canChangeName and factory ~= nil then
 		local defaultText = factory:getCustomTitle()
 		local confirmText = g_i18n:getText("button_confirm")
-		
-		-- Close GC GUI first so we can open the Giants one.
+
 		self.doSelectedReset = false
 		g_company.gui:closeActiveGui()
-		
-		-- Open Text dialogue
+
 		g_gui:showTextInputDialog({
 			text = self.changeTitleText,
 			defaultText = defaultText,
@@ -161,7 +164,6 @@ function Gc_Gui_Factories:setCustomTitle(text, applyTitle)
 		self.currentSelectedFactory:setCustomTitle(text)
 	end
 
-	-- Try and open the GC GUI again
 	g_company.gui:openGui("gc_main")
 end
 

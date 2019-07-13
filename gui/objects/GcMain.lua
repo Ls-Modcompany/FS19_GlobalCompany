@@ -39,8 +39,10 @@ function Gc_Gui_MainGui:new(target, custom_mt)
     g_company.gui:loadGui(Gc_Gui_MainSettings, "gcMainSettings");
     g_company.gui:loadGui(Gc_Gui_Errors, "gcMainErrors");    
 	g_company.gui:loadGui(Gc_Gui_Factories, "gcMainFactories");
-    
-    self.backupItems = {};            
+	
+	local factoryMenu = {imageFilename = "g_gcUi2", imageUVs = "icon_factories", gui = g_company.gui:getGui("gcMainFactories")};    
+	self.backupItems = {factoryMenu}; 
+	
 	return self;
 end;
 
@@ -59,7 +61,6 @@ function Gc_Gui_MainGui:onOpen()
     if self.loadSpecial then
         self:addMenuItem("g_gcUi2", "icon_errors", g_company.gui:getGui("gcMainErrors"), true);
         self:addMenuItem("g_gcUi2", "icon_settings", g_company.gui:getGui("gcMainSettings"), true);
-        self:addMenuItem("g_gcUi2", "icon_factories", g_company.gui:getGui("gcMainFactories"), true);
         self.loadSpecial = false;
     end;
     

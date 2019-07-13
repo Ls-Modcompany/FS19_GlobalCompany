@@ -71,6 +71,9 @@
 		<e k="GC_gui_lifeTimeIncome" v="Bisheriger Verdienst"/>
 		<e k="GC_gui_changeFactoryTitle" v="Geben Sie unten einen neuen Fabriknamen ein."/>
 		
+		<e k="GC_gui_placeableObject" v="Platzierbare Objekt"/>
+		<e k="GC_gui_farmlandObject" v="Farmland Objekt"/>
+		
 		<!-- Formatting required -->
 		<e k="GC_Factory_Sell_Warning" v="Es sind noch Produkte in der Fabrik. Diese werden als loses Schüttgut für den folgenden Betrag verkauft:
 

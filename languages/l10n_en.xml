@@ -72,6 +72,9 @@
 		<e k="GC_gui_lifeTimeIncome" v="Lifetime Income"/>
 		<e k="GC_gui_changeFactoryTitle" v="Enter new factory reference name below."/>
 		
+		<e k="GC_gui_placeableObject" v="Placeable Object"/>
+		<e k="GC_gui_farmlandObject" v="Farmland Object"/>
+		
 		<!-- Formatting required -->
 		<e k="GC_Factory_Sell_Warning" v="This factory still contains products. These will be sold in bulk for the following amount:
 

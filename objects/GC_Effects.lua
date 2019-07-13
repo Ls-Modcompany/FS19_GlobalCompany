@@ -209,12 +209,13 @@ function GC_Effects:load(nodeId, target, xmlFile, xmlKey, baseDirectory, groupKe
 
 					effects.needReset = Utils.getNoNil(getXMLBool(xmlFile, key .. "#needReset"), false)
 
+					local fillTypeNames
 					local productName = getXMLString(xmlFile, key .. "#productName")
 					if productName ~= nil then
 						effects.productName = productName
 						effects.fillTypeIndex = FillType.WHEAT
 					else
-						local fillTypeNames = getXMLString(xmlFile, key .. "#fillTypes") -- Using 'fillTypes' with 'operatingIntervalSeconds' cycles through the fillTypes at each interval change.
+						fillTypeNames = getXMLString(xmlFile, key .. "#fillTypes") -- Using 'fillTypes' with 'operatingIntervalSeconds' cycles through the fillTypes at each interval change.
 						if fillTypeNames == nil then
 							local fillTypeName = getXMLString(xmlFile, key .. "#fillType") -- Single product to use for the effect.
 							local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillTypeName)

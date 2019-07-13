@@ -12,6 +12,7 @@
 --
 -- 	v1.1.0.0 (09.02.2019):
 -- 		- convert to fs19
+--		- add support for material swapping
 --
 -- 	v1.0.0.0 (26.05.2018):
 -- 		- initial fs17 (GtX)
@@ -40,6 +41,9 @@ function GC_Movers:new(isServer, isClient, customMt)
 	self.isClient = isClient
 
 	self.movers = nil
+	
+	self.hasMaterials = false
+	self.lastFillTypeIndex = nil
 
 	return self
 end
@@ -142,26 +146,64 @@ function GC_Movers:load(nodeId, target, xmlFile, xmlKey, baseDirectory, capaciti
 						mover.useScale = false
 					end
 
-					local colourMin = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. ".shaderColor#minimum", 3, false, self.debugData)
-					local colourMax = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. ".shaderColor#maximum", 3, false, self.debugData)
-					if colourMin ~= nil and colourMax ~= nil then
-						-- Only with (bunkerSiloSilageShader.xml)
-						if getHasShaderParameter(mover.node, "colorScale") then
-							mover.colourMin = colourMin
-							mover.colourMax = colourMax
-							setShaderParameter(mover.node, "colorScale", colourMin[1], colourMin[2], colourMin[3], 0, false)
-
-							mover.useColourChange = true
-							mover.colourReset = false
-							local startColourChange = Utils.getNoNil(getXMLFloat(xmlFile, key .. ".shaderColor#start"), 0)
-							mover.startColourChange = math.max(startColourChange, 0)
-							mover.stopColourChange = self:getAcceptedStopLevel(getXMLFloat(xmlFile, key .. ".shaderColor#stop"), capacity)
-							mover.originalStopColourChange = mover.stopColourChange
-						else
-							g_company.debug:writeModding(self.debugData, "'allowColorChange' disbaled! Shader Parameter 'colorScale' does not exist on node '%s' at %s. - Supported Shader: bunkerSiloSilageShader -", mover.node, key)
+					-- This takes a material from a node in the mod and applies it to the mover when needed.
+					-- See Base Game BigBags for an example of how you can use this for best performance.
+					if hasXMLProperty(xmlFile, key .. ".materials") then
+						local j = 0
+						while true do
+							local materialKey = string.format("%s.materials.material(%d)", key, j)
+							if not hasXMLProperty(xmlFile, materialKey) then
+								break
+							end
+							
+							local fillTypeName = getXMLString(xmlFile, materialKey .. "#fillType")						
+							if fillTypeName ~= nil then
+								local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillTypeName)
+								if fillTypeIndex ~= nil then								
+									local refMaterialNode = I3DUtil.indexToObject(self.rootNode, getXMLString(xmlFile, materialKey .. "#refNode"), self.target.i3dMappings)
+									if refMaterialNode ~= nil and getHasClassId(refMaterialNode, ClassIds.SHAPE) then
+										if mover.materials == nil then
+											mover.materials = {}
+										end
+	
+										mover.materials[fillTypeIndex] = getMaterial(refMaterialNode, 0)
+										self.hasMaterials = true
+									else
+										g_company.debug:writeModding(self.debugData, "No reference material or node is not a shape for '%s'!", materialKey)
+									end
+								else
+									g_company.debug:writeModding(self.debugData, "Invalid fillType '%s' for '%s'!", fillTypeName, materialKey)
+								end
+							end
+							
+							j = j + 1
 						end
+					end
+					
+					mover.useColourChange = false
+					
+					if mover.materials ~= nil then
+						mover.originalMaterial = getMaterial(mover.node, 0)					
 					else
-						mover.useColourChange = false
+						local colourMin = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. ".shaderColor#minimum", 3, false, self.debugData)
+						local colourMax = GlobalCompanyXmlUtils.getNumbersFromXMLString(xmlFile, key .. ".shaderColor#maximum", 3, false, self.debugData)
+						if colourMin ~= nil and colourMax ~= nil then
+							-- Only with (bunkerSiloSilageShader.xml)
+							if getHasShaderParameter(mover.node, "colorScale") then
+								mover.colourMin = colourMin
+								mover.colourMax = colourMax
+								setShaderParameter(mover.node, "colorScale", colourMin[1], colourMin[2], colourMin[3], 0, false)
+	
+								mover.useColourChange = true
+								mover.colourReset = false
+								local startColourChange = Utils.getNoNil(getXMLFloat(xmlFile, key .. ".shaderColor#start"), 0)
+								mover.startColourChange = math.max(startColourChange, 0)
+								mover.stopColourChange = self:getAcceptedStopLevel(getXMLFloat(xmlFile, key .. ".shaderColor#stop"), capacity)
+								mover.originalStopColourChange = mover.stopColourChange
+							else
+								g_company.debug:writeModding(self.debugData, "'allowColorChange' disbaled! Shader Parameter 'colorScale' does not exist on node '%s' at %s. - Supported Shader: bunkerSiloSilageShader -", mover.node, key)
+							end
+						end
 					end
 
 					mover.hideAtFillLevel = Utils.getNoNil(getXMLFloat(xmlFile, key .. "#hideAtFillLevel"), -100) + 0.0001
@@ -210,6 +252,10 @@ end
 function GC_Movers:updateMovers(fillLevel, fillTypeIndex)
 	if self.isClient then
 		if self.movers ~= nil then
+			if self.hasMaterials then
+				self:setMoversMaterialType(fillTypeIndex)
+			end
+			
 			if self.disableFillType then
 				for _, mover in pairs(self.movers) do
 					self:setMover(mover, fillLevel)
@@ -315,6 +361,33 @@ function GC_Movers:setMover(mover, fillLevel)
 				mover.colourReset = false
 			end
 		end
+	end
+end
+
+function GC_Movers:setMoversMaterialType(fillTypeIndex)
+	if fillTypeIndex == nil then
+		return
+	end
+	
+	if self.lastFillTypeIndex ~= fillTypeIndex then
+		self.lastFillTypeIndex = fillTypeIndex
+		
+		for _, mover in pairs(self.movers) do
+			if mover.materials ~= nil then
+				local newMaterial = mover.materials[fillTypeIndex]
+				
+				print(newMaterial ~= nil)
+				if newMaterial ~= nil then
+					if getMaterial(mover.node, 0) ~= newMaterial then
+						setMaterial(mover.node, newMaterial, 0)
+					end
+				else
+					if getMaterial(mover.node, 0) ~= mover.originalMaterial then
+						setMaterial(mover.node, mover.originalMaterial, 0)
+					end
+				end
+			end
+		end		
 	end
 end
 

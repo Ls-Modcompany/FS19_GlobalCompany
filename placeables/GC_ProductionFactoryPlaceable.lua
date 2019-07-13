@@ -31,7 +31,7 @@ GC_ProductionFactoryPlaceable = {}
 local GC_ProductionFactoryPlaceable_mt = Class(GC_ProductionFactoryPlaceable, Placeable)
 InitObjectClass(GC_ProductionFactoryPlaceable, "GC_ProductionFactoryPlaceable")
 
--- With Product Lines this is all we need.
+-- With Product Lines this is all we need for performance reasons.
 -- This allows one factory to be used to build the other one if needed.
 GC_ProductionFactoryPlaceable.MAX_FACTORIES = 2
 
@@ -94,6 +94,7 @@ function GC_ProductionFactoryPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRa
 					usedIndexNames[indexName] = key
 					local factory = GC_ProductionFactory:new(self.isServer, g_dedicatedServerInfo == nil, nil, filenameToUse, self.baseDirectory, self.customEnvironment)
 					if factory:load(self.nodeId, xmlFile, key, indexName, true) then
+						factory.owningPlaceable = self
 						factory:setOwnerFarmId(self:getOwnerFarmId(), false)
 						table.insert(self.productionFactories, factory)
 					else
@@ -169,9 +170,6 @@ function GC_ProductionFactoryPlaceable:writeStream(streamId, connection)
 end
 
 function GC_ProductionFactoryPlaceable:collectPickObjects(node)
-	-- We only want to add node once.
-	-- This should be a simple check in the Placeable.lua be standard I think.
-	-- Maybe Giants know something I do not :-)
 	if g_currentMission.nodeToObject[node] == nil then
 		GC_ProductionFactoryPlaceable:superClass().collectPickObjects(self, node)
 	end
@@ -219,7 +217,6 @@ function GC_ProductionFactoryPlaceable:saveToXMLFile(xmlFile, key, usedModNames)
 	end
 end
 
--- We need to update the 'OwnerFarmId' here so that sub-objects can also be updated and for land sales.
 function GC_ProductionFactoryPlaceable:setOwnerFarmId(ownerFarmId, noEventSend)
 	GC_ProductionFactoryPlaceable:superClass().setOwnerFarmId(self, ownerFarmId, noEventSend)
 

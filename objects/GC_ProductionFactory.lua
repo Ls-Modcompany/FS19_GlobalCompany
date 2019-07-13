@@ -635,7 +635,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 						end
 
 						self:loadProductParts(xmlFile, outputProductKey, outputProduct)
-						self:updateFactoryLevels(0, outputProduct, nil, false)
+						self:updateFactoryLevels(0, outputProduct, outputProduct.fillTypeIndex, false)
 
 						self.outputProducts[outputProductId] = outputProduct
 						self.numOutputProducts = outputProductId
@@ -1753,7 +1753,7 @@ function GC_ProductionFactory:updateFactoryLevels(fillLevel, product, fillTypeIn
 		end
 
 		if product.movers ~= nil then
-			product.movers:updateMovers(fillLevel)
+			product.movers:updateMovers(fillLevel, fillTypeIndex)
 		end
 
 		if product.fillVolumes ~= nil then
