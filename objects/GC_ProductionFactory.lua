@@ -21,7 +21,6 @@
 --
 --
 -- ToDo:
--- 		- Add missing triggers (Dynamic Pallet Input, Animal Load / Unload).
 --
 --
 
@@ -35,6 +34,14 @@ GC_ProductionFactory.LIMIT = 10
 GC_ProductionFactory.MAX_INT = 2147483647
 
 GC_ProductionFactory.BACKUP_TITLE = "- - - - - -"
+
+GC_ProductionFactory.BACKUP_ANIMAL_TO_LITRES = {
+	["COW"] = 1000,
+	["HORSE"] = 1000,
+	["SHEEP"] = 500,
+	["PIG"] = 500,
+	["CHICKEN"] = 100
+}
 
 GC_ProductionFactory.debugIndex = g_company.debug:registerScriptName("GC_ProductionFactory")
 
@@ -102,8 +109,7 @@ function GC_ProductionFactory:new(isServer, isClient, customMt, xmlFilename, bas
 	self.triggerIdToLineIds = {}
 	self.drawProductLineUI = {}
 
-	self.lineIdToConveyor = {}
-	self.lineIdToConveyorEffect = {}
+	self.animalTypeToInputProduct = {}
 
 	self.productLines = {}
 	self.inputProducts = {}
@@ -234,6 +240,9 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			inputProduct.name = inputProductName
 			inputProduct.canPurchaseProduct = false
 
+			inputProduct.animalFillTypeIndexs = {}
+			inputProduct.isAnimalTypes = Utils.getNoNil(getXMLBool(xmlFile, inputProductKey .. ".fillTypes#isAnimalTypes"), false)
+
 			local j = 0
 			while true do
 				local fillTypesKey = string.format("%s.fillTypes.fillType(%d)", inputProductKey, j)
@@ -243,7 +252,46 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 
 				local fillTypeName = getXMLString(xmlFile, fillTypesKey .. "#name")
 				if fillTypeName ~= nil then
-					local fillType = g_fillTypeManager:getFillTypeByName(fillTypeName)
+					local fillType
+
+					if inputProduct.isAnimalTypes then
+						local animalType = g_animalManager:getAnimalsByType(fillTypeName)
+						if animalType ~= nil then
+							local animalTypeName = animalType.type
+							if self.animalTypeToInputProduct[animalTypeName] == nil then
+								self.animalTypeToInputProduct[animalTypeName] = inputProduct
+
+								if inputProduct.animalTypeToLitres == nil then
+									inputProduct.animalTypeToLitres = {}
+								end
+
+								for id, subType in pairs (animalType.subTypes) do
+									usedFillTypeNames[subType.fillTypeDesc.name] = inputProductName
+
+									inputProduct.animalFillTypeIndexs[subType.fillType] = true
+
+									if id == 1 then
+										fillType = subType.fillTypeDesc
+									end
+								end
+
+								local litresPerAnimal = getXMLInt(xmlFile, fillTypesKey .. "#litresPerAnimal")
+								if litresPerAnimal == nil then
+									-- Use backup values if none given.
+									litresPerAnimal = Utils.getNoNil(GC_ProductionFactory.BACKUP_ANIMAL_TO_LITRES[animalTypeName], 500)
+								end
+
+								inputProduct.animalTypeToLitres[animalTypeName] = litresPerAnimal
+							else
+								g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Duplicate animalType ( %s ) used in factory at %s! Only use each 'animalType' once per factory.", indexName, animalTypeName, inputProductName)
+							end
+						else
+							g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Unknown animalType ( %s ) found in 'inputProduct' ( %s ) at %s, ignoring!", indexName, fillTypeName, inputProductName, fillTypesKey)
+						end
+					else
+						fillType = g_fillTypeManager:getFillTypeByName(fillTypeName)
+					end
+
 					if fillType ~= nil and usedFillTypeNames[fillTypeName] == nil then
 						usedFillTypeNames[fillTypeName] = inputProductName
 
@@ -266,7 +314,9 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 						table.insert(concatTitles, fillTypeTitle)
 					else
 						if fillType == nil then
-							g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Unknown fillType ( %s ) found in 'inputProduct' ( %s ) at %s, ignoring!", indexName, fillTypeName, fillTypesKey)
+							if not inputProduct.isAnimalTypes then
+								g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Unknown fillType ( %s ) found in 'inputProduct' ( %s ) at %s, ignoring!", indexName, fillTypeName, inputProductName, fillTypesKey)
+							end
 						else
 							g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Duplicate 'inputProduct' fillType ( %s ) in '%s', FillType already used at '%s'!", indexName, fillTypeName, inputProductName, usedFillTypeNames[fillTypeName])
 						end
@@ -281,20 +331,23 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				inputProduct.concatedFillTypeTitles = table.concat(concatTitles, " | ")
 				inputProduct.capacity = Utils.getNoNil(getXMLInt(xmlFile, inputProductKey .. "#capacity"), 1000)
 
-				-- 'fixedPricePerLitre' This is the price per litre to purchase the product.
-				-- 'useSellPointPrice' The highest sell point price for the given fillType will be used.
-				-- 'purchaseMultiplier' (Default = 1.1) The multiplier to allow for transport and so it is not a easy cheat. (Min Value: 1)
-				local fixedPricePerLitre = getXMLFloat(xmlFile, inputProductKey .. ".purchase#fixedPricePerLitre")
-				if fixedPricePerLitre == nil or fixedPricePerLitre <= 0.0 then
-					local sellPointFillType = g_fillTypeManager:getFillTypeIndexByName(getXMLString(xmlFile, inputProductKey .. ".purchase#useSellPointPrice"))
-					if sellPointFillType ~= nil then
+				-- Not for animals, will break the world :-)
+				if inputProduct.animalTypeToLitres == nil then
+					-- 'fixedPricePerLitre' This is the price per litre to purchase the product.
+					-- 'useSellPointPrice' The highest sell point price for the given fillType will be used.
+					-- 'purchaseMultiplier' (Default = 1.1) The multiplier to allow for transport and so it is not a easy cheat. (Min Value: 1)
+					local fixedPricePerLitre = getXMLFloat(xmlFile, inputProductKey .. ".purchase#fixedPricePerLitre")
+					if fixedPricePerLitre == nil or fixedPricePerLitre <= 0.0 then
+						local sellPointFillType = g_fillTypeManager:getFillTypeIndexByName(getXMLString(xmlFile, inputProductKey .. ".purchase#useSellPointPrice"))
+						if sellPointFillType ~= nil then
+							inputProduct.canPurchaseProduct = true
+							inputProduct.sellPointFillType = sellPointFillType
+							inputProduct.purchaseMultiplier = math.max(Utils.getNoNil(getXMLFloat(xmlFile, inputProductKey .. ".purchase#purchaseMultiplier"), 1.1), 1)
+						end
+					else
 						inputProduct.canPurchaseProduct = true
-						inputProduct.sellPointFillType = sellPointFillType
-						inputProduct.purchaseMultiplier = math.max(Utils.getNoNil(getXMLFloat(xmlFile, inputProductKey .. ".purchase#purchaseMultiplier"), 1.1), 1)
+						inputProduct.fixedPricePerLitre = fixedPricePerLitre
 					end
-				else
-					inputProduct.canPurchaseProduct = true
-					inputProduct.fixedPricePerLitre = fixedPricePerLitre
 				end
 
 				local productTitle = getXMLString(xmlFile, inputProductKey .. "#title")
@@ -381,17 +434,23 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 						end
 					end
 
-					-- Dynamic Pallet Trigger
-					--local dynamicPalletAreaKey = inputProductKey .. ".inputMethods.dynamicPalletArea"
-					--if hasXMLProperty(xmlFile, dynamicPalletAreaKey) then
+					if inputProduct.isAnimalTypes and inputProduct.animalTypeToLitres ~= nil then
+						local livestockTriggerKey = inputProductKey .. ".inputMethods.livestockTrigger"
+						if hasXMLProperty(xmlFile, livestockTriggerKey) then
+							local trigger = self.triggerManager:addTrigger(GC_AnimalLoadingTrigger, self.rootNode, self, xmlFile, livestockTriggerKey, inputProduct.animalTypeToLitres)
+							if trigger ~= nil then
+								trigger:setTitleName(factoryTitle)
 
-					--end
+								local triggerId = trigger.managerId
+								trigger.extraParamater = triggerId
 
-					-- Livestock Trigger
-					--local livestockTriggerKey = inputProductKey .. ".inputMethods.livestockTrigger"
-					--if hasXMLProperty(xmlFile, livestockTriggerKey) then
-
-					--end
+								self.triggerIdToInputProductId[triggerId] = {}
+								for index, _ in pairs (inputProduct.animalFillTypeIndexs) do
+									self.triggerIdToInputProductId[triggerId][index] = inputProductId
+								end
+							end
+						end
+					end
 				end
 
 				self:loadProductParts(xmlFile, inputProductKey, inputProduct)
@@ -862,7 +921,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 
 		if canLoad then
 			self.globalIndex = g_company.addFactory(self)
-			
+
 			if self.isServer then
 				if addMinuteChange then
 					g_currentMission.environment:addMinuteChangeListener(self)
@@ -967,7 +1026,7 @@ end
 
 function GC_ProductionFactory:delete()
 	self.factoryDeleteStarted = true
-	
+
 	g_company.removeFactory(self, self.globalIndex)
 
 	if not self.isPlaceable then
@@ -1097,7 +1156,7 @@ function GC_ProductionFactory:readStream(streamId, connection)
 				productLine.productSale.lifeTimeIncome = streamReadInt32(streamId)
 			end
 		end
-		
+
 		if streamReadBool(streamId) then
 			local customTitle = streamReadString(streamId)
 			self:setCustomTitle(customTitle, true)
@@ -1144,10 +1203,10 @@ function GC_ProductionFactory:writeStream(streamId, connection)
 				streamWriteInt32(streamId, lifeTimeIncome)
 			end
 		end
-		
+
 		local customTitle = self:getCustomTitle()
 		if streamWriteBool(streamId, customTitle ~= GC_ProductionFactory.BACKUP_TITLE) then
-			streamWriteString(streamId, self.customTitle)
+			streamWriteString(streamId, customTitle)
 		end
 	end
 end
@@ -1226,7 +1285,7 @@ function GC_ProductionFactory:loadFromXMLFile(xmlFile, key)
 	if not self.isPlaceable then
 		factoryKey = string.format("%s.productionFactory", key)
 	end
-	
+
 	local customTitle = getXMLString(xmlFile, factoryKey .. "#customTitle")
 	self:setCustomTitle(customTitle, true)
 
@@ -1355,7 +1414,7 @@ function GC_ProductionFactory:saveToXMLFile(xmlFile, key, usedModNames)
 	end
 
 	setXMLString(xmlFile, factoryKey .. "#indexName", self.indexName)
-	
+
 	local customTitle = self:getCustomTitle()
 	if customTitle ~= GC_ProductionFactory.BACKUP_TITLE then
 		setXMLString(xmlFile, factoryKey .. "#customTitle", customTitle)
@@ -2082,15 +2141,15 @@ end
 
 function GC_ProductionFactory:setCustomTitle(customTitle, noEventSend)
 	if customTitle ~= nil and customTitle ~= self:getCustomTitle() then
-		GC_ProductionFactoryCustomTitleEvent.sendEvent(self, customTitle, noEventSend)	
-		
+		GC_ProductionFactoryCustomTitleEvent.sendEvent(self, customTitle, noEventSend)
+
 		self.guiData.factoryCustomTitle = customTitle
 	end
 end
 
 function GC_ProductionFactory:getCustomTitle()
 	local title = self.guiData.factoryCustomTitle
-	
+
 	if title == nil then
 		title = GC_ProductionFactory.BACKUP_TITLE
 	end

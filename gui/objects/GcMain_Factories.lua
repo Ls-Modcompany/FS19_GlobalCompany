@@ -51,8 +51,15 @@ function Gc_Gui_Factories:onOpen()
 		self.gui_factoryTitleText:setText(self.backupText)
 		self.gui_factoryTitleText:setTextColor(1, 1, 1, 1)
 		
+		self.gui_factoryNameText:setText("- - - - - -")
+		
 		self.gui_factoryRenameButton:setDisabled(true)
 	else
+		local customTitle = self.currentSelectedFactory:getCustomTitle()
+		if self.gui_factoryNameText.text ~= customTitle then		
+			self.gui_factoryNameText:setText(customTitle)
+		end
+
 		self.gui_factoryRenameButton:setDisabled(not self.canChangeName)
 	end
 	
@@ -85,10 +92,8 @@ end
 
 function Gc_Gui_Factories:onCreateFactoryTitle2(element)
     if self.currentSetupFactory ~= nil then
-		local customTitle = self.currentSetupFactory.guiData.factoryCustomTitle
-		if customTitle ~= nil and customTitle ~= "" then
-			element:setText(customTitle)
-		end
+		local customTitle = self.currentSetupFactory:getCustomTitle()		
+		element:setText(customTitle)
     end
 end
 
@@ -110,6 +115,9 @@ function Gc_Gui_Factories:setOverviewBox()
 		
 		if factory.guiData.factoryTitle ~= nil then
 			self.gui_factoryTitleText:setText(factory.guiData.factoryTitle)
+			
+			local customTitle = factory:getCustomTitle()
+			self.gui_factoryNameText:setText(customTitle)
 			
 			if factory.owningPlaceable ~= nil and not factory.owningPlaceable.boughtWithFarmland then
 				self.gui_factoryTitleText:setTextColor(1, 1, 1, 1)

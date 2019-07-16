@@ -990,8 +990,8 @@
 		</template>
 
 		<template name="gcMenuFactoriesOverviewImage" anchor="middleCenter" extends="gcBase">
-			<value name="size" value="440px 440px" />
-			<value name="position" value="0px 30px" />
+			<value name="size" value="400px 400px" />
+			<value name="position" value="0px 0px" />
 			<Value name="imageUVs" value="0 0 1 1"/>
 			<Value name="imageFilename" value="g_factoryDefault"/>
 		</template>
@@ -1018,9 +1018,14 @@
 		<template name="gcMenuFactoriesOverviewTitleText" anchor="middleCenter" extends="gcBase_text">
 			<value name="textSize" value="30px" />
 			<value name="textAlignment" value="center" />
-			<value name="margin" value="0px -230px 0px 0px" />
+			<value name="margin" value="0px 240px 0px 0px" />
 			<value name="textBold" value="true" />
 			<value name="textMaxWidth" value="730px"/>
+		</template>
+		
+		<template name="gcMenuFactoriesOverviewNameText" extends="gcMenuFactoriesOverviewTitleText">
+			<value name="textSize" value="26px" />
+			<value name="margin" value="0px -235px 0px 0px" />
 		</template>
 
 		<template name="gcMenuFactoriesVisitButton" anchor="leftBottom" extends="gcBase">

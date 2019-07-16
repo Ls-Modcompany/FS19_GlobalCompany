@@ -253,7 +253,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_Effects.lua");
 	source(GlobalCompany.dir .. "objects/GC_Lighting.lua");
 	source(GlobalCompany.dir .. "objects/GC_Conveyor.lua");
-	source(GlobalCompany.dir .. "objects/GC_MovingPart.lua");
+	-- source(GlobalCompany.dir .. "objects/GC_MovingPart.lua");
 	source(GlobalCompany.dir .. "objects/GC_FillVolume.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicHeap.lua");
 	--source(GlobalCompany.dir .. "objects/GC_BaleShreader.lua");
@@ -280,6 +280,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "triggers/GC_LoadingTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_UnloadingTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_ShovelFillTrigger.lua");
+	source(GlobalCompany.dir .. "triggers/GC_AnimalLoadingTrigger.lua");
 	--source(GlobalCompany.dir .. "triggers/GC_PalletExtendedTrigger.lua");
 
 	--|| Placeables ||--
@@ -300,11 +301,13 @@ function GlobalCompany.loadSourceFiles()
 	--|| Events ||--
 	source(GlobalCompany.dir .. "events/GC_PalletCreatorWarningEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_AnimationManagerStopEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_AnimalLoadingTriggerEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_AnimationManagerStartEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryStateEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryCustomTitleEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactorySpawnPalletEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryProductPurchaseEvent.lua");
+	
 
 	--|| Specializations ||--
 	--source(GlobalCompany.dir .. "specializations/PalletExtended.lua");
@@ -465,6 +468,14 @@ function GlobalCompany.loadBaseGameGuiFiles(directory)
 			local factoryDialog = GC_ProductionFactoryGui:new(g_i18n, g_messageCenter)
 			g_gui:loadGui(directory .. "GC_ProductionFactoryGui.xml", "GC_ProductionFactoryDialog", factoryDialog)
 			g_company.productionFactoryDialog = factoryDialog
+		end
+		
+		if g_company.animalDeliveryDialog == nil then
+			source(directory .. "GC_AnimalDeliveryDialog.lua")
+			
+			local animalDeliveryDialog = GC_AnimalDeliveryDialog:new()
+			g_gui:loadGui(directory .. "GC_AnimalDeliveryDialog.xml", "GC_AnimalDeliveryDialog", animalDeliveryDialog)
+			g_company.animalDeliveryDialog = animalDeliveryDialog
 		end
 	end
 end

@@ -375,8 +375,7 @@ function GC_Movers:setMoversMaterialType(fillTypeIndex)
 		for _, mover in pairs(self.movers) do
 			if mover.materials ~= nil then
 				local newMaterial = mover.materials[fillTypeIndex]
-				
-				print(newMaterial ~= nil)
+
 				if newMaterial ~= nil then
 					if getMaterial(mover.node, 0) ~= newMaterial then
 						setMaterial(mover.node, newMaterial, 0)
