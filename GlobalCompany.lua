@@ -272,6 +272,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "triggers/GC_UnloadingTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_ShovelFillTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_AnimalLoadingTrigger.lua");
+	--source(GlobalCompany.dir .. "triggers/GC_PalletExtendedTrigger.lua");
 
 	--|| Placeables ||--
 	-- source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
@@ -293,7 +294,12 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryStateEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryCustomTitleEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactorySpawnPalletEvent.lua");
-	source(GlobalCompany.dir .. "events/GC_ProductionFactoryProductPurchaseEvent.lua");	
+	source(GlobalCompany.dir .. "events/GC_ProductionFactoryProductPurchaseEvent.lua");
+	
+
+	--|| Specializations ||--
+	--source(GlobalCompany.dir .. "specializations/PalletExtended.lua");
+	
 end;
 
 --| Add Base GC Placeables |--
