@@ -15,7 +15,7 @@
 --
 --
 -- Notes:
---      - some parts from productionFactory
+--
 --
 -- ToDo:
 --
@@ -27,8 +27,6 @@ local GC_DynamicStorage_mt = Class(GC_DynamicStorage, Object);
 InitObjectClass(GC_DynamicStorage, "GC_DynamicStorage");
 
 GC_DynamicStorage.debugIndex = g_company.debug:registerScriptName("GC_DynamicStorage");
-
-getfenv(0)["GC_DynamicStorage"] = GC_DynamicStorage;
 
 function GC_DynamicStorage:onCreate(transformId)
 	local indexName = getUserAttribute(transformId, "indexName");
@@ -113,7 +111,7 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
     self.fillTypes = {};
     self.places = {};
 
-    self:setActiveUnloadingBox();
+    self.activeUnloadingBox = 1;
     self.vehicleInteractionInTrigger = false;
     self.vehicleInteractionConter = 0;
 
@@ -142,24 +140,17 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
         i = i + 1;
     end;
 
-    local unloadingTriggerKey = string.format("%s.unloadingTrigger", xmlKey);
-    local name = getXMLString(xmlFile, unloadingTriggerKey .. "#name");
-    if name ~= nil then
-        local unloadingTrigger = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.rootNode, self, xmlFile, unloadingTriggerKey, self.fillTypes);
-        if unloadingTrigger ~= nil then
-            self.unloadingTrigger = unloadingTrigger;
-        end;
+    local unloadingTriggerKey = string.format("%s.unloadingTrigger", xmlKey);    
+    local unloadingTrigger = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.rootNode, self, xmlFile, unloadingTriggerKey, self.fillTypes);
+    if unloadingTrigger ~= nil then
+        self.unloadingTrigger = unloadingTrigger;
     end;
 
     local loadingTriggerKey = string.format("%s.loadingTrigger", xmlKey);
-    local name = getXMLString(xmlFile, loadingTriggerKey .. "#name");
-    if name ~= nil then
-        local loadingTrigger = self.triggerManager:addTrigger(GC_LoadingTrigger, self.rootNode, self, xmlFile, loadingTriggerKey, {}, false, true);
-        if loadingTrigger ~= nil then
-            
-            loadingTrigger.onActivateObject = function() self:loadingTriggerOnActivateObject() end;
-            self.loadingTrigger = loadingTrigger;
-        end;
+    local loadingTrigger = self.triggerManager:addTrigger(GC_LoadingTrigger, self.rootNode, self, xmlFile, loadingTriggerKey, {}, false, true);
+    if loadingTrigger ~= nil then        
+        loadingTrigger.onActivateObject = function() self:loadingTriggerOnActivateObject() end;
+        self.loadingTrigger = loadingTrigger;
     end;
   
     i = 0;
@@ -175,7 +166,7 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
         place.capacity = getXMLInt(xmlFile, placeKey .. "#capacity");
         place.activeFillTypeIndex = -1;
 
-        place.shovelTrigger = self.triggerManager:addTrigger(GC_ShovelFillTrigger, self.rootNode, self, xmlFile, placeKey .. ".shovelFillTrigger");
+        place.shovelTrigger = self.triggerManager:addTrigger(GC_ShovelFillTrigger, self.rootNode, self, xmlFile, placeKey .. ".shovelFillTrigger", place.activeFillTypeIndex);
         place.shovelTrigger.extraParamater = place.number;
         
         if hasXMLProperty(xmlFile, placeKey .. ".movers") then
@@ -208,6 +199,9 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 
     self.dynamicStorageDirtyFlag = self:getNextDirtyFlag();
         
+	self.eventId_setActiveUnloadingBox = g_company.eventManager:registerEvent(self, self.setActiveUnloadingBoxEvent);
+    self.eventId_setActiveLoadingBox = g_company.eventManager:registerEvent(self, self.setActiveLoadingBoxEvent);
+    
 	return true;
 end;
 
@@ -228,16 +222,33 @@ end;
 function GC_DynamicStorage:readStream(streamId, connection)
 	GC_DynamicStorage:superClass().readStream(self, streamId, connection);
 
+    self:setActiveUnloadingBox(streamReadInt8(streamId));
+
+    local loadingTrigger = NetworkUtil.readNodeObjectId(streamId);
+    g_client:finishRegisterObject(self.loadingTrigger, loadingTrigger);
+
 	if connection:getIsServer() then
-                
+        for _,place in pairs (self.places) do
+            local fillLevel =  streamReadFloat32(streamId);
+            local fillTypeIndex =  streamReadInt16(streamId);
+            self:updatePlace(place, fillLevel, fillTypeIndex);
+        end;
 	end;
 end;
 
 function GC_DynamicStorage:writeStream(streamId, connection)
 	GC_DynamicStorage:superClass().writeStream(self, streamId, connection);
 
+    streamWriteInt8(streamId, self.activeUnloadingBox);
+
+    NetworkUtil.writeNodeObjectId(streamId, NetworkUtil.getObjectId(self.loadingTrigger));
+    g_server:registerObjectInStream(connection, self.loadingTrigger);
+
 	if not connection:getIsServer() then
-                
+        for _,place in pairs (self.places) do     
+            streamWriteFloat32(streamId, place.fillLevel);
+            streamWriteInt16(streamId, place.activeFillTypeIndex);
+        end;
 	end;
 end;
 
@@ -245,7 +256,13 @@ function GC_DynamicStorage:readUpdateStream(streamId, timestamp, connection)
 	GC_DynamicStorage:superClass().readUpdateStream(self, streamId, timestamp, connection);
 
 	if connection:getIsServer() then
-		
+        if streamReadBool(streamId) then
+            for _,place in pairs (self.places) do
+                local fillLevel =  streamReadFloat32(streamId);
+                local fillTypeIndex =  streamReadInt16(streamId);
+                self:updatePlace(place, fillLevel, fillTypeIndex);
+            end;
+        end;		
 	end;
 end;
 
@@ -253,18 +270,74 @@ function GC_DynamicStorage:writeUpdateStream(streamId, connection, dirtyMask)
 	GC_DynamicStorage:superClass().writeUpdateStream(self, streamId, connection, dirtyMask);
 
 	if not connection:getIsServer() then
-		
+		if streamWriteBool(streamId, bitAND(dirtyMask, self.dynamicStorageDirtyFlag) ~= 0) then
+            for _,place in pairs (self.places) do     
+                streamWriteFloat32(streamId, place.fillLevel);
+                streamWriteInt16(streamId, place.activeFillTypeIndex);
+            end;
+        end;
 	end;
 end;
 
 function GC_DynamicStorage:loadFromXMLFile(xmlFile, key)
-	
+    if not self.isPlaceable then
+		key = string.format("%s.dynamicStorage", key);
+    end
+
+    self:setActiveUnloadingBox(getXMLInt(xmlFile, key .. "#activeUnloadingBox"));
+
+    local index = 0;
+	while true do
+		local placeKey = string.format(key .. ".place(%d)", index)
+		if not hasXMLProperty(xmlFile, placeKey) then
+			break
+        end
+        
+        local num = getXMLInt(xmlFile, placeKey .. "#num");
+        local fillLevel = getXMLInt(xmlFile, placeKey .. "#fillLevel");
+        local activeFillTypeIndex = getXMLInt(xmlFile, placeKey .. "#activeFillTypeIndex");
+
+        if activeFillTypeIndex ~= -1 then
+            for _,place in pairs(self.places) do
+                if place.number == num then
+                    place.activeFillTypeIndex = activeFillTypeIndex;
+                    place.shovelTrigger.fillTypeIndex = activeFillTypeIndex;
+                    local material = self.materials[g_fillTypeManager:getFillTypeNameByIndex(activeFillTypeIndex):lower()];            
+                    if material ~= nil then
+                        for _,mover in pairs(place.movers.movers) do
+                            setMaterial(mover.node, material, 0);
+                        end;
+                    end;
+                    place.fillLevel = fillLevel;
+                    place.movers:updateMovers(place.fillLevel);
+                    place.digitalDisplays:updateLevelDisplays(place.fillLevel, place.capacity);                
+                    break;
+                end;
+            end;
+        end;
+
+        index = index + 1;
+    end;
 
 	return true;
 end;
 
 function GC_DynamicStorage:saveToXMLFile(xmlFile, key, usedModNames)
-	
+	if not self.isPlaceable then
+		key = string.format("%s.dynamicStorage", key);
+		setXMLInt(xmlFile, key .. "#farmId", self:getOwnerFarmId());
+    end
+    
+    setXMLInt(xmlFile, key .. "#activeUnloadingBox", self.activeUnloadingBox);
+
+	local index = 0;
+    for _, place in pairs(self.places) do
+        local placeKey = string.format("%s.place(%d)", key, index);
+        setXMLInt(xmlFile, placeKey .. "#num", place.number);
+        setXMLInt(xmlFile, placeKey .. "#fillLevel", place.fillLevel);
+        setXMLInt(xmlFile, placeKey .. "#activeFillTypeIndex", place.activeFillTypeIndex);
+        index = index + 1;
+    end;
 end;
 
 function GC_DynamicStorage:update(dt) end;
@@ -283,45 +356,48 @@ end;
 
 function GC_DynamicStorage:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, toolType, fillPositionData, triggerId)
     if fillLevelDelta > 0 then
-        local place = self.places[self.activeUnloadingBox];
-        if place.fillLevel == 0 then
-            
-            place.activeFillTypeIndex = fillTypeIndex;
-            place.shovelFillTrigger.fillTypeIndex = fillTypeIndex;
-            local material = self.materials[g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex):lower()];            
-            if material ~= nil then
-                for _,mover in pairs(place.movers.movers) do
-                    setMaterial(mover.node, material, 0);
-                end;
-            end;
-        end;
-
-        if place.activeFillTypeIndex == fillTypeIndex then
-            place.fillLevel = place.fillLevel + fillLevelDelta;      
-            place.movers:updateMovers(place.fillLevel);
-            place.digitalDisplays:updateLevelDisplays(place.fillLevel, place.capacity);
-            
-            if self.isServer and raiseFlags ~= false then
-                self:raiseDirtyFlags(self.dynamicStorageDirtyFlag);
-            end;
+        self:updatePlace(self.places[self.activeUnloadingBox], self.places[self.activeUnloadingBox].fillLevel + fillLevelDelta, fillTypeIndex);
+        if self.isServer then
+            self:raiseDirtyFlags(self.dynamicStorageDirtyFlag);
         end;
     end;
 end;
 
-function GC_DynamicStorage:removeFillLevel(farmId, fillLevelDelta, fillTypeIndex, triggerId)
+function GC_DynamicStorage:removeFillLevel(farmId, fillLevelDelta, fillTypeIndex, extraParamater)
     if fillLevelDelta > 0 then
-        local place = self.places[self.activeLoadingBox];
-        place.fillLevel = place.fillLevel - fillLevelDelta;      
-        place.movers:updateMovers(place.fillLevel);
-        place.digitalDisplays:updateLevelDisplays(place.fillLevel, place.capacity);
+        local place;
+        if extraParamater ~= nil then
+            place = self.places[extraParamater];
+        else
+            place = self.places[self.activeLoadingBox];
+        end;
+        self:updatePlace(place, place.fillLevel - fillLevelDelta, fillTypeIndex);
         
-        if self.isServer and raiseFlags ~= false then
+        if self.isServer then
             self:raiseDirtyFlags(self.dynamicStorageDirtyFlag);
         end;
         return place.fillLevel;
     end;
 	return 0;
 end;
+
+function GC_DynamicStorage:updatePlace(place, fillLevel, fillTypeIndex)    
+    if place.fillLevel == 0 and fillLevel > 0 then        
+        place.activeFillTypeIndex = fillTypeIndex;
+        place.shovelTrigger.fillTypeIndex = fillTypeIndex;
+        local material = self.materials[g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex):lower()];            
+        if material ~= nil then
+            for _,mover in pairs(place.movers.movers) do
+                setMaterial(mover.node, material, 0);
+            end;
+        end;
+    end;
+    if place.activeFillTypeIndex == fillTypeIndex then
+        place.fillLevel = fillLevel;      
+        place.movers:updateMovers(place.fillLevel);
+        place.digitalDisplays:updateLevelDisplays(place.fillLevel, place.capacity);        
+    end;
+end
 
 function GC_DynamicStorage:getProvidedFillTypes()
 	return self.fillTypes;
@@ -343,11 +419,21 @@ function GC_DynamicStorage:getNumOfPlaces()
 end;
 
 function GC_DynamicStorage:setActiveUnloadingBox(number)
-    self.activeUnloadingBox = Utils.getNoNil(number, 1);
+	self:setActiveUnloadingBoxEvent({number}, noEventSend);
+end;
+
+function GC_DynamicStorage:setActiveUnloadingBoxEvent(data, noEventSend)
+	g_company.eventManager:createEvent(self.eventId_setActiveUnloadingBox, data, false, noEventSend);
+    self.activeUnloadingBox = Utils.getNoNil(data[1], 1);
 end;
 
 function GC_DynamicStorage:setActiveLoadingBox(number)
-    self.activeLoadingBox = Utils.getNoNil(number, 1);
+	self:setActiveLoadingBoxEvent({number}, noEventSend);
+end;
+
+function GC_DynamicStorage:setActiveLoadingBoxEvent(data, noEventSend)
+	g_company.eventManager:createEvent(self.eventId_setActiveLoadingBox, data, false, noEventSend);
+    self.activeLoadingBox = Utils.getNoNil(data[1], 1);
 end;
 
 function GC_DynamicStorage:onActivableObject()
@@ -378,7 +464,7 @@ function GC_DynamicStorage:loadingTriggerOnActivateObject()
         local gui = g_company.gui:openGuiWithData("gc_dynamicStorage", false, self, false);
         gui.classGui:setCloseCallback(self, self.loadingTriggerOnActivateObjectCallback);
     else
-		self.loadingTrigger:setIsLoading(false);
+        self.loadingTrigger:setIsLoading(false);
     end;
 	g_currentMission:addActivatableObject(self.loadingTrigger);
 end
