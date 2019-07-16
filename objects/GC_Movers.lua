@@ -284,7 +284,7 @@ function GC_Movers:setMover(mover, fillLevel)
 		if fillLevel > mover.startTrans then
 			mover.transReset = true
 
-			if fillLevel < mover.stopTrans then
+			if fillLevel <= mover.stopTrans then
 				local trans = {}
 				local factor = (fillLevel-mover.startTrans) / (mover.stopTrans-mover.startTrans)
 				for i = 1, 3 do
@@ -304,7 +304,7 @@ function GC_Movers:setMover(mover, fillLevel)
 		if fillLevel > mover.startRot then
 			mover.rotReset = true
 
-			if fillLevel < mover.stopRot then
+			if fillLevel <= mover.stopRot then
 				local rot = {}
 				local factor = (fillLevel-mover.startRot) / (mover.stopRot-mover.startRot)
 				for i = 1, 3 do
@@ -325,7 +325,7 @@ function GC_Movers:setMover(mover, fillLevel)
 		if fillLevel > mover.startScale then
 			mover.scaleReset = true
 
-			if fillLevel < mover.stopScale then
+			if fillLevel <= mover.stopScale then
 				local scale = {}
 				local factor = (fillLevel-mover.startScale) / (mover.stopScale-mover.startScale)
 				for i = 1, 3 do
@@ -346,7 +346,7 @@ function GC_Movers:setMover(mover, fillLevel)
 		if fillLevel >= mover.startColourChange then
 			mover.colourReset = true
 
-			if fillLevel < mover.stopColourChange then
+			if fillLevel <= mover.stopColourChange then
 				local colourScale = {0, 0, 0}
 				local factor = (fillLevel - mover.startColourChange) / (mover.stopColourChange - mover.startColourChange)
 				for i = 1, 3 do
