@@ -37,7 +37,7 @@ end;
 function GC_TreeTypeManager:loadFromXML(modName, xmlFile)
 
     local key = "globalCompany.treeTypeManager";
-    if hasXMLProperty(xmlFile, key) then
+    if not hasXMLProperty(xmlFile, key) then
         return;
     end;
     
@@ -47,12 +47,36 @@ function GC_TreeTypeManager:loadFromXML(modName, xmlFile)
     end;
 
     local path = g_company.utils.createModPath(modName, filename);
-
+    
     if not fileExists(path) then
         return;
     end;
 
     local xmlFile = loadXMLFile("map", path);
 
-    XMLUtil.loadDataFromMapXML(xmlFile, "treeTypes", g_modsDirectory .. modName, g_treePlantManager, g_treePlantManager.loadTreeTypes, nil, g_modsDirectory .. modName)
+    local i = 0
+    while true do
+        local xmlKey = string.format("map.treeTypes.treeType(%d)", i);
+        if not hasXMLProperty(xmlFile, xmlKey) then
+            break;
+        end;
+        
+        local name = getXMLString(xmlFile, xmlKey .. "#name");
+        local nameI18N = getXMLString(xmlFile, xmlKey .. "#nameI18N");
+        local growthTimeHours = getXMLInt(xmlFile, xmlKey .. "#growthTimeHours");
+        
+        local treeFilenames = {};
+        while true do
+            local stageKey = string.format("%s.stage(%d)", xmlKey, table.getn(treeFilenames));
+            if not hasXMLProperty(xmlFile, stageKey) then
+                break;
+            end;
+            table.insert(treeFilenames, g_company.utils.createModPath(modName, getXMLString(xmlFile, stageKey .. "#filename")));
+        end;
+        g_treePlantManager:registerTreeType(name, nameI18N, treeFilenames, growthTimeHours, false)
+        
+        i = i + 1;
+    end;
+
+    --XMLUtil.loadDataFromMapXML(xmlFile, "treeTypes", g_modsDirectory .. modName, g_treePlantManager, g_treePlantManager.loadTreeTypes)
 end
