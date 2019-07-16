@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+	<GuiElement type="empty" profile="newLayer" />
+	<GuiElement type="bitmap" profile="dialogFullscreenBg" />
+
+	<GuiElement type="bitmap" profile="siloDialogBg" id="dialogElement">
+		<GuiElement type="bitmap" profile="dialogHeaderDocked">
+			<GuiElement type="text" profile="dialogHeaderText" text="" id="dialogTitleElement"/>
+		</GuiElement>
+
+		<GuiElement type="text" profile="siloDialogText" text="$l10n_ui_siloFillingDescription:" id="dialogTextElement" />
+
+		<GuiElement type="multiTextOption" profile="multiTextOptionSilo" onClick="onClickNumberToDeliver" id="numberToAddElement" focusInit="onOpen" handleFocus="true">
+			<GuiElement type="button" profile="multiTextOptionLeft" />
+			<GuiElement type="button" profile="multiTextOptionRight" />
+			<GuiElement type="text"   profile="multiTextOptionTextSilo" id="animalDescText"/>
+			<GuiElement type="bitmap" profile="multiTextOptionBgSilo" />
+			<GuiElement type="bitmap" profile="multiTextOptionSiloIcon" id="animalTypeIcon"/>
+		</GuiElement>
+
+		<GuiElement type="bitmap" profile="siloDialogMessageBg" id="messageBackground">
+			<GuiElement type="text" profile="siloDialogMessage" text="$l10n_warning_noFreeSpaceHere" />
+		</GuiElement>
+
+		<GuiElement type="flowLayout" profile="buttonBoxDialog" id="buttonsPC">
+			<GuiElement type="button" profile="buttonOK" text="$l10n_button_start" onClick="onClickOk" id="yesButton" />
+			<GuiElement type="button" profile="buttonBack" text="$l10n_button_back" onClick="onClickBack" id="noButton" />
+		</GuiElement>
+	</GuiElement>
+</GUI>

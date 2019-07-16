@@ -26,7 +26,7 @@
 
 		<!-- Settings -->
 		<e k="GC_settings_header" v="GlobalCompany - Settings"/>
-		<e k="GC_settings1_title" v="Activate Place Anywhere"/>
+		<e k="GC_settings1_title" v="Activate Extended Placeable"/>
 		<e k="GC_settings2_title" v="Show Object Info"/>
 		<e k="GC_settings3_title" v="Horse Helper ($300 / Horse / Day)"/>
 		<e k="GC_settings4_title" v="Activate More Trees"/>
@@ -63,6 +63,8 @@
 		
 		<e k="GC_Open_Product_Menu" v="Open product menu"/>
 		<e k="GC_Open_Overview_Menu" v="Open overview menu"/>
+		
+		<e k="GC_Factory_Animal_Dialogue" v="Select the number of animals to unload to factory."/>
 
 		<e k="GC_gui_disabled" v="Disabled"/>
 		<e k="GC_gui_add" v="Add"/>
@@ -71,7 +73,7 @@
 		<e k="GC_gui_percent" v="Percent"/>
 		<e k="GC_gui_lifeTimeIncome" v="Lifetime Income"/>
 		<e k="GC_gui_changeFactoryTitle" v="Enter new factory reference name below."/>
-		
+
 		<e k="GC_gui_placeableObject" v="Placeable Object"/>
 		<e k="GC_gui_farmlandObject" v="Farmland Object"/>
 		
@@ -124,7 +126,7 @@ Cost:  %s"/>
 		<e k="GC_dynamicStorage_gui_header_loading" v="Select charging box"/>
 		<e k="GC_dynamicStorage_gui_info_unloading" v="Choose in which box should be unloaded. Note that in each box only one fruit can be unloaded."/>
 		<e k="GC_dynamicStorage_gui_info_loading" v="Choose from which box to load."/>
-		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s Liter"/>
+		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s Litre"/>
 		<e k="GC_dynamicStorage_gui_empty" v="empty"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Confirm unloading position"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Confirm charging box"/>

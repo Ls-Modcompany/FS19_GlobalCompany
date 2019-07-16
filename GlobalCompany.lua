@@ -217,11 +217,6 @@ function GlobalCompany.removeUpdateable(target, update)
 	end;
 end;
 
---|| Parameters ||--
--- function GlobalCompany.addXmlLoad(target)
-	-- GlobalCompany.xmlLoads[target] = {target=target};
--- end;
-
 --| Load Source Files |--
 function GlobalCompany.loadSourceFiles()
 	if GlobalCompany.initialLoadComplete ~= nil then
@@ -246,17 +241,16 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "GlobalCompanyGui.lua");
 
 	--|| Objects ||--
-	source(GlobalCompany.dir .. "objects/GC_Baler.lua");
+	-- source(GlobalCompany.dir .. "objects/GC_Baler.lua");
 	source(GlobalCompany.dir .. "objects/GC_Sounds.lua");
 	source(GlobalCompany.dir .. "objects/GC_Movers.lua");
 	source(GlobalCompany.dir .. "objects/GC_Shaders.lua");
 	source(GlobalCompany.dir .. "objects/GC_Effects.lua");
 	source(GlobalCompany.dir .. "objects/GC_Lighting.lua");
 	source(GlobalCompany.dir .. "objects/GC_Conveyor.lua");
-	source(GlobalCompany.dir .. "objects/GC_MovingPart.lua");
+	-- source(GlobalCompany.dir .. "objects/GC_MovingPart.lua");
 	source(GlobalCompany.dir .. "objects/GC_FillVolume.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicHeap.lua");
-	--source(GlobalCompany.dir .. "objects/GC_BaleShreader.lua");
 	source(GlobalCompany.dir .. "objects/GC_DirtyObjects.lua");
 	source(GlobalCompany.dir .. "objects/GC_PalletCreator.lua");
 	source(GlobalCompany.dir .. "objects/GC_ObjectSpawner.lua");
@@ -268,10 +262,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_VisibilityNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_AnimationManager.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
-	--source(GlobalCompany.dir .. "objects/GC_DynamicPalletAreas.lua");
-	--source(GlobalCompany.dir .. "objects/GC_Greenhouse.lua");
-	--source(GlobalCompany.dir .. "objects/GC_FuelStation.lua");
-	source(GlobalCompany.dir .. "objects/GC_DynamicStorage.lua");
+	-- source(GlobalCompany.dir .. "objects/GC_DynamicStorage.lua");
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
@@ -280,15 +271,12 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "triggers/GC_LoadingTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_UnloadingTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_ShovelFillTrigger.lua");
-	--source(GlobalCompany.dir .. "triggers/GC_PalletExtendedTrigger.lua");
+	source(GlobalCompany.dir .. "triggers/GC_AnimalLoadingTrigger.lua");
 
 	--|| Placeables ||--
-	source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
-	--source(GlobalCompany.dir .. "placeables/GC_BaleShreaderPlaceable.lua");
+	-- source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");
-	--source(GlobalCompany.dir .. "placeables/GC_GreenhousePlaceable.lua");
-	--source(GlobalCompany.dir .. "placeables/GC_FuelStationPlaceable.lua");
-	source(GlobalCompany.dir .. "placeables/GC_DynamicStoragePlaceable.lua");
+	-- source(GlobalCompany.dir .. "placeables/GC_DynamicStoragePlaceable.lua");
 
 	--|| Additionals ||--
 	source(GlobalCompany.dir .. "additionals/GC_BaleAddon.lua");
@@ -300,15 +288,12 @@ function GlobalCompany.loadSourceFiles()
 	--|| Events ||--
 	source(GlobalCompany.dir .. "events/GC_PalletCreatorWarningEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_AnimationManagerStopEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_AnimalLoadingTriggerEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_AnimationManagerStartEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryStateEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryCustomTitleEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactorySpawnPalletEvent.lua");
-	source(GlobalCompany.dir .. "events/GC_ProductionFactoryProductPurchaseEvent.lua");
-
-	--|| Specializations ||--
-	--source(GlobalCompany.dir .. "specializations/PalletExtended.lua");
-	
+	source(GlobalCompany.dir .. "events/GC_ProductionFactoryProductPurchaseEvent.lua");	
 end;
 
 --| Add Base GC Placeables |--
@@ -319,13 +304,9 @@ function GlobalCompany.loadPlaceables()
 
 	local placeablesDir = GlobalCompany.dir .. "placeables/";
 
-	GlobalCompany:addPlaceableType("GC_BalerPlaceable", "GC_BalerPlaceable", placeablesDir .. "GC_BalerPlaceable.lua");
-	GlobalCompany:addPlaceableType("GC_DynamicStoragePlaceable", "GC_DynamicStoragePlaceable", placeablesDir .. "GC_DynamicStoragePlaceable.lua");
+	-- GlobalCompany:addPlaceableType("GC_BalerPlaceable", "GC_BalerPlaceable", placeablesDir .. "GC_BalerPlaceable.lua");
+	-- GlobalCompany:addPlaceableType("GC_DynamicStoragePlaceable", "GC_DynamicStoragePlaceable", placeablesDir .. "GC_DynamicStoragePlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_ProductionFactoryPlaceable", "GC_ProductionFactoryPlaceable", placeablesDir .. "GC_ProductionFactoryPlaceable.lua");
-	
-	--GlobalCompany:addPlaceableType("GC_GreenhousePlaceable", "GC_GreenhousePlaceable", placeablesDir .. "GC_GreenhousePlaceable.lua");
-	--GlobalCompany:addPlaceableType("GC_FuelStationPlaceable", "GC_FuelStationPlaceable", placeablesDir .. "GC_FuelStationPlaceable.lua");
-	--GlobalCompany:addPlaceableType("GC_BaleShreaderPlaceable", "GC_BaleShreaderPlaceable", placeablesDir .. "GC_BaleShreaderPlaceable.lua");
 end;
 
 --| Main |--
@@ -396,11 +377,6 @@ function GlobalCompany:update(dt)
 			g_company.fillLevelsDisplay:update(dt)
 		end
 	end
-
-	--can enable for testing!
-	--if g_currentMission.missionInfo.timeScale >= 120 then
-	--	g_currentMission.missionInfo.timeScale = 900;
-	--end;
 end;
 
 function GlobalCompany:draw()
@@ -465,6 +441,14 @@ function GlobalCompany.loadBaseGameGuiFiles(directory)
 			local factoryDialog = GC_ProductionFactoryGui:new(g_i18n, g_messageCenter)
 			g_gui:loadGui(directory .. "GC_ProductionFactoryGui.xml", "GC_ProductionFactoryDialog", factoryDialog)
 			g_company.productionFactoryDialog = factoryDialog
+		end
+		
+		if g_company.animalDeliveryDialog == nil then
+			source(directory .. "GC_AnimalDeliveryDialog.lua")
+			
+			local animalDeliveryDialog = GC_AnimalDeliveryDialog:new()
+			g_gui:loadGui(directory .. "GC_AnimalDeliveryDialog.xml", "GC_AnimalDeliveryDialog", animalDeliveryDialog)
+			g_company.animalDeliveryDialog = animalDeliveryDialog
 		end
 	end
 end

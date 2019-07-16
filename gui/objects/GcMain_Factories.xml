@@ -19,6 +19,7 @@
 		<GuiElement type="image" template="gcMenuFactoriesOverviewImageBackground">
 			<GuiElement type="image" template="gcMenuFactoriesOverviewImage" id="gui_factoryImageLarge" />
 			<GuiElement type="text" template="gcMenuFactoriesOverviewTitleText" text="$l10n_GC_gui_overview" id="gui_factoryTitleText"/>
+			<GuiElement type="text" template="gcMenuFactoriesOverviewNameText" text="- - - - - -" id="gui_factoryNameText"/>
 
 			<GuiElement type="button" template="gcMenuFactoriesVisitButton" id="gui_factoryVisitButton" onClick="onClickOpenOverview" text="$l10n_GC_Open_Overview_Menu"/>
 			<GuiElement type="button" template="gcMenuFactoriesRenameButton" id="gui_factoryRenameButton" onClick="onClickRenameFactory" text="$l10n_button_rename"/>
