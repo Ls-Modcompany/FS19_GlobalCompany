@@ -86,6 +86,7 @@ function GlobalCompany.initialLoad()
 
 		g_company.farmlandOwnerListener = GC_FarmlandOwnerListener:new();
 		g_company.fillTypeManager = GC_FillTypeManager:new();
+		g_company.treeTypeManager = GC_TreeTypeManager:new();
 
 		GlobalCompany.loadEnviroment(modNameCurrent, GlobalCompany.dir .. "xml/globalCompany.xml", false);
 		g_company.modManager:initSelectedMods();
@@ -95,6 +96,7 @@ function GlobalCompany.initialLoad()
 		for modName, xmlFile in pairs(GlobalCompany.environments) do
 			g_company.shopManager:loadFromXML(modName, xmlFile);
 			g_company.fillTypeManager:loadFromXML(modName, xmlFile);
+			g_company.treeTypeManager:loadFromXML(modName, xmlFile);
 
 			if modName == modNameCurrent then
 				xmlFileCurrentMod = xmlFile;
@@ -236,6 +238,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "utils/GC_specializations.lua");
 	source(GlobalCompany.dir .. "utils/GC_FarmlandOwnerListener.lua");
 	source(GlobalCompany.dir .. "utils/GC_FillTypeManager.lua");
+	source(GlobalCompany.dir .. "utils/GC_TreeTypeManager.lua");
 
 	--|| Gui ||--
 	source(GlobalCompany.dir .. "GlobalCompanyGui.lua");
