@@ -153,6 +153,8 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
         self.loadingTrigger = loadingTrigger;
     end;
   
+    self.placeEffectsAreActive = false;
+
     i = 0;
     while true do
         local placeKey = string.format("%s.places.place(%d)", xmlKey, i);
@@ -184,7 +186,33 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
                 place.digitalDisplays:updateLevelDisplays(place.fillLevel, place.capacity);
             end;
         end;
+        
+        if self.isClient then
+            place.unloadingEffects = g_effectManager:loadEffect(xmlFile, placeKey .. ".loading.effects", nodeId, self, self.i3dMappings);
+            place.unloadingEffectsTimer = 0;
+            
+			local fillSoundNode = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, xmlKey .. ".loading.sounds#fillSoundNode"), self.i3dMappings)
+            local fillSoundIdentifier = getXMLString(xmlFile, placeKey .. ".loading.sounds#fillSoundIdentifier")
+			if fillSoundIdentifier ~= nil then
+				local xmlSoundFile = loadXMLFile("mapXML", g_currentMission.missionInfo.mapSoundXmlFilename)
+				if xmlSoundFile ~= nil and xmlSoundFile ~= 0 then
+					local directory = g_currentMission.baseDirectory
+					local modName, baseDirectory = Utils.getModNameAndBaseDirectory(g_currentMission.missionInfo.mapSoundXmlFilename)
+					if modName ~= nil then
+						directory = baseDirectory .. modName
+					end
 
+					place.samplesLoad = g_soundManager:loadSampleFromXML(xmlSoundFile, "sound.object", fillSoundIdentifier, directory, getRootNode(), 0, AudioGroup.ENVIRONMENT, nil, nil)
+					if self.samplesLoad ~= nil then
+						link(nodeId, self.samplesLoad.soundNode)
+						setTranslation(self.samplesLoad.soundNode, 0, 0, 0)
+					end
+
+					delete(xmlSoundFile)
+                end
+            end;
+        end;
+        
         table.insert(self.places, place);
         i = i + 1;
     end;
@@ -202,6 +230,8 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	self.eventId_setActiveUnloadingBox = g_company.eventManager:registerEvent(self, self.setActiveUnloadingBoxEvent);
     self.eventId_setActiveLoadingBox = g_company.eventManager:registerEvent(self, self.setActiveLoadingBoxEvent);
     
+    g_company.addRaisedUpdateable(self);
+
 	return true;
 end;
 
@@ -214,7 +244,14 @@ function GC_DynamicStorage:delete()
     end;
 	if self.vehicleInteractionActivation ~= nil then
         self.vehicleInteractionActivation:delete();
-    end;   
+    end;
+
+    if self.isClient then  
+        for _,place in pairs(self.places) do
+            g_effectManager:deleteEffects(place.unloadingEffects);
+        end;
+    end;
+
     removeTrigger(self.vehicleInteractionNode);
 	GC_DynamicStorage:superClass().delete(self);
 end;
@@ -340,7 +377,21 @@ function GC_DynamicStorage:saveToXMLFile(xmlFile, key, usedModNames)
     end;
 end;
 
-function GC_DynamicStorage:update(dt) end;
+function GC_DynamicStorage:update(dt)     
+    if self.isClient and self.placeEffectsAreActive then
+        for _,place in pairs(self.places) do
+            if place.unloadingEffectsTimer > 0 then
+                place.unloadingEffectsTimer = place.unloadingEffectsTimer - dt;
+                if place.unloadingEffectsTimer <= 0 then
+                    g_effectManager:stopEffects(place.unloadingEffects);
+                    g_soundManager:stopSample(place.samplesLoad);
+                else
+                    self:raiseUpdate();
+                end;
+            end;
+        end;
+    end;
+end;
 
 function GC_DynamicStorage:getFreeCapacity(fillTypeIndex, farmId, triggerId)
     if self.places[self.activeUnloadingBox].fillLevel > 0 then
@@ -357,6 +408,16 @@ end;
 function GC_DynamicStorage:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, toolType, fillPositionData, triggerId)
     if fillLevelDelta > 0 then
         self:updatePlace(self.places[self.activeUnloadingBox], self.places[self.activeUnloadingBox].fillLevel + fillLevelDelta, fillTypeIndex);
+
+        if self.isClient and not self.places[self.activeUnloadingBox].unloadingEffectsIsOn then
+            g_effectManager:setFillType(self.places[self.activeUnloadingBox].unloadingEffects, fillTypeIndex);
+            g_effectManager:startEffects(self.places[self.activeUnloadingBox].unloadingEffects);
+            g_soundManager:playSample(self.places[self.activeUnloadingBox].samplesLoad);
+            self.places[self.activeUnloadingBox].unloadingEffectsTimer = 1000;
+            self.placeEffectsAreActive = true;
+            self:raiseUpdate();
+        end;
+
         if self.isServer then
             self:raiseDirtyFlags(self.dynamicStorageDirtyFlag);
         end;
