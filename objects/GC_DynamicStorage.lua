@@ -3,14 +3,14 @@
 --
 -- @Interface: --
 -- @Author: LS-Modcompany / kevink98
--- @Date: 04.06.2019
+-- @Date: 24.07.2019
 -- @Version: 1.0.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
 --
--- 	v1.0.0.0 (04.06.2019):
+-- 	v1.0.0.0 (24.07.2019):
 -- 		- initial fs19 (kevink98)
 --
 --
