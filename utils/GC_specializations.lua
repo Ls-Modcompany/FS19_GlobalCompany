@@ -17,7 +17,7 @@
 -- 		- initial fs19 (GtX)
 -- 
 -- Notes:
--- 
+-- 		'registerSpecializations' with attribute 'onlyLoad' and 'loadSpecializations' don't work any more with the actual patch!
 -- 
 -- ToDo:
 -- 
@@ -27,6 +27,7 @@ local debugIndex = g_company.debug:registerScriptName("GlobalCompany-GC_speciali
 GC_specializations = {};
 g_company.specializations = GC_specializations;
 GC_specializations.specs = {};
+GC_specializations.loadedSpecs = {};
 GC_specializations.modNeedSpec = {};
 
 function GC_specializations:loadFromXML(modName, xmlFile)
@@ -40,17 +41,21 @@ function GC_specializations:loadFromXML(modName, xmlFile)
 
 		local i = 0;
 		while true do
-			local key = string.format("%s.registerSpecializations.specialization(%d)", key, i);
-			if not hasXMLProperty(xmlFile, key) then
+			local specializationKey = string.format("%s.registerSpecializations.specialization(%d)", key, i);
+			if not hasXMLProperty(xmlFile, specializationKey) then
 				break;
 			end;	
-			GC_specializations:registerSpecialization(xmlFile, key, modName); 				
+			GC_specializations:registerSpecialization(xmlFile, specializationKey, modName); 				
 			i = i + 1;
 		end;	
 
 		i = 0;
 		while true do
 			local specializationKey = string.format("%s.loadSpecializations.specialization(%d)", key, i);
+			if not hasXMLProperty(xmlFile, specializationKey) then
+				break;
+			end;	
+			
 			local specName = getXMLString(xmlFile, specializationKey .. "#name");
 			if specName == nil then
 				break;
@@ -66,7 +71,7 @@ function GC_specializations:loadFromXML(modName, xmlFile)
 end;
 
 function GC_specializations:registerSpecialization(xmlFile, key, modName)
-	local name = getXMLString(xmlFile, string.format("%s#name", key));
+	local name = getXMLString(xmlFile, string.format("%s#name", key));	
 	local className = getXMLString(xmlFile, string.format("%s#className", key));
 	local filename = Utils.getNoNil(getXMLString(xmlFile, string.format("%s#filename", key)), "");
 	local onlyLoad = Utils.getNoNil(getXMLString(xmlFile, string.format("%s#onlyLoad", key)), false);
@@ -76,6 +81,7 @@ function GC_specializations:registerSpecialization(xmlFile, key, modName)
 		local mName = string.format("%s.%s", modName, name);	
 		local cName = string.format("%s.%s", modName, className);	
 		g_specializationManager:addSpecialization(mName, cName, filename, modName);
+		GC_specializations.loadedSpecs[name] = {modName=modName, name=name, className=className, filename=filename};	
 		
 		if GC_specializations.modNeedSpec[name] ~= nil then
 			for _, mName in pairs(GC_specializations.modNeedSpec[name])do
@@ -139,10 +145,18 @@ function GC_specializations:getCanAddSpec(vehicleType, spec, s)
 end;
 
 function GC_specializations:addNeedSpec(modName, specName)
-	if GC_specializations.modNeedSpec[specName] == nil then
-		GC_specializations.modNeedSpec[specName] = {};
+	if GC_specializations.loadedSpecs[specName] == nil then
+		if GC_specializations.modNeedSpec[specName] == nil then
+			GC_specializations.modNeedSpec[specName] = {};
+		end;
+		table.insert(GC_specializations.modNeedSpec[specName], modName);
+	else
+		local s = GC_specializations.loadedSpecs[specName];
+		local mName = string.format("%s.%s", s.modName, s.name);
+		local mNameN = string.format("%s.%s", modName, s.name);	
+		local cName = string.format("%s.%s", modName, s.className);	
+		g_specializationManager:addSpecialization(mNameN, cName, s.filename, mName);	
 	end;
-	table.insert(GC_specializations.modNeedSpec[specName], modName);
 end;
 
 GlobalCompany.addLoadable(GC_specializations, GC_specializations.load);

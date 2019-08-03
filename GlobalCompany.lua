@@ -95,6 +95,7 @@ function GlobalCompany.initialLoad()
 		for modName, xmlFile in pairs(GlobalCompany.environments) do
 			g_company.shopManager:loadFromXML(modName, xmlFile);
 			g_company.fillTypeManager:loadFromXML(modName, xmlFile);
+			g_company.densityMapHeight:loadFromXML(modName, xmlFile);
 
 			if modName == modNameCurrent then
 				xmlFileCurrentMod = xmlFile;
@@ -234,6 +235,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "utils/GC_shopManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_TriggerManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_specializations.lua");
+	source(GlobalCompany.dir .. "utils/GC_densityMapHeight.lua"); --fixed with patch 1.3 --but in patch 1.4 we need it again... thanks! :)
 	source(GlobalCompany.dir .. "utils/GC_FarmlandOwnerListener.lua");
 	source(GlobalCompany.dir .. "utils/GC_FillTypeManager.lua");
 
