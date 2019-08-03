@@ -42,7 +42,7 @@ end;
 function GC_FillTypeManager:loadFromXML(modName, xmlFile)
 
     local key = "globalCompany.fillTypeManager";
-    if hasXMLProperty(xmlFile, key) then
+    if not hasXMLProperty(xmlFile, key) then
         return;
     end;
     
@@ -59,7 +59,36 @@ function GC_FillTypeManager:loadFromXML(modName, xmlFile)
 
     local xmlFile = loadXMLFile("map", path);
 
-    XMLUtil.loadDataFromMapXML(xmlFile, "fillTypes", g_modsDirectory .. modFileName, g_fillTypeManager, g_fillTypeManager.loadFillTypes, nil, g_modsDirectory .. modFileName)
+    local i = 0
+    while true do
+        local xmlKey = string.format("map.treeTypes.treeType(%d)", i);
+        if not hasXMLProperty(xmlFile, xmlKey) then
+            break;
+        end;
+        
+        local name = getXMLString(xmlFile, xmlKey .. "#name");
+        local title = getXMLString(xmlFile, xmlKey .. "#title");
+        local showOnPriceTable = getXMLBool(xmlFile, xmlKey .. "#showOnPriceTable");
+        local pricePerLiter = getXMLFloat(xmlFile, xmlKey .. "#pricePerLiter");
+        local massPerLiter = getXMLFloat(xmlFile, xmlKey .. ".physics#massPerLiter");
+        local maxPhysicalSurfaceAngle = getXMLInt(xmlFile, xmlKey .. ".physics#maxPhysicalSurfaceAngle");        
+        local hudOverlayFilename = g_company.utils.createModPath(modName, getXMLString(xmlFile, xmlKey .. ".image#hud"));
+        local hudOverlayFilenameSmall = g_company.utils.createModPath(modName, getXMLString(xmlFile, xmlKey .. ".image#hudSmall"));
+        local palletFilename = getXMLString(xmlFile, xmlKey .. ".pallet#filename");
+       
+        local s,_ = palletFilename:find("$data");
+        if s == nil then
+            palletFilename = g_company.utils.createModPath(modName, palletFilename);
+        end;
+
+        title = g_company.languageManager:getText(title);
+
+        g_fillTypeManager:addFillType(name, title, showOnPriceTable, pricePerLiter, massPerLiter, maxPhysicalSurfaceAngle, hudOverlayFilename, hudOverlayFilenameSmall, g_company.utils.createDirPath(modName), nil, {1,1,1}, palletFilename, false);
+                
+        i = i + 1;
+    end;
+    
+    --XMLUtil.loadDataFromMapXML(xmlFile, "fillTypes", g_modsDirectory .. modFileName, g_fillTypeManager, g_fillTypeManager.loadFillTypes, nil, g_modsDirectory .. modFileName)
 end
 
 --[[
