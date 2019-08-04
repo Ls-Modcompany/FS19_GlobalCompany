@@ -124,7 +124,7 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 					if object:isa(Bale) then
 						GC_ObjectInfo.foundBale = object;
 						self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(Utils.getNoNil(g_fillTypeManager.fillTypes[object.fillType].title,"unknown"));
-						self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level'):format(object.fillLevel);
+						self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level'):format(g_company.mathUtils.round(object.fillLevel,0.01));
 						self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object, self, false));
 						self.showInfo = true;						
 					end;
@@ -132,7 +132,9 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 
 				if (hitObjectId ~= self.debugPrintObjectId) then
 					g_company.debug:writeDevDebug(self.debugData, "hitObjectId = %s, locRigidBodyType = %s", hitObjectId, locRigidBodyType);
-					-- gc_debugPrint(object, nil, 1, "ObjectInfo");
+					if g_company.debug.printLevel[6] then
+						gc_debugPrint(object, nil, 1, "ObjectInfo");
+					end;
 				end;
 
 				self.debugPrintObjectId = hitObjectId;

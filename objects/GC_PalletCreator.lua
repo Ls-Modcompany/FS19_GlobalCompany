@@ -3,12 +3,15 @@
 --
 -- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany
--- @Date: 08.03.2019
+-- @Date: 04.08.2019
 -- @Version: 1.1.1.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+--
+-- 	v1.1.1.0 (04.08.2019):
+-- 		- y offset is not taken from the node unless lower than terrain.
 --
 -- 	v1.1.0.0 (08.03.2019):
 -- 		- convert to fs19
@@ -31,6 +34,8 @@
 GC_PalletCreator = {}
 local GC_PalletCreator_mt = Class(GC_PalletCreator, Object)
 InitObjectClass(GC_PalletCreator, "GC_PalletCreator")
+
+GC_PalletCreator.ALLOW_OFFSET_ADDON = false -- Disable addon if it tries to load. Not needed when updated.
 
 GC_PalletCreator.debugIndex = g_company.debug:registerScriptName("GC_PalletCreator")
 
@@ -333,9 +338,13 @@ function GC_PalletCreator:findNextPallet()
 	else
 		if nextSpawnerToUse ~= nil then
 			self.spawnerInUse = nextSpawnerToUse.spawner
-			local x, _, z = getWorldTranslation(self.spawnerInUse)
+			local x, y, z = getWorldTranslation(self.spawnerInUse)
 			local _, ry, _ = getWorldRotation(self.spawnerInUse)
-			self.selectedPallet = g_currentMission:loadVehicle(self.palletFilename, x, nil, z, 0.5, ry, true, 0, Vehicle.PROPERTY_STATE_OWNED, self:getOwnerFarmId(), nil, nil)
+			
+			local terrainHeight = getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, x, 300, z) + 0.5
+            y = math.max(terrainHeight, y)
+
+            self.selectedPallet = g_currentMission:loadVehicle(self.palletFilename, x, y, z, 0, ry, true, 0, Vehicle.PROPERTY_STATE_OWNED, self:getOwnerFarmId(), nil, nil)
 
 			local appliedDelta = self.selectedPallet:addFillUnitFillLevel(self:getOwnerFarmId(), self.palletFillUnitIndex, self.deltaToAdd, self.palletFillTypeIndex, ToolType.UNDEFINED)
 			self.deltaToAdd = self.deltaToAdd - appliedDelta
