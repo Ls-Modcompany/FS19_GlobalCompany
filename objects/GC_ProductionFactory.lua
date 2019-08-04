@@ -2444,22 +2444,24 @@ function GC_ProductionFactory:doBulkProductSell(getPrice)
 		end
 	end
 
-	for _, outputProduct in pairs (self.outputProducts) do
-		if outputProduct.removeFillLevelOnSell then
-			local fillLevel = outputProduct.fillLevel
-			if fillLevel > 100 then
-				local lowestPrice = self:getFillTypePrice(outputProduct.fillTypeIndex, true)
+	if self.outputProducts ~= nil then
+		for _, outputProduct in pairs (self.outputProducts) do
+			if outputProduct.removeFillLevelOnSell then
+				local fillLevel = outputProduct.fillLevel
+				if fillLevel > 100 then
+					local lowestPrice = self:getFillTypePrice(outputProduct.fillTypeIndex, true)
 
-				if lowestPrice == math.huge then
-					lowestPrice = 0.5
+					if lowestPrice == math.huge then
+						lowestPrice = 0.5
+					end
+
+					local price = fillLevel * lowestPrice
+					totalSellPrice = totalSellPrice + price
 				end
 
-				local price = fillLevel * lowestPrice
-				totalSellPrice = totalSellPrice + price
-			end
-
-			if not getPrice then
-				self:updateFactoryLevels(0.0, outputProduct, outputProduct.fillTypeIndex, false)
+				if not getPrice then
+					self:updateFactoryLevels(0.0, outputProduct, outputProduct.fillTypeIndex, false)
+				end
 			end
 		end
 	end
