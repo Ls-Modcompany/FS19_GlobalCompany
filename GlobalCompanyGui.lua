@@ -3,13 +3,16 @@
 -- 
 -- @Interface: --
 -- @Author: LS-Modcompany / kevink98
--- @Date: 26.01.2019
--- @Version: 1.0.0.0
+-- @Date: 03.08.2019
+-- @Version: 1.1.0.0
 -- 
 -- @Support: LS-Modcompany
 -- 
 -- Changelog:
 --		
+-- 	v1.1.0.0 (03.08.2019):
+-- 		- fix output size at hight width resolution (3840:1080)
+--
 -- 	v1.0.0.0 ():
 -- 		- initial fs19
 -- 
@@ -875,9 +878,14 @@ function GlobalCompanyGui:getOutputSize()
 		return GlobalCompanyGui:getSizeWithFactor(1);
 	end;
 	]]--
-
-	local factor =  1920 / g_screenWidth;
-	return {g_screenWidth * factor, g_screenHeight * factor};
+	
+	if g_screenWidth / g_screenHeight > 2.3333 then
+		local factor =  g_screenHeight / g_screenWidth;
+		return {g_screenWidth * factor, g_screenHeight * factor};
+	else
+		local factor =  1920 / g_screenWidth;
+		return {g_screenWidth * factor, g_screenHeight * factor};
+	end;
 end
 
 --[[
