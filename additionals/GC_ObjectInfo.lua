@@ -117,9 +117,9 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 								if object:getFillUnitExists(fUnit[1].fillUnitIndex) then							
 									local lev = Utils.getNoNil(g_company.mathUtils.round(fUnit[1].fillLevel,0.01),0);
 									local perc = Utils.getNoNil(g_company.mathUtils.round((object:getFillUnitFillLevelPercentage(fUnit[1].fillUnitIndex) * 100),0.01),0);
-									local ft = Utils.getNoNil(g_fillTypeManager.fillTypes[fUnit[1].fillType].title,"unknown");
-									if (string.lower(ft) ~= "unknown") then
-										self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(ft);
+									local fill = Utils.getNoNil(g_fillTypeManager.fillTypes[fUnit[1].fillType].title,"unknown");
+									if (string.lower(fill) ~= "unknown") then
+										self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(fill);
 										self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level2'):format(lev, perc);
 										self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object, self, false));
 										self.showInfo = true;
