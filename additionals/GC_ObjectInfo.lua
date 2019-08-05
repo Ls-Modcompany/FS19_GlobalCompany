@@ -39,6 +39,7 @@ InitObjectClass(GC_ObjectInfo, "GC_ObjectInfo");
 GC_ObjectInfo.debugIndex = g_company.debug:registerScriptName("Gc_ObjectInfo");
 GC_ObjectInfo.foundBale = nil;
 GC_ObjectInfo.lastFoundBaleNetworkId = nil;
+GC_ObjectInfo.supportedTypes = {"pallet","genetix","attachablePallet","FS19_bresselUndLadeBigBagPack.bigBagRack"};
 
 function GC_ObjectInfo:init()
 	local self = setmetatable({}, GC_ObjectInfo_mt);
@@ -107,17 +108,24 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 		if (locRigidBodyType == "Dynamic") or (self.isMultiplayer and (locRigidBodyType == "Kinematic")) then
 			local object = g_currentMission:getNodeObject(hitObjectId);		
 			if (object~= nil) then
-				if (object.typeName == "pallet") or (object.typeName == "genetix") or (object.typeName == "attachablePallet") then
+				if (object.typeName ~= nil) then					
 					GC_ObjectInfo.foundBale = nil;
-					if (object.getFillUnits ~= nil) then
-						local fUnit = object:getFillUnits();
-						if object:getFillUnitExists(fUnit[1].fillUnitIndex) then							
-							local lev = Utils.getNoNil(g_company.mathUtils.round(fUnit[1].fillLevel,0.01),0);
-							local perc = Utils.getNoNil(g_company.mathUtils.round((object:getFillUnitFillLevelPercentage(fUnit[1].fillUnitIndex) * 100),0.01),0);
-							self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(Utils.getNoNil(g_fillTypeManager.fillTypes[fUnit[1].fillType].title,"unknown"));
-							self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level2'):format(lev, perc);
-							self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object, self, false));
-							self.showInfo = true;
+					for k, v in pairs(GC_ObjectInfo.supportedTypes) do
+						if (object.typeName == v) then
+							if (object.getFillUnits ~= nil) then
+								local fUnit = object:getFillUnits();								
+								if object:getFillUnitExists(fUnit[1].fillUnitIndex) then							
+									local lev = Utils.getNoNil(g_company.mathUtils.round(fUnit[1].fillLevel,0.01),0);
+									local perc = Utils.getNoNil(g_company.mathUtils.round((object:getFillUnitFillLevelPercentage(fUnit[1].fillUnitIndex) * 100),0.01),0);
+									local ft = Utils.getNoNil(g_fillTypeManager.fillTypes[fUnit[1].fillType].title,"unknown");
+									if (string.lower(ft) ~= "unknown") then
+										self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(ft);
+										self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level2'):format(lev, perc);
+										self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object, self, false));
+										self.showInfo = true;
+									end;
+								end;
+							end;
 						end;
 					end;
 				elseif (object.typeName == nil) and (object.fillType ~= nil) and (object.fillLevel ~= nil) then
