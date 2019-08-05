@@ -167,7 +167,7 @@ function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes
 
 			-- Animations that are activated when filling is started and stopped when filling is ended. (Source script must have active 'animationManager'! See ProductionFactory.lua)
 			-- Example: Handle and lights for a real look. (Only operates 'Client Side').
-			if self.source.animationManager ~= nil then
+			if self.source.animationManager ~= nil and hasXMLProperty(xmlFile, xmlKey .. ".actionAnimation") then
 				local fillingAnimation = self.source.animationManager:loadAnimationNameFromXML(xmlFile, xmlKey .. ".actionAnimation")
 				if fillingAnimation ~= nil then
 					self.fillingAnimation = fillingAnimation
