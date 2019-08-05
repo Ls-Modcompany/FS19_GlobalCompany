@@ -942,6 +942,10 @@ end
 
 function GC_AnimationManager:loadAnimationNameFromXML(xmlFile, xmlKey, warningExtra)
 	local animationName = getXMLString(xmlFile, xmlKey .. "#name")
+	if animationName == nil then
+		return
+	end
+
 	if self:getAnimationExists(animationName) then
 		return animationName
 	else
@@ -966,14 +970,16 @@ function GC_AnimationManager:loadAnimationNamesFromXML(xmlFile, xmlKey, warningE
 		end
 
 		local animationName = getXMLString(xmlFile, key .. "#name")
-		if self:getAnimationExists(animationName) then
-			table.insert(animationNames, animationName)
-		else
-			if warningExtra == nil then
-				warningExtra = ""
+		if animationName ~= nil then
+			if self:getAnimationExists(animationName) then
+				table.insert(animationNames, animationName)
+			else
+				if warningExtra == nil then
+					warningExtra = ""
+				end
+	
+				g_company.debug:writeModding(self.debugData, "%s Unknown animation name '%s' given at %s", warningExtra, animationName, key)
 			end
-
-			g_company.debug:writeModding(self.debugData, "%s Unknown animation name '%s' given at %s", warningExtra, animationName, key)
 		end
 
 		i = i + 1

@@ -10,6 +10,11 @@
 --
 -- Changelog:
 --
+-- 	v1.2.0.0 (04.08.2019):
+-- 		- Add option for multiple 'loadingTriggers' and 'unloadingTriggers' for each product.
+--		- Fixed access to menu and triggers for onCreate when first loading game without a save.
+--		- Added ability to set an input to be always 100%. 'registerInputProducts.inputProduct#isAlwaysFull' FillType must still be set and no 'inputMethods' can be used.
+--
 -- 	v1.1.0.0 (21.06.2019):
 -- 		- release version
 --
@@ -67,7 +72,7 @@ function GC_ProductionFactory:onCreate(transformId)
 				object:register(true)
 
 				local warningText = string.format("[FACTORY - %s]  Attribute 'farmlandId' is invalid! Factory will not operate correctly. 'farmlandId' should match area object is located at.", indexName)
-				g_company.farmlandOwnerListener:addListener(object, farmlandId, warningText)
+				g_company.farmlandOwnerListener:addListener(object, farmlandId, warningText, false)
 			else
 				g_company.debug:writeOnCreate(object.debugData, "[FACTORY - %s]  Failed to load from '%s'!", indexName, xmlFilename)
 				object:delete()
@@ -243,6 +248,8 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			inputProduct.animalFillTypeIndexs = {}
 			inputProduct.isAnimalTypes = Utils.getNoNil(getXMLBool(xmlFile, inputProductKey .. ".fillTypes#isAnimalTypes"), false)
 
+			inputProduct.isAlwaysFull = Utils.getNoNil(getXMLBool(xmlFile, inputProductKey .. "#isAlwaysFull"), false)
+
 			local j = 0
 			while true do
 				local fillTypesKey = string.format("%s.fillTypes.fillType(%d)", inputProductKey, j)
@@ -312,6 +319,11 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 						end
 
 						table.insert(concatTitles, fillTypeTitle)
+
+						-- Only need '1' fillType
+						if inputProduct.isAlwaysFull then
+							break
+						end
 					else
 						if fillType == nil then
 							if not inputProduct.isAnimalTypes then
@@ -332,7 +344,8 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				inputProduct.capacity = Utils.getNoNil(getXMLInt(xmlFile, inputProductKey .. "#capacity"), 1000)
 
 				-- Not for animals, will break the world :-)
-				if inputProduct.animalTypeToLitres == nil then
+				-- Not for 'isAlwaysFull' either as not needed.
+				if inputProduct.animalTypeToLitres == nil and not inputProduct.isAlwaysFull then
 					-- 'fixedPricePerLitre' This is the price per litre to purchase the product.
 					-- 'useSellPointPrice' The highest sell point price for the given fillType will be used.
 					-- 'purchaseMultiplier' (Default = 1.1) The multiplier to allow for transport and so it is not a easy cheat. (Min Value: 1)
@@ -365,7 +378,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				inputProduct.maximumAccepted = Utils.getNoNil(getXMLInt(xmlFile, inputProductKey .. "#maximumAccepted"), 0)
 				inputProduct.totalDelivered = 0
 
-				if hasXMLProperty(xmlFile, inputProductKey .. ".inputMethods") then
+				if not inputProduct.isAlwaysFull and hasXMLProperty(xmlFile, inputProductKey .. ".inputMethods") then
 					if self.isServer then
 						if hasXMLProperty(xmlFile, inputProductKey .. ".inputMethods.rainWaterCollector") then
 							if inputProduct.fillTypes[FillType.WATER] ~= nil then
@@ -406,31 +419,23 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 
 					local unloadingTriggerKey = inputProductKey .. ".inputMethods.unloadingTrigger"
 					if hasXMLProperty(xmlFile, unloadingTriggerKey) then
-						local name = getXMLString(xmlFile, unloadingTriggerKey .. "#name")
-						if self.registeredUnloadingTriggers[name] ~= nil then
-							self.registeredUnloadingTriggers[name].isUsed = true
-							local trigger = self.registeredUnloadingTriggers[name].trigger
-							local triggerId = trigger.extraParamater
+						self:setUnloadingTrigger(inputProduct, xmlFile, unloadingTriggerKey, inputProductName)
+					else
+						-- Only if there is no 'single' trigger check for multiple triggers.
+						-- Done like this so old mods still work no errors or updates needed.
+						local multiUnloadingTriggerKey = inputProductKey .. ".inputMethods.unloadingTriggers"
+						if hasXMLProperty(xmlFile, multiUnloadingTriggerKey) then
+							local multiIn = 0
+							while true do
+								local multiInKey = string.format("%s.unloadingTrigger(%d)", multiUnloadingTriggerKey, multiIn)
+								if not hasXMLProperty(xmlFile, multiInKey) then
+									break
+								end
 
-							local canAdd = true
-							if trigger.fillTypes ~= nil then
-								for index, _ in pairs (inputProduct.fillTypes) do
-									if trigger.fillTypes[index] ~= nil then
-										canAdd = false
-										break
-									end
-								end
+								self:setUnloadingTrigger(inputProduct, xmlFile, multiInKey, inputProductName)
+
+								multiIn = multiIn + 1
 							end
-							if canAdd then
-								for index, _ in pairs (inputProduct.fillTypes) do
-									trigger:setAcceptedFillTypeState(index, true)
-									self.triggerIdToInputProductId[triggerId][index] = inputProductId
-								end
-							else
-								g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Can not add Input Product '%s' to Unloading Trigger '%s'! FillType '%s' already exists.", indexName, outputProductName, name, fillTypeName)
-							end
-						else
-							g_company.debug:writeModding(self.debugData, "[FACTORY - %s] unloadingTrigger '%s could not be found at 'productionFactory.registerUnloadingTriggers'! You first need to register this trigger.", indexName, name)
 						end
 					end
 
@@ -604,27 +609,27 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 
 							local loadingTriggerKey = outputMethodsKey .. ".loadingTrigger"
 							if hasXMLProperty(xmlFile, loadingTriggerKey) then
-								local name = getXMLString(xmlFile, loadingTriggerKey .. "#name")
-								local stationName = getXMLString(xmlFile, loadingTriggerKey .. "#stationName")
-								if self.registeredLoadingTriggers[name] ~= nil then
-									self.registeredLoadingTriggers[name].isUsed = true
-									local trigger = self.registeredLoadingTriggers[name].trigger
-									local triggerId = trigger.extraParamater
-
-									if self.providedFillTypes[triggerId][fillTypeIndex] == nil then
-										self.providedFillTypes[triggerId][fillTypeIndex] = true
-										if stationName ~= nil then
-											trigger:setStationName(stationName)
+								if self:setLoadingTrigger(outputProduct, xmlFile, loadingTriggerKey, outputProductName, fillTypeIndex) then
+									table.insert(triggersLoaded, "loadingTrigger")
+								end
+							else
+								-- Only if there is no 'single' trigger check for multiple triggers.
+								-- Done like this so old mods still work no errors or updates needed.
+								local multiLoadingTriggerKey = outputMethodsKey .. ".loadingTriggers"
+								if hasXMLProperty(xmlFile, multiLoadingTriggerKey) then
+									local multiOut = 0
+									while true do
+										local multiOutKey = string.format("%s.loadingTrigger(%d)", multiLoadingTriggerKey, multiOut)
+										if not hasXMLProperty(xmlFile, multiOutKey) then
+											break
 										end
 
-										self.triggerIdToOutputProductId[triggerId][fillTypeIndex] = outputProductId
+										if self:setLoadingTrigger(outputProduct, xmlFile, multiOutKey, outputProductName, fillTypeIndex) then
+											table.insert(triggersLoaded, "loadingTrigger")
+										end
 
-										table.insert(triggersLoaded, "loadingTrigger")
-									else
-										g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Can not add Output Product '%s' to Loading Trigger '%s'! FillType '%s' already exists.", indexName, outputProductName, name, fillTypeName)
+										multiOut = multiOut + 1
 									end
-								else
-									g_company.debug:writeModding(self.debugData, "[FACTORY - %s] loadingTrigger '%s could not be found at 'productionFactory.registerLoadingTriggers'! You first need to register this trigger.", indexName, name)
 								end
 							end
 
@@ -942,6 +947,73 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 	return canLoad
 end
 
+function GC_ProductionFactory:setUnloadingTrigger(inputProduct, xmlFile, unloadingTriggerKey, inputProductName)
+	if inputProduct ~= nil then
+		local name = getXMLString(xmlFile, unloadingTriggerKey .. "#name")
+		if self.registeredUnloadingTriggers[name] ~= nil then
+			self.registeredUnloadingTriggers[name].isUsed = true
+			local trigger = self.registeredUnloadingTriggers[name].trigger
+			local triggerId = trigger.extraParamater
+
+			local canAdd = true
+			local fillTypeNameError = ""
+			if trigger.fillTypes ~= nil then
+				for index, _ in pairs (inputProduct.fillTypes) do
+					if trigger.fillTypes[index] ~= nil then
+						canAdd = false
+						fillTypeNameError =  g_fillTypeManager:getFillTypeNameByIndex(index)
+						break
+					end
+				end
+			end
+			if canAdd then
+				for index, _ in pairs (inputProduct.fillTypes) do
+					trigger:setAcceptedFillTypeState(index, true)
+					self.triggerIdToInputProductId[triggerId][index] = inputProduct.id
+				end
+
+				return true
+			else
+				g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Can not add Input Product '%s' to Unloading Trigger '%s'! FillType '%s' already exists.", self.indexName, inputProductName, name, fillTypeNameError)
+			end
+		else
+			g_company.debug:writeModding(self.debugData, "[FACTORY - %s] unloadingTrigger '%s could not be found at 'productionFactory.registerUnloadingTriggers'! You first need to register this trigger.", self.indexName, name)
+		end
+	end
+
+	return false
+end
+
+function GC_ProductionFactory:setLoadingTrigger(outputProduct, xmlFile, loadingTriggerKey, outputProductName, fillTypeIndex)
+	if outputProduct ~= nil then
+		local name = getXMLString(xmlFile, loadingTriggerKey .. "#name")
+		local stationName = getXMLString(xmlFile, loadingTriggerKey .. "#stationName")
+		if self.registeredLoadingTriggers[name] ~= nil then
+			self.registeredLoadingTriggers[name].isUsed = true
+			local trigger = self.registeredLoadingTriggers[name].trigger
+			local triggerId = trigger.extraParamater
+
+			if self.providedFillTypes[triggerId][fillTypeIndex] == nil then
+				self.providedFillTypes[triggerId][fillTypeIndex] = true
+				if stationName ~= nil then
+					trigger:setStationName(stationName)
+				end
+
+				self.triggerIdToOutputProductId[triggerId][fillTypeIndex] = outputProduct.id
+
+				return true
+			else
+				local fillTypeName = g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex)
+				g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Can not add Output Product '%s' to Loading Trigger '%s'! FillType '%s' already exists.", self.indexName, outputProductName, name, fillTypeName)
+			end
+		else
+			g_company.debug:writeModding(self.debugData, "[FACTORY - %s] loadingTrigger '%s could not be found at 'productionFactory.registerLoadingTriggers'! You first need to register this trigger.", self.indexName, name)
+		end
+	end
+
+	return false
+end
+
 function GC_ProductionFactory:loadProductParts(xmlFile, key, product)
 	if self.isClient then
 		local fillTypeName = g_fillTypeManager.indexToName[product.lastFillTypeIndex]
@@ -1008,7 +1080,7 @@ function GC_ProductionFactory:loadOperatingParts(xmlFile, key, parent, isProduct
 			end
 		end
 
-		if self.animationManager ~= nil then
+		if self.animationManager ~= nil and hasXMLProperty(xmlFile, key .. ".animations") then
 			local xmlKey = string.format("%s.animations.animation", key)
 			local warningExtra = string.format("[FACTORY - %s]", self.indexName)
 			local operateAnimations = self.animationManager:loadAnimationNamesFromXML(xmlFile, xmlKey, warningExtra)
@@ -1537,7 +1609,9 @@ function GC_ProductionFactory:hourChanged()
 								local input = productLine.inputs[i]
 								local amount = producedFactor * productLine.inputsPercent[i]
 
-								self:updateFactoryLevels(input.fillLevel - amount, input, input.lastFillTypeIndex, false)
+								if not input.isAlwaysFull then
+									self:updateFactoryLevels(input.fillLevel - amount, input, input.lastFillTypeIndex, false)
+								end
 
 								if input.fillLevel <= 0 then
 									stopProductLine = true
@@ -1639,7 +1713,9 @@ function GC_ProductionFactory:minuteChanged()
 									local input = productLine.inputs[i]
 									local amount = producedFactor * productLine.inputsPercent[i]
 
-									self:updateFactoryLevels(input.fillLevel - amount, input, input.lastFillTypeIndex, false)
+									if not input.isAlwaysFull then
+										self:updateFactoryLevels(input.fillLevel - amount, input, input.lastFillTypeIndex, false)
+									end
 
 									local income = productLine.inputsIncome[i]
 									if income ~= nil and income.pricePerLiter > 0.0 then
@@ -1736,6 +1812,11 @@ function GC_ProductionFactory:getHasInputProducts(productLine, factor)
 	if productLine ~= nil and productLine.inputs ~= nil and factor ~= nil then
 		for i = 1, #productLine.inputs do
 			local input = productLine.inputs[i]
+
+			if input.isAlwaysFull and input.fillLevel ~= input.capacity then
+				input.fillLevel = self:getInputCapacity(input)
+			end
+
 			local productNeeded = productLine.inputsPercent[i] * factor
 			local productToUse = math.min(productNeeded, input.fillLevel)
 
@@ -2365,8 +2446,8 @@ function GC_ProductionFactory:changeNumberToSpawn(output, delta, numberToSpawn)
 	end
 end
 
-function GC_ProductionFactory:onSetFarmlandStateChanged(farmId)
-	self:setOwnerFarmId(farmId, false)
+function GC_ProductionFactory:onSetFarmlandStateChanged(farmId, noEventSend)
+	self:setOwnerFarmId(farmId, noEventSend)
 end
 
 function GC_ProductionFactory:setOwnerFarmId(ownerFarmId, noEventSend)
@@ -2376,6 +2457,13 @@ function GC_ProductionFactory:setOwnerFarmId(ownerFarmId, noEventSend)
 	if self.factoryIsOwned then
 		-- Just in-case it is lost before the sale.
 		self.currentFarmOwnerId = ownerFarmId
+
+		for id, inputProduct in pairs (self.inputProducts) do
+			if inputProduct.isAlwaysFull then
+				-- Fill then input to capacity
+				self:updateFactoryLevels(inputProduct.capacity, inputProduct, inputProduct.lastFillTypeIndex, false)
+			end
+		end
 	else
 		for lineId, productLine in pairs (self.productLines) do
 			self:setFactoryState(lineId, false, false, true)
@@ -2420,7 +2508,7 @@ function GC_ProductionFactory:doBulkProductSell(getPrice)
 		if inputProduct.maximumAccepted <= 0 then
 			local fillLevel = inputProduct.fillLevel
 
-			if fillLevel > 100 then
+			if fillLevel > 100 and not inputProduct.isAlwaysFull then
 				local lowestPrice = math.huge
 
 				for fillTypeIndex, _ in pairs (inputProduct.fillTypes) do
