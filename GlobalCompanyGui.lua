@@ -880,7 +880,7 @@ function GlobalCompanyGui:getOutputSize()
 	]]--
 	
 	if g_screenWidth / g_screenHeight > 2.3333 then
-		local factor =  g_screenHeight / g_screenWidth;
+		local factor =  g_screenWidth / g_screenHeight;
 		return {g_screenWidth * factor, g_screenHeight * factor};
 	else
 		local factor =  1920 / g_screenWidth;
