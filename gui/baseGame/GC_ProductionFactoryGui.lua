@@ -2,7 +2,7 @@
 -- GlobalCompany - BaseGui - GC_ProductionFactoryGui
 --
 -- @Interface: 1.4.0.0 b5007
--- @Author: LS-Modcompany / GtX
+-- @Author: LS-Modcompany
 -- @Date: 16.06.2019
 -- @Version: 1.1.0.0
 --
@@ -11,7 +11,7 @@
 -- Changelog:
 --
 -- 	v1.1.0.0 (16.06.2019):
---		- New script [GC_ProductionFactoryGui] using Giants GUI. (GtX)
+--		- New script [GC_ProductionFactoryGui] using Giants GUI.
 --		- Camera feature added and output sale support.
 --
 --

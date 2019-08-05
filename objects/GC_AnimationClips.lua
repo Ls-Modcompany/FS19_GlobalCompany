@@ -16,7 +16,7 @@
 --		- add interval option
 --
 -- 	v1.0.0.0 (22.04.2018):
--- 		- initial fs17 (GtX)
+-- 		- initial fs17 ()
 --
 -- Notes:
 --

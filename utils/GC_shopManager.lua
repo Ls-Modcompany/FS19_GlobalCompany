@@ -1,15 +1,18 @@
 -- 
 -- GlobalCompany - Utils - GC_shopManager
 -- 
--- @Interface: --
+-- @Interface: 1.4.1.0 b5332
 -- @Author: LS-Modcompany / kevink98
--- @Date: 01.01.2019
--- @Version: 1.0.0.0
+-- @Date: 05.08.2019
+-- @Version: 1.1.0.0
 -- 
 -- @Support: LS-Modcompany
 -- 
 -- Changelog:
 --		
+-- 	v1.1.0.0 (05.08.2019):
+-- 		- adaptation to patch 1.4.1.0 b5332
+--
 -- 	v1.0.0.0 (01.01.2019):
 -- 		- initial fs19 (kevink98)
 -- 
@@ -23,6 +26,10 @@ local debugIndex = g_company.debug:registerScriptName("GlobalCompany-GC_shopMana
 
 GC_shopManager = {};
 g_company.shopManager = GC_shopManager;
+g_company.shopManager.addCategorys = {};
+g_company.shopManager.sortCategories = {};
+g_company.shopManager.removeItems = {};
+g_company.shopManager.changeCategorys = {};
 
 function GC_shopManager:loadFromXML(modName, xmlFile)
 	local key = "globalCompany.shopManager";
@@ -44,49 +51,26 @@ function GC_shopManager:loadFromXML(modName, xmlFile)
 			local title = g_company.languageManager:getText(getXMLString(xmlFile, keySub.."#title"));
 			
 			local image = getXMLString(xmlFile, keySub.."#image");		
+			
 			g_storeManager:addCategory(name, title, image, type, g_company.shopManager:getFullImagePath(image, modName));
+			--table.insert(g_company.shopManager.addCategorys, {name=name, title=title, image=image, type=type, img=g_company.shopManager:getFullImagePath(image, modName)});	
 			i = i + 1;
 		end;	
-		
-		local categories = {};
-		for name, category in pairs(g_storeManager.categories) do
-			categories[category.orderId] = name:lower();
-		end;
-	
+			
 		i = 0;
 		while true do
 			local keySub = string.format("%s.sortCategories.category(%d)", key, i);
 			if not hasXMLProperty(xmlFile, keySub) then
 				break;
 			end;
-			local type = getXMLString(xmlFile, keySub.."#type");
+			--local type = getXMLString(xmlFile, keySub.."#type");
 			local name = getXMLString(xmlFile, keySub.."#name"):lower();
 			local after = Utils.getNoNil(getXMLString(xmlFile, keySub.."#after"), "");
 			local before = Utils.getNoNil(getXMLString(xmlFile, keySub.."#before"), "");
 			
-			for k, cN in pairs(categories) do
-				if cN == name then
-					table.remove(categories, k);
-					break;
-				end;
-			end; 
-			
-			for k,cN in pairs(categories) do
-				if after:lower() == cN then
-					table.insert(categories, k+1, name);
-					break;
-				elseif before:lower() == cN then
-					table.insert(categories, k-1, name);
-					break;
-				end;
-			end;
-			i = i + 1;
-		end;
+			table.insert(g_company.shopManager.sortCategories, {name=name, after=after, before=before});	
 		
-		if i > 0 then
-			for orderId, name in pairs(categories) do
-				g_storeManager:getCategoryByName(name).orderId = orderId;
-			end;
+			i = i + 1;
 		end;
 		
 		i = 0;
@@ -98,8 +82,7 @@ function GC_shopManager:loadFromXML(modName, xmlFile)
 			local xmlFilename = getXMLString(xmlFile, keySub.."#xmlFilename");
 			xmlFilename = g_company.shopManager:getFullXmlFilename(xmlFilename, modName);
 			
-			local item = g_storeManager:getItemByXMLFilename(xmlFilename);
-			g_storeManager:removeItemByIndex(item.id);
+			table.insert(g_company.shopManager.removeItems, xmlFilename);
 			i = i + 1;
 		end;
 			
@@ -112,10 +95,8 @@ function GC_shopManager:loadFromXML(modName, xmlFile)
 			local xmlFilename = getXMLString(xmlFile, keySub.."#xmlFilename");
 			xmlFilename = g_company.shopManager:getFullXmlFilename(xmlFilename, modName);
 			local name = getXMLString(xmlFile, keySub.."#category");
-					
-			local item = g_storeManager:getItemByXMLFilename(xmlFilename);
-			item.categoryName = name:upper();
-			
+								
+			table.insert(g_company.shopManager.changeCategorys, {xmlFilename=xmlFilename, name=name});
 			i = i + 1;
 		end;	
 
@@ -142,7 +123,50 @@ function GC_shopManager:getFullImagePath(imagePath, modName)
 	end; 
 end;
 
+function GC_shopManager:load()
+	for _, data in pairs(g_company.shopManager.addCategorys) do				
+		--g_storeManager:addCategory(data.name, data.title, data.image, data.type, data.img);
+	end;
+		
+	local categories = {};
+	for name, category in pairs(g_storeManager.categories) do
+		categories[category.orderId] = name:lower();
+	end;
 
+	for _, data in pairs(g_company.shopManager.sortCategories) do				
+		for k, cN in pairs(categories) do
+			if cN == data.name then
+				table.remove(categories, k);
+				break;
+			end;
+		end; 
+		
+		for k,cN in pairs(categories) do
+			if data.after:lower() == cN then
+				table.insert(categories, k+1, data.name);
+				break;
+			elseif data.before:lower() == cN then
+				table.insert(categories, k-1, data.name);
+				break;
+			end;
+		end;
+	end;
+		
+	if g_company.utils.getTableLength(categories) > 0 then
+		for orderId, name in pairs(categories) do
+			g_storeManager:getCategoryByName(name).orderId = orderId;
+		end;
+	end;
+	
+	for _, xmlFilename in pairs(g_company.shopManager.removeItems) do
+		local item = g_storeManager:getItemByXMLFilename(xmlFilename);
+		g_storeManager:removeItemByIndex(item.id);
+	end;
 
+	for _, data in pairs(g_company.shopManager.changeCategorys) do
+		local item = g_storeManager:getItemByXMLFilename(data.xmlFilename);
+		item.categoryName = data.name:upper();
+	end;
+end;
 
-
+g_company.addLoadable(GC_shopManager, GC_shopManager.load);

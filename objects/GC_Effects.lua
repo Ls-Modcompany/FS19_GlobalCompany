@@ -18,7 +18,7 @@
 --		- convert in fs19 (kevink98)
 --
 -- 	v1.0.0.0 (20.11.2018):
--- 		- initial fs17 (GtX)
+-- 		- initial fs17 ()
 --
 -- Notes:
 --		- Client Side Only.

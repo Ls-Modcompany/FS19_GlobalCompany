@@ -2,7 +2,7 @@
 -- GlobalCompany - Objects - GC_ProductionFactory
 --
 -- @Interface: 1.4.0.0 b5007
--- @Author: LS-Modcompany / GtX
+-- @Author: LS-Modcompany
 -- @Date: 22.03.2018
 -- @Version: 1.0.0.0
 --
@@ -19,7 +19,7 @@
 -- 		- release version
 --
 -- 	v1.0.0.0 (22.03.2018):
--- 		- initial fs17 (GtX)
+-- 		- initial fs17 ()
 --
 --
 -- Notes:

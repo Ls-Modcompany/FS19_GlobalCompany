@@ -2,7 +2,7 @@
 -- GC_Checker
 --
 -- @Interface: 1.4.0.0 b5007
--- @Author: LS-Modcompany / GtX
+-- @Author: LS-Modcompany
 -- @Date: 24.04.2019
 -- @Version: 1.1.0.0
 --
@@ -16,7 +16,7 @@
 --
 --
 -- 	v1.0.0.0 (07.03.2019):
--- 		- initial fs19 (GtX)
+-- 		- initial fs19 ()
 --		- 'de' warning translation (aPuehri)
 --
 -- Notes:

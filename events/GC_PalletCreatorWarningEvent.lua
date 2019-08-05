@@ -2,7 +2,7 @@
 -- GlobalCompany - Events - GC_PalletCreatorWarningEvent
 --
 -- @Interface: 1.4.0.0 b5007
--- @Author: LS-Modcompany / GtX
+-- @Author: LS-Modcompany
 -- @Date: 08.03.2019
 -- @Version: 1.0.0.0
 --
@@ -12,7 +12,7 @@
 --
 --
 -- 	v1.0.0.0 (08.03.2019):
--- 		- initial fs19 (GtX)
+-- 		- initial fs19 ()
 --
 -- Notes:
 --		- Server to Client only!

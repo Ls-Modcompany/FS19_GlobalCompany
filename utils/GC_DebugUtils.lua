@@ -286,7 +286,7 @@ function GC_DebugUtils:registerScriptName(scriptName, isSpec)
 		self.registeredScriptNames[scriptName] = self.registeredScriptsCount;
 
 		return self.registeredScriptsCount;
-	elseif not isSpec then -- @gtx: i'm not sure, if that is good... but if the script is a spec, and i register it in multiple mod-environments,
+	elseif not isSpec then --i'm not sure, if that is good... but if the script is a spec, and i register it in multiple mod-environments,
 		-- then will the function ``g_specializationManager:addSpecialization`` call every times ``source`` and so this function here also multiple times.
 		local text = string.format("  [LSMC - GlobalCompany > GC_DebugUtils] - Script name %s is already registered! Registered Script Id = %d", scriptName, self.registeredScriptNames[scriptName]);
 		print(text);
@@ -356,7 +356,7 @@ end;
 
 function GC_DebugUtils:getIsDev(getName)
 	local isDev, name = false, "";
-	local devNames = {"kevink98", "GtX_Test", "LSMC", "DEV", "aPuehri"};
+	local devNames = {"kevink98", "LSMC", "DEV", "aPuehri"};
 	if g_mpLoadingScreen ~= nil and g_mpLoadingScreen.missionInfo ~= nil then
 		if g_mpLoadingScreen.missionInfo.playerStyle ~= nil and g_mpLoadingScreen.missionInfo.playerStyle.playerName ~= nil then
 			for i = 1, #devNames do

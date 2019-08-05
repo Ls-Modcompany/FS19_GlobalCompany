@@ -2,7 +2,7 @@
 -- GlobalCompany - Events - GC_ProductionFactoryProductPurchaseEvent
 --
 -- @Interface: 1.4.0.0 b5007
--- @Author: LS-Modcompany / GtX
+-- @Author: LS-Modcompany
 -- @Date: 09.03.2019
 -- @Version: 1.0.0.0
 --
@@ -11,7 +11,7 @@
 -- Changelog:
 --
 -- 	v1.0.0.0 (09.03.2019):
--- 		- initial fs19 (GtX)
+-- 		- initial fs19 ()
 --
 --
 -- Notes:

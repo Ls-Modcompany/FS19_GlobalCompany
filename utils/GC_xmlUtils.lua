@@ -11,7 +11,7 @@
 -- Changelog:
 --
 -- 	v1.0.0.0 (01.02.2019):
--- 		- initial fs19 (GtX, kevink98)
+-- 		- initial fs19 (kevink98)
 --
 -- Notes:
 --

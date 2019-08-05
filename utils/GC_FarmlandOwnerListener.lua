@@ -2,7 +2,7 @@
 -- GlobalCompany - Utils - GC_FarmlandOwnerListener
 --
 -- @Interface: 1.4.0.0 b5007
--- @Author: LS-Modcompany / GtX
+-- @Author: LS-Modcompany
 -- @Date: 24.03.2019
 -- @Version: 1.0.0.0
 --

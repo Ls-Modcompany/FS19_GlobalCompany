@@ -2,7 +2,7 @@
 -- GlobalCompany - BaseGui - GC_FillLevelsDisplay
 --
 -- @Interface: 1.4.0.0 b5007
--- @Author: LS-Modcompany / GtX
+-- @Author: LS-Modcompany
 -- @Date: 21.05.2018
 -- @Version: 1.0.0.0
 --
@@ -12,7 +12,7 @@
 --
 --
 -- 	v1.0.0.0 (21.05.2018):
--- 		- initial fs19 (GtX)
+-- 		- initial fs19 ()
 --
 --
 -- Notes:
@@ -72,7 +72,7 @@ function GC_FillLevelsDisplay.new(hudAtlasPath)
 	self.hudAtlasPath = hudAtlasPath
 
 	self.object = nil
-	self.debugActive = false -- Testing for GtX
+	self.debugActive = false
 
 	self.rightListItemFrames = {}
 	self.leftListItemFrames = {}

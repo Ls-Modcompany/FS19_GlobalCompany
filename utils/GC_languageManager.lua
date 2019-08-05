@@ -11,7 +11,7 @@
 -- Changelog:
 --
 -- 	v1.1.0.0 (24.04.2019):
--- 		- update consoleCommand (GtX)
+-- 		- update consoleCommand ()
 --
 --
 -- 	v1.0.0.0 ():

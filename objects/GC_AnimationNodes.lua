@@ -12,7 +12,7 @@
 --
 --
 -- 	v1.0.0.0 (03.02.2019):
--- 		- initial fs19 (GtX)
+-- 		- initial fs19 ()
 --
 -- Notes:
 --		- Client Side Only.

@@ -14,7 +14,7 @@
 -- 		- convert to fs19
 --
 -- 	v1.0.0.0 (09.06.2018):
--- 		- initial fs17 (GtX)
+-- 		- initial fs17 ()
 --
 -- Notes:
 --

@@ -11,7 +11,7 @@
 -- Changelog:
 --
 --		- v1.0.0.0 (15.06.2019):
--- 		- initial fs19 (GtX)
+-- 		- initial fs19 ()
 --
 --
 -- Notes:

@@ -11,7 +11,7 @@
 -- Changelog:
 --
 -- 	v1.0.0.0 (31.12.2018):
--- 		- initial fs19 (kevink98, GtX)
+-- 		- initial fs19 (kevink98)
 --
 -- Notes:
 --
@@ -332,7 +332,7 @@ function GlobalCompanyUtils.getCorrectNumberValue(value, newValue, minValue, max
 end
 
 -- Part code from http://lua-users.org/wiki/StringRecipes
--- GtX add insert to table option and first line indent matching.
+-- add insert to table option and first line indent matching.
 function GlobalCompanyUtils.stringWrap(str, limit, indent, returnTable)
 	if str == nil then
 		if returnTable then

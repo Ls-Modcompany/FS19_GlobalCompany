@@ -2,7 +2,7 @@
 -- GlobalCompany - Placeables - GC_BalerPlaceable
 --
 -- @Interface: --
--- @Author: LS-Modcompany / kevink98 / GtX
+-- @Author: LS-Modcompany / kevink98
 -- @Date: 02.03.2019
 -- @Version: 1.0.1.0
 --

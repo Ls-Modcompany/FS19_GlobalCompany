@@ -2,7 +2,7 @@
 -- GlobalCompany - Placeables - GC_ProductionFactoryPlaceable
 --
 -- @Interface: 1.4.0.0 b5007
--- @Author: LS-Modcompany / GtX / kevink98
+-- @Author: LS-Modcompany / kevink98
 -- @Date: 21.02.2019
 -- @Version: 1.1.1.0
 --
@@ -15,7 +15,7 @@
 --		- Add GC Placeable registration method instead of script specific.
 --
 -- 	v1.0.0.0 (06.02.2019):
--- 		- initial fs19 (GtX / kevink98)
+-- 		- initial fs19 (kevink98)
 --
 --
 -- Notes:

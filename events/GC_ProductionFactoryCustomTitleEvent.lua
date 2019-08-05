@@ -12,7 +12,7 @@
 --
 
 -- 	v1.0.0.0 (09.07.2018):
--- 		- initial fs19 (GtX)
+-- 		- initial fs19 ()
 --
 -- Notes:
 --

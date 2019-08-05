@@ -2,7 +2,7 @@
 -- GlobalCompany - Utils - Specializations
 -- 
 -- @Interface: --
--- @Author: LS-Modcompany / GtX, kevink98
+-- @Author: LS-Modcompany / kevink98
 -- @Date: 31.12.2018
 -- @Version: 1.1.0.0
 -- 
@@ -14,7 +14,7 @@
 -- 		- make it dynamicly (kevink98)
 --
 -- 	v1.0.0.0 (30.11.2018):
--- 		- initial fs19 (GtX)
+-- 		- initial fs19 ()
 -- 
 -- Notes:
 -- 		'registerSpecializations' with attribute 'onlyLoad' and 'loadSpecializations' don't work any more with the actual patch!

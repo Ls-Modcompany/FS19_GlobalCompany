@@ -6,7 +6,7 @@
         </addCategories>
         
         <sortCategories>
-            <category type="PLACEABLE" name="globalCompanyPlaceable" after="containers" />
+            <category type="PLACEABLE" name="globalCompanyPlaceable" after="sheds" />
         </sortCategories>
     </shopManager>
 

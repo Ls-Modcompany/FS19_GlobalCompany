@@ -2,7 +2,7 @@
 -- GlobalCompany - Placeables - GC_DynamicStoragePlaceable
 --
 -- @Interface: --
--- @Author: LS-Modcompany / GtX / kevink98
+-- @Author: LS-Modcompany / kevink98
 -- @Date: 02.06.2019
 -- @Version: 1.0.0.0
 --
@@ -11,7 +11,7 @@
 -- Changelog:
 --
 -- 	v1.0.0.0 (02.06.2019):
--- 		- initial fs19 (GtX / kevink98)
+-- 		- initial fs19 (kevink98)
 --
 --
 -- Notes:
