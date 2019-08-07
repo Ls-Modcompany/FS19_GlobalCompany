@@ -19,6 +19,11 @@ GlobalCompany is the base for many scripts. No matter if production, warehouse o
 
 GlobalCompany ist die Grundlage für viele Scripte. Egal ob Produktionen, Lager oder was auch immer - hiermit lässt es sich einfach umsetzen.]]>
 		</de>
+		<ru>
+			<![CDATA[Global Company - самой большое собрание скриптов для Farming Simulator!
+
+GlobalCompany основа для многих скриптов. Будь то производства, хранилища или что то еще - с ним возможно многое.]]>
+		</ru>
     </description>
     
 	<iconFilename>globalCompany.dds</iconFilename>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<l10n>
+	<elements>
+
+		<!-- Warnings / Errors -->
+		<e k="GC_mapVersionWarning" v="Карте '%s' от %s необходим GlobalCompany - Версия %s или выше. Скачай актуальную версию на Modhub или посети '%s' для поддержки."/>	
+		<e k="GC_modVersionWarning" v="Моду '%s' от %s необходим GlobalCompany - Версия %s или выше. Скачай актуальную версию на Modhub или посети '%s' для поддержки."/>	
+		<e k="GC_loadingError" v="При загрузке GlobalCompany что то пошло не так! Скачай актуальную версию на Modhub или посети '%s' для поддержки."/>	
+		<e k="GC_duplicateError" v="GlobalCompany загружается дважды! Удали '%s' из папки с модами и запусти игру по новой."/>
+		<e k="GC_combinedError" v="GlobalCompany загружается как часть Карты '%s'! Это запрещено и приводит к ошибкам. Скачай актуальную версию на Modhub или посети '%s' для поддержки."/>
+		<e k="GC_invalidModWarning" v="Модификация %s от %s не поддерживается! Во избежании ошибок эта модификация должна быть удалена"/>
+		<e k="GC_quitToMainMenu" v="Are you sure you want to exit to the main menu?"/>
+		<e k="GC_betaVersionWarning" v="Development version has been loaded. Please report warnings or errors at %s. Visit modHub download link for the latest official release version or visit '%s' for support."/>
+		<e k="GC_namingError" v="Invalid 'file / zip' name '%s' found for development release! Use 'FS19_GlobalCompany' for file / zip name. Visit modHub download link for the latest official release version or visit '%s' for support."/>
+
+		<!-- GUI -->
+		<e k="GC_gui_buttons_ok" v="OK"/>
+		<e k="GC_gui_buttons_yes" v="да"/>
+		<e k="GC_gui_buttons_no" v="нет"/>
+		<e k="GC_gui_buttons_back" v="назад"/>
+		<e k="GC_gui_modHubLink" v="ModHub ссылка для скачивания"/>
+		<e k="GC_gui_buttons_nextWarning" v="Следующее предупреждение"/>
+		<e k="GC_gui_buttons_nextConflict" v="Следующий конфликт"/>
+		
+		<!-- General -->
+		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
+
+		<!-- Settings -->
+		<e k="GC_settings_header" v="GlobalCompany - настройки"/>
+		<e k="GC_settings1_title" v="Активировать повсеместное размещение"/>
+		<e k="GC_settings2_title" v="Показать информацию об объекте"/>
+		<e k="GC_settings3_title" v="Нанять конюха (€ 300 / лошадь / день)"/>
+		<e k="GC_settings4_title" v="Активировать больше деревьев"/>
+		<e k="GC_settings5_title" v="Активировать резку тюков"/>
+		
+		<!-- Factory -->
+		<e k="GC_gui_overview" v="Обзор"/>
+		<e k="GC_gui_productLines" v="производственная линия"/>
+		<e k="GC_gui_description" v="Описание"/>
+		<e k="GC_gui_active" v="Активный"/>
+		<e k="GC_gui_productionPerHour" v="Производство: %s литров/час"/>
+		<e k="GC_gui_capacity" v="Вместимость:"/>
+		<e k="GC_gui_filllevel" v="Уровень заполнения:"/>
+		<e k="GC_gui_liter" v="%s литр"/>
+		<e k="GC_gui_buyText" v="Купить (%s)"/>
+		<e k="GC_gui_activate" v="Включить"/>
+		<e k="GC_gui_deactivate" v="Выключить"/>
+		<e k="GC_gui_state" v="Статус:"/>
+		<e k="GC_gui_automatic" v="Автоматически:"/>
+		<e k="GC_gui_state_on" v="работает"/>
+		<e k="GC_gui_state_off" v="остановлено"/>
+		<e k="GC_gui_pallet1" v="%s Поддон"/>
+		<e k="GC_gui_pallet2" v="%s Поддоны"/>
+		<e k="GC_gui_spawnText1" v="Создать %s поддон"/>
+		<e k="GC_gui_spawnText2" v="Создать %s поддоны"/>		
+		
+		<e k="GC_Productline_Title_Backup" v="Производственная линия %d"/>
+		<e k="GC_Input_Title_Backup" v="Сырьё %d"/>
+		<e k="GC_Output_Title_Backup" v="Продукт %d"/>
+		<e k="GC_Input_Header_Backup" v="Сырьё"/>
+		<e k="GC_Output_Header_Backup" v="Продукция"/>
+		
+		<e k="GC_Open_Product_Menu" v="Открыть меню производства"/>
+		<e k="GC_Open_Overview_Menu" v="Открыть обзорное меню"/>
+		
+		<e k="GC_Factory_Animal_Dialogue" v="Выберите количество животных для выгрузки на завод."/>
+		
+		<e k="GC_gui_disabled" v="Остановлено"/>
+		<e k="GC_gui_add" v="Добавить"/>
+		<e k="GC_gui_remove" v="Удалить"/>
+		<e k="GC_gui_max" v="Максимум"/>
+		<e k="GC_gui_percent" v="Процент"/>
+		<e k="GC_gui_lifeTimeIncome" v="Доход"/>
+		<e k="GC_gui_changeFactoryTitle" v="Введите новое имя фабрики ниже."/>
+		
+		<e k="GC_gui_placeableObject" v="Размещаемый объект"/>
+		<e k="GC_gui_farmlandObject" v="Farmland объект"/>
+		
+		<!-- Formatting required -->
+		<e k="GC_Factory_Sell_Warning" v="Эта фабрика до сих пор содержит продукты. Это будет продано оптом на следующую сумму:
+
+Цена:  %s"/>
+
+		<e k="GC_Factory_Purchase_Warning" v="Пожалуйста, подтвердите следующую покупку продукта.
+
+Сырьё:  %s
+Объём:  %s
+Стоимость:  %s"/>
+
+		<!-- BaleShreader -->
+		<e k="GC_baleShreader_openSteer" v="Открыть элемент управления"/>
+		<e k="GC_baleShreader_closeSteer" v="Закрыть элемент управления"/>
+		<e k="GC_baleShreader_startWork" v="Запустить измельчитель тюков"/>
+		<e k="GC_baleShreader_endWork" v="Остановить измельчитель тюков"/>
+		<e k="GC_baleShreader_toggleOnWorkLight" v="Включить рабочий свет"/>
+		<e k="GC_baleShreader_toggleOffWorkLight" v="Выключить рабочий свет"/>
+
+		<!-- Baler -->
+		<e k="GC_baler_title" v="пресс-подборщик"/>
+		<e k="GC_baler_title_witStack" v="Пресс-подборщик с вилочным погрузчиком"/>
+		<e k="GC_baler_cleaner" v="Очистить пресс-подборщик"/>
+		<e k="GC_baler_openGui" v="Открыть управление"/>
+		<e k="GC_baler_closeGui" v="Закрыть управление"/>
+		<e k="GC_baler_makeEmpty" v="Пустой"/>
+		<e k="GC_baler_turnOn" v="Включить"/>
+		<e k="GC_baler_turnOff" v="Выключить"/>
+		<e k="GC_baler_info_machineData" v="Данные"/>
+		<e k="GC_baler_info_fillLevel" v="Уровень заполнения"/>
+		<e k="GC_baler_info_fillLevelBunker" v="Уровень заполнения бункера"/>
+		<e k="GC_baler_info_counter" v="Прессованные тюки"/>
+		<e k="GC_baler_info_automatic" v="Автоматический старт"/>
+		<e k="GC_baler_actualTyp" v="Текущий тип тюка:"/>
+		<e k="GC_baler_canStack" v="Колличество тюков:"/>
+
+		<!-- ObjectInfo -->
+		<e k="GC_ObjectInfo_filltype" v="Продукт: %s"/>
+		<e k="GC_ObjectInfo_level" v="Уровень: %s литр (а/ов)"/>
+		<e k="GC_ObjectInfo_level2" v="Уровень: %s литр (а/ов) (%s%%)"/>
+		<e k="GC_ObjectInfo_owner" v="Владелец: %s"/>
+
+		<!-- DynamicStorage -->
+		<e k="GC_dynamicStorage_unloadSettings" v="Настройки разгрузки"/>
+		<e k="GC_dynamicStorage_gui_header_unloading" v="Выбрать сторону разгрузки"/>
+		<e k="GC_dynamicStorage_gui_header_loading" v="Выбрать коробку"/>
+		<e k="GC_dynamicStorage_gui_info_unloading" v="Выбрать на каком поле должен быть выгружен. Обратите внимание, что в каждой коробке может быть выгружен только один фрукт."/>
+		<e k="GC_dynamicStorage_gui_info_loading" v="Выбрать из какой коробки загрузить."/>
+		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s литр"/>
+		<e k="GC_dynamicStorage_gui_empty" v="пустой"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Подтвердите позицию разгрузки"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Подтвердите зарядку коробки"/>
+
+	</elements>
+</l10n>
