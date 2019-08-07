@@ -4,14 +4,24 @@
 -- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany
 -- @Date: 11.05.2018
--- @Version: 1.1.1.0
+-- @Version: 1.1.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
 --
--- 	v1.0.0.0 (11.05.2018):
+-- 	v1.1.0.0 (..2018):
+--		- add language russian
+--		- fix Shopmanager for actual patch
+--		
+--	
 --
+--
+--
+--
+--
+-- 	v1.0.0.0 (11.05.2018):
+--		- first Release
 --
 -- Notes:
 --
