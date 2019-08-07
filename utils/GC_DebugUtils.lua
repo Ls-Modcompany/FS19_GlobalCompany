@@ -29,7 +29,7 @@
 GC_DebugUtils = {};
 local GC_DebugUtils_mt = Class(GC_DebugUtils);
 
-GC_DebugUtils.setDevLevelMax = false;
+-- GC_DebugUtils.setDevLevelMax = false;
 
 GC_DebugUtils.defaultLevel = 1;
 
@@ -59,7 +59,7 @@ function GC_DebugUtils:new(customMt)
 	setmetatable(self, customMt or GC_DebugUtils_mt);
 
 	self.isDev = GC_DebugUtils:getIsDev();
-	local setMax = self.isDev and GC_DebugUtils.setDevLevelMax;
+	-- local setMax = self.isDev and GC_DebugUtils.setDevLevelMax;
 
 	self.registeredScriptNames = {};
 
@@ -73,7 +73,8 @@ function GC_DebugUtils:new(customMt)
 	self.printLevelPrefix = {};
 
 	for i = -3, GC_DebugUtils.numLevels + 4 do
-		if i <= GC_DebugUtils.defaultLevel or (setMax and (i < GC_DebugUtils.DEVDEBUG)) then
+		-- if i <= GC_DebugUtils.defaultLevel or (setMax and (i < GC_DebugUtils.DEVDEBUG)) then
+		if i <= GC_DebugUtils.defaultLevel or (self.isDev and (i < GC_DebugUtils.DEVDEBUG)) then
 			self.printLevel[i] = true;
 		else
 			self.printLevel[i] = false;
@@ -480,6 +481,7 @@ function debugPrint(name, text, depth, referenceText, isExtraPrintText)
 	end;
 end;
 
-if GC_DebugUtils.setDevLevelMax then
+-- if GC_DebugUtils.setDevLevelMax then
+if GC_DebugUtils:getIsDev() then
 	getfenv(0)["gc_debugPrint"] = debugPrint;
 end
