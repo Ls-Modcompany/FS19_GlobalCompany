@@ -3,13 +3,16 @@
 -- 
 -- @Interface: --
 -- @Author: LS-Modcompany / kevink98
--- @Date: 27.04.2019
--- @Version: 1.0.0.0
+-- @Date: 07.08.2019
+-- @Version: 1.1.0.0
 -- 
 -- @Support: LS-Modcompany
 -- 
 -- Changelog:
 --		
+-- 	v1.1.0.0 (07.08.2019):
+-- 		- add reg for Giants-filltypes
+--
 -- 	v1.0.0.0 (01.01.2019):
 -- 		- initial fs19 (kevink98)
 -- 
@@ -32,7 +35,10 @@ function GC_FillTypeManager:new()
     --self.fillTypes = {};
     --self.fillTypesById = {};
     --self.fillTypesByName = {};
+
+    self.xmlFiles = {};
     
+    g_company.addLoadable(self, self.load);
 
 	self.debugData = g_company.debug:getDebugData(GC_FillTypeManager.debugIndex);
 
@@ -57,39 +63,76 @@ function GC_FillTypeManager:loadFromXML(modName, xmlFile)
         return;
     end;
 
-    local xmlFile = loadXMLFile("map", path);
-
-    local i = 0
-    while true do
-        local xmlKey = string.format("map.treeTypes.treeType(%d)", i);
-        if not hasXMLProperty(xmlFile, xmlKey) then
-            break;
-        end;
-        
-        local name = getXMLString(xmlFile, xmlKey .. "#name");
-        local title = getXMLString(xmlFile, xmlKey .. "#title");
-        local showOnPriceTable = getXMLBool(xmlFile, xmlKey .. "#showOnPriceTable");
-        local pricePerLiter = getXMLFloat(xmlFile, xmlKey .. "#pricePerLiter");
-        local massPerLiter = getXMLFloat(xmlFile, xmlKey .. ".physics#massPerLiter");
-        local maxPhysicalSurfaceAngle = getXMLInt(xmlFile, xmlKey .. ".physics#maxPhysicalSurfaceAngle");        
-        local hudOverlayFilename = g_company.utils.createModPath(modName, getXMLString(xmlFile, xmlKey .. ".image#hud"));
-        local hudOverlayFilenameSmall = g_company.utils.createModPath(modName, getXMLString(xmlFile, xmlKey .. ".image#hudSmall"));
-        local palletFilename = getXMLString(xmlFile, xmlKey .. ".pallet#filename");
-       
-        local s,_ = palletFilename:find("$data");
-        if s == nil then
-            palletFilename = g_company.utils.createModPath(modName, palletFilename);
-        end;
-
-        title = g_company.languageManager:getText(title);
-
-        g_fillTypeManager:addFillType(name, title, showOnPriceTable, pricePerLiter, massPerLiter, maxPhysicalSurfaceAngle, hudOverlayFilename, hudOverlayFilenameSmall, g_company.utils.createDirPath(modName), nil, {1,1,1}, palletFilename, false);
-                
-        i = i + 1;
-    end;
-    
-    --XMLUtil.loadDataFromMapXML(xmlFile, "fillTypes", g_modsDirectory .. modFileName, g_fillTypeManager, g_fillTypeManager.loadFillTypes, nil, g_modsDirectory .. modFileName)
+    table.insert(self.xmlFiles, {path=path, modName=modName});
 end
+
+function GC_FillTypeManager:load()
+    for _,data  in pairs(self.xmlFiles) do
+        local xmlFile = loadXMLFile("map", data.path);
+
+        local i = 0
+        while true do
+            local xmlKey = string.format("map.fillTypes.fillType(%d)", i);
+            if not hasXMLProperty(xmlFile, xmlKey) then
+                break;
+            end;
+            
+            local name = getXMLString(xmlFile, xmlKey .. "#name");
+            local title = getXMLString(xmlFile, xmlKey .. "#title");
+            local showOnPriceTable = getXMLBool(xmlFile, xmlKey .. "#showOnPriceTable");
+            local pricePerLiter = getXMLFloat(xmlFile, xmlKey .. "#pricePerLiter");
+            local massPerLiter = getXMLFloat(xmlFile, xmlKey .. ".physics#massPerLiter") / 1000;
+            local maxPhysicalSurfaceAngle = getXMLInt(xmlFile, xmlKey .. ".physics#maxPhysicalSurfaceAngle");        
+            local hudOverlayFilename = getXMLString(xmlFile, xmlKey .. ".image#hud");
+            local hudOverlayFilenameSmall = getXMLString(xmlFile, xmlKey .. ".image#hudSmall");
+            local palletFilename = getXMLString(xmlFile, xmlKey .. ".pallet#filename");
+        
+            local s,_ = palletFilename:find("$data");
+            if s == nil then
+                palletFilename = g_company.utils.createModPath(data.modName, palletFilename);
+            end;
+            
+            title = g_company.languageManager:getText(string.format("%s_%s", string.gsub(data.modName, "FS19_", ""), string.gsub(title, "$l10n_", "")));
+
+            g_fillTypeManager:addFillType(name, title, showOnPriceTable, pricePerLiter, massPerLiter, maxPhysicalSurfaceAngle, hudOverlayFilename, hudOverlayFilenameSmall, g_company.utils.createDirPath(data.modName), nil, {1,1,1}, palletFilename, false);
+                    
+            i = i + 1;
+        end;
+
+        i = 0
+        while true do
+            local xmlKey = string.format("map.fillTypeCategories.fillTypeCategory(%d)", i);
+            if not hasXMLProperty(xmlFile, xmlKey) then
+                break;
+            end;
+            
+            local name = getXMLString(xmlFile, xmlKey .. "#name");
+            local fillTypes = getXMLString(xmlFile, xmlKey);            
+            local typesSplit = g_company.utils.splitString(fillTypes, " ");
+        
+            for _,type in pairs(typesSplit) do
+                local categoryIndex = g_fillTypeManager.nameToCategoryIndex[name];
+                g_fillTypeManager:addFillTypeToCategory(g_fillTypeManager:getFillTypeIndexByName(type), categoryIndex);
+            end;
+            i = i + 1;
+        end;
+
+        i = 0
+        while true do
+            local xmlKey = string.format("map.materialholders.materialholder(%d)", i);
+            if not hasXMLProperty(xmlFile, xmlKey) then
+                break;
+            end;
+            
+            local matHolderFileName = getXMLString(xmlFile, xmlKey .. "#filename");
+            if matHolderFileName ~= nil then
+                loadI3DFile(g_company.utils.createModPath(data.modName, matHolderFileName));
+            end;       
+
+            i = i + 1;
+        end;
+    end;
+end;
 
 --[[
 function GC_FillTypeManager:getNextId()
