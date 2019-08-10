@@ -57,15 +57,24 @@ function GC_HorseHelper:hourChanged()
 						if moneyToOwner[farmId] == nil then
 							moneyToOwner[farmId] = 0;
 						end;				
-						moneyToOwner[farmId] = moneyToOwner[farmId] + ((animal.DAILY_TARGET_RIDING_TIME - animal.ridingTimer) / animal.DAILY_TARGET_RIDING_TIME);
+						local factor = ((animal.DAILY_TARGET_RIDING_TIME - animal.ridingTimer) / animal.DAILY_TARGET_RIDING_TIME);
+						local price = factor * GC_HorseHelper.price;
 
-						animal.ridingTimerSent  = animal.DAILY_TARGET_RIDING_TIME;
-						animal.ridingTimer  = animal.DAILY_TARGET_RIDING_TIME;
+						--other price for seasons
+						if animal.subType ~= nil and animal.subType.livery ~= nil and animal.subType.livery.income  ~= nil then
+							price = animal.subType.livery.income * 0.3;
+							animal.ridingScale = 1;
+						else							
+							animal.ridingTimerSent  = animal.DAILY_TARGET_RIDING_TIME;
+							animal.ridingTimer  = animal.DAILY_TARGET_RIDING_TIME;
+						end;
+
+						moneyToOwner[farmId] = moneyToOwner[farmId] + price;
 					end;
 				end;	
 			end;
-			for farmId, factor in pairs(moneyToOwner) do
-					local price = factor * GC_HorseHelper.price;
+			for farmId, price in pairs(moneyToOwner) do
+					--local price = factor * GC_HorseHelper.price;
 					g_currentMission:addMoney(-price, farmId, MoneyType.ANIMAL_UPKEEP, true, true);
 			end;
 		end;	
