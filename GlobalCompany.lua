@@ -13,9 +13,10 @@
 -- 	v1.1.0.0 (..2018):
 --		- add language russian
 --		- fix Shopmanager for actual patch
---		
---	
---
+--		- Objectinfo: Add support for pallets of VertexDesign
+--		- add registration of filltypes
+--		- add registration of treetypes
+--		- Horsehelper: Change money when play with seasonsmod
 --
 --
 --
@@ -97,6 +98,7 @@ function GlobalCompany.initialLoad()
 		g_company.farmlandOwnerListener = GC_FarmlandOwnerListener:new();
 		g_company.fillTypeManager = GC_FillTypeManager:new();
 		g_company.treeTypeManager = GC_TreeTypeManager:new();
+		g_company.physicManager = GC_PhysicManager:new();
 
 		GlobalCompany.loadEnviroment(modNameCurrent, GlobalCompany.dir .. "xml/globalCompany.xml", false);
 		g_company.modManager:initSelectedMods();
@@ -251,6 +253,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "utils/GC_FarmlandOwnerListener.lua");
 	source(GlobalCompany.dir .. "utils/GC_FillTypeManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_TreeTypeManager.lua");
+	source(GlobalCompany.dir .. "utils/GC_PhysicManager.lua");
 
 	--|| Gui ||--
 	source(GlobalCompany.dir .. "GlobalCompanyGui.lua");
