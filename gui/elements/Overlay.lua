@@ -82,7 +82,9 @@ function GC_Gui_overlay:loadTemplate(templateName, xmlFile, key, overlayName)
 	
 	local uiElement = g_company.gui:getUiElement(self.imageFilename)
 	if self.imageFilename == "g_baseUIFilename" then
-        self.imageFilename = g_baseUIFilename;
+		self.imageFilename = g_baseUIFilename;
+	elseif self.imageFilename == "g_baseHUDFilename" then
+		self.imageFilename = g_baseHUDFilename;
 	elseif self.imageFilename == "gc_uiElements1" then
         self.imageFilename = g_company.dir .. "images/ui_elements_1.dds";
 	elseif uiElement ~= nil then
