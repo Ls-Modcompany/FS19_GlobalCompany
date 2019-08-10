@@ -29,6 +29,12 @@ function GC_Gui:assignClass(class)
 	end;
 end;
 
+function GC_Gui:setData( ... )
+	if self.classGui ~= nil then
+		self.classGui:setData(...);
+	end;
+end
+
 function GC_Gui:loadFromXML()
 	if self.classGui.xmlFilename == nil then
 		g_debug.write(debugIndex, Debug.ERROR, "Gui %s haven't xmlFilename", self.name);
