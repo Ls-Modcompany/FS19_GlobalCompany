@@ -31,6 +31,7 @@
 		<e k="GC_settings3_title" v="Horse Helper ($300 / Horse / Day)"/>
 		<e k="GC_settings4_title" v="Activate More Trees"/>
 		<e k="GC_settings5_title" v="Activate Cut Bales"/>
+		<e k="GC_settings6_title" v="VehicleControl: Shop Interaktionshelp"/>
 		
 		<!-- Factory -->
 		<e k="GC_gui_buttons_back" v="Back"/>

@@ -55,7 +55,15 @@ Changelog:
         <GuiElement type="button" template="gcMenuSettingsButtonLayoutButton" id="gui_btn_settings_5" onClick="onClickBtnSetting" parameter="cutBales" />
       </GuiElement>
       <GuiElement type="text" template="gcMenuSettingsButtonLayoutText" text="$l10n_GC_settings5_title" />    
-    </GuiElement>      
+    </GuiElement>  
 
+    <!-- Setting: AddOn: VehicleControl - ShowInteractionGui -->
+    <GuiElement type="flowLayout" template="gcMenuSettingsButtonLayout">         
+      <GuiElement type="image" template="gcMenuSettingsButtonLayoutBackground">    
+        <GuiElement type="button" template="gcMenuSettingsButtonLayoutButton" id="gui_btn_settings_6" onClick="onClickBtnSetting" parameter="addOnVehicleControllShowInteractionGui" />
+      </GuiElement>
+      <GuiElement type="text" template="gcMenuSettingsButtonLayoutText" text="$l10n_GC_settings6_title" />    
+    </GuiElement>      
+    
   </GuiElement>
 </GUI>
