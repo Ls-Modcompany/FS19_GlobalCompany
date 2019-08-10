@@ -75,8 +75,12 @@ function GlobalCompanySettings:setSettingEvent(data, noEventSend)
     end;
 end
 
-function GlobalCompanySettings:getSetting(name, ignoreWarning)
+function GlobalCompanySettings:getSetting(name)
     return self.settings[name];
+end
+
+function GlobalCompanySettings:haveSetting(name)
+    return self.settings[name] ~= nil;
 end
 
 function GlobalCompanySettings:loadSettings()   
