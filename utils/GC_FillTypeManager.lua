@@ -67,6 +67,7 @@ function GC_FillTypeManager:loadFromXML(modName, xmlFile)
 end
 
 function GC_FillTypeManager:load()
+    local newFilltype = false;
     for _,data  in pairs(self.xmlFiles) do
         local xmlFile = loadXMLFile("map", data.path);
 
@@ -95,7 +96,7 @@ function GC_FillTypeManager:load()
             title = g_company.languageManager:getText(string.format("%s_%s", string.gsub(data.modName, "FS19_", ""), string.gsub(title, "$l10n_", "")));
 
             g_fillTypeManager:addFillType(name, title, showOnPriceTable, pricePerLiter, massPerLiter, maxPhysicalSurfaceAngle, hudOverlayFilename, hudOverlayFilenameSmall, g_company.utils.createDirPath(data.modName), nil, {1,1,1}, palletFilename, false);
-                    
+            newFilltype = true;
             i = i + 1;
         end;
 
@@ -131,6 +132,10 @@ function GC_FillTypeManager:load()
 
             i = i + 1;
         end;
+    end;
+
+    if newFilltype then
+        g_currentMission.hud.fillLevelsDisplay:refreshFillTypes(g_fillTypeManager);        
     end;
 end;
 
