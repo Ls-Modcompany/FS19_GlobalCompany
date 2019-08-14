@@ -33,7 +33,7 @@ InitObjectClass(GC_ProductionFactoryPlaceable, "GC_ProductionFactoryPlaceable")
 
 -- With Product Lines this is all we need for performance reasons.
 -- This allows one factory to be used to build the other one if needed.
-GC_ProductionFactoryPlaceable.MAX_FACTORIES = 2
+GC_ProductionFactoryPlaceable.MAX_FACTORIES = 5
 
 GC_ProductionFactoryPlaceable.debugIndex = g_company.debug:registerScriptName("ProductionFactoryPlaceable")
 
