@@ -2314,8 +2314,9 @@ function GC_ProductionFactory:getInputCapacity(input)
 	return 0
 end
 
+--KK(14.08.19): add 'self.currentFarmOwnerId ~= nil' so now you can only buy, when the current farmOwner is not nil.
 function GC_ProductionFactory:canBuyProduct(input)
-	local hasPermission = input ~= nil and input.canPurchaseProduct
+	local hasPermission = input ~= nil and input.canPurchaseProduct and self.currentFarmOwnerId ~= nil
 
 	if hasPermission and g_currentMission.missionDynamicInfo.isMultiplayer then
 		local userId = g_currentMission.playerUserId
