@@ -181,7 +181,9 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 		factoryImage = factoryImage,
 		factoryCamera = factoryCamera,
 		factoryDescription = factoryDescription,
-		factoryCustomTitle = "- - - - - -"
+		factoryCustomTitle = "- - - - - -",
+		spawnTextOne = Utils.getNoNil(getXMLString(xmlFile, xmlKey .. ".guiInformation#spawnTextOne"), "GC_gui_spawnText1"),
+		spawnTextTwo = Utils.getNoNil(getXMLString(xmlFile, xmlKey .. ".guiInformation#spawnTextTwo"), "GC_gui_spawnText2")
 	}
 
 	self.disableAllOutputGUI = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. ".operation#disableAllOutputGUI"), false)

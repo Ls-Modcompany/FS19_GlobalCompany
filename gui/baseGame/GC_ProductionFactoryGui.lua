@@ -167,6 +167,13 @@ function GC_ProductionFactoryGui:setupOverviewAndTexts(guiData)
 		if guiData.outputHeader ~= nil then
 			self.outputHeaderText:setText(guiData.outputHeader)
 		end
+		
+		if guiData.spawnTextOne ~= nil then
+			self.texts.spawnPalletOne = g_company.languageManager:getText(guiData.spawnTextOne);
+		end;
+		if guiData.spawnTextTwo ~= nil then
+			self.texts.spawnPalletTwo = g_company.languageManager:getText(guiData.spawnTextTwo);
+		end;
 	end
 
 	self.buttonAdd:setText(self.texts.add)
