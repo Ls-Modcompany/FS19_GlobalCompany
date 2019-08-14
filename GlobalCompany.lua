@@ -16,6 +16,7 @@
 --		- Objectinfo: Add support for pallets of VertexDesign
 --		- add registration of filltypes
 --		- add registration of treetypes
+--		- fix densityHeightManager
 --		- Horsehelper: Change money when play with seasonsmod
 --
 --
@@ -97,6 +98,7 @@ function GlobalCompany.initialLoad()
 
 		g_company.farmlandOwnerListener = GC_FarmlandOwnerListener:new();
 		g_company.fillTypeManager = GC_FillTypeManager:new();
+		g_company.densityMapHeightManager = GC_densityMapHeightManager:new();
 		g_company.treeTypeManager = GC_TreeTypeManager:new();
 		g_company.physicManager = GC_PhysicManager:new();
 
@@ -109,7 +111,7 @@ function GlobalCompany.initialLoad()
 			g_company.shopManager:loadFromXML(modName, xmlFile);
 			g_company.fillTypeManager:loadFromXML(modName, xmlFile);
 			g_company.treeTypeManager:loadFromXML(modName, xmlFile);
-			g_company.densityMapHeight:loadFromXML(modName, xmlFile);
+			g_company.densityMapHeightManager:loadFromXML(modName, xmlFile);
 
 			if modName == modNameCurrent then
 				xmlFileCurrentMod = xmlFile;

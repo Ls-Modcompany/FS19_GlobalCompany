@@ -24,24 +24,38 @@
 --
 -- 
 
-GC_densityMapHeight = {};
-g_company.densityMapHeight = GC_densityMapHeight;
-g_company.densityMapHeight.fileNames = {};
 
-function GC_densityMapHeight:loadFromXML(modName, xmlFile)
-    local key = "globalCompany.densityMapHeight";
+
+GC_densityMapHeightManager = {};
+local GC_densityMapHeight_mt = Class(GC_densityMapHeightManager);
+
+function GC_densityMapHeightManager:new()
+    local self = {};
+	setmetatable(self, GC_densityMapHeight_mt);
+
+    self.fileNames = {};
+    
+    g_company.addLoadable(self, self.loadDensitys);
+
+	self.debugData = g_company.debug:getDebugData(GC_FillTypeManager.debugIndex);
+
+	return self;
+end;
+
+function GC_densityMapHeightManager:loadFromXML(modName, xmlFile)
+    local key = "globalCompany.densityMapHeightManager";
     if not hasXMLProperty(xmlFile, key) then
         return
     end;
 
-    local xmlFilename = getXMLString(xmlFile, key .. "#xmlFilename");
+    local xmlFilename = getXMLString(xmlFile, key .. "#filename");
     if xmlFilename ~= nil then
-        g_company.densityMapHeight.fileNames[g_company.utils.createModPath(modName, xmlFilename)] = modName;
+        self.fileNames[g_company.utils.createModPath(modName, xmlFilename)] = modName;
     end;
 end;
 
-function GC_densityMapHeight:loadDensitys()
-    for xmlFilename,modName in pairs(GC_densityMapHeight.fileNames) do
+function GC_densityMapHeightManager:loadDensitys()
+    for xmlFilename,modName in pairs(self.fileNames) do
         local xmlFile = loadXMLFile("densityMapHeightTypes", xmlFilename);	    
         local i = 0
         while true do
@@ -77,7 +91,7 @@ function GC_densityMapHeight:loadDensitys()
                 g_company.debug:print("Error loading density map height type. '"..tostring(key).."' is missing texture(s)!");
                 return
             end
-
+            print("load fillTypeName")
             g_densityMapHeightManager:addDensityMapHeightType(fillTypeName, maxSurfaceAngle, collisionScale, collisionBaseOffset, minCollisionOffset, maxCollisionOffset, fillToGroundScale, allowsSmoothing, diffuseMapFilename, normalMapFilename, distanceFilename, isBaseType)
             i = i + 1
         end
@@ -85,4 +99,4 @@ function GC_densityMapHeight:loadDensitys()
     end;
 end;
 
-g_densityMapHeightManager.loadMapData = Utils.appendedFunction(g_densityMapHeightManager.loadMapData, g_company.densityMapHeight.loadDensitys);
+--g_densityMapHeightManager.loadMapData = Utils.appendedFunction(g_densityMapHeightManager.loadMapData, g_company.densityMapHeight.loadDensitys);
