@@ -432,7 +432,7 @@ function GC_LoadingTrigger:getIsActivatable()
 			if self.playerTriggerNode ~= nil then
 				return self.playerInTrigger and self.currentFillableObject ~= nil
 			else
-				if self.currentFillableObject ~= nil and self.currentFillableObject:getRootVehicle() == g_currentMission.controlledVehicle then
+				if self.currentFillableObject ~= nil and self:vehicleHasActiveDriver(self.currentFillableObject:getRootVehicle()) then
 					return true
 				end
 			end
@@ -460,7 +460,7 @@ function GC_LoadingTrigger:getIsActivatable()
 					if self.playerTriggerNode ~= nil then
 						canActivate = self.playerInTrigger -- Need to Test.
 					else
-						canActivate = fillableObject.object:getRootVehicle() == g_currentMission.controlledVehicle
+						canActivate = self:vehicleHasActiveDriver(fillableObject.object:getRootVehicle())
 					end
 
 					if canActivate then
@@ -483,6 +483,13 @@ function GC_LoadingTrigger:getIsActivatable()
 	return false
 end
 
+function GC_LoadingTrigger:vehicleHasActiveDriver(vehicle)
+	if (vehicle == g_currentMission.controlledVehicle) or self:vehicleHasAutoDriveActive(vehicle) then
+		return true;
+	end;
+	return false;
+end;
+
 function GC_LoadingTrigger:shouldRemoveActivatable()
 	return self.playerTriggerNode == nil
 end
@@ -491,7 +498,7 @@ function GC_LoadingTrigger:onFillTypeSelection(fillTypeIndex)
 	if fillTypeIndex ~= nil and fillTypeIndex ~= FillType.UNKNOWN then
 		local validFillableObject = self.validFillableObject
 		if validFillableObject ~= nil then
-			local canActivate = validFillableObject:getRootVehicle() == g_currentMission.controlledVehicle
+			local canActivate = self:vehicleHasActiveDriver(validFillableObject:getRootVehicle())
 			if self.playerTriggerNode ~= nil then
 				canActivate = true
 			end
