@@ -488,6 +488,13 @@ function GC_LoadingTrigger:vehicleHasActiveDriver(vehicle)
 		return true;
 	end;
 	return false;
+end;	
+
+function GC_LoadingTrigger:vehicleHasAutoDriveActive(vehicle)
+	if vehicle ~= nil and vehicle.ad ~= nil and vehicle.ad.isActive then
+		return true;
+	end;
+	return false;
 end;
 
 function GC_LoadingTrigger:shouldRemoveActivatable()
