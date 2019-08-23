@@ -14,7 +14,7 @@
 -- 		- Add option for multiple 'loadingTriggers' and 'unloadingTriggers' for each product.
 --		- Fixed access to menu and triggers for onCreate when first loading game without a save.
 --		- Added ability to set an input to be always 100%. 'registerInputProducts.inputProduct#isAlwaysFull' FillType must still be set and no 'inputMethods' can be used.
---
+--		- Remove input- and outputpercent limit
 -- 	v1.1.0.0 (21.06.2019):
 -- 		- release version
 --
@@ -790,7 +790,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 						inputProductNameToInputId[name] = inputId
 
 						productLine.inputs[inputId] = self.inputProducts[inputProductId]
-						productLine.inputsPercent[inputId] = math.min(math.max(inputPercent, 0.1), 1)
+						productLine.inputsPercent[inputId] = inputPercent;
 
 						-- Allow simple income as fillType is used. This is product line specific.
 						local pricePerLiter = getXMLFloat(xmlFile, inputKey .. ".income#pricePerLiter")
@@ -832,7 +832,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 							outputProductNameToOutputId[name] = outputId
 
 							productLine.outputs[outputId] = self.outputProducts[outputProductId]
-							productLine.outputsPercent[outputId] = math.min(math.max(outputPercent, 0.1), 1)
+							productLine.outputsPercent[outputId] = outputPercent;
 
 							local out = productLine.outputs[outputId]
 							if out.palletCreator ~= nil then
