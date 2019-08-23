@@ -372,6 +372,8 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 					inputProduct.title = string.format(g_company.languageManager:getText("GC_Input_Title_Backup"), self.numInputProducts + 1)
 				end
 
+				inputProduct.unitLang = g_company.languageManager:getText(getXMLString(xmlFile, inputProductKey .. "#unitLang"))
+
 				local inputProductId = #self.inputProducts + 1
 				inputProduct.id = inputProductId
 
@@ -554,6 +556,8 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 							outputProduct.title = fillType.title
 							outputProduct.imageFilename = fillType.hudOverlayFilename
 						end
+
+						outputProduct.unitLang = g_company.languageManager:getText(getXMLString(xmlFile, outputProductKey .. "#unitLang"))
 
 						local outputProductId = #self.outputProducts + 1
 						outputProduct.id = outputProductId
@@ -753,6 +757,8 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			productLine.userStopped = false
 			productLine.autoStart = Utils.getNoNil(getXMLBool(xmlFile, productLineKey .. "#autoLineStart"), false)
 			productLine.outputPerHour = Utils.getNoNil(getXMLInt(xmlFile, productLineKey .. "#outputPerHour"), 1000)
+
+			productLine.unitLang = g_company.languageManager:getText(getXMLString(xmlFile, productLineKey .. "#unitLang"))
 
 			productLine.inputsPercent = {}
 			productLine.inputsIncome = {}

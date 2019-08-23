@@ -3,12 +3,16 @@
 --
 -- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany
--- @Date: 16.06.2019
--- @Version: 1.1.0.0
+-- @Date: 23.08.2019
+-- @Version: 1.2.0.0
 --
 -- @Support: https://ls-modcompany.com
 --
 -- Changelog:
+--
+-- 	v1.1.0.0 (23.08.2019):
+--		- Add own unit (kevink98)
+--
 --
 -- 	v1.1.0.0 (16.06.2019):
 --		- New script [GC_ProductionFactoryGui] using Giants GUI.
@@ -305,9 +309,9 @@ function GC_ProductionFactoryGui:onCreateProductLineProduction(element)
 		self.productLineElementMapping[self.currentProductLineId].outputPerHour = element
 
 		if self.currentProductLine.active then
-			element:setText(string.format(self.l10n:getText("shop_incomeValue"), self:formatVolume(self.currentProductLine.outputPerHour, true)))
+			element:setText(string.format(self.l10n:getText("shop_incomeValue"), self:formatVolume(self.currentProductLine.outputPerHour, true, self.currentProductLine.unitLang)))
 		else
-			element:setText(string.format(self.l10n:getText("shop_incomeValue"), self:formatVolume(0, true)))
+			element:setText(string.format(self.l10n:getText("shop_incomeValue"), self:formatVolume(0, true, self.currentProductLine.unitLang)))
 		end
 	end
 end
@@ -491,12 +495,12 @@ function GC_ProductionFactoryGui:updateProductLinePage(updateListItems)
 				local elements = self.inputElementMapping[inputId]
 				if elements ~= nil then
 					local inputProduct = selectedProductLine.inputs[inputId]
-					elements.fillLevel:setText(self:formatVolume(math.min(inputProduct.fillLevel, inputProduct.capacity), true))
+					elements.fillLevel:setText(self:formatVolume(math.min(inputProduct.fillLevel, inputProduct.capacity), true, inputProduct.unitLang))
 					self:updateStatusBar(elements.statusBar, elements.statusBarSize, inputProduct, true, false)
 					elements.percent:setText(self:getFlooredPercent(inputProduct.fillLevel, inputProduct.capacity))
 
 					if elements.capacity ~= nil and inputProduct.maximumAccepted > 0 then
-						elements.capacity:setText(self:formatVolume(math.max(inputProduct.maximumAccepted - inputProduct.totalDelivered, 0), true))
+						elements.capacity:setText(self:formatVolume(math.max(inputProduct.maximumAccepted - inputProduct.totalDelivered, 0), true, inputProduct.unitLang))
 					end
 				end
 			end
@@ -509,7 +513,7 @@ function GC_ProductionFactoryGui:updateProductLinePage(updateListItems)
 					if elements ~= nil then
 						local outputProduct = selectedProductLine.outputs[outputId]
 						if elements.fillLevel ~= nil then
-							elements.fillLevel:setText(self:formatVolume(math.min(outputProduct.fillLevel, outputProduct.capacity), true))
+							elements.fillLevel:setText(self:formatVolume(math.min(outputProduct.fillLevel, outputProduct.capacity), true, outputProduct.unitLang))
 						end
 						if elements.statusBar ~= nil then
 							self:updateStatusBar(elements.statusBar, elements.statusBarSize, outputProduct, false, false)
@@ -595,7 +599,7 @@ function GC_ProductionFactoryGui:updateProductLineListItem(productLine, productL
 				if productLine.active then
 					outputPerHour = productLine.outputPerHour
 				end
-				elementMapping.outputPerHour:setText(string.format(self.l10n:getText("shop_incomeValue"), self:formatVolume(outputPerHour, true)))
+				elementMapping.outputPerHour:setText(string.format(self.l10n:getText("shop_incomeValue"), self:formatVolume(outputPerHour, true, productLine.unitLang)))
 			end
 		end
 	end
@@ -690,13 +694,13 @@ function GC_ProductionFactoryGui:onCreateProductFillLevel(element, argument)
 				element:setText(self.l10n:formatMoney(self.currentOutputProduct.incomePerHour, 0, true, true))
 			else
 				self.outputElementMapping[self.currentOutputProductId].fillLevel = element
-				element:setText(self:formatVolume(math.min(self.currentOutputProduct.fillLevel, self.currentOutputProduct.capacity), true))
+				element:setText(self:formatVolume(math.min(self.currentOutputProduct.fillLevel, self.currentOutputProduct.capacity), true, self.currentOutputProduct.unitLang))
 			end
 		end
 	else
 		if self.currentInputProduct ~= nil then
 			self.inputElementMapping[self.currentInputProductId].fillLevel = element
-			element:setText(self:formatVolume(math.min(self.currentInputProduct.fillLevel, self.currentInputProduct.capacity), true))
+			element:setText(self:formatVolume(math.min(self.currentInputProduct.fillLevel, self.currentInputProduct.capacity), true, self.currentInputProduct.unitLang))
 		end
 	end
 end
@@ -748,16 +752,16 @@ function GC_ProductionFactoryGui:onCreateProductCapacity(element, argument)
 				element:setText(self.l10n:formatMoney(self.currentOutputProduct.lifeTimeIncome, 0, true, true))
 				self.outputElementMapping[self.currentOutputProductId].lifeTimeIncome = element
 			else
-				element:setText(self:formatVolume(self.currentOutputProduct.capacity, true))
+				element:setText(self:formatVolume(self.currentOutputProduct.capacity, true, self.currentOutputProduct.unitLang))
 			end
 		end
 	else
 		if self.currentInputProduct ~= nil then
 			if self.currentInputProduct.maximumAccepted <= 0 then
-				element:setText(self:formatVolume(self.currentInputProduct.capacity, true))
+				element:setText(self:formatVolume(self.currentInputProduct.capacity, true, self.currentInputProduct.unitLang))
 			else
 				self.inputElementMapping[self.currentInputProductId].capacity = element
-				element:setText(self:formatVolume(math.max(self.currentInputProduct.maximumAccepted - self.currentInputProduct.totalDelivered, 0), true))
+				element:setText(self:formatVolume(math.max(self.currentInputProduct.maximumAccepted - self.currentInputProduct.totalDelivered, 0), true, self.currentInputProduct.unitLang))
 			end
 		end
 	end
@@ -882,7 +886,7 @@ function GC_ProductionFactoryGui:onClickActivate()
 				end
 
 				local validLitres, price = self.factory:verifyPriceAndLitres(input, buyLiters, self.productPurchasePrices[input])
-				local text = string.format(self.texts.confirmPurchase, self.selectedInput.title, self:formatVolume(validLitres, true), self.l10n:formatMoney(price, 0, true, true))
+				local text = string.format(self.texts.confirmPurchase, self.selectedInput.title, self:formatVolume(validLitres, true, self.selectedInput.unitLang), self.l10n:formatMoney(price, 0, true, true))
 				g_gui:showYesNoDialog({text = text, title = "", callback = self.onConfirmPurchase, target = self})
 			end
 		elseif self.selectedOutput ~= nil then
@@ -963,7 +967,7 @@ function GC_ProductionFactoryGui:setPurchaseAmount(input, litres)
 		local validLitres, price = self.factory:changeBuyLiters(input, litres, self.buyLiters, self.productPurchasePrices[input])
 		self.buyLiters = validLitres
 
-		purchaseText = string.format("%s ( %s ) ( %s )", self.l10n:getText("button_buy"), self:formatVolume(math.max(validLitres, 0), false), self.l10n:formatMoney(price, 0, true, true))
+		purchaseText = string.format("%s ( %s ) ( %s )", self.l10n:getText("button_buy"), self:formatVolume(math.max(validLitres, 0), false, input.unitLang), self.l10n:formatMoney(price, 0, true, true))
 
 		if validLitres > 0 then
 			removeText = self.texts.remove
@@ -1072,12 +1076,15 @@ function GC_ProductionFactoryGui:playAddRemoveSample()
 	end
 end
 
-function GC_ProductionFactoryGui:formatVolume(litres, useLongName)
+function GC_ProductionFactoryGui:formatVolume(litres, useLongName, ownUnit)
 	if litres == nil then
 		litres = 0
 	end
-
-	return self.l10n:formatNumber(litres, 0) .. " " .. self.l10n:getVolumeUnit(useLongName)
+	if ownUnit == nil or ownUnit == "" then
+		return self.l10n:formatNumber(litres, 0) .. " " .. self.l10n:getVolumeUnit(useLongName)
+	else
+		return self.l10n:formatNumber(litres, 0) .. " " .. ownUnit
+	end
 end
 
 function GC_ProductionFactoryGui:getFlooredPercent(level, maxLevel)
