@@ -3,12 +3,15 @@
 --
 -- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany / kevink98
--- @Date: 26.01.2019
--- @Version: 1.1.1.0
+-- @Date: 23.08.2019
+-- @Version: 1.2.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+-- 	v1.1.1.0 (26.01.2019):
+--		- add query if bitmask is correct (for autodrive)
+--
 -- 	v1.1.1.0 (26.01.2019):
 --		- add function for set triggernode when don't use xml for loading
 --
@@ -90,6 +93,9 @@ function GC_PlayerTrigger:setTriggerNode(playerTriggerNode)
 	if playerTriggerNode ~= nil then
 		self.playerTriggerNode = I3DUtil.indexToObject(self.rootNode, playerTriggerNode, self.target.i3dMappings)
 		if self.playerTriggerNode ~= nil then
+			if RaycastUtil.MASK.TRIGGER_PLAYER ~= getCollisionMask(self.playerTriggerNode) then
+				g_company.debug:logWrite(self.debugData, GC_DebugUtils.WARNING, "Playertrigger %s should have collisionMask! Need only Bit 20", self.playerTriggerNode);
+			end;
 			addTrigger(self.playerTriggerNode, "playerTriggerCallback", self)
 			return true
 		end
