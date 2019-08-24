@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<l10n>
+	<elements>
+
+		<!-- Warnings / Errors -->
+		<e k="GC_mapVersionWarning" v="La carte '%s' de %s requiert Global Company - Version %s ou supérieure pour fonctionner correctement. Vous pouvez aller sur le modHub pour télécharger la dernière version officielle ou consulter '%s' pour obtenir de l'aide."/>
+		<e k="GC_modVersionWarning" v="Le mod '%s' de %s requiert Global Company - Version %s ou supérieure pour fonctionner correctement. Vous pouvez aller sur le modHub pour télécharger la dernière version officielle ou consulter '%s' pour obtenir de l'aide"/>
+		<e k="GC_loadingError" v="Le chargement de Global Company ne s'est pas déroulé correctement ! Vous pouvez aller sur le modHub pour télécharger la dernière version officielle ou consulter '%s' pour obtenir de l'aide."/>
+		<e k="GC_duplicateError" v="Tentative de double chargement de Global Company ! Merci d'effacer '%s' de votre dossier mods avant de relancer le jeu."/>
+		<e k="GC_combinedError" v="Tentative de chargement de Global Company depuis la carte '%s' ! Ceci n'est pas possible et provoquera d'importantes erreurs. Vous pouvez aller sur le modHub pour télécharger la dernière version officielle ou consulter '%s' pour obtenir de l'aide."/>
+		<e k="GC_invalidModWarning" v="Le mod %s de %s n'est pas supporté ! Pour éviter des erreurs, ce mod doit être effacé !"/>
+		<e k="GC_quitToMainMenu" v="Êtes-vous sûr(e) de vouloir quitter vers le menu principal ?"/>
+		<e k="GC_betaVersionWarning" v="La version de développement a été chargée. Merci de signaler les avertissements et les erreurs à %s. Vous pouvez aller sur le modHub pour télécharger la dernière version officielle ou consulter '%s' pour obtenir de l'aide."/>
+		<e k="GC_namingError" v="'%s' est un nom de fichier .zip invalide pour la version de développement ! Utilisez 'FS19_GlobalCompany' comme nom de fichier .zip. Vous pouvez aller sur le modHub pour télécharger la dernière version officielle ou consulter '%s' pour obtenir de l'aide."/>
+
+		<!-- GUI -->
+		<e k="GC_gui_buttons_ok" v="OK"/>
+		<e k="GC_gui_buttons_yes" v="Oui"/>
+		<e k="GC_gui_buttons_no" v="Non"/>
+		<e k="GC_gui_modHubLink" v="Lien de téléchargement du ModHub"/>
+		<e k="GC_gui_buttons_nextWarning" v="Avertissement suivant"/>
+		<e k="GC_gui_buttons_nextConflict" v="Conflit suivant"/>
+
+		<!-- General -->
+		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
+
+		<!-- Settings -->
+		<e k="GC_settings_header" v="GlobalCompany - Paramètres"/>
+		<e k="GC_settings1_title" v="Activer le placement d'objets amélioré"/>
+		<e k="GC_settings2_title" v="Afficher les infos des objets"/>
+		<e k="GC_settings3_title" v="Engager un employé pour les chevaux (300 € / cheval / jour)"/>
+		<e k="GC_settings4_title" v="Activer le dépassement de la quantité limite d'arbres"/>
+		<e k="GC_settings5_title" v="Activer le découpage des balles"/>
+		
+		<!-- Factory -->
+		<e k="GC_gui_buttons_back" v="Précédent"/>
+		<e k="GC_gui_overview" v="Aperçu"/>
+		<e k="GC_gui_productLines" v="Lignes de production"/>
+		<e k="GC_gui_description" v="Description"/>
+		<e k="GC_gui_active" v="Actif"/>
+		<e k="GC_gui_productionPerHour" v="Production : %s litres/heure"/>
+		<e k="GC_gui_capacity" v="Capacité:"/>
+		<e k="GC_gui_filllevel" v="Quantité:"/>
+		<e k="GC_gui_liter" v="%s litres"/>
+		<e k="GC_gui_buyText" v="Acheter (%s)"/>
+		
+		<e k="GC_gui_activate" v="Activer"/>
+		<e k="GC_gui_deactivate" v="Désactiver"/>
+		<e k="GC_gui_state" v="Statut:"/>
+		<e k="GC_gui_automatic" v="Automatique:"/>
+		<e k="GC_gui_state_on" v="En fonctionnement"/>
+		<e k="GC_gui_state_off" v="Arrêté"/>
+		<e k="GC_gui_pallet1" v="%s palette"/>
+		<e k="GC_gui_pallet2" v="%s palettes"/>
+		<e k="GC_gui_spawnText1" v="Sortir %s palette"/>
+		<e k="GC_gui_spawnText2" v="Sortir %s palettes"/>
+		<e k="GC_gui_autoStart" v="Démarrage automatique :"/>		
+		
+		<e k="GC_Productline_Title_Backup" v="Ligne de production %d"/>
+		<e k="GC_Input_Title_Backup" v="Entrée %d"/>
+		<e k="GC_Output_Title_Backup" v="Sortie %d"/>
+		<e k="GC_Input_Header_Backup" v="Entrée"/>
+		<e k="GC_Output_Header_Backup" v="Sortie"/>
+		
+		<e k="GC_Open_Product_Menu" v="Menu des produits"/>
+		<e k="GC_Open_Overview_Menu" v="Aperçu"/>
+		
+		<e k="GC_Factory_Animal_Dialogue" v="Sélectionnez le nombre d'animaux à décharger."/>
+
+		<e k="GC_gui_disabled" v="Désactivé"/>
+		<e k="GC_gui_add" v="Ajouter"/>
+		<e k="GC_gui_remove" v="Retirer"/>
+		<e k="GC_gui_max" v="Maximum"/>
+		<e k="GC_gui_percent" v="Pourcentage"/>
+		<e k="GC_gui_lifeTimeIncome" v="Revenu pour la durée de vie"/>
+		<e k="GC_gui_changeFactoryTitle" v="Entrez le nouveau nom de référence de l'usine."/>
+
+		<e k="GC_gui_placeableObject" v="Objet plaçable"/>
+		<e k="GC_gui_farmlandObject" v="Objet de la carte"/>
+		
+		<!-- Formatting required -->
+		<e k="GC_Factory_Sell_Warning" v="Cette usine contient encore des produits. Ils vont être vendus en gros pour le montant suivant :
+
+Prix de gros : %s"/>		
+		
+		<e k="GC_Factory_Purchase_Warning" v="Merci de confirmer l'achat des produits suivants.
+
+Produits en entrée : %s
+Volume : %s
+Coût : %s"/>
+
+
+		<!-- BaleShreader -->
+		<e k="GC_baleShreader_openSteer" v="Déployer la buse"/>
+		<e k="GC_baleShreader_closeSteer" v="Replier la buse"/>
+		<e k="GC_baleShreader_startWork" v="Démarrer la déchiqueteuse"/>
+		<e k="GC_baleShreader_endWork" v="Arrêter la déchiqueteuse"/>
+		<e k="GC_baleShreader_toggleOnWorkLight" v="Allumer les lumières"/>
+		<e k="GC_baleShreader_toggleOffWorkLight" v="Éteindre les lumières"/>
+
+		<!-- Baler -->
+		<e k="GC_baler_title" v="Presse à balles"/>
+		<e k="GC_baler_title_witStack" v="Presse à balle avec empilement"/>
+		<e k="GC_baler_cleaner" v="Nettoyer la presse à balles"/>
+		<e k="GC_baler_openGui" v="Ouvrir le capot"/>
+		<e k="GC_baler_closeGui" v="Refermer le capot"/>
+		<e k="GC_baler_makeEmpty" v="Vide"/>
+		<e k="GC_baler_turnOn" v="Allumer"/>
+		<e k="GC_baler_turnOff" v="Éteindre"/>
+		<e k="GC_baler_info_machineData" v="Données"/>
+		<e k="GC_baler_info_fillLevel" v="Quantité"/>
+		<e k="GC_baler_info_fillLevelBunker" v="Niveau de remplissage du bunker"/>
+		<e k="GC_baler_info_counter" v="Compteur de balles"/>
+		<e k="GC_baler_info_automatic" v="Démarrage automatique"/>
+		<e k="GC_baler_actualTyp" v="Produit :"/>
+		<e k="GC_baler_canStack" v="Nombre de balles à empiler :"/>
+
+		<!-- ObjectInfo -->
+		<e k="GC_ObjectInfo_filltype" v="Produit : %s"/>
+		<e k="GC_ObjectInfo_level" v="Volume : %s litres"/>
+		<e k="GC_ObjectInfo_level2" v="Volume : %s litres (%s%%)"/>
+		<e k="GC_ObjectInfo_owner" v="Propriétaire : %s"/>
+
+		<!-- DynamicStorage -->
+		<e k="GC_dynamicStorage_unloadSettings" v="Paramètres de déchargement"/>
+		<e k="GC_dynamicStorage_gui_header_unloading" v="Sélectionner la position de déchargement"/>
+		<e k="GC_dynamicStorage_gui_header_loading" v="Sélectionner la boîte de chargement"/>
+		<e k="GC_dynamicStorage_gui_info_unloading" v="Sélectionner la boîte de déchargement. Notez que chaque boîte ne peut contenir qu'un seul type de produit."/>
+		<e k="GC_dynamicStorage_gui_info_loading" v="Sélectionnez la boîte à charger."/>
+		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s litre"/>
+		<e k="GC_dynamicStorage_gui_empty" v="vide"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Confirmer la position de déchargement"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Confirmer la boîte à charger"/>
+	</elements>
+</l10n>
