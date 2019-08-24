@@ -58,12 +58,12 @@ Changelog:
     </GuiElement>  
 
     <!-- Setting: AddOn: VehicleControl - ShowInteractionGui -->
-    <GuiElement type="flowLayout" template="gcMenuSettingsButtonLayout">         
+    <!--GuiElement type="flowLayout" template="gcMenuSettingsButtonLayout">         
       <GuiElement type="image" template="gcMenuSettingsButtonLayoutBackground">    
         <GuiElement type="button" template="gcMenuSettingsButtonLayoutButton" id="gui_btn_settings_6" onClick="onClickBtnSetting" parameter="addOnVehicleControllShowInteractionGui" />
       </GuiElement>
       <GuiElement type="text" template="gcMenuSettingsButtonLayoutText" text="$l10n_GC_settings6_title" />    
-    </GuiElement>      
+    </GuiElement-->      
     
   </GuiElement>
 </GUI>
