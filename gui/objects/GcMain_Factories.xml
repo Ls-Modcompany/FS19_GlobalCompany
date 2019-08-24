@@ -1,40 +1,42 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 
 <GUI>
-	<GuiElement type="image" template="gcMenuFactoriesBackgroundLeft">
-		<GuiElement type="image" template="gcSeperator" size="2px 722px" position="398px 0px"/>
-	</GuiElement>
-
-	<GuiElement type="table" template="gcMenuFactoriesTableLayout" id="gui_factoryListTable">
-		<GuiElement type="button" template="gcMenuFactoriesLayoutButton" id="gui_factorySelectFactory" onClick="onClickSelectFactory" isTableTemplate="true">
-			<GuiElement type="image" template="gcFactoriesSeperator" size="2px 200px" position="-158px 0px" />
-			<GuiElement type="image" template="gcMenuFactoriesButtonLayoutImage" onCreate="onCreateFactoryImageSmall"/>
-
-			<GuiElement type="text" template="gcMenuFactoriesButtonLayoutText" onCreate="onCreateFactoryTitle1" text="$l10n_GC_Open_Overview_Menu" />
-			<GuiElement type="text" template="gcMenuFactoriesButtonLayoutIdText" onCreate="onCreateFactoryTitle2" text="- - - - - -" />
-		</GuiElement>
-	</GuiElement>
-
-	<GuiElement type="image" template="gcMenuFactoriesBackgroundRight">
-		<GuiElement type="image" template="gcMenuFactoriesOverviewImageBackground">
-			<GuiElement type="image" template="gcMenuFactoriesOverviewImage" id="gui_factoryImageLarge" />
-			<GuiElement type="text" template="gcMenuFactoriesOverviewTitleText" text="$l10n_GC_gui_overview" id="gui_factoryTitleText"/>
-			<GuiElement type="text" template="gcMenuFactoriesOverviewNameText" text="- - - - - -" id="gui_factoryNameText"/>
-
-			<GuiElement type="button" template="gcMenuFactoriesVisitButton" id="gui_factoryVisitButton" onClick="onClickOpenOverview" text="$l10n_GC_Open_Overview_Menu"/>
-			<GuiElement type="button" template="gcMenuFactoriesRenameButton" id="gui_factoryRenameButton" onClick="onClickRenameFactory" text="$l10n_button_rename"/>
-		</GuiElement>
-	</GuiElement>
-
-	<GuiElement type="image" template="gcMenuFactoriesTypeImage">
-		<GuiElement type="text" template="gcMenuFactoriesTypeText" text="$l10n_GC_gui_placeableObject"/>
-	</GuiElement>
+	<GuiElement type="flowLayout" template="gcMenuFactoriesLayout1">   
 		
-	<GuiElement type="image" template="gcMenuFactoriesTypeImageBlue">			
-		<GuiElement type="text" template="gcMenuFactoriesTypeTextBlue" text="$l10n_GC_gui_farmlandObject"/>
-	</GuiElement>
+		<GuiElement type="flowLayout" template="gcMenuFactoriesLayout2">     
+			<GuiElement type="image" template="gcMenuFactoriesBackgroundLeft">
+				<GuiElement type="table" template="gcMenuFactoriesTableLayout" id="gui_factoryListTable">
+					<GuiElement type="button" template="gcMenuFactoriesLayoutButton" id="gui_factorySelectFactory" onClick="onClickSelectFactory" isTableTemplate="true">
+						<GuiElement type="image" template="gcFactoriesSeperator" size="2px 200px" position="-158px 0px" />
+						<GuiElement type="image" template="gcMenuFactoriesButtonLayoutImage" onCreate="onCreateFactoryImageSmall"/>
 
-    <GuiElement type="button" template="gcMenuFactoriesButtonBack" onClick="onClickClose">
-		<GuiElement type="text" template="gcMenuFactoriesButtonBackText" text="$l10n_button_back"/>
+						<GuiElement type="text" template="gcMenuFactoriesButtonLayoutText" onCreate="onCreateFactoryTitle1" text="$l10n_GC_Open_Overview_Menu" />
+						<GuiElement type="text" template="gcMenuFactoriesButtonLayoutIdText" onCreate="onCreateFactoryTitle2" text="- - - - - -" />
+					</GuiElement>
+				</GuiElement>
+				<GuiElement type="image" template="gcSeperator" size="2px 722px" position="398px 0px"/>
+			</GuiElement>
+
+			<GuiElement type="image" template="gcMenuFactoriesBackgroundRight">
+				<GuiElement type="image" template="gcMenuFactoriesOverviewImageBackground">
+					<GuiElement type="image" template="gcMenuFactoriesOverviewImage" id="gui_factoryImageLarge" />
+					<GuiElement type="text" template="gcMenuFactoriesOverviewTitleText" text="$l10n_GC_gui_overview" id="gui_factoryTitleText"/>
+					<GuiElement type="text" template="gcMenuFactoriesOverviewNameText" text="- - - - - -" id="gui_factoryNameText"/>
+
+					<GuiElement type="button" template="gcMenuFactoriesVisitButton" id="gui_factoryVisitButton" onClick="onClickOpenOverview" text="$l10n_GC_Open_Overview_Menu"/>
+					<GuiElement type="button" template="gcMenuFactoriesRenameButton" id="gui_factoryRenameButton" onClick="onClickRenameFactory" text="$l10n_button_rename"/>
+				</GuiElement>
+			</GuiElement>
+		</GuiElement>
+
+		
+		<GuiElement type="flowLayout" template="gcMenuFactoriesLayout3"> 
+			<GuiElement type="button" template="gcMenuFactoriesButtonBack" onClick="onClickClose" />
+			<GuiElement type="text" template="gcMenuFactoriesButtonBackText" text="$l10n_button_back"/>
+			<GuiElement type="image" template="gcMenuFactoriesTypeImage" />
+			<GuiElement type="text" template="gcMenuFactoriesTypeText" text="$l10n_GC_gui_placeableObject"/>
+			<GuiElement type="image" template="gcMenuFactoriesTypeImageBlue" />	
+			<GuiElement type="text" template="gcMenuFactoriesTypeTextBlue" text="$l10n_GC_gui_farmlandObject"/>
+		</GuiElement>	
 	</GuiElement>
 </GUI>

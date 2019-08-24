@@ -32,7 +32,7 @@ GlobalCompanyGui.debugData = g_company.debug:getDebugData(GlobalCompanyGui.debug
 GlobalCompanyGui.DevelopementVersionTemplatesFilename = {};
 addModEventListener(GlobalCompanyGui);
 
-GlobalCompanyGui.devVersion = false;
+GlobalCompanyGui.devVersion = true;
 
 GlobalCompanyGui.guis = {};
 GlobalCompanyGui.smallGuis = {};
@@ -879,12 +879,28 @@ function GlobalCompanyGui:getOutputSize()
 	end;
 	]]--
 	
+
+	--old
+	--local factor =  1920 / g_screenWidth;
+	--return {g_screenWidth * factor, g_screenHeight * factor};
+	
+	local factor =  1920 / g_screenWidth;
+	if g_screenWidth / 2 > g_screenHeight then
+		factor =  1080 / g_screenHeight;
+	end;
+	return {g_screenWidth * factor, g_screenHeight * factor};
+
+
+
+
+
+	--test
 	--if g_screenWidth / g_screenHeight > 2.3333 then
 	--	local factor =  g_screenWidth / g_screenHeight;
 	--	return {g_screenWidth * factor, g_screenHeight * factor};
 	--else
-		local factor =  1920 / g_screenWidth;
-		return {g_screenWidth * factor, g_screenHeight * factor};
+		--local factor =  1920 / g_screenWidth;
+		--return {g_screenWidth * factor, g_screenHeight * factor};
 	--end;
 end
 
@@ -938,8 +954,3 @@ end;
 g_company.gui:loadGuiTemplates(g_company.dir .. "gui/guiTemplates.xml");
 g_company.addInit(GlobalCompanyGui, GlobalCompanyGui.init);
 BaseMission.draw = Utils.appendedFunction(BaseMission.draw, GlobalCompanyGui.drawB);
-
-
-
-
-

@@ -889,12 +889,29 @@
 		</template>
 
 		<!-- GcMainScreen - Factories -->
+		<template name="gcMenuFactoriesLayout1" anchor="middleCenter" extends="">
+			<value name="orientation" value="y" />
+			<value name="alignment" value="top" />
+			<value name="size" value="1920px 746px" />
+			<value name="position" value="0px 0px" />
+			<value name="margin" value="0px 0px 0px 0px" />
+		</template>
+		<template name="gcMenuFactoriesLayout2" anchor="middleCenter" extends="">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="left" />
+			<value name="size" value="1660px 746px" />
+			<value name="position" value="0px 0px" />
+			<value name="margin" value="0px 0px 0px 0px" />
+		</template>
+		<template name="gcMenuFactoriesLayout3" anchor="middleCenter" extends="gcMenuFactoriesLayout2">
+			<value name="size" value="1660px 50px" />
+		</template>
 		<template name="gcMenuFactoriesTableLayout" anchor="leftTop" extends="">
 			<value name="debugEnabled" value="false" />
 			<value name="orientation" value="y" />
 			<value name="alignment" value="top" />
 			<value name="size" value="800px 700px" />
-			<value name="position" value="130px -200px" />
+			<value name="position" value="10px -10px" />
 			<value name="maxItemsX" value="1" />
 			<value name="maxItemsY" value="3" />
 			<value name="hasSlider" value="true" />
@@ -906,8 +923,8 @@
 		</template>
 
 		<template name="gcMenuFactoriesBackgroundLeft" anchor="leftCenter" extends="gcBase">
-			<value name="size" value="848px 726px" />
-			<value name="position" value="130px 10px" />
+			<value name="size" value="850px 726px" />
+			<value name="position" value="0px 0px" />
 			<value name="imageColor" value="transparent" />
 			<value name="hasBorders" value="true" />
 			<value name="borderLeftSize" value="2px" />
@@ -922,7 +939,7 @@
 
 		<template name="gcMenuFactoriesBackgroundRight" anchor="rightCenter" extends="gcMenuFactoriesBackgroundLeft">
 			<value name="size" value="800px 724px" />
-			<value name="position" value="-120px 10px" />
+			<value name="position" value="20px 0px" />
 			
 		</template>
 
@@ -935,7 +952,6 @@
 		</template>
 
 		<template name="gcMenuFactoriesLayoutButton" extends="gcBase">
-			<value name="debugEnabled" value="false" />
 			<value name="size" value="760px 200px" />
 
 			<value name="imageColor" value="buttonMain" />
@@ -1066,7 +1082,7 @@
 
 		<template name="gcMenuFactoriesButtonBack" anchor="leftBottom" extends="gcBaseGuiButton">
 			<value name="size" value="53px 43px" />
-			<value name="position" value="124px 134px"/>
+			<value name="position" value="20px 0px"/>
 			<value name="clickZone" value="-2px 48px 120px -2px 120px 48px -4px -4px" />
 			<value name="textMargin" value="0px 0px 0px 14px" />
 			<value name="textUpperCase" value="true" />
@@ -1074,12 +1090,14 @@
 			<value name="textBold" value="false" />
 			<value name="textColor_selected" value="text" />			
 			<value name="inputAction" value="MENU_BACK"/>
+			<value name="hasText" value="true" />
+			<value name="textAlignment" value="center" />
 		</template>
 		
 		<template name="gcMenuFactoriesButtonBackText" anchor="leftBottom" extends="gcBase">
 			<value name="textAlignment" value="left"/>
-			<value name="size" value="200px 60px"/>
-			<value name="textMargin" value="54px 0px 0px 14px" />
+			<value name="size" value="20px 0px"/>
+			<value name="textMargin" value="20px 0px 0px 14px" />
 			<value name="textUpperCase" value="true" />
 			<value name="textSize" value="20px" />
 			<value name="textBold" value="true" />
@@ -1087,16 +1105,15 @@
 		</template>
 
 		<template name="gcMenuFactoriesTypeText" extends="gcBase">
-			<value name="textAlignment" value="right"/>
-			<!-- <value name="textUpperCase" value="true" /> -->
+			<value name="textAlignment" value="left"/>
 			<value name="textSize" value="20px" />
 			<value name="textBold" value="true" />
-			<value name="position" value="-990px 1px" />
-			<value name="textMaxWidth" value="300px"/>
+			<value name="position" value="20px 1px" />
+			<value name="size" value="20px 1px" />
 		</template>
 
-		<template name="gcMenuFactoriesTypeImage" anchor="rightBottom" extends="gcBase">	
-			<value name="position" value="-120px 140px" />
+		<template name="gcMenuFactoriesTypeImage" anchor="leftBottom" extends="gcBase">	
+			<value name="position" value="800px 6px" />
 			<value name="size" value="32px 32px" />
 			<value name="imageColor" value="white" />
 			
@@ -1112,13 +1129,12 @@
 		</template>
 		
 		<template name="gcMenuFactoriesTypeImageBlue" anchor="leftBottom" extends="gcMenuFactoriesTypeImage">
-			<value name="position" value="1000px 140px" />
+			<value name="position" value="250px 6px" />
 			<value name="imageColor" value="blue" />
 		</template>
 		
 		<template name="gcMenuFactoriesTypeTextBlue" extends="gcMenuFactoriesTypeText">
 			<value name="textAlignment" value="left"/>
-			<value name="position" value="990px 1px" />
 			<value name="textMaxWidth" value="300px"/>
 		</template>
 	</templates>
