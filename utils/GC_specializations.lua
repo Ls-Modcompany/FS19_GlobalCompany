@@ -109,14 +109,14 @@ function GC_specializations:load()
 						if GC_specializations:getCanAddSpec(vehicleType, spec, s) then
 							g_vehicleTypeManager:addSpecialization(typeName, s.specEnvName);
 
-							spec.registerEventListeners(vehicleType);
+							--spec.registerEventListeners(vehicleType);
 
 							if spec.registerFunctions ~= nil then
-								spec.registerFunctions(vehicleType);
+								--spec.registerFunctions(vehicleType);
 							end;
 
 							if spec.registerOverwrittenFunctions ~= nil then
-								spec.registerOverwrittenFunctions(vehicleType);
+								--spec.registerOverwrittenFunctions(vehicleType);
 							end;
 						end;
 					end;
@@ -159,4 +159,5 @@ function GC_specializations:addNeedSpec(modName, specName)
 	end;
 end;
 
-GlobalCompany.addLoadable(GC_specializations, GC_specializations.load);
+--GlobalCompany.addLoadable(GC_specializations, GC_specializations.load);
+VehicleTypeManager.finalizeVehicleTypes = Utils.prependedFunction(VehicleTypeManager.finalizeVehicleTypes, GC_specializations.load);
