@@ -45,7 +45,7 @@
 						<GuiElement type="text"  profile="productLineInfoTitle" position="40px -75px" text="$l10n_ui_missionStatusTitle:" />
 						<GuiElement type="text"  profile="productLineInfoValue" position="-595px -75px" text="Active" id="productLineStatusText"/>
 						<GuiElement type="bitmap" profile="lineSeparator" position="0px -75px" size="1px 25dp" screenAlign="topCenter" positionOrigin="topCenter"/>
-						<GuiElement type="text"  profile="productLineInfoTitle" position="600px -75px" text="Auto Start:" />
+						<GuiElement type="text"  profile="productLineInfoTitle" position="600px -75px" text="$l10n_GC_gui_autoStart" />
 						<GuiElement type="text"  profile="productLineInfoValue" position="-40px -75px" text="False" id="productLineOperationText"/>
 					</GuiElement>
 

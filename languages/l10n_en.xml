@@ -55,6 +55,7 @@
 		<e k="GC_gui_pallet2" v="%s Pallets"/>
 		<e k="GC_gui_spawnText1" v="Spawn %s Pallet"/>
 		<e k="GC_gui_spawnText2" v="Spawn %s Pallets"/>
+		<e k="GC_gui_autoStart" v="Auto Start:"/>		
 		
 		<e k="GC_Productline_Title_Backup" v="Production Line %d"/>
 		<e k="GC_Input_Title_Backup" v="Input %d"/>
