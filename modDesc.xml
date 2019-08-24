@@ -2,33 +2,79 @@
 <modDesc descVersion="44">
 	<author>LS-Modcompany / kevink98, aPuehri, Eribus</author>
 	
-    <version>1.0.1.0</version>
+    <version>1.1.0.0</version>
     
 	<title>
-        <en>Global Company - Beta</en>
+        <en>GlobalCompany</en>
     </title>
     
 	<description>
         <en>
 			<![CDATA[Global Company - A large script extension for Farming Simulator!
 
-GlobalCompany is the base for many scripts. No matter if production, warehouse or whatever - with this it is easy to implement.]]>
-		</en>		
+GlobalCompany is the base for many scripts. No matter if production, warehouse or whatever - with this it is easy to implement.
+
+Changelog 1.1.0.0:
+- NEW: French and Russian languages added
+- FIX: Shopmanager adapted to current patch
+- FIX: DensityHeightMapManager adapted to current patch
+- FIX: Added support for VertexDesign palettes for object info
+- NEW: Registration for Filltypes and Treetypes in Mods
+- FIX: Horsehelper adapted to Seasonsmod
+- FIX: Gui adapted for very wide monitors
+- NEW: more features for ProductionFactorys
+- FIX: Adaptation to AutoDrive
+
+Translated with www.DeepL.com/Translator]]></en>		
 		<de>
 			<![CDATA[Global Company - Die größte Scripterweiterung für den Landwirtschaft Simulator!
 
-GlobalCompany ist die Grundlage für viele Scripte. Egal ob Produktionen, Lager oder was auch immer - hiermit lässt es sich einfach umsetzen.]]>
-		</de>
+GlobalCompany ist die Grundlage für viele Scripte. Egal ob Produktionen, Lager oder was auch immer - hiermit lässt es sich einfach umsetzen.
+
+Changelog 1.1.0.0:
+- NEU: Sprachen Französisch und Russisch hinzugefügt
+- FIX: Shopmanager an aktuellen Patch angepasst
+- FIX: DensityHeightMapManager an aktuellen Patch angepasst
+- FIX: Support für Paletten von VertexDesign bei Objektinfo hinzugefügt
+- NEU: Registration für Filltypes und Treetypes in Mods
+- FIX: Horsehelper an Seasonsmod angepasst
+- FIX: Gui für sehr breite Monitore angepasst
+- NEU: weitere Features für ProductionFactorys
+- FIX: Anpassung an AutoDrive]]></de>
 		<ru>
 			<![CDATA[Global Company - самой большое собрание скриптов для Farming Simulator!
 
-GlobalCompany основа для многих скриптов. Будь то производства, хранилища или что то еще - с ним возможно многое.]]>
-		</ru>
+GlobalCompany основа для многих скриптов. Будь то производства, хранилища или что то еще - с ним возможно многое.
+
+Блог изменений 1.1.0.0:
+- НОВИНКА: Добавлены французский и русский языки
+- FIX: Shopmanager адаптирован к текущему патчу.
+- FIX: DensityHeightMapManager адаптирован к текущему патчу.
+- FIX: Добавлена поддержка палитры VertexDesign для информации об объектах
+- НОВИНКА: Регистрация для типов заполнения и типов деревьев в модах
+- FIX: Лошадиный скакун адаптирован к сезону.
+- FIX: Gui адаптирован для очень широких мониторов
+- НОВИНКА: больше возможностей для ProductionFactorys
+- FIX: адаптация к AutoDrive
+
+Переведено с помощью www.DeepL.com/Translator]]></ru>
         <fr>
 			<![CDATA[Global Company - Une grande extension de script pour Farming Simulator !
 
-GlobalCompany est la base de nombreux scripts. Que ce soit pour la production, l'entreposage ou autre - avec ce mod, il est facile de tout implémenter.]]>
-		</fr>	
+GlobalCompany est la base de nombreux scripts. Que ce soit pour la production, l'entreposage ou autre - avec ce mod, il est facile de tout implémenter.
+
+Changelog 1.1.0.0.0 :
+- NOUVEAU : ajout des langues française et russe
+- CORRECTIF : Gestionnaire de boutique adapté au patch actuel
+- CORRECTIF : DensityHeightMapMapManager adapté au patch actuel
+- CORRIGE : Ajout de la prise en charge des palettes VertexDesign pour les informations sur les objets
+- NOUVEAU : Enregistrement pour les types de remplissage et les types d'arbres dans les Mods
+- CORRECTIF : Horsehelper adapté à Seasonsmod
+- CORRECTIF : Gui adapté pour les moniteurs très larges
+- NOUVEAU : plus de fonctionnalités pour ProductionFactorys
+- CORRECTIF : Adaptation à AutoDrive
+
+Traduit avec www.DeepL.com/Translator]]></fr>	
     </description>
     
 	<iconFilename>globalCompany.dds</iconFilename>

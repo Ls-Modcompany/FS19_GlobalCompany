@@ -3,14 +3,14 @@
 --
 -- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany
--- @Date: 11.05.2018
--- @Version: 1.0.2.0
+-- @Date: 24.08.2018
+-- @Version: 1.1.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
 --
--- 	v1.1.0.0 (..2018):
+-- 	v1.1.0.0 (24.08.2018):
 --		- add language russian
 --		- fix Shopmanager for actual patch
 --		- Objectinfo: Add support for pallets of VertexDesign
@@ -18,9 +18,8 @@
 --		- add registration of treetypes
 --		- fix densityHeightManager
 --		- Horsehelper: Change money when play with seasonsmod
---
---
---
+--		- fix gui for large width
+--		- adaption to autoDrive
 --
 -- 	v1.0.0.0 (11.05.2018):
 --		- first Release
@@ -35,9 +34,9 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.0.2.0";
-GlobalCompany.versionDate = "05.08.2019";
-GlobalCompany.currentVersionId = 1020; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.version = "1.1.0.0";
+GlobalCompany.versionDate = "24.08.2019";
+GlobalCompany.currentVersionId = 1100; -- Mod Manager ID. (Version number without periods.)
 GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
 
 function GlobalCompany.initialLoad()
