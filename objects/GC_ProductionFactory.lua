@@ -115,6 +115,7 @@ function GC_ProductionFactory:new(isServer, isClient, customMt, xmlFilename, bas
 	self.drawProductLineUI = {}
 
 	self.animalTypeToInputProduct = {}
+	self.animalTypeToOutputProduct = {}
 
 	self.productLines = {}
 	self.inputProducts = {}
@@ -224,6 +225,34 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 		end
 	end
 
+	self.registeredLivestockTriggers = {}
+	if hasXMLProperty(xmlFile, xmlKey .. ".registeredLivestockTriggers") then
+		local i = 0
+		while true do
+			local livestockTriggerKey = string.format("%s.registeredLivestockTriggers.livestockTrigger(%d)", xmlKey, i)
+			if not hasXMLProperty(xmlFile, livestockTriggerKey) then
+				break
+			end
+
+			local name = getXMLString(xmlFile, livestockTriggerKey .. "#name")
+			if name ~= nil and self.registeredLivestockTriggers[name] == nil then
+				local livestockTrigger = self.triggerManager:addTrigger(GC_AnimalLoadingTrigger, self.rootNode, self, xmlFile, livestockTriggerKey, {})
+				if livestockTrigger ~= nil then
+					livestockTrigger:setTitleName(factoryTitle)
+					local triggerId = livestockTrigger.managerId
+					livestockTrigger.extraParamater = triggerId
+					self.registeredLivestockTriggers[name] = {trigger = livestockTrigger, isUsed = false, key = livestockTriggerKey}
+					if livestockTrigger.type == GC_AnimalLoadingTrigger.TYPE_UNLOADING then
+						self.triggerIdToInputProductId[triggerId] = {}
+					else
+						self.triggerIdToOutputProductId[triggerId] = {}
+					end;
+				end
+			end
+			i = i + 1
+		end
+	end;
+
 	local inputHeader = getXMLString(xmlFile, xmlKey .. ".registerInputProducts#headerTitle")
 	if inputHeader ~= nil then
 		self.guiData.inputHeader = g_company.languageManager:getText(inputHeader)
@@ -274,14 +303,19 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 									inputProduct.animalTypeToLitres = {}
 								end
 
+								local subTypeName = getXMLString(xmlFile, fillTypesKey .. "#subType")
 								for id, subType in pairs (animalType.subTypes) do
 									usedFillTypeNames[subType.fillTypeDesc.name] = inputProductName
 
 									inputProduct.animalFillTypeIndexs[subType.fillType] = true
-
-									if id == 1 then
+									
+									if subTypeName ~= nil then
+										if subType.fillTypeDesc.name == subTypeName then
+											fillType = subType.fillTypeDesc
+										end
+									elseif id == 1 then
 										fillType = subType.fillTypeDesc
-									end
+									end;
 								end
 
 								local litresPerAnimal = getXMLInt(xmlFile, fillTypesKey .. "#litresPerAnimal")
@@ -446,14 +480,18 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 					if inputProduct.isAnimalTypes and inputProduct.animalTypeToLitres ~= nil then
 						local livestockTriggerKey = inputProductKey .. ".inputMethods.livestockTrigger"
 						if hasXMLProperty(xmlFile, livestockTriggerKey) then
-							local trigger = self.triggerManager:addTrigger(GC_AnimalLoadingTrigger, self.rootNode, self, xmlFile, livestockTriggerKey, inputProduct.animalTypeToLitres)
-							if trigger ~= nil then
-								trigger:setTitleName(factoryTitle)
+							if getXMLString(xmlFile, livestockTriggerKey .. "#triggerNode") ~= nil then
+								g_company.debug:writeError(self.debugData, "[FACTORY - %s] registration of livestockTrigger is here invalid. Use registeredLivestockTriggers.livestockTrigger!", indexName, inputProductName)
+							end;
 
-								local triggerId = trigger.managerId
-								trigger.extraParamater = triggerId
+							local name = getXMLString(xmlFile, livestockTriggerKey .. "#name")
+							if self.registeredLivestockTriggers[name] ~= nil then
+								self.registeredLivestockTriggers[name].isUsed = true
+								local trigger = self.registeredLivestockTriggers[name].trigger
+								local triggerId = trigger.extraParamater
 
-								self.triggerIdToInputProductId[triggerId] = {}
+								trigger:setConversionData(inputProduct.animalTypeToLitres);							
+
 								for index, _ in pairs (inputProduct.animalFillTypeIndexs) do
 									self.triggerIdToInputProductId[triggerId][index] = inputProductId
 								end
@@ -534,9 +572,55 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				local outputProduct = {}
 				outputProduct.name = outputProductName
 
+				outputProduct.animalFillTypeIndexs = {}
+				outputProduct.isAnimalTypes = Utils.getNoNil(getXMLBool(xmlFile, outputProductKey .. "#isAnimalTypes"), false)				
+
 				local fillTypeName = getXMLString(xmlFile, outputProductKey .. "#fillType")
+
 				if fillTypeName ~= nil then
-					local fillType = g_fillTypeManager:getFillTypeByName(fillTypeName)
+
+					local fillType
+					if outputProduct.isAnimalTypes then
+						local animalType = g_animalManager:getAnimalsByType(fillTypeName)
+						if animalType ~= nil then
+							local animalTypeName = animalType.type
+							if self.animalTypeToOutputProduct[animalTypeName] == nil then
+								self.animalTypeToOutputProduct[animalTypeName] = outputProduct
+							
+								if outputProduct.animalTypeToLitres == nil then
+									outputProduct.animalTypeToLitres = {}
+								end
+	
+								local subTypeName = getXMLString(xmlFile, outputProductKey .. "#fillTypeSubType")
+								for id, subType in pairs (animalType.subTypes) do	
+																			
+									outputProduct.animalFillTypeIndexs[subType.fillType] = true
+									if subTypeName ~= nil then
+										if subType.fillTypeDesc.name == subTypeName then
+											fillType = subType.fillTypeDesc
+										end
+									elseif id == 1 then
+										fillType = subType.fillTypeDesc
+									end;
+								end
+	
+								local litresPerAnimal = getXMLInt(xmlFile, outputProductKey .. "#litresPerAnimal")
+								if litresPerAnimal == nil then
+									-- Use backup values if none given.
+									litresPerAnimal = Utils.getNoNil(GC_ProductionFactory.BACKUP_ANIMAL_TO_LITRES[animalTypeName], 500)
+								end
+	
+								outputProduct.animalTypeToLitres[animalTypeName] = litresPerAnimal
+							else
+								g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Duplicate animalType ( %s ) used in output factory at %s! Only use each 'animalType' once per factory.", indexName, animalTypeName, outputProductName)
+							end
+						else
+							g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Unknown animalType ( %s ) found in 'outputProduct' ( %s ) at %s, ignoring!", indexName, fillTypeName, outputProductName, fillTypesKey)
+						end
+					else
+						fillType = g_fillTypeManager:getFillTypeByName(fillTypeName)
+					end
+
 					if fillType ~= nil then
 						local fillTypeIndex = fillType.index
 
@@ -696,6 +780,23 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 								end
 							end
 
+							local livestockTriggerKey = outputMethodsKey .. ".livestockTrigger"
+							if hasXMLProperty(xmlFile, livestockTriggerKey) then								
+								local name = getXMLString(xmlFile, livestockTriggerKey .. "#name")
+								if self.registeredLivestockTriggers[name] ~= nil then
+									--TODO: load only trigger with LOADING
+									self.registeredLivestockTriggers[name].isUsed = true
+									local trigger = self.registeredLivestockTriggers[name].trigger
+									local triggerId = trigger.extraParamater
+	
+									trigger:setConversionData(outputProduct.animalTypeToLitres);							
+	
+									for index, _ in pairs (outputProduct.animalFillTypeIndexs) do
+										self.triggerIdToOutputProductId[triggerId] = {[index] = outputProductId}
+									end
+								end
+							end
+
 							if #invalidTriggers > 0 then
 								triggersLoaded = table.concat(triggersLoaded, " or ")
 								invalidTriggers = table.concat(invalidTriggers, " and ")
@@ -786,7 +887,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				if self.inputProductNameToId[name] ~= nil then
 					if inputProductNameToInputId[name] == nil then
 						local inputProductId = self.inputProductNameToId[name]
-						local inputPercent = Utils.getNoNil(getXMLInt(xmlFile, inputKey .. "#percent"), 100) / 100
+						local inputPercent = Utils.getNoNil(getXMLFloat(xmlFile, inputKey .. "#percent"), 100) / 100
 
 						if productLine.inputs == nil then
 							productLine.inputs = {}
@@ -828,7 +929,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 					if self.outputProductNameToId[name] ~= nil then
 						if outputProductNameToOutputId[name] == nil then
 							local outputProductId = self.outputProductNameToId[name]
-							local outputPercent = Utils.getNoNil(getXMLInt(xmlFile, outputKey .. "#percent"), 100) / 100
+							local outputPercent = Utils.getNoNil(getXMLFloat(xmlFile, outputKey .. "#percent"), 100) / 100
 
 							if productLine.outputs == nil then
 								productLine.outputs = {}

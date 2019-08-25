@@ -25,6 +25,9 @@
 
 GC_AnimalLoadingTrigger = {}
 
+GC_AnimalLoadingTrigger.TYPE_UNLOADING = 1;
+GC_AnimalLoadingTrigger.TYPE_LOADING = 1;
+
 local GC_AnimalLoadingTrigger_mt = Class(GC_AnimalLoadingTrigger, Object)
 InitObjectClass(GC_AnimalLoadingTrigger, "GC_AnimalLoadingTrigger")
 
@@ -56,6 +59,8 @@ function GC_AnimalLoadingTrigger:new(isServer, isClient)
 	
 	self.registerTriggerInStream = true
 	self.extraParamater = nil
+
+	self.type = GC_AnimalLoadingTrigger.TYPE_UNLOADING;
    
    return self
 end
@@ -80,6 +85,11 @@ function GC_AnimalLoadingTrigger:load(nodeId, target, xmlFile, xmlKey, conversio
 			self.conversionData = conversionData
 		end
 	end
+
+	local type = getXMLString(xmlFile, xmlKey .. "#type")
+	if type ~= nil and type == "LOADING" then
+		self.type = GC_AnimalLoadingTrigger.TYPE_LOADING;
+	end;
 	
 	if self.triggerNode == nil then
 		g_company.debug:writeModding(self.debugData, "Failed to load! No 'triggerNode' was found!")
@@ -114,10 +124,14 @@ function GC_AnimalLoadingTrigger:triggerCallback(triggerId, otherId, onEnter, on
     if self.isEnabled and (onEnter or onLeave) then
         local vehicle = g_currentMission.nodeToObject[otherId]
         if vehicle ~= nil and vehicle.getSupportsAnimalType ~= nil then
-            if onEnter then
-				if vehicle:getCurrentAnimalType() ~= nil then
+			if onEnter then
+				if self.type == GC_AnimalLoadingTrigger.TYPE_UNLOADING then
+					if vehicle:getCurrentAnimalType() ~= nil then
+						self:setLoadingTrailer(vehicle)
+					end
+				else
 					self:setLoadingTrailer(vehicle)
-				end
+				end;
             elseif onLeave then
                 if vehicle == self.loadingVehicle then
                     self:setLoadingTrailer(nil)
@@ -186,6 +200,11 @@ function GC_AnimalLoadingTrigger:getAnimalTypeAccepted(typeName)
 	return false
 end
 
+--25.08.2019: add function
+function GC_AnimalLoadingTrigger:setConversionData(conversionData)	
+	self.conversionData = conversionData;
+end;
+
 function GC_AnimalLoadingTrigger:getConversionDataPerAnimal(typeName)
 	if self.conversionData ~= nil and self.conversionData[typeName] ~= nil then
 		return self.conversionData[typeName]
@@ -220,21 +239,27 @@ function GC_AnimalLoadingTrigger:onActivateObject()
     self.objectActivated = true
     self.activatedTarget = self.loadingVehicle
 	
-	local typeName = self.activatedTarget:getCurrentAnimalType()
-	if self:getAnimalTypeAccepted(typeName) then
-		local animals = self.activatedTarget:getAnimals()
-		local freeCapacity = self:getFreeCapacity(typeName, animals[1]:getSubType(), self.activatedTarget:getOwnerFarmId())
-	
-		local dialog = g_gui:showDialog("GC_AnimalDeliveryDialog")
-		if dialog ~= nil then
-			dialog.target:setTitle(self.title)
-			dialog.target:setText(self.text)
-			dialog.target:setDialogData(animals, freeCapacity)
-			dialog.target:setCallback(self.doDeliveryCallback, self)
+	if self.type == GC_AnimalLoadingTrigger.TYPE_UNLOADING then
+		local typeName = self.activatedTarget:getCurrentAnimalType()
+		if self:getAnimalTypeAccepted(typeName) then
+			local animals = self.activatedTarget:getAnimals()
+			local freeCapacity = self:getFreeCapacity(typeName, animals[1]:getSubType(), self.activatedTarget:getOwnerFarmId())
+		
+			local dialog = g_gui:showDialog("GC_AnimalDeliveryDialog")
+			if dialog ~= nil then
+				dialog.target:setTitle(self.title)
+				dialog.target:setText(self.text)
+				dialog.target:setDialogData(animals, freeCapacity)
+				dialog.target:setCallback(self.doDeliveryCallback, self)
+			end
+		else
+			g_currentMission:showBlinkingWarning(g_i18n:getText("animals_invalidAnimalType"), 5000)
 		end
 	else
-		g_currentMission:showBlinkingWarning(g_i18n:getText("animals_invalidAnimalType"), 5000)
-	end
+		local typeName = self.target:getCurrentAnimalType()
+
+
+	end;
 end
 
 function GC_AnimalLoadingTrigger:doDeliveryCallback(numberToDeliver)
@@ -271,7 +296,7 @@ function GC_AnimalLoadingTrigger:deliverAnimals(animalTrailer, numberToDeliver)
 				local farmId = animalTrailer:getOwnerFarmId()
 				local litresPerAnimal = self:getConversionDataPerAnimal(typeName)
 				local freeCapacity = self:getFreeCapacity(typeName, subType, farmId)
-			
+				
 				local maxAvailableAnimals = math.min(numberToDeliver, numAnimal)
 				local numberToRemove = math.min(maxAvailableAnimals, freeCapacity)
 	
