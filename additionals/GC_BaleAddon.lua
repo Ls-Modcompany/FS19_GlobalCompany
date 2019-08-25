@@ -1,14 +1,17 @@
 --
 -- GlobalCompany - Additionals - GC_BaleAddon
 --
--- @Interface: --
+-- @Interface: 1.4.1.0 b5332
 -- @Author: LS-Modcompany / aPuehri
--- @Date: 20.06.2019
--- @Version: 1.0.2.0
+-- @Date: 25.08.2019
+-- @Version: 1.0.3.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+--
+-- 	v1.0.3.0 (23.06.2019)/(aPuehri):
+-- 		- bugfixing
 --
 -- 	v1.0.2.0 (20.06.2019)/(aPuehri):
 -- 		- changed client detection
@@ -37,6 +40,7 @@ GC_BaleAddon.debugIndex = g_company.debug:registerScriptName("GC_BaleAddon");
 GC_BaleAddon.enableCutBale = false;
 GC_BaleAddon.object = nil;
 GC_BaleAddon.eventId = nil;
+GC_BaleAddon.lastFoundBaleNetworkId = nil;
 
 function GC_BaleAddon:load()
     Player.registerActionEvents = Utils.appendedFunction(Player.registerActionEvents, GC_BaleAddon.registerActionEvents);
@@ -55,7 +59,9 @@ function GC_BaleAddon:init()
     self.debugData = g_company.debug:getDebugData(GC_BaleAddon.debugIndex, g_company);
 
     self.eventId_CutBale = g_company.eventManager:registerEvent(self, self.cutBaleEvent);
-    
+    self.eventId_getCanCutBale = g_company.eventManager:registerEvent(self, self.getCanCutBaleEvent);
+    self.eventId_sendCanCutBale = g_company.eventManager:registerEvent(self, self.sendCanCutBaleEvent, true);
+
     if self.isClient then
         g_company.addUpdateable(self, self.update);			
     end;
@@ -90,20 +96,20 @@ function GC_BaleAddon:update(dt)
                         if object:isa(Bale) then
                             if (object.typeName == nil) and (object.fillType ~= nil) and (object.fillLevel ~= nil) then
                                 GC_BaleAddon.object = object;
-                                GC_BaleAddon.enableCutBale = GC_BaleAddon:getCanCutBale(GC_BaleAddon.object);
+                                GC_BaleAddon.enableCutBale = GC_BaleAddon:getCanCutBale(GC_BaleAddon.object, self, false);
                             end;
                         end;
                     end;
                 end;
-            elseif self.isMultiplayer and g_company.settings:getSetting("objectInfo", true) then
-                if (GC_ObjectInfo.foundBale~= nil) then
-                    if GC_BaleAddon.object ~= GC_ObjectInfo.foundBale then
-                        GC_BaleAddon.object = GC_ObjectInfo.foundBale;
-                        -- gc_debugPrint(GC_ObjectInfo.foundBale, nil, nil, "GC_BaleAddon - GC_ObjectInfo.foundBale");
+            elseif self.isMultiplayer and (GC_ObjectInfo.foundBale~= nil) then
+                if GC_BaleAddon.object ~= GC_ObjectInfo.foundBale then
+                    GC_BaleAddon.object = GC_ObjectInfo.foundBale;
+                    if g_company.debug.printLevel[6] then
+                        gc_debugPrint(GC_ObjectInfo.foundBale, nil, nil, "GC_BaleAddon - GC_ObjectInfo.foundBale");
                     end;
-                    if (GC_BaleAddon.object.typeName == nil) and (GC_BaleAddon.object.fillType ~= nil) and (GC_BaleAddon.object.fillLevel ~= nil) then
-                        GC_BaleAddon.enableCutBale = GC_BaleAddon:getCanCutBale(GC_BaleAddon.object);
-                    end;
+                end;
+                if (GC_BaleAddon.object.typeName == nil) and (GC_BaleAddon.object.fillType ~= nil) and (GC_BaleAddon.object.fillLevel ~= nil) then
+                    GC_BaleAddon.enableCutBale = GC_BaleAddon:getCanCutBale(GC_BaleAddon.object, self, false);
                 end;
             end;	
         end;
@@ -111,14 +117,27 @@ function GC_BaleAddon:update(dt)
     end;
 end;
 
-function GC_BaleAddon:getCanCutBale(foundObject)
+function GC_BaleAddon:getCanCutBale(foundObject, ref, noEventSend)
+    local self = ref;
+   
     if (foundObject.fillLevel ~= nil) and (foundObject.fillType ~= nil) and (foundObject.nodeId ~= nil) and (foundObject.nodeId ~= 0) then
-        local testDrop = g_densityMapHeightManager:getMinValidLiterValue(foundObject.fillType);
-        local sx,sy,sz = getWorldTranslation(foundObject.nodeId);
-        local radius = (DensityMapHeightUtil.getDefaultMaxRadius(foundObject.fillType) / 2);
-        
-        if DensityMapHeightUtil.getCanTipToGroundAroundLine(nil, testDrop, foundObject.fillType, sx, sy, sz, (sx + 0.1), (sy - 0.1), (sz + 0.1), radius, nil, 3, true, nil, true) then
-            return true;
+        if self.isClient and self.isMultiplayer then
+            local networkId = NetworkUtil.getObjectId(foundObject);
+
+            if GC_BaleAddon.lastFoundBaleNetworkId ~= networkId then
+                GC_BaleAddon.lastFoundBaleNetworkId = networkId;
+                self.canCut = nil;
+                self:getCanCutBaleEvent({networkId}, noEventSend);
+            end;
+            return self.canCut;
+        else
+            local testDrop = g_densityMapHeightManager:getMinValidLiterValue(foundObject.fillType);
+            local sx,sy,sz = getWorldTranslation(foundObject.nodeId);
+            local radius = (DensityMapHeightUtil.getDefaultMaxRadius(foundObject.fillType) / 2);
+            
+            if DensityMapHeightUtil.getCanTipToGroundAroundLine(nil, testDrop, foundObject.fillType, sx, sy, sz, (sx + 0.1), (sy - 0.1), (sz + 0.1), radius, nil, 3, true, nil, true) then
+                return true;
+            end;            
         end;
     end;
     
@@ -144,16 +163,11 @@ function GC_BaleAddon:cutBale(foundObject, isServer, isClient, eventId, noEventS
     self.isClient = isClient;
     self.eventId = eventId;
     self.foundObjectNetworkId = NetworkUtil.getObjectId(foundObject);
-    -- gc_debugPrint(self.foundObjectNetworkId, nil, nil, "GC_BaleAddon:setCutBale - self.foundObjectNetworkId");
+    
     self:cutBaleEvent({self.foundObjectNetworkId}, foundObject, noEventSend);
 end;
 
-function GC_BaleAddon:cutBaleEvent(data, foundObject, noEventSend)    
-    -- gc_debugPrint(data, nil, nil, "GC_BaleAddon:cutBaleEvent - data");
-    -- gc_debugPrint(self.isServer, nil, nil, "GC_BaleAddon:cutBaleEvent - self.isServer");
-    -- gc_debugPrint(self.isClient, nil, nil, "GC_BaleAddon:cutBaleEvent - self.isClient");
-    -- gc_debugPrint(self.eventId, nil, nil, "GC_BaleAddon:cutBaleEvent - self.eventId");
-    
+function GC_BaleAddon:cutBaleEvent(data, foundObject, noEventSend)      
     g_company.eventManager:createEvent(self.eventId, data, false, noEventSend);
     -- Arguments
     -- table	vehicle	vehicle that is tipping
@@ -182,7 +196,6 @@ function GC_BaleAddon:cutBaleEvent(data, foundObject, noEventSend)
         object = NetworkUtil.getObject(data[1]);
     end;
 
-    -- gc_debugPrint(object, nil, nil, "GC_BaleAddon:cutBaleEvent - object");
     if (object~= nil) then
         if object:isa(Bale) then
             if (object.fillLevel ~= nil) and (object.fillType ~= nil) then
@@ -201,6 +214,31 @@ function GC_BaleAddon:cutBaleEvent(data, foundObject, noEventSend)
             end;
         end;
     end;    
+end;
+
+function GC_BaleAddon:getCanCutBaleEvent(data, noEventSend)
+    g_company.eventManager:createEvent(self.eventId_getCanCutBale, data, false, noEventSend);
+
+    local object = nil;
+    if self.isServer then
+        object = NetworkUtil.getObject(data[1]);
+
+        local testDrop = g_densityMapHeightManager:getMinValidLiterValue(object.fillType);
+        local sx,sy,sz = getWorldTranslation(object.nodeId);
+        local radius = (DensityMapHeightUtil.getDefaultMaxRadius(object.fillType) / 2);
+        
+        if DensityMapHeightUtil.getCanTipToGroundAroundLine(nil, testDrop, object.fillType, sx, sy, sz, (sx + 0.1), (sy - 0.1), (sz + 0.1), radius, nil, 3, true, nil, true) then
+            self:sendCanCutBaleEvent({true});
+        end;
+    end;
+end;
+
+function GC_BaleAddon:sendCanCutBaleEvent(data, noEventSend)   
+	if self.isServer then
+		g_company.eventManager:createEvent(self.eventId_sendCanCutBale, data, false, noEventSend);
+	else
+        self.canCut = data[1];
+	end;
 end;
 
 g_company.addInit(GC_BaleAddon, GC_BaleAddon.init);
