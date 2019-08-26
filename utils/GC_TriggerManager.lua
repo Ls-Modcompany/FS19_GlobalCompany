@@ -44,6 +44,11 @@ function GC_TriggerManager:new(parent, customMt)
 
 	self.debugData = g_company.debug:getDebugData(GC_TriggerManager.debugIndex, parent)
 
+	if g_company.triggerManagerList == nil then
+		g_company.triggerManagerList = {};
+	end;
+	table.insert(g_company.triggerManagerList, self);
+
 	return self
 end
 
