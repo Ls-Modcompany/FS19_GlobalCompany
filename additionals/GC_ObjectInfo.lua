@@ -1,14 +1,18 @@
 --
 -- GlobalCompany - Additionals - GC_Objectinfo
 --
--- @Interface: --
+-- @Interface: 1.4.1.0 b5332
 -- @Author: LS-Modcompany / aPuehri
--- @Date: 23.06.2019
--- @Version: 1.0.2.0
+-- @Date: 19.08.2019
+-- @Version: 1.0.3.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+--
+-- 	v1.0.3.0 (23.06.2019)/(aPuehri):
+-- 		- new supportedTypes
+-- 		- improved Multiplayer-Support
 --
 -- 	v1.0.2.0 (23.06.2019)/(aPuehri):
 -- 		- changed client detection
@@ -39,7 +43,7 @@ InitObjectClass(GC_ObjectInfo, "GC_ObjectInfo");
 GC_ObjectInfo.debugIndex = g_company.debug:registerScriptName("Gc_ObjectInfo");
 GC_ObjectInfo.foundBale = nil;
 GC_ObjectInfo.lastFoundBaleNetworkId = nil;
-GC_ObjectInfo.supportedTypes = {"pallet","genetix","attachablePallet","FS19_bresselUndLadeBigBagPack.bigBagRack"};
+GC_ObjectInfo.supportedTypes = {"pallet","genetix","attachablePallet","FS19_bresselUndLadeBigBagPack.bigBagRack","FS19_bresselUndLadeBigBagPack.bigBag"};
 
 function GC_ObjectInfo:init()
 	local self = setmetatable({}, GC_ObjectInfo_mt);
@@ -66,15 +70,16 @@ function GC_ObjectInfo:init()
 end;
 
 function GC_ObjectInfo:update(dt)
-	if self.isClient and g_company.settings:getSetting("objectInfo", true) then				
+	if self.isClient and (g_company.settings:getSetting("objectInfo", true) or g_company.settings:getSetting("cutBales", true)) then				
 		if g_currentMission.player.isControlled and not g_currentMission.player.isCarryingObject then
 			self.showInfo = false;
+			self.objectInfoEnabled = g_company.settings:getSetting("objectInfo", true);
 			GC_ObjectInfo.foundBale = nil;
 			-- check objects in front of player
 			local x,y,z = localToWorld(g_currentMission.player.cameraNode, 0,0,1.0);
 			local dx,dy,dz = localDirectionToWorld(g_currentMission.player.cameraNode, 0,0,-1);
 			local distance = Player.MAX_PICKABLE_OBJECT_DISTANCE * 1.75;
-			raycastAll(x,y,z, dx,dy,dz, "infoObjectRaycastCallback", distance, self);			
+			raycastAll(x,y,z, dx,dy,dz, "infoObjectRaycastCallback", distance, self);
 		else
 			self.showInfo = false;
 			GC_ObjectInfo.foundBale = nil;
@@ -108,7 +113,7 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 		if (locRigidBodyType == "Dynamic") or (self.isMultiplayer and (locRigidBodyType == "Kinematic")) then
 			local object = g_currentMission:getNodeObject(hitObjectId);		
 			if (object~= nil) then
-				if (object.typeName ~= nil) then					
+				if (object.typeName ~= nil) and self.objectInfoEnabled then
 					GC_ObjectInfo.foundBale = nil;
 					for k, v in pairs(GC_ObjectInfo.supportedTypes) do
 						if (object.typeName == v) then
@@ -131,10 +136,12 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 				elseif (object.typeName == nil) and (object.fillType ~= nil) and (object.fillLevel ~= nil) then
 					if object:isa(Bale) then
 						GC_ObjectInfo.foundBale = object;
-						self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(Utils.getNoNil(g_fillTypeManager.fillTypes[object.fillType].title,"unknown"));
-						self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level'):format(g_company.mathUtils.round(object.fillLevel,0.01));
-						self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object, self, false));
-						self.showInfo = true;						
+						if self.objectInfoEnabled then
+							self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(Utils.getNoNil(g_fillTypeManager.fillTypes[object.fillType].title,"unknown"));
+							self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level'):format(g_company.mathUtils.round(object.fillLevel,0.01));
+							self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object, self, false));
+							self.showInfo = true;
+						end;
 					end;
 				end;
 
