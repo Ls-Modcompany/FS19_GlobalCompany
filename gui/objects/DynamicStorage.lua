@@ -47,6 +47,12 @@ end;
 
 function Gc_Gui_DynamicStorage:onCreate() end;
 
+function Gc_Gui_DynamicStorage:keyEvent(unicode, sym, modifier, isDown, eventUsed)
+    if sym == 13 and isDown then
+        self:onClickAccept();
+    end;    
+end;
+
 function Gc_Gui_DynamicStorage:setCloseCallback(target, func) 
     self.closeCallback = {target=target, func=func};
 end;
@@ -152,7 +158,7 @@ function Gc_Gui_DynamicStorage:onClickSetBox(element)
     end;
 end;
 
-function Gc_Gui_DynamicStorage:onClickAccept(element)  
+function Gc_Gui_DynamicStorage:onClickAccept()  
     if not self.isUnloading and not self.isUnloading and self.closeCallback ~= nil then
         self.closeCallback.func(self.closeCallback.target);
     end;
