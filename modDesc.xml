@@ -87,11 +87,13 @@ Traduit avec www.DeepL.com/Translator]]></fr>
     <l10n>		
 		<text name="input_GC_MAIN"><en>GlobalCompany</en><de>GlobalCompany</de></text>
 		<text name="input_GC_BALEADDON_CUT"><en>Cut Bale</en><de>Ballen aufschneiden</de></text>
+		<text name="input_GC_DYNSTORAGE_VEHICLEINTERACTION"><en>dynStorageVehInterAct</en></text>
 	</l10n>		
 	
 	<actions>
         <action name="GC_MAIN" />
 		<action name="GC_BALEADDON_CUT" />
+		<action name="GC_DYNSTORAGE_VEHICLEINTERACTION" />
     </actions>
 
     <inputBinding>  
@@ -101,5 +103,8 @@ Traduit avec www.DeepL.com/Translator]]></fr>
 		<actionBinding action="GC_BALEADDON_CUT">
             <binding device="KB_MOUSE_DEFAULT" input="MOUSE_BUTTON_RIGHT" axisComponent="+" neutralInput="0" index="3"/>
         </actionBinding>
+		<actionBinding action="GC_DYNSTORAGE_VEHICLEINTERACTION">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_t" axisComponent="+" neutralInput="0" index="1"/>
+        </actionBinding>	
     </inputBinding>
 </modDesc>
