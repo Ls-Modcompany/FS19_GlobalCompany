@@ -61,6 +61,7 @@ source(g_currentModDirectory .. "gui/elements/Borders.lua");
 source(g_currentModDirectory .. "gui/elements/Table.lua");
 source(g_currentModDirectory .. "gui/elements/Slider.lua");
 source(g_currentModDirectory .. "gui/elements/Input.lua");
+source(g_currentModDirectory .. "gui/elements/GuiScreen.lua");
 
 source(g_currentModDirectory .. "gui/FakeGui.lua");
 source(g_currentModDirectory .. "gui/MultiDialog.lua");
@@ -68,6 +69,7 @@ source(g_currentModDirectory .. "gui/objects/Baler.lua");
 source(g_currentModDirectory .. "gui/objects/ObjectInfo.lua");
 source(g_currentModDirectory .. "gui/objects/GcMain.lua");
 source(g_currentModDirectory .. "gui/objects/DynamicStorage.lua");
+source(g_currentModDirectory .. "gui/objects/AnimalShop.lua");
 
 function GlobalCompanyGui:init()	
 	for _,inAc in pairs(self.toInit_actionEvents) do
@@ -108,6 +110,7 @@ function GlobalCompanyGui:load()
 	g_company.gui:registerGui("gcPlaceable_baler", nil, Gc_Gui_Baler, true, true);
 	g_company.gui:registerGui("gcObjectInfo", nil, Gc_Gui_ObjectInfo, false, false);
 	g_company.gui:registerGui("gc_dynamicStorage", nil, Gc_Gui_DynamicStorage, true, true);
+	g_company.gui:registerGui("gc_animalShop", nil, Gc_Gui_AnimalShop, true, true);
 	
 	self.activeGuiDialogs = {};
 	self.registeredActonEvents = false;
