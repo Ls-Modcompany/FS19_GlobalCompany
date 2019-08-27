@@ -20,6 +20,7 @@
 --		- Horsehelper: Change money when play with seasonsmod
 --		- fix gui for large width
 --		- adaption to autoDrive
+--		- add dynamicStorage
 --
 -- 	v1.0.0.0 (11.05.2018):
 --		- first Release
