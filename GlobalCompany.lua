@@ -38,7 +38,7 @@ GlobalCompany.dir = g_currentModDirectory;
 GlobalCompany.version = "1.1.0.0";
 GlobalCompany.versionDate = "24.08.2019";
 GlobalCompany.currentVersionId = 1100; -- Mod Manager ID. (Version number without periods.)
-GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
+GlobalCompany.isDevelopmentVersion = false; -- This is for versions loaded from GIT.
 
 function GlobalCompany.initialLoad()
 	if GlobalCompany.initialLoadComplete ~= nil then
