@@ -77,8 +77,9 @@ function GlobalCompany.initialLoad()
 		
 		GlobalCompany.loadedFactories = {}
 
-		Mission00.load = Utils.prependedFunction(Mission00.load, GlobalCompany.initModClasses);
+		Mission00.load = Utils.prependedFunction(Mission00.load, GlobalCompany.onMissionLoad);
 		Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, GlobalCompany.init);
+		FSCareerMissionInfo.saveToXMLFile = Utils.appendedFunction(FSCareerMissionInfo.saveToXMLFile, GlobalCompany.saveToXMLFile)
 
 		GlobalCompany.inits = {};
 		GlobalCompany.loadables = {};
@@ -88,6 +89,7 @@ function GlobalCompany.initialLoad()
 		GlobalCompany.xmlLoads = {};
 		GlobalCompany.modClassNames = {};
 		GlobalCompany.modLanguageFiles = {};
+		GlobalCompany.saveables = {};
 
 		g_company.modManager:initDevelopmentWarning(GlobalCompany.isDevelopmentVersion);
 
@@ -101,6 +103,8 @@ function GlobalCompany.initialLoad()
 		g_company.densityMapHeightManager = GC_densityMapHeightManager:new();
 		g_company.treeTypeManager = GC_TreeTypeManager:new();
 		g_company.physicManager = GC_PhysicManager:new();
+		g_company.bitmapManager = GC_BitmapManager:new();
+		g_company.jobManager = GC_JobManager:new();
 
 		GlobalCompany.loadEnviroment(modNameCurrent, GlobalCompany.dir .. "xml/globalCompany.xml", false);
 		g_company.modManager:initSelectedMods();
@@ -142,7 +146,11 @@ end;
 -- Script still needs to be loaded from modDesc using 'extraSourceFiles'.
 -- <globalCompany minimumVersion="1.0.0.0"> <customClasses> <customClass name="MyAddonScript"/> </customClasses> </globalCompany>
 -- function MyAddonScript:initGlobalCompany(customEnvironment, baseDirectory, xmlFile) end;
-function GlobalCompany:initModClasses()
+function GlobalCompany.onMissionLoad(mission)
+
+	g_company.bitmapManager.mission = mission;
+
+	-- init mod classes
 	if g_company.modClassNames ~= nil then
 		for modName, modClasses in pairs (g_company.modClassNames) do
 			local modEnv = getfenv(0)["_G"][modName];
@@ -150,7 +158,7 @@ function GlobalCompany:initModClasses()
 				local baseDirectory = g_modNameToDirectory[modName];
 				for _, className in ipairs(modClasses) do
 					if className ~= nil and modEnv[className] ~= nil and modEnv[className].initGlobalCompany ~= nil then
-						modEnv[className].initGlobalCompany(modEnv[className], modName, baseDirectory, GlobalCompany.environments[modName]);
+						modEnv[className].initGlobalCompany(modEnv[className], modName, baseDirectory, GlobalCompany.environments[modName], mission);
 					end;
 				end;
 			end;
@@ -195,6 +203,11 @@ end;
 --|| Load ||--
 function GlobalCompany.addLoadable(target, loadF)
 	table.insert(GlobalCompany.loadables, {loadF=loadF, target=target});
+end;
+
+--|| Saveables ||--
+function GlobalCompany.addSaveable(target, saveF)
+	table.insert(GlobalCompany.saveables, {saveF=saveF, target=target});
 end;
 
 --|| Raised Updateables ||--
@@ -256,6 +269,8 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "utils/GC_FillTypeManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_TreeTypeManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_PhysicManager.lua");
+	source(GlobalCompany.dir .. "utils/GC_BitmapManager.lua");
+	source(GlobalCompany.dir .. "utils/GC_JobManager.lua");
 
 	--|| Gui ||--
 	source(GlobalCompany.dir .. "GlobalCompanyGui.lua");
@@ -378,6 +393,12 @@ function GlobalCompany:loadMap()
 
 	for _,loadable in pairs(GlobalCompany.loadables) do
 		loadable.loadF(loadable.target);
+	end;
+end;
+
+function GlobalCompany:saveToXMLFile()
+	for _, save in pairs(GlobalCompany.saveables) do
+		save.saveF(save.target);
 	end;
 end;
 

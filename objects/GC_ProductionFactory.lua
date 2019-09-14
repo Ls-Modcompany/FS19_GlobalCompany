@@ -35,7 +35,7 @@ local GC_ProductionFactory_mt = Class(GC_ProductionFactory, Object)
 InitObjectClass(GC_ProductionFactory, "GC_ProductionFactory")
 
 -- This is for performance and GUI support! Even this is High.
-GC_ProductionFactory.LIMIT = 10
+GC_ProductionFactory.LIMIT = 20
 GC_ProductionFactory.MAX_INT = 2147483647
 
 GC_ProductionFactory.BACKUP_TITLE = "- - - - - -"

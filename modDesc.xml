@@ -9,8 +9,7 @@
     </title>
     
 	<description>
-        <en>
-			<![CDATA[Global Company - A large script extension for Farming Simulator!
+        <en><![CDATA[Global Company - A large script extension for Farming Simulator!
 
 GlobalCompany is the base for many scripts. No matter if production, warehouse or whatever - with this it is easy to implement.
 
@@ -25,8 +24,7 @@ Changelog 1.1.0.0:
 - NEW: more features for ProductionFactorys
 - FIX: Adaptation to AutoDrive
 - NEW: DynamicStorage]]></en>		
-		<de>
-			<![CDATA[Global Company - Die größte Scripterweiterung für den Landwirtschaft Simulator!
+		<de><![CDATA[Global Company - Die größte Scripterweiterung für den Landwirtschaft Simulator!
 
 GlobalCompany ist die Grundlage für viele Scripte. Egal ob Produktionen, Lager oder was auch immer - hiermit lässt es sich einfach umsetzen.
 
@@ -41,8 +39,7 @@ Changelog 1.1.0.0:
 - NEU: weitere Features für ProductionFactorys
 - FIX: Anpassung an AutoDrive
 - NEW: DynamicStorage]]></de>
-		<ru>
-			<![CDATA[Global Company - самой большое собрание скриптов для Farming Simulator!
+		<ru><![CDATA[Global Company - самой большое собрание скриптов для Farming Simulator!
 
 GlobalCompany основа для многих скриптов. Будь то производства, хранилища или что то еще - с ним возможно многое.
 
@@ -57,8 +54,7 @@ GlobalCompany основа для многих скриптов. Будь то �
 - НОВИНКА: больше возможностей для ProductionFactorys
 - FIX: адаптация к AutoDrive
 - НОВИНКА: Динамическое хранение данных]]></ru>
-        <fr>
-			<![CDATA[Global Company - Une grande extension de script pour Farming Simulator !
+        <fr><![CDATA[Global Company - Une grande extension de script pour Farming Simulator !
 
 GlobalCompany est la base de nombreux scripts. Que ce soit pour la production, l'entreposage ou autre - avec ce mod, il est facile de tout implémenter.
 
