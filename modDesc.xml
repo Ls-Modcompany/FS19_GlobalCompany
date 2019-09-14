@@ -24,8 +24,7 @@ Changelog 1.1.0.0:
 - FIX: Gui adapted for very wide monitors
 - NEW: more features for ProductionFactorys
 - FIX: Adaptation to AutoDrive
-
-Translated with www.DeepL.com/Translator]]></en>		
+- NEW: DynamicStorage]]></en>		
 		<de>
 			<![CDATA[Global Company - Die größte Scripterweiterung für den Landwirtschaft Simulator!
 
@@ -40,7 +39,8 @@ Changelog 1.1.0.0:
 - FIX: Horsehelper an Seasonsmod angepasst
 - FIX: Gui für sehr breite Monitore angepasst
 - NEU: weitere Features für ProductionFactorys
-- FIX: Anpassung an AutoDrive]]></de>
+- FIX: Anpassung an AutoDrive
+- NEW: DynamicStorage]]></de>
 		<ru>
 			<![CDATA[Global Company - самой большое собрание скриптов для Farming Simulator!
 
@@ -56,8 +56,7 @@ GlobalCompany основа для многих скриптов. Будь то �
 - FIX: Gui адаптирован для очень широких мониторов
 - НОВИНКА: больше возможностей для ProductionFactorys
 - FIX: адаптация к AutoDrive
-
-Переведено с помощью www.DeepL.com/Translator]]></ru>
+- НОВИНКА: Динамическое хранение данных]]></ru>
         <fr>
 			<![CDATA[Global Company - Une grande extension de script pour Farming Simulator !
 
@@ -73,8 +72,7 @@ Changelog 1.1.0.0.0 :
 - CORRECTIF : Gui adapté pour les moniteurs très larges
 - NOUVEAU : plus de fonctionnalités pour ProductionFactorys
 - CORRECTIF : Adaptation à AutoDrive
-
-Traduit avec www.DeepL.com/Translator]]></fr>	
+- NOUVEAU : DynamicStorage]]></fr>	
     </description>
     
 	<iconFilename>globalCompany.dds</iconFilename>
@@ -87,11 +85,13 @@ Traduit avec www.DeepL.com/Translator]]></fr>
     <l10n>		
 		<text name="input_GC_MAIN"><en>GlobalCompany</en><de>GlobalCompany</de></text>
 		<text name="input_GC_BALEADDON_CUT"><en>Cut Bale</en><de>Ballen aufschneiden</de></text>
+		<text name="input_GC_DYNSTORAGE_VEHICLEINTERACTION"><en>dynStorageVehInterAct</en></text>
 	</l10n>		
 	
 	<actions>
         <action name="GC_MAIN" />
 		<action name="GC_BALEADDON_CUT" />
+		<action name="GC_DYNSTORAGE_VEHICLEINTERACTION" />
     </actions>
 
     <inputBinding>  
@@ -101,5 +101,8 @@ Traduit avec www.DeepL.com/Translator]]></fr>
 		<actionBinding action="GC_BALEADDON_CUT">
             <binding device="KB_MOUSE_DEFAULT" input="MOUSE_BUTTON_RIGHT" axisComponent="+" neutralInput="0" index="3"/>
         </actionBinding>
+		<actionBinding action="GC_DYNSTORAGE_VEHICLEINTERACTION">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_t" axisComponent="+" neutralInput="0" index="1"/>
+        </actionBinding>	
     </inputBinding>
 </modDesc>

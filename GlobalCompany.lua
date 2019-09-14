@@ -20,6 +20,7 @@
 --		- Horsehelper: Change money when play with seasonsmod
 --		- fix gui for large width
 --		- adaption to autoDrive
+--		- add dynamicStorage
 --
 -- 	v1.0.0.0 (11.05.2018):
 --		- first Release
@@ -37,7 +38,7 @@ GlobalCompany.dir = g_currentModDirectory;
 GlobalCompany.version = "1.1.0.0";
 GlobalCompany.versionDate = "24.08.2019";
 GlobalCompany.currentVersionId = 1100; -- Mod Manager ID. (Version number without periods.)
-GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
+GlobalCompany.isDevelopmentVersion = false; -- This is for versions loaded from GIT.
 
 function GlobalCompany.initialLoad()
 	if GlobalCompany.initialLoadComplete ~= nil then
@@ -281,8 +282,8 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_VisibilityNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_AnimationManager.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
-	-- source(GlobalCompany.dir .. "objects/GC_DynamicStorage.lua");
 	source(GlobalCompany.dir .. "objects/GC_AnimalShop.lua");
+	source(GlobalCompany.dir .. "objects/GC_DynamicStorage.lua");
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
@@ -297,8 +298,8 @@ function GlobalCompany.loadSourceFiles()
 	--|| Placeables ||--
 	-- source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");
-	-- source(GlobalCompany.dir .. "placeables/GC_DynamicStoragePlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_AnimalShopPlaceable.lua");
+	source(GlobalCompany.dir .. "placeables/GC_DynamicStoragePlaceable.lua");
 
 	--|| Additionals ||--
 	source(GlobalCompany.dir .. "additionals/GC_BaleAddon.lua");
@@ -332,7 +333,7 @@ function GlobalCompany.loadPlaceables()
 	local placeablesDir = GlobalCompany.dir .. "placeables/";
 
 	-- GlobalCompany:addPlaceableType("GC_BalerPlaceable", "GC_BalerPlaceable", placeablesDir .. "GC_BalerPlaceable.lua");
-	-- GlobalCompany:addPlaceableType("GC_DynamicStoragePlaceable", "GC_DynamicStoragePlaceable", placeablesDir .. "GC_DynamicStoragePlaceable.lua");
+	GlobalCompany:addPlaceableType("GC_DynamicStoragePlaceable", "GC_DynamicStoragePlaceable", placeablesDir .. "GC_DynamicStoragePlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_ProductionFactoryPlaceable", "GC_ProductionFactoryPlaceable", placeablesDir .. "GC_ProductionFactoryPlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_AnimalShopPlaceable", "GC_AnimalShopPlaceable", placeablesDir .. "GC_AnimalShopPlaceable.lua");
 end;

@@ -786,7 +786,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				if self.inputProductNameToId[name] ~= nil then
 					if inputProductNameToInputId[name] == nil then
 						local inputProductId = self.inputProductNameToId[name]
-						local inputPercent = Utils.getNoNil(getXMLInt(xmlFile, inputKey .. "#percent"), 100) / 100
+						local inputPercent = Utils.getNoNil(getXMLFloat(xmlFile, inputKey .. "#percent"), 100) / 100
 
 						if productLine.inputs == nil then
 							productLine.inputs = {}
@@ -828,7 +828,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 					if self.outputProductNameToId[name] ~= nil then
 						if outputProductNameToOutputId[name] == nil then
 							local outputProductId = self.outputProductNameToId[name]
-							local outputPercent = Utils.getNoNil(getXMLInt(xmlFile, outputKey .. "#percent"), 100) / 100
+							local outputPercent = Utils.getNoNil(getXMLFloat(xmlFile, outputKey .. "#percent"), 100) / 100
 
 							if productLine.outputs == nil then
 								productLine.outputs = {}
