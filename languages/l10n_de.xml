@@ -131,14 +131,6 @@ Kosten:  %s"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Abladeposition bestätigen"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Aufladebox bestätigen"/>
 
-		<!-- AnimalShop -->
-		<e k="GC_animalShop_openGui" v="Tiershop öffnen"/>
-		<e k="GC_animalShop_page_1" v="Shop"/>
-		<e k="GC_animalShop_page_2_1" v="Kühe"/>
-		<e k="GC_animalShop_page_2_2" v="Schafe"/>
-		<e k="GC_animalShop_page_2_3" v="Schweine"/>
-		<e k="GC_animalShop_page_2_4" v="Pferde"/>
-
 
 	</elements>
 </l10n>

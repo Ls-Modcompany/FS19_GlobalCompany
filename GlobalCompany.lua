@@ -297,7 +297,6 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_VisibilityNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_AnimationManager.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
-	source(GlobalCompany.dir .. "objects/GC_AnimalShop.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicStorage.lua");
 
 	--|| Triggers ||--
@@ -313,7 +312,6 @@ function GlobalCompany.loadSourceFiles()
 	--|| Placeables ||--
 	-- source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");
-	source(GlobalCompany.dir .. "placeables/GC_AnimalShopPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_DynamicStoragePlaceable.lua");
 
 	--|| Additionals ||--
@@ -350,7 +348,6 @@ function GlobalCompany.loadPlaceables()
 	-- GlobalCompany:addPlaceableType("GC_BalerPlaceable", "GC_BalerPlaceable", placeablesDir .. "GC_BalerPlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_DynamicStoragePlaceable", "GC_DynamicStoragePlaceable", placeablesDir .. "GC_DynamicStoragePlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_ProductionFactoryPlaceable", "GC_ProductionFactoryPlaceable", placeablesDir .. "GC_ProductionFactoryPlaceable.lua");
-	GlobalCompany:addPlaceableType("GC_AnimalShopPlaceable", "GC_AnimalShopPlaceable", placeablesDir .. "GC_AnimalShopPlaceable.lua");
 end;
 
 --| Main |--
