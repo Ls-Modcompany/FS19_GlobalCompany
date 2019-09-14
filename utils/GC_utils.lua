@@ -374,3 +374,19 @@ function GlobalCompanyUtils.stringWrap(str, limit, indent, returnTable)
 		return newString
 	end
 end
+
+function GlobalCompanyUtils.convertNumberToBits(num,bits)
+	bits = bits or math.max(1, select(2, math.frexp(num)))
+	local t = {}    
+	local str = ""
+	for b = bits, 1, -1 do
+		t[b] = math.fmod(num, 2)
+		str = t[b] .. str
+		num = math.floor((num - t[b]) / 2)
+	end
+	return t, str
+end
+
+function GlobalCompanyUtils.getValueOfBits(bits, start, lenght)
+	return tonumber(bits:reverse():sub(start + 1, start + lenght):reverse(), 2)
+end
