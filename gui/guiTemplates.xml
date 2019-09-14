@@ -22,6 +22,11 @@
         <color name="glass0_1" value="0.018 0.016 0.015 0.65"/>
         <color name="glass0_2" value="0.718 0.716 0.715 0.04"/>
 
+		
+        <color name="_red" value="0.5 0.0 0.0 1"/>
+        <color name="_glass" value="0.018 0.018 0.018 0.4"/>
+        <color name="_guiBackground" value="0.02 0.02 0.02 0.8"/>
+
 		<color name="glass1_60" value="0.3 0.3 0.3 0.6" />
 		<color name="glass1_50" value="0.3 0.3 0.3 0.5" />
 		<color name="glass1_80" value="0.3 0.3 0.3 0.8" />
@@ -1136,6 +1141,112 @@
 		<template name="gcMenuFactoriesTypeTextBlue" extends="gcMenuFactoriesTypeText">
 			<value name="textAlignment" value="left"/>
 			<value name="textMaxWidth" value="300px"/>
+		</template>
+
+		<!-- AnimalShop -->
+		<template name="_gcBaseGuiButton" extends="gcBase">
+			<value name="size" value="65px 50px" />
+			<value name="position" value="0px 0px" />
+			<value name="imageColor_selected" value="_red" />
+			<value name="textColor_selected" value="_red" />
+			<value name="hasOverlay" value="true" />
+			<Value name="imageUVs" value="keyBordKey"/>
+			<Value name="imageUVs_selected" value="keyBordKey"/>
+			<value name="textAlignment" value="center" />
+			<value name="textSize" value="20px" />
+			<value name="textMargin" value="0px 17px 0px 0px" />
+		</template>
+
+		<template name="_gcBaseGuiButtonText" extends="gcBase_text">
+			<value name="textSize" value="22px" />
+			<value name="textAlignment" value="center" />
+			<value name="position" value="80px 3px" />
+			<value name="textColor_selected" value="_red" />
+		</template>
+
+		<template name="gcAnimalShopHeaderLayout" anchor="centerLeft">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="left" />
+			<value name="size" value="600px 50px" />
+			<value name="position" value="0px 0px" />
+			<value name="margin" value="0px 0px 0px 0px" />
+		</template>
+
+
+		<template name="gcAnimalShop" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="1920px 1080px" />
+			<value name="imageColor" value="_glass" />
+		</template>
+		<template name="gcAnimalShopBackground" anchor="middleCenter" extends="gcBase gcBorder">
+			<value name="size" value="1700px 850px" />
+			<value name="position" value="0px 0px" />
+			<value name="hasBorders" value="true" />
+			<value name="borderBottomSize" value="6px" />
+			<value name="borderBottomColor" value="_red" />
+			<Value name="imageUVs" value="colorBg"/>
+			<value name="imageColor" value="_guiBackground" />
+		</template>
+		<template name="gcAnimalShopHeader" anchor="middleTop" extends="gcBase gcBorder">
+			<value name="size" value="1700px 50px" />
+			<value name="position" value="0px 0px" />
+			<value name="hasBorders" value="true" />
+			<value name="borderBottomSize" value="6px" />
+			<value name="borderBottomColor" value="gray2" />
+			<Value name="imageUVs" value="colorBg"/>
+			<value name="imageColor" value="transparent" />
+		</template>
+		<template name="gcAnimalShopFooter" anchor="middleBottom" extends="gcBase gcBorder">
+			<value name="size" value="1700px 25px" />
+			<value name="position" value="0px 0px" />
+			<value name="hasBorders" value="true" />
+			<value name="borderTopSize" value="6px" />
+			<value name="borderTopColor" value="gray2" />
+			<Value name="imageUVs" value="colorBg"/>
+			<value name="imageColor" value="transparent" />
+		</template>
+		<template name="gcAnimalShopButtonsLayout" anchor="middleBottom" extends="gcBase">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="left" />
+			<value name="position" value="0px -60px" />
+			<value name="size" value="1700px 50px" />
+		</template>
+		<template name="gcAnimalShopHeaderLocation" anchor="centerLeft" extends="gcBase_text">
+			<value name="textSize" value="20px" />
+			<value name="textAlignment" value="center" />
+			<value name="position" value="10px 3px" />
+			<value name="autoSize" value="true" />
+		</template>
+		<template name="gcAnimalShopHeaderLocationL" anchor="centerLeft" extends="gcAnimalShopHeaderLocation">
+			<value name="textBold" value="true" />
+			<value name="textColor" value="_red" />
+		</template>
+		<template name="gcAnimalShopHeaderLocationSep" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="18px 28px" />
+			<value name="position" value="0px 0px" />
+			<Value name="imageUVs" value="294px 342px 24px 36px"/>
+			<Value name="margin" value="20px 0px 10px 0px"/>
+			<value name="imageColor" value="white" />
+		</template>
+		
+		<template name="gcAnimalShopHeaderTitle" anchor="middleCenter" extends="gcBase_text">
+			<value name="textSize" value="26px" />
+			<value name="textBold" value="true" />
+			<value name="textAlignment" value="center" />
+		</template>
+		<template name="gcAnimalShopHeaderDate" anchor="centerRight" extends="gcBase_text">
+			<value name="textSize" value="20px" />			
+			<value name="textAlignment" value="center" />
+			<value name="position" value="-10px 0px" />
+		</template>
+		<template name="gcAnimalShopFooterTextLeft" anchor="leftCenter" extends="gcBase_text">
+			<value name="textSize" value="14px" />
+			<value name="textAlignment" value="left" />
+			<value name="size" value="300px 0px" />
+			<value name="position" value="10px 2px" />
+		</template>
+		<template name="gcAnimalShopFooterTextRight" anchor="rightCenter" extends="gcAnimalShopFooterTextLeft">
+			<value name="textAlignment" value="right" />
+			<value name="position" value="-10px 2px" />
 		</template>
 	</templates>
 </guiTemplates>

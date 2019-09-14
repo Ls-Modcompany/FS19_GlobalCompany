@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI>  
+    <GuiElement type="image" template="gcAnimalShop">
+        <GuiElement type="image" template="gcAnimalShopBackground">
+
+            <GuiElement type="image" template="gcAnimalShopHeader">
+
+                <GuiElement type="flowLayout" template="gcAnimalShopHeaderLayout">
+                    <GuiElement type="text" template="gcAnimalShopHeaderLocation" id="gui_headerLocationText_1" />    
+                    <GuiElement type="image" template="gcAnimalShopHeaderLocationSep" id="gui_headerLocationSep_2" />    
+                    <GuiElement type="text" template="gcAnimalShopHeaderLocationL" id="gui_headerLocationText_2" />  
+                    <GuiElement type="image" template="gcAnimalShopHeaderLocationSep" id="gui_headerLocationSep_3" />    
+                    <GuiElement type="text" template="gcAnimalShopHeaderLocationL" id="gui_headerLocationText_3" />  
+                </GuiElement>
+
+                <GuiElement type="text" template="gcAnimalShopHeaderTitle" id="gui_header" text="Seitentitel" />    
+                <GuiElement type="text" template="gcAnimalShopHeaderDate" id="gui_header" text="18:54" />    
+            </GuiElement>
+            
+            <GuiElement type="image" template="gcAnimalShopFooter">
+                <GuiElement type="text" template="gcAnimalShopFooterTextLeft" id="gui_header" text="LS-Modcompany - AddOn XYZ" />    
+                <GuiElement type="text" template="gcAnimalShopFooterTextRight" id="gui_header" text="v1.0.0.0" />    
+            </GuiElement>
+
+            <GuiElement type="flowLayout" template="gcAnimalShopButtonsLayout">
+                <GuiElement type="button" template="_gcBaseGuiButton" inputAction="MENU_BACK" onClick="onClickClose">
+                    <GuiElement type="text" template="_gcBaseGuiButtonText" text="$l10n_GC_gui_buttons_back" />  
+                </GuiElement>
+            </GuiElement>
+        </GuiElement>
+    </GuiElement>  
+</GUI>

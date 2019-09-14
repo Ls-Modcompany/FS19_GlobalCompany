@@ -40,6 +40,8 @@ function GC_Gui_text:new(gui, custom_mt)
 	self.textMaxWidth = nil;
 	self.textWrapWidth = 1;
 	self.textMaxNumLines = 1;
+
+	self.autoSize = false;
 	
 	self.textAlignment = RenderText.ALIGN_LEFT;
 	self.text = "";	
@@ -62,6 +64,8 @@ function GC_Gui_text:loadTemplate(templateName, xmlFile, key)
 	self.textUpperCase = g_company.gui:getTemplateValueBool(templateName, "textUpperCase", self.textUpperCase);
 	self.textUpperCase_disabled = g_company.gui:getTemplateValueBool(templateName, "textUpperCase_disabled", self.textUpperCase_disabled);
 	self.textUpperCase_selected = g_company.gui:getTemplateValueBool(templateName, "textUpperCase_selected", self.textUpperCase_selected);
+	
+	self.autoSize = g_company.gui:getTemplateValueBool(templateName, "autoSize", self.autoSize);
 	
 	self.textSize = unpack(GuiUtils.getNormalizedValues(g_company.gui:getTemplateValue(templateName, "textSize"), {self.outputSize[2]}, {self.textSize}));
 	self.textMaxWidth = unpack(GuiUtils.getNormalizedValues(g_company.gui:getTemplateValue(templateName, "textMaxWidth"), {self.outputSize[1]}, {self.textMaxWidth}));
@@ -113,6 +117,8 @@ function GC_Gui_text:copy(src)
 	self.textMaxWidth = src.textMaxWidth;
 	self.textWrapWidth = src.textWrapWidth;
 	self.textMaxNumLines = src.textMaxNumLines;
+
+	self.autoSize = src.autoSize;
 	
 	self.textAlignment = src.textAlignment;
 	self:setText(src.text, true);
@@ -158,6 +164,11 @@ function GC_Gui_text:draw(index)
 		
 		if self.textMaxWidth ~= nil then
 			text = Utils.limitTextToWidth(text, self.textSize, self.textMaxWidth, false, "...");
+		end;
+
+		if self.autoSize then
+			self.size[1] = self:getTextWidth();
+			self.drawPosition[1], self.drawPosition[2] = g_company.gui:calcDrawPos(self, index);
 		end;
 		
 		
