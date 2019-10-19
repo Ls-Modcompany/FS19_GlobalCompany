@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI>  
+    <GuiElement type="image" template="gcPlaceDigDisplay">
+        <GuiElement type="image" template="gcPlaceDigDisplayBackground">
+            <GuiElement type="text" template="gcPlaceDigDisplayTextHeader" text="$l10n_GC_placeableDigDisplay_header" />    
+            <GuiElement type="text" template="gcPlaceDigDisplayTextInfo" text = "$l10n_GC_placeableDigDisplay_headerInfo" /> 
+            
+            <GuiElement type="image" template="gcPlaceDigDisplayInputBackground">
+                <GuiElement type="input" template="gcPlaceDigDisplayInput" position="0px -10px" id="gui_input1" onClick="onClickInput" parameter="1" />   
+                <GuiElement type="input" template="gcPlaceDigDisplayInput" position="0px -40px" id="gui_input2"  onClick="onClickInput" parameter="2" />   
+                <GuiElement type="input" template="gcPlaceDigDisplayInput" position="0px -70px" id="gui_input3"  onClick="onClickInput" parameter="3" />   
+                <GuiElement type="input" template="gcPlaceDigDisplayInput" position="0px -100px" id="gui_input4"  onClick="onClickInput" parameter="4" />   
+                <GuiElement type="input" template="gcPlaceDigDisplayInput" position="0px -130px" id="gui_input5"  onClick="onClickInput" parameter="5" />   
+                <GuiElement type="input" template="gcPlaceDigDisplayInput" position="0px -160px" id="gui_input6"  onClick="onClickInput" parameter="6" />   
+                <GuiElement type="input" template="gcPlaceDigDisplayInput" position="0px -190px" id="gui_input7"  onClick="onClickInput" parameter="7" />   
+                <GuiElement type="input" template="gcPlaceDigDisplayInput" position="0px -220px" id="gui_input8"  onClick="onClickInput" parameter="8" />   
+            </GuiElement>     
+        </GuiElement>
+        
+        <GuiElement type="flowLayout" template="gcPlaceDigDisplayButtonsLayout">
+            <GuiElement type="button" template="gcBaseGuiButton" inputAction="MENU_BACK" onClick="onClickClose" />
+            <GuiElement type="text" template="gcBaseGuiButtonText" text="$l10n_GC_gui_buttons_back" />   
+            <GuiElement type="button" position="50px 0px" template="gcBaseGuiButtonNext" inputAction="MENU_ACCEPT" onClick="onClickSave" />
+            <GuiElement type="text" template="gcBaseGuiButtonText" text="$l10n_GC_placeableDigDisplay_btnSave" />     
+        </GuiElement>
+        
+    </GuiElement>  
+</GUI>

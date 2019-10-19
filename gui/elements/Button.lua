@@ -75,7 +75,7 @@ function GC_Gui_button:loadTemplate(templateName, xmlFile, key)
 	
 	if self.hasOverlay then
 		self.overlayElement = GC_Gui_overlay:new(self.gui);
-		self.overlayElement:loadTemplate(templateName, xmlFile, key);
+		self.overlayElement:loadTemplate(string.format("%s_overlay", templateName), xmlFile, key);
 		self.overlayElement.position = { 0,0 };
 		self:addElement(self.overlayElement);
 		--if id ~= nil and id ~= "" then
@@ -85,7 +85,7 @@ function GC_Gui_button:loadTemplate(templateName, xmlFile, key)
 
 	if self.hasText then
 		self.textElement = GC_Gui_text:new(self.gui);
-		self.textElement:loadTemplate(templateName, xmlFile, key);
+		self.textElement:loadTemplate(string.format("%s_text", templateName), xmlFile, key);
 		self.textElement.position = { 0,0 };
 		self:addElement(self.textElement);
 		--if id ~= nil and id ~= "" then

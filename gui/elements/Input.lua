@@ -38,7 +38,7 @@ function GC_Gui_input:loadTemplate(templateName, xmlFile, key)
 	self:addElement(self.buttonElement);
 		        
     self.textElement = GC_Gui_text:new(self.gui);
-    self.textElement:loadTemplate(templateName, xmlFile, key);
+    self.textElement:loadTemplate(string.format("%s_text", templateName), xmlFile, key);
     self:addElement(self.textElement);
         
 	
@@ -65,10 +65,10 @@ function GC_Gui_input:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
 end;
 
 function GC_Gui_input:keyEvent(unicode, sym, modifier, isDown, eventUsed)
-    if self.buttonElement:getActive() then
+    if self.buttonElement:getActive() and isDown then
         local currentText = self.textElement.text;
         if sym == Input.KEY_backspace then
-
+			currentText = currentText:sub(0, currentText:len() - 1);
         else
             currentText = currentText .. unicodeToUtf8(unicode);
         end;

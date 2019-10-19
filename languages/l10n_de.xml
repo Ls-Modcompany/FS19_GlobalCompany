@@ -131,6 +131,11 @@ Kosten:  %s"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Abladeposition bestätigen"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Aufladebox bestätigen"/>
 
+		<!-- PlaceableDigitalDisplay -->
+		<e k="GC_placeableDigDisplay_openGui" v="Digitales Display anpassen"/>
+		<e k="GC_placeableDigDisplay_header" v="Digitales Display"/>
+		<e k="GC_placeableDigDisplay_headerInfo" v="Hier kannst du einen beliebigen Text festlegen, der auf dem Display erscheinen soll."/>
+		<e k="GC_placeableDigDisplay_btnSave" v="Speichern"/>
 
 	</elements>
 </l10n>
