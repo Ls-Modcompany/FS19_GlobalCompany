@@ -26,6 +26,8 @@ GC_DynamicStorage = {};
 local GC_DynamicStorage_mt = Class(GC_DynamicStorage, Object);
 InitObjectClass(GC_DynamicStorage, "GC_DynamicStorage");
 
+GC_DynamicStorage.BACKUP_TITLE = ""
+
 GC_DynamicStorage.debugIndex = g_company.debug:registerScriptName("GC_DynamicStorage");
 
 function GC_DynamicStorage:onCreate(transformId)
@@ -106,7 +108,26 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	self.saveId = getXMLString(xmlFile, xmlKey .. "#saveId");
 	if self.saveId == nil then
 		self.saveId = "DynamicStorage_" .. indexName;
-	end;
+    end;
+    
+    self.guiData = {}
+    local dynamicStorageImage = getXMLString(xmlFile, xmlKey .. ".guiInformation#imageFilename")
+	if dynamicStorageImage ~= nil then
+        self.guiData.dynamicStorageImage = self.baseDirectory .. dynamicStorageImage
+    else
+        for _,mod in pairs(g_modManager.nameToMod) do
+            if mod.modDir == self.baseDirectory then
+                self.guiData.dynamicStorageImage = mod.iconFilename
+            end
+        end
+    end
+
+    local dynamicStorageTitle = getXMLString(xmlFile, xmlKey .. ".guiInformation#title")
+	if dynamicStorageTitle ~= nil then
+		self.guiData.dynamicStorageTitle = g_company.languageManager:getText(dynamicStorageTitle)
+	else
+		self.guiData.dynamicStorageTitle = g_company.languageManager:getText("GC_gui_dynamicStorage_titleBackup")
+	end
 
     self.fillTypes = {};
     self.places = {};
@@ -232,10 +253,14 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
     
     g_company.addRaisedUpdateable(self);
 
+    self.globalIndex = g_company.addDynamicStorage(self)
+
 	return true;
 end;
 
 function GC_DynamicStorage:delete()
+    g_company.removeDynamicStorage(self, self.globalIndex)
+    
 	if not self.isPlaceable then
 		g_currentMission:removeOnCreateLoadedObjectToSave(self);
 	end;
@@ -261,15 +286,20 @@ function GC_DynamicStorage:readStream(streamId, connection)
 
     self:setActiveUnloadingBox(streamReadInt8(streamId));
 
-    local loadingTrigger = NetworkUtil.readNodeObjectId(streamId);
-    g_client:finishRegisterObject(self.loadingTrigger, loadingTrigger);
-
 	if connection:getIsServer() then
         for _,place in pairs (self.places) do
             local fillLevel =  streamReadFloat32(streamId);
             local fillTypeIndex =  streamReadInt16(streamId);
             self:updatePlace(place, fillLevel, fillTypeIndex);
         end;
+
+		if streamReadBool(streamId) then
+			local customTitle = streamReadString(streamId)
+			self:setCustomTitle(customTitle, true)
+		end
+
+        --local loadingTrigger = NetworkUtil.readNodeObjectId(streamId);
+        --g_client:finishRegisterObject(self.loadingTrigger, loadingTrigger);
 	end;
 end;
 
@@ -278,14 +308,19 @@ function GC_DynamicStorage:writeStream(streamId, connection)
 
     streamWriteInt8(streamId, self.activeUnloadingBox);
 
-    NetworkUtil.writeNodeObjectId(streamId, NetworkUtil.getObjectId(self.loadingTrigger));
-    g_server:registerObjectInStream(connection, self.loadingTrigger);
-
 	if not connection:getIsServer() then
         for _,place in pairs (self.places) do     
             streamWriteFloat32(streamId, place.fillLevel);
             streamWriteInt16(streamId, place.activeFillTypeIndex);
         end;
+
+		local customTitle = self:getCustomTitle()
+		if streamWriteBool(streamId, customTitle ~= GC_DynamicStorage.BACKUP_TITLE) then
+			streamWriteString(streamId, customTitle)
+		end
+
+        --NetworkUtil.writeNodeObjectId(streamId, NetworkUtil.getObjectId(self.loadingTrigger));
+        --g_server:registerObjectInStream(connection, self.loadingTrigger);
 	end;
 end;
 
@@ -319,6 +354,11 @@ end;
 function GC_DynamicStorage:loadFromXMLFile(xmlFile, key)
     if not self.isPlaceable then
 		key = string.format("%s.dynamicStorage", key);
+    end
+
+    local customTitle = getXMLString(xmlFile, key .. "#customTitle")
+    if customTitle ~= nil and customTitle ~= "" then
+        self:setCustomTitle(customTitle, true)
     end
 
     self:setActiveUnloadingBox(getXMLInt(xmlFile, key .. "#activeUnloadingBox"));
@@ -364,6 +404,11 @@ function GC_DynamicStorage:saveToXMLFile(xmlFile, key, usedModNames)
 		key = string.format("%s.dynamicStorage", key);
 		setXMLInt(xmlFile, key .. "#farmId", self:getOwnerFarmId());
     end
+
+    local customTitle = self:getCustomTitle()
+	if customTitle ~= GC_DynamicStorage.BACKUP_TITLE then
+		setXMLString(xmlFile, key .. "#customTitle", customTitle)
+	end
     
     setXMLInt(xmlFile, key .. "#activeUnloadingBox", self.activeUnloadingBox);
 
@@ -544,3 +589,21 @@ function GC_DynamicStorage:setOwnerFarmId(ownerFarmId, noEventSend)
 		self.triggerManager:setAllOwnerFarmIds(ownerFarmId, noEventSend)
 	end;
 end;
+
+function GC_DynamicStorage:setCustomTitle(customTitle, noEventSend)
+	if customTitle ~= nil and customTitle ~= self:getCustomTitle() then
+		GC_ProductionDynamicStorageCustomTitleEvent.sendEvent(self, customTitle, noEventSend)
+
+		self.guiData.dynamicStorageCustomTitle = customTitle
+	end
+end
+
+function GC_DynamicStorage:getCustomTitle()
+	local title = self.guiData.dynamicStorageCustomTitle
+
+	if title == nil then
+		title = GC_DynamicStorage.BACKUP_TITLE
+	end
+
+	return title
+end

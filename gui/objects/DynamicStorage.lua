@@ -50,6 +50,8 @@ function Gc_Gui_DynamicStorage:onCreate() end;
 function Gc_Gui_DynamicStorage:keyEvent(unicode, sym, modifier, isDown, eventUsed)
     if sym == 13 and isDown then
         self:onClickAccept();
+    elseif not g_company.gui.guis["gc_dynamicStorage"].canExit and sym == 27 and not isDown then
+        self:onClickClose();
     end;    
 end;
 
@@ -57,10 +59,12 @@ function Gc_Gui_DynamicStorage:setCloseCallback(target, func)
     self.closeCallback = {target=target, func=func};
 end;
 
-function Gc_Gui_DynamicStorage:setData(storage, isUnloading, activeUnloadingBox)
+function Gc_Gui_DynamicStorage:setData(storage, isUnloading, activeUnloadingBox, showFromMenu)
     self.storage = storage;
     self.isUnloading = isUnloading;
     self.closeCallback = nil;
+
+    self.showFromMenu = showFromMenu or false
   
     self.gui_table_places:removeElements();
     
@@ -100,7 +104,12 @@ function Gc_Gui_DynamicStorage:setData(storage, isUnloading, activeUnloadingBox)
 end
 
 function Gc_Gui_DynamicStorage:onClickClose() 
-	g_company.gui:closeActiveGui();
+    if self.showFromMenu then
+        g_company.gui:closeActiveGui("gc_main", false, 2);
+        self.showFromMenu = false
+    else
+        g_company.gui:closeActiveGui();
+    end
 end;
 
 function Gc_Gui_DynamicStorage:onCreateNumber(element)   
@@ -147,7 +156,12 @@ function Gc_Gui_DynamicStorage:onDoubleClickSetBox(element)
             self.closeCallback.func(self.closeCallback.target);
         end;
     end;
-	g_company.gui:closeActiveGui();
+    if self.showFromMenu then
+        g_company.gui:closeActiveGui("gc_main", false, 2);
+        self.showFromMenu = false
+    else
+        g_company.gui:closeActiveGui();
+    end
 end;
 
 function Gc_Gui_DynamicStorage:onClickSetBox(element)  
@@ -162,6 +176,11 @@ function Gc_Gui_DynamicStorage:onClickAccept()
     if not self.isUnloading and not self.isUnloading and self.closeCallback ~= nil then
         self.closeCallback.func(self.closeCallback.target);
     end;
-	g_company.gui:closeActiveGui();
+    if self.showFromMenu then
+        g_company.gui:closeActiveGui("gc_main", false, 2);
+        self.showFromMenu = false
+    else
+        g_company.gui:closeActiveGui();
+    end
 end;
 

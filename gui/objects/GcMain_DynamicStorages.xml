@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+
+<GUI>
+	<GuiElement type="flowLayout" template="gcMenuFactoriesLayout1">   
+		
+		<GuiElement type="flowLayout" template="gcMenuFactoriesLayout2">     
+			<GuiElement type="image" template="gcMenuFactoriesBackgroundLeft">
+				
+				<GuiElement type="tableSort" template="gcMenuFactoriesTableHeader" id="gui_tableSort" text="$l10n_GC_gui_dynamicStorages" onClick="onClickChangeSortDirection" />
+
+				<GuiElement type="table" template="gcMenuFactoriesTableLayout" id="gui_storageListTable">
+					<GuiElement type="button" template="gcMenuFactoriesLayoutButton" id="gui_factorySelectFactory" onClick="onClickSelectStorage" isTableTemplate="true">
+						<GuiElement type="image" template="gcMenuFactoriesButtonLayoutImage" onCreate="onCreateStorageImageSmall"/>
+						<GuiElement type="image" template="gcFactoriesSeperator" size="2px 130px" position="-250px 0px" />
+
+						<GuiElement type="flowLayout" template="gcMenuFactoriesButtonLayoutTextLayoutHeader">   
+							<GuiElement type="text" template="gcMenuFactoriesButtonLayoutTextHeader" onCreate="onCreateStorageTitel" />
+						</GuiElement>
+
+						<GuiElement type="text" template="gcMenuFactoriesButtonLayoutTextInfoHeader" position="200px 15px" text="$l10n_GC_gui_freeSlots" />
+						
+						<GuiElement type="text" template="gcMenuFactoriesButtonLayoutTextInfoHeaderData" position="420px 15px" onCreate="onCreateFreeSlots" />					
+					</GuiElement>
+				</GuiElement>
+			</GuiElement>
+
+			<GuiElement type="image" template="gcMenuPdaBackground">
+				<GuiElement type="ingameMap" template="gcMenuPdaMap" id="gui_ingameMap" />
+				<GuiElement type="image" template="gcMenuPdaMapMarker" id="gui_pdaMarker" />
+			</GuiElement>
+		</GuiElement>
+		
+		<GuiElement type="flowLayout" template="gcMenuFactoriesLayout3"> 
+			<GuiElement type="button" template="gcMenuFactoriesButtonBack" onClick="onClickClose" />
+			<GuiElement type="text" template="gcBaseGuiButtonText" text="$l10n_button_back"/>
+			<GuiElement type="button" position="80px 0px" template="gcBaseGuiButtonNext" inputAction="MENU_ACCEPT" onClick="onClickOpenOverview" />
+        	<GuiElement type="text" template="gcBaseGuiButtonText" text="$l10n_GC_Open_Overview_Menu" />     
+			<GuiElement type="button" position="80px 0px" template="gcBaseGuiButtonNext" inputAction="TOGGLE_TIPSIDE" onClick="onClickRenameStorage" />
+        	<GuiElement type="text" template="gcBaseGuiButtonText" text="$l10n_GC_gui_rename" />   
+		</GuiElement>	
+	</GuiElement>
+</GUI>

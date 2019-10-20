@@ -76,6 +76,7 @@ function GlobalCompany.initialLoad()
 		addModEventListener(GlobalCompany);
 		
 		GlobalCompany.loadedFactories = {}
+		GlobalCompany.loadedDynamicStorages = {}
 
 		Mission00.load = Utils.prependedFunction(Mission00.load, GlobalCompany.onMissionLoad);
 		Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, GlobalCompany.init);
@@ -188,6 +189,28 @@ function GlobalCompany.removeFactory(factory, index)
 			for i, globalFactory in pairs (GlobalCompany.loadedFactories) do
 				if globalFactory == factory then
 					table.remove(GlobalCompany.loadedFactories, i);
+					break;
+				end;
+			end;
+		end;
+	end;
+end;
+
+function GlobalCompany.addDynamicStorage(dynamicStorage)
+	if dynamicStorage ~= nil then
+		table.insert(GlobalCompany.loadedDynamicStorages, dynamicStorage);
+		return #GlobalCompany.loadedDynamicStorages;
+	end;
+end;
+
+function GlobalCompany.removeDynamicStorage(dynamicStorage, index)
+	if dynamicStorage ~= nil then
+		if index ~= nil and GlobalCompany.loadedDynamicStorages[index] == dynamicStorage then
+			table.remove(GlobalCompany.loadedDynamicStorages, index);
+		else
+			for i, globalFactory in pairs (GlobalCompany.loadedDynamicStorages) do
+				if globalFactory == dynamicStorage then
+					table.remove(GlobalCompany.loadedDynamicStorages, i);
 					break;
 				end;
 			end;
@@ -332,6 +355,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryCustomTitleEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactorySpawnPalletEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryProductPurchaseEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_ProductionDynamicStorageCustomTitleEvent.lua");
 	
 
 	--|| Specializations ||--
