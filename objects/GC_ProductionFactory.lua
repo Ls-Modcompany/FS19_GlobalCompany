@@ -38,7 +38,7 @@ InitObjectClass(GC_ProductionFactory, "GC_ProductionFactory")
 GC_ProductionFactory.LIMIT = 20
 GC_ProductionFactory.MAX_INT = 2147483647
 
-GC_ProductionFactory.BACKUP_TITLE = "- - - - - -"
+GC_ProductionFactory.BACKUP_TITLE = ""
 
 GC_ProductionFactory.BACKUP_ANIMAL_TO_LITRES = {
 	["COW"] = 1000,
@@ -800,7 +800,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 
 						-- Allow simple income as fillType is used. This is product line specific.
 						local pricePerLiter = getXMLFloat(xmlFile, inputKey .. ".income#pricePerLiter")
-						if pricePerLiter ~= nil and pricePerLiter > 0.0 then
+						if pricePerLiter ~= nil then -- 21.9.19 / KK: remove and pricePerLiter > 0.0
 							local usePriceMultiplier = Utils.getNoNil(getXMLBool(xmlFile, inputKey .. ".income#usePriceMultiplier"), true)
 							productLine.inputsIncome[inputId] = {pricePerLiter = pricePerLiter, usePriceMultiplier = usePriceMultiplier}
 							addHourChange = true
@@ -1023,14 +1023,15 @@ function GC_ProductionFactory:setLoadingTrigger(outputProduct, xmlFile, loadingT
 end
 
 function GC_ProductionFactory:loadProductParts(xmlFile, key, product)
+	local capacity = product.capacity
+
+	local visibilityNodes = GC_VisibilityNodes:new(self.isServer, self.isClient)
+	if visibilityNodes:load(self.rootNode, self, xmlFile, key, self.baseDirectory, capacity, true) then
+		product.visibilityNodes = visibilityNodes
+	end
+
 	if self.isClient then
 		local fillTypeName = g_fillTypeManager.indexToName[product.lastFillTypeIndex]
-		local capacity = product.capacity
-
-		local visibilityNodes = GC_VisibilityNodes:new(self.isServer, self.isClient)
-		if visibilityNodes:load(self.rootNode, self, xmlFile, key, self.baseDirectory, capacity, true) then
-			product.visibilityNodes = visibilityNodes
-		end
 
 		local movers = GC_Movers:new(self.isServer, self.isClient)
 		if movers:load(self.rootNode, self, xmlFile, key, self.baseDirectory, capacity, true) then
@@ -1130,12 +1131,22 @@ function GC_ProductionFactory:delete()
 		self.animationManager:delete()
 	end
 
-	if self.isClient then
-		for _, product in ipairs (self.inputProducts) do
+	for _, product in ipairs (self.inputProducts) do
+		if product.visibilityNodes ~= nil then
+			product.visibilityNodes:delete()
+		end
+	end
+
+	if self.outputProducts ~= nil then
+		for _, product in ipairs (self.outputProducts) do
 			if product.visibilityNodes ~= nil then
 				product.visibilityNodes:delete()
 			end
+		end
+	end
 
+	if self.isClient then
+		for _, product in ipairs (self.inputProducts) do
 			if product.fillVolumes ~= nil then
 				product.fillVolumes:delete()
 			end
@@ -1145,10 +1156,6 @@ function GC_ProductionFactory:delete()
 
 		if self.outputProducts ~= nil then
 			for _, product in ipairs (self.outputProducts) do
-				if product.visibilityNodes ~= nil then
-					product.visibilityNodes:delete()
-				end
-
 				if product.fillVolumes ~= nil then
 					product.fillVolumes:delete()
 				end
@@ -1655,8 +1662,10 @@ function GC_ProductionFactory:hourChanged()
 
 		if self.hourlyIncomeTotal > 0 then
 			g_currentMission:addMoney(self.hourlyIncomeTotal, self:getOwnerFarmId(), MoneyType.PROPERTY_INCOME, true, false)
-			self.hourlyIncomeTotal = 0
+		else
+			g_currentMission:addMoney(self.hourlyIncomeTotal, self:getOwnerFarmId(), MoneyType.PROPERTY_MAINTENANCE, true, false)			 
 		end
+		self.hourlyIncomeTotal = 0
 	end
 end
 
@@ -1726,7 +1735,7 @@ function GC_ProductionFactory:minuteChanged()
 									end
 
 									local income = productLine.inputsIncome[i]
-									if income ~= nil and income.pricePerLiter > 0.0 then
+									if income ~= nil then --22.9.19 / KK:  and income.pricePerLiter > 0.0
 										local updateAmount = income.pricePerLiter * amount
 										if income.usePriceMultiplier then
 											updateAmount = updateAmount * EconomyManager.getPriceMultiplier()
@@ -1895,11 +1904,11 @@ function GC_ProductionFactory:updateFactoryLevels(fillLevel, product, fillTypeIn
 
 	product.fillLevel = fillLevel
 
-	if self.isClient then
-		if product.visibilityNodes ~= nil then
-			product.visibilityNodes:updateNodes(fillLevel)
-		end
+	if product.visibilityNodes ~= nil then
+		product.visibilityNodes:updateNodes(fillLevel)
+	end
 
+	if self.isClient then
 		if product.movers ~= nil then
 			product.movers:updateMovers(fillLevel, fillTypeIndex)
 		end
