@@ -32,7 +32,8 @@ g_company.languageManager = GC_languageManager;
 local baseModNameToPrefix = {
 	["GlobalCompany"] = "GC",
 	["GlobalCompanyTablet"] = "GCT",
-	["GlobalCompanySRS"] = "SRS"
+	["GlobalCompanySRS"] = "SRS",
+	["GlobalCompanyAddOn_OrganicSoilManagement"] = "OSM"
 };
 
 function GC_languageManager:load(loadingDirectory)
