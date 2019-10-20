@@ -74,7 +74,7 @@ function GC_Gui_table:loadTemplate(templateName, xmlFile, key, overlayName)
 
 	if self.hasSlider then
 		self.slider = GC_Gui_slider:new();
-		self.slider:loadTemplate(string.format( "%sSlider",templateName), xmlFile, key);
+		self.slider:loadTemplate(string.format( "%s_slider",templateName), xmlFile, key);
 		self.slider.parent = self;
 		--self:addElement(self.slider);
 		if self.id ~= nil then
@@ -218,10 +218,9 @@ function GC_Gui_table:scrollTable(num)
 	if num == nil then
 		self.scrollCount = 0;
 	else
-		self.scrollCount = self.scrollCount + num;	
-		
-		self:scrollItems();
+		self.scrollCount = self.scrollCount + num;			
 	end;
+	self:scrollItems();
 	self:updateVisibleItems();
 end;
 
@@ -291,12 +290,13 @@ function GC_Gui_table:onOpen()
 	GC_Gui_table:superClass().onOpen(self);
 end;
 
-
-
-
-
-
-
-
-
-
+function GC_Gui_table:selectFirstItem()
+	self:scrollTable()
+	for k,element in pairs(self.items) do
+			element:setActive(true);
+			if element.callback_onClick ~= nil then
+				element.gui[element.callback_onClick](element.gui, element, element.parameter);
+			end;
+		break
+	end
+end

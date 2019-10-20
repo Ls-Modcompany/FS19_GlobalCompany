@@ -61,11 +61,15 @@ source(g_currentModDirectory .. "gui/elements/Borders.lua");
 source(g_currentModDirectory .. "gui/elements/Table.lua");
 source(g_currentModDirectory .. "gui/elements/Slider.lua");
 source(g_currentModDirectory .. "gui/elements/Input.lua");
+source(g_currentModDirectory .. "gui/elements/Page.lua");
+source(g_currentModDirectory .. "gui/elements/PageSelector.lua");
 source(g_currentModDirectory .. "gui/elements/GuiScreen.lua");
+source(g_currentModDirectory .. "gui/elements/IngameMap.lua");
+source(g_currentModDirectory .. "gui/elements/TableSort.lua");
 
 source(g_currentModDirectory .. "gui/FakeGui.lua");
 source(g_currentModDirectory .. "gui/MultiDialog.lua");
-source(g_currentModDirectory .. "gui/objects/Baler.lua");
+--source(g_currentModDirectory .. "gui/objects/Baler.lua");
 source(g_currentModDirectory .. "gui/objects/ObjectInfo.lua");
 source(g_currentModDirectory .. "gui/objects/GcMain.lua");
 source(g_currentModDirectory .. "gui/objects/DynamicStorage.lua");
@@ -107,7 +111,7 @@ function GlobalCompanyGui:load()
 	
 	self.mainGui = g_company.gui:registerGui("gc_main", InputAction.GC_MAIN, Gc_Gui_MainGui, true, true, true).classGui;
 	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
-	g_company.gui:registerGui("gcPlaceable_baler", nil, Gc_Gui_Baler, true, true);
+	--g_company.gui:registerGui("gcPlaceable_baler", nil, Gc_Gui_Baler, true, true);
 	g_company.gui:registerGui("gcObjectInfo", nil, Gc_Gui_ObjectInfo, false, false);
 	g_company.gui:registerGui("gc_dynamicStorage", nil, Gc_Gui_DynamicStorage, true, true);
 	g_company.gui:registerGui("gc_placeableDigitalDisplay", nil, Gc_Gui_PlaceableDigitalDisplay, true, true);
@@ -294,6 +298,12 @@ function GlobalCompanyGui:registerGui(name, inputAction, class, isFullGui, canEx
 	return newGui;
 end;
 
+function GlobalCompanyGui:setCanExit(name, canExit)
+	if self.guis[name] ~= nil then
+		self.guis[name].canExit = canExit
+	end
+end
+
 function GlobalCompanyGui:unregisterGui()
 	if self.guis[name] ~= nil then
 		self.guis[name].gui:delete();
@@ -392,10 +402,13 @@ function GlobalCompanyGui:closeGui(name)
 	end;	
 end;
 
-function GlobalCompanyGui:closeActiveGui()
+function GlobalCompanyGui:closeActiveGui(guiName, ...)
 	if self.activeGui ~= nil then
 		self:closeGui(self.activeGui);
 	end;
+	if guiName ~= nil then
+		self:openGuiWithData(guiName, ...)
+	end
 end;
 
 function GlobalCompanyGui:getGuiIsOpen(guiName)

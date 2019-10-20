@@ -86,7 +86,9 @@ function GC_Gui_overlay:loadTemplate(templateName, xmlFile, key, overlayName)
 	elseif self.imageFilename == "g_baseHUDFilename" then
 		self.imageFilename = g_baseHUDFilename;
 	elseif self.imageFilename == "gc_uiElements1" then
-        self.imageFilename = g_company.dir .. "images/ui_elements_1.dds";
+		self.imageFilename = g_company.dir .. "images/ui_elements_1.dds";
+	elseif self.imageFilename == "pda" then
+		self.imageFilename = g_currentMission.mapImageFilename;
 	elseif uiElement ~= nil then
         self.imageFilename = uiElement;
     end;

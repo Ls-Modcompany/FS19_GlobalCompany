@@ -242,6 +242,10 @@ function GC_Gui_text:setTextColor(r,g,b,a)
     self.textColor = {r,g,b,a};
 end;
 
+function GC_Gui_text:setTextColorSelected(r,g,b,a)
+    self.textColor_selected = {r,g,b,a};
+end;
+
 function GC_Gui_text:getTextWidth(text)
 	if text == nil then
 		text = self.text;

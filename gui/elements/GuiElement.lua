@@ -277,6 +277,10 @@ function GC_Gui_element:getYtop()
 	return self.position[2] + self.margin[2] + self.size[2];
 end;
 
+function GC_Gui_element:setSortName(sortName)
+	self.sortName = sortName
+end
+
 
 
 
