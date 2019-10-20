@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<l10n>
+	<elements>
+
+		<!-- Warnings / Errors -->
+		<e k="GC_mapVersionWarning" v="地图 '%s' 出自 %s 需要Global Company - 版本 %s 或更高才能正常使用.请访问modhub下载链接获取最新官方版本或访问 '%s' 获取支持."/>
+		<e k="GC_modVersionWarning" v="Mod '%s' 出自 %s 需要Global Company - 版本 %s 或更高才能正常使用.请访问modhub下载链接获取最新官方版本或访问 '%s' 获取支持."/>
+		<e k="GC_loadingError" v="加载Global Company时出错! 请访问modhub下载链接获取最新官方版本或访问 '%s' 获取支持."/>
+		<e k="GC_duplicateError" v="尝试加载两次Global Company! 请从mod文件夹中删除 '%s' , 然后重新加载游戏."/>
+		<e k="GC_combinedError" v="正在尝试将Global Company加载为mod 地图 '%s' 的一部分! 这是不可能的,会导致严重的错误.请访问modhub下载链接获取最新官方版本或访问 '%s' 获取支持."/>
+		<e k="GC_invalidModWarning" v="Mod %s 出自 %s 不被支持! 为了避免错误,应该删除这个mod!"/>
+		<e k="GC_quitToMainMenu" v="确定要退出主菜单吗?"/>
+		<e k="GC_betaVersionWarning" v="已加载开发版本. 请在 %s 报告警告或错误. 访问modhub下载链接获取最新官方版本或访问 '%s' 获取支持."/>
+		<e k="GC_namingError" v="为开发版本找到的'file / zip'名称 '%s' 无效! 使用'FS19_GlobalCompany'作为文件/zip名称. 访问modhub下载链接获取最新官方版本或访问 '%s' 获取支持."/>
+
+		<!-- GUI -->
+		<e k="GC_gui_buttons_ok" v="好的"/>
+		<e k="GC_gui_buttons_yes" v="确定"/>
+		<e k="GC_gui_buttons_no" v="不"/>
+		<e k="GC_gui_modHubLink" v="ModHub 下载链接"/>
+		<e k="GC_gui_buttons_nextWarning" v="下一条警告"/>
+		<e k="GC_gui_buttons_nextConflict" v="下一个冲突"/>
+
+		<!-- General -->
+		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
+
+		<!-- Settings -->
+		<e k="GC_settings_header" v="GlobalCompany - 设置"/>
+		<e k="GC_settings1_title" v="启用扩展的可放置项"/>
+		<e k="GC_settings2_title" v="显示物体信息"/>
+		<e k="GC_settings3_title" v="骑马助手 ($300 / 马 / 天)"/>
+		<e k="GC_settings4_title" v="启用更多树"/>
+		<e k="GC_settings5_title" v="启用切割捆"/>
+		<e k="GC_settings6_title" v="车辆控制: 车间互动帮助"/>
+		
+		<!-- Factory -->
+		<e k="GC_gui_buttons_back" v="返回"/>
+		<e k="GC_gui_overview" v="概览"/>
+		<e k="GC_gui_productLines" v="产品线"/>
+		<e k="GC_gui_description" v="说明"/>
+		<e k="GC_gui_active" v="启用"/>
+		<e k="GC_gui_productionPerHour" v="产量: %s 升/小时"/>
+		<e k="GC_gui_capacity" v="容量:"/>
+		<e k="GC_gui_filllevel" v="填充量:"/>
+		<e k="GC_gui_liter" v="%s 升"/>
+		<e k="GC_gui_buyText" v="购买 (%s)"/>
+		
+		<e k="GC_gui_activate" v="启用"/>
+		<e k="GC_gui_deactivate" v="停用"/>
+		<e k="GC_gui_state" v="状态:"/>
+		<e k="GC_gui_automatic" v="自动:"/>
+		<e k="GC_gui_state_on" v="正在运行"/>
+		<e k="GC_gui_state_off" v="已停止"/>
+		<e k="GC_gui_pallet1" v="%s 托盘"/>
+		<e k="GC_gui_pallet2" v="%s 托盘"/>
+		<e k="GC_gui_spawnText1" v="生成 %s 托盘"/>
+		<e k="GC_gui_spawnText2" v="生成 %s 托盘"/>
+		<e k="GC_gui_autoStart" v="自动启动:"/>		
+
+		<e k="GC_Productline_Title_Backup" v="生产线 %d"/>
+		<e k="GC_Input_Title_Backup" v="输入 %d"/>
+		<e k="GC_Output_Title_Backup" v="输出 %d"/>
+		<e k="GC_Input_Header_Backup" v="输入"/>
+		<e k="GC_Output_Header_Backup" v="输出"/>
+		
+		<e k="GC_Open_Product_Menu" v="打开产品菜单"/>
+		<e k="GC_Open_Overview_Menu" v="打开概览菜单"/>
+		
+		<e k="GC_Factory_Animal_Dialogue" v="选择要卸载到工厂的动物数量."/>
+
+		<e k="GC_gui_disabled" v="禁用"/>
+		<e k="GC_gui_add" v="添加"/>
+		<e k="GC_gui_remove" v="移除"/>
+		<e k="GC_gui_max" v="最大量"/>
+		<e k="GC_gui_percent" v="比例"/>
+		<e k="GC_gui_lifeTimeIncome" v="总收入"/>
+		<e k="GC_gui_changeFactoryTitle" v="在下面输入新的工厂参考名称."/>
+
+		<e k="GC_gui_placeableObject" v="可放置物体"/>
+		<e k="GC_gui_farmlandObject" v="农场物体"/>
+		
+		<!-- Formatting required -->
+		<e k="GC_Factory_Sell_Warning" v="该工厂仍含有产品. 这些产品将按以下金额批量出售:
+
+批量出售价格:  %s"/>		
+		
+		<e k="GC_Factory_Purchase_Warning" v="请确认以下产品的购买.
+
+输入产品:  %s
+容量:  %s
+费用:  %s"/>
+
+
+		<!-- BaleShreader -->
+		<e k="GC_baleShreader_openSteer" v="开启转向"/>
+		<e k="GC_baleShreader_closeSteer" v="关闭转向"/>
+		<e k="GC_baleShreader_startWork" v="启动打捆机"/>
+		<e k="GC_baleShreader_endWork" v="停止打捆机"/>
+		<e k="GC_baleShreader_toggleOnWorkLight" v="打开工作灯"/>
+		<e k="GC_baleShreader_toggleOffWorkLight" v="关闭工作灯"/>
+
+		<!-- Baler -->
+		<e k="GC_baler_title" v="打捆机"/>
+		<e k="GC_baler_title_witStack" v="带堆叠的打捆机"/>
+		<e k="GC_baler_cleaner" v="清洁打捆机"/>
+		<e k="GC_baler_openGui" v="打开 Hud"/>
+		<e k="GC_baler_closeGui" v="关闭 Hud"/>
+		<e k="GC_baler_makeEmpty" v="清空"/>
+		<e k="GC_baler_turnOn" v="打开"/>
+		<e k="GC_baler_turnOff" v="关闭"/>
+		<e k="GC_baler_info_machineData" v="机器数据"/>
+		<e k="GC_baler_info_fillLevel" v="填充量"/>
+		<e k="GC_baler_info_fillLevelBunker" v="仓库填充量"/>
+		<e k="GC_baler_info_counter" v="捆计数器"/>
+		<e k="GC_baler_info_automatic" v="自动开启"/>
+		<e k="GC_baler_actualTyp" v="实际填充类型:"/>
+		<e k="GC_baler_canStack" v="要堆叠的捆数:"/>
+
+		<!-- ObjectInfo -->
+		<e k="GC_ObjectInfo_filltype" v="填充类型: %s"/>
+		<e k="GC_ObjectInfo_level" v="填充量: %s 升"/>
+		<e k="GC_ObjectInfo_level2" v="填充量: %s 升 (%s%%)"/>
+		<e k="GC_ObjectInfo_owner" v="所有者: %s"/>
+
+		<!-- DynamicStorage -->
+		<e k="GC_dynamicStorage_unloadSettings" v="卸载设置"/>
+		<e k="GC_dynamicStorage_gui_header_unloading" v="选择卸载位置"/>
+		<e k="GC_dynamicStorage_gui_header_loading" v="选择填充框"/>
+		<e k="GC_dynamicStorage_gui_info_unloading" v="选择应在哪个框中卸载. 请注意,每个盒子只能卸下一种类型."/>
+		<e k="GC_dynamicStorage_gui_info_loading" v="选择要加载的框."/>
+		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s 升"/>
+		<e k="GC_dynamicStorage_gui_empty" v="空的"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="确认卸载位置"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="确认填充框"/>
+	</elements>
+</l10n>

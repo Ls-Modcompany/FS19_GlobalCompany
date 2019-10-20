@@ -132,5 +132,11 @@ Cost:  %s"/>
 		<e k="GC_dynamicStorage_gui_empty" v="empty"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Confirm unloading position"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Confirm charging box"/>
+
+		<!-- PlaceableDigitalDisplay -->
+		<e k="GC_placeableDigDisplay_openGui" v="Adjust digital display"/>
+		<e k="GC_placeableDigDisplay_header" v="Digitales display"/>
+		<e k="GC_placeableDigDisplay_headerInfo" v="Here you can specify any text you want to appear on the display."/>
+		<e k="GC_placeableDigDisplay_btnSave" v="Save"/>
 	</elements>
 </l10n>
