@@ -484,18 +484,8 @@ function GC_LoadingTrigger:getIsActivatable()
 end
 
 function GC_LoadingTrigger:vehicleHasActiveDriver(vehicle)
-	if (vehicle == g_currentMission.controlledVehicle) or self:vehicleHasAutoDriveActive(vehicle) then
-		return true;
-	end;
-	return false;
+	return (vehicle == g_currentMission.controlledVehicle) or (vehicle ~= nil and ((vehicle.cp ~= nil and vehicle.cp.isDriving) or (vehicle.ad ~= nil and vehicle.ad.isActive)))
 end;	
-
-function GC_LoadingTrigger:vehicleHasAutoDriveActive(vehicle)
-	if vehicle ~= nil and vehicle.ad ~= nil and vehicle.ad.isActive then
-		return true;
-	end;
-	return false;
-end;
 
 function GC_LoadingTrigger:shouldRemoveActivatable()
 	return self.playerTriggerNode == nil
