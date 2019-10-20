@@ -27,6 +27,7 @@ Gc_Gui_MainGui.debugIndex = g_company.debug:registerScriptName("Gc_Gui_MainGui")
 source(g_company.dir .. "gui/objects/GcMain_Errors.lua");
 source(g_company.dir .. "gui/objects/GcMain_Settings.lua");
 source(g_company.dir .. "gui/objects/GcMain_Factories.lua");
+source(g_company.dir .. "gui/objects/GcMain_DynamicStorages.lua");
 
 local Gc_Gui_MainGui_mt = Class(Gc_Gui_MainGui);
 
@@ -38,10 +39,12 @@ function Gc_Gui_MainGui:new(target, custom_mt)
 
     g_company.gui:loadGui(Gc_Gui_MainSettings, "gcMainSettings");
     g_company.gui:loadGui(Gc_Gui_Errors, "gcMainErrors");    
+	g_company.gui:loadGui(Gc_Gui_DynamicStorages, "gcMainDynamicStorages");
 	g_company.gui:loadGui(Gc_Gui_Factories, "gcMainFactories");
 	
 	local factoryMenu = {imageFilename = "g_gcUi2", imageUVs = "icon_factories", gui = g_company.gui:getGui("gcMainFactories")};    
-	self.backupItems = {factoryMenu}; 
+	local dynStorageMenu = {imageFilename = "g_gcUi2", imageUVs = "icon_dynamicStorages", gui = g_company.gui:getGui("gcMainDynamicStorages")};   
+	self.backupItems = {factoryMenu, dynStorageMenu}; 
 	
 	return self;
 end;
@@ -154,3 +157,8 @@ function Gc_Gui_MainGui:onClickMenuNext()
         self.gui_menu.elements[i]:setActive(i == toOpen);      
     end;  
 end;
+
+function Gc_Gui_MainGui:setData(site)
+    self:onClickMainMenu(self.gui_menu.elements[site]);
+    self.gui_menu.elements[site]:setActive(true);  
+end
