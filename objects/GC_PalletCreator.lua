@@ -339,8 +339,15 @@ function GC_PalletCreator:findNextPallet()
 		if nextSpawnerToUse ~= nil then
 			self.spawnerInUse = nextSpawnerToUse.spawner
 			local x, y, z = getWorldTranslation(self.spawnerInUse)
-			local _, ry, _ = getWorldRotation(self.spawnerInUse)
+			local rx, ry, rz = getWorldRotation(self.spawnerInUse)
 			
+			--Thanks to grouminait! https://ls-modcompany.com/forum/thread/5655-gc-palletcreator-optionen/?postID=67874#post67874
+			if g_company.utils.floatEqual(math.abs(math.deg(rx)), 180, 1) and g_company.utils.floatEqual(math.abs(math.deg(rz)), 180, 1) then
+				rx = math.rad(0)
+				ry = math.rad(-math.deg(ry))
+				rz = math.rad(0)
+			end
+
 			local terrainHeight = getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, x, 300, z) + 0.5
             y = math.max(terrainHeight, y)
 

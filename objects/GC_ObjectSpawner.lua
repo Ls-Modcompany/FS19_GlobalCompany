@@ -129,6 +129,13 @@ function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesH
 				local x, y, z = spawnPlace[1], spawnPlace[2], spawnPlace[3]
 				local rx, ry, rz = spawnPlace[4], spawnPlace[5], spawnPlace[6]
 
+				--Thanks to grouminait! https://ls-modcompany.com/forum/thread/5655-gc-palletcreator-optionen/?postID=67874#post67874
+				if g_company.utils.floatEqual(math.abs(math.deg(rx)), 180, 1) and g_company.utils.floatEqual(math.abs(math.deg(rz)), 180, 1) then
+					rx = math.rad(0)
+					ry = math.rad(-math.deg(ry))
+					rz = math.rad(0)
+				end
+
 				if object.filename ~= nil then
 					if object.fillLevel ~= nil then						
 						local configs = object.configurations

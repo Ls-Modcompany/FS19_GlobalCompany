@@ -390,3 +390,7 @@ end
 function GlobalCompanyUtils.getValueOfBits(bits, start, lenght)
 	return tonumber(bits:reverse():sub(start + 1, start + lenght):reverse(), 2)
 end
+
+function GlobalCompanyUtils.floatEqual(lhs, rhs, epsilon)
+	return math.abs(lhs - rhs) < epsilon
+end
