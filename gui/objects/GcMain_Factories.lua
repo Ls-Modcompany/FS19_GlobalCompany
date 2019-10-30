@@ -159,7 +159,7 @@ end
 function Gc_Gui_Factories:onClickSelectFactory(element)
 	self.currentSelectedFactory = element.factory	
 
-	local x,_,y = getWorldTranslation(self.currentSelectedFactory.rootNode)
+	local x,_,y = getWorldTranslation(self.currentSelectedFactory.refPoint)
 	local posX = 440 / (self.pdaWith / 2) * x 
 	local posY = 440 / (self.pdaWith / 2) * -y
 	self.gui_pdaMarker.position = GuiUtils.getNormalizedValues(string.format("%spx %spx", posX, posY), self.gui_pdaMarker.outputSize, self.gui_pdaMarker.position)

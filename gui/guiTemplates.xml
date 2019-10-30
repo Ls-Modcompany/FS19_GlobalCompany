@@ -64,6 +64,7 @@
         <uv name="icon_settings" value="0px 0px 128px 128px"/>
         <uv name="icon_factories" value="256px 0px 128px 128px"/>
         <uv name="icon_dynamicStorages" value="384px 0px 128px 128px"/>
+        <uv name="icon_market" value="512px 0px 128px 128px"/>
 
         <uv name="icon_arrowBottom" value="678px 390px 35px 35px"/>
         <uv name="icon_circle" value="530px 388px 55px 55px"/>
@@ -1197,7 +1198,153 @@
 			<value name="size" value="1200px 50px" />
 		</template>
 
-	
+		<!--###################################################################################################################################-->
+		<!--#############################################   -Market-   ########################################################################-->
+		<!--###################################################################################################################################-->
+		<template name="gcMenuMarketBackground" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="1900px 900px" />
+			<value name="position" value="0px 0px" />
+			<value name="imageColor" value="transparent" />
+			<value name="hasBorders" value="true" />
+			<value name="borderLeftSize" value="2px" />
+			<value name="borderRightSize" value="2px" />
+			<value name="borderTopSize" value="2px" />
+			<value name="borderBottomSize" value="6px" />
+			<value name="borderLeftColor" value="gray2" />
+			<value name="borderRightColor" value="gray2" />
+			<value name="borderTopColor" value="gray2" />
+			<value name="borderBottomColor" value="orange" />
+		</template>
+		<template name="gcMenuMarketLayoutBottom" anchor="middleCenter" extends="gcBase">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="left" />
+			<value name="position" value="0px -480px" />
+			<value name="size" value="1900px 50px" />
+			<value name="margin" value="0px 0px 0px 0px" />
+		</template>
+		<template name="gcMenuMarketTypeLayout" anchor="middleTop" extends="gcBase">
+			<value name="orientation" value="x" />
+			<value name="maxItemsX" value="2" />
+			<value name="position" value="0px -10px" />
+			<value name="size" value="440px 40px" />
+		</template>
+		<template name="gcMenuMarketTypeButton" anchor="middleCenter" extends="gcBaseGuiButton">
+			<value name="size" value="200px 40px" />
+			<value name="margin" value="10px 0px 10px 0px" />
+			<value name="position" value="0px 0px"/>	
+			<value name="hasOverlay" value="true" />	
+			<value name="hasText" value="true" />	
+			<value name="isActivable" value="true" />	
+			<value name="canDeactivable" value="false" />	
+		</template>		
+		<template name="gcMenuMarketTypeButton_overlay" anchor="middleCenter" extends="gcMenuMarketTypeButton">
+			<value name="imageColor" value="buttonMain" />
+			<value name="imageColor_selected" value="orange" />
+			<value name="imageColor_disabled" value="transparent" />
+			<value name="margin" value="0px 0px 0px 0px" />
+		</template>
+		<template name="gcMenuMarketTypeButton_text" anchor="middleCenter" extends="gcMenuMarketTypeButton">
+			<value name="textMargin" value="0px 0px 0px 0px" />
+			<value name="textUpperCase" value="true" />
+			<value name="textSize" value="17px" />
+			<value name="textBold" value="false" />
+			<value name="textColor_selected" value="text" />	
+			<value name="textAlignment" value="center" />
+		</template>
+		<template name="gcMenuMarketTableSortLayout" anchor="middleTop" extends="gcBase">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="left" />
+			<value name="position" value="0px -60px" />
+			<value name="size" value="1880px 35px" />
+		</template>
+
+		<template name="gcMenuMarketTableSort" anchor="leftTop" extends="gcBase">
+			<value name="size" value="368px 35px" />
+			<value name="position" value="0px 0px" />
+			<value name="margin" value="0px 0px 4px 0px" />
+			<value name="hasOverlay" value="true" />			
+		</template>
+		<template name="gcMenuMarketTableSort_button" anchor="leftTop" extends="gcMenuMarketTableSort">
+			<value name="position" value="0px 0px" />
+			<value name="hasOverlay" value="true" />			
+			<value name="hasText" value="true" />			
+		</template>
+		<template name="gcMenuMarketTableSort_button_overlay" anchor="leftTop" extends="gcMenuMarketTableSort_button">
+			<value name="imageColor" value="buttonMain" />
+			<value name="imageColor_selected" value="orange" />
+			<value name="imageColor_disabled" value="transparent" />
+		</template>
+		<template name="gcMenuMarketTableSort_button_text" anchor="leftTop" extends="gcMenuMarketTableSort_button">
+			<value name="position" value="0px 0px" />
+			<value name="textUpperCase" value="false" />
+			<value name="textAlignment" value="left" />
+			<value name="textSize" value="20px" />
+			<value name="textMargin" value="40px 5px 0px 0px" />
+			<value name="textColor_selected" value="white" />	
+		</template>
+		<template name="gcMenuMarketTableSort_overlay" anchor="leftTop" extends="gcMenuMarketTableSort">
+			<value name="size" value="20px 20px" />
+			<value name="position" value="10px -9px" />
+			<value name="imageUVs" value="icon_arrowBottom" />
+			<value name="imageColor" value="white" />
+			<value name="imageColor_selected" value="white" />
+			<value name="imageColor_disabled" value="transparent" />
+		</template>
+		<template name="gcMenuMarketTableGoods" anchor="leftTop" extends="gcBase">
+			<value name="orientation" value="y" />
+			<value name="alignment" value="top" />
+			<value name="size" value="1880px 790px" />
+			<value name="position" value="10px -100px" />
+			<value name="maxItemsX" value="1" />
+			<value name="maxItemsY" value="25" />
+			<value name="hasSlider" value="true" />
+		</template>
+		<template name="gcMenuMarketTableGoods_slider" anchor="rightTop" extends="gcBase">
+			<value name="size" value="20px 790px" />
+			<value name="position" value="0px 0px" />
+			<value name="hasOverlay" value="true" />
+		</template>
+		<template name="gcMenuMarketTableGoods_slider_overlay" anchor="rightTop" extends="gcMenuMarketTableGoods_slider">
+			<value name="position" value="0px 0px" />
+			<value name="imageColor" value="buttonMain" />
+			<value name="imageColor_selected" value="buttonMainSelected" />
+		</template>
+		<template name="gcMenuMarketTableGoodsItem" extends="gcBase">
+			<value name="size" value="1856px 27px" />
+			<value name="hasOverlay" value="true" />
+			<value name="isActivable" value="true" />
+			<value name="canDeactivable" value="false" />
+			<value name="margin" value="0px 0px 0px 5px" />
+		</template>
+		<template name="gcMenuMarketTableGoodsItem_overlay" extends="gcMenuMarketTableGoodsItem">			
+			<value name="imageColor" value="transparent" />
+			<value name="imageColor_selected" value="transparent" />
+			<value name="imageColor_disabled" value="transparent" />
+			<value name="imageColor_disabledSelected" value="transparent" />
+		</template>
+		<template name="gcMenuMarketTableGoodsItemLayout" extends="gcBase">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="left" />
+			<value name="position" value="0px 0px" />
+			<value name="size" value="1856px 27px" />
+		</template>
+		<template name="gcMenuMarketTableGoodsItemButtonOverlay" anchor="leftTop" extends="gcBase">
+			<value name="size" value="368px 27px" />
+			<value name="position" value="0px 0px" />
+			<value name="margin" value="0px 0px 4px 0px" />
+			<value name="imageUVs" value="colorBg" />
+			<value name="imageColor" value="buttonMain" />
+			<value name="imageColor_selected" value="orange" />
+			<value name="imageColor_disabled" value="transparent" />	
+		</template>
+		<template name="gcMenuMarketTableGoodsItemButtonText" anchor="leftTop" extends="gcMenuMarketTableGoodsItemButtonOverlay">
+			<value name="position" value="0px 0px" />
+			<value name="textUpperCase" value="false" />
+			<value name="textAlignment" value="left" />
+			<value name="textSize" value="18px" />
+			<value name="textMargin" value="10px 3px 0px 0px" />
+			<value name="textColor_selected" value="white" />	
+		</template>
 		
 	</templates>
 </guiTemplates>

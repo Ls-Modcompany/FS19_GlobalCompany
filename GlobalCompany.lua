@@ -1,16 +1,29 @@
 --
 -- GlobalCompany
 --
--- @Interface: 1.4.0.0 b5007
+-- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
--- @Date: 24.08.2018
--- @Version: 1.1.0.0
+-- @Date: 30.10.2019
+-- @Version: 1.1.1.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
 --
--- 	v1.1.0.0 (24.08.2018):
+-- 	v1.1.1.0 (30.10.2019):
+--		- GC-Menu
+--			- NEW: Overview for DynamicStorage
+--			- NEW: Better overview for Factorys
+--			- NEW: AddOns can now create Tabs
+--		- Factory
+--			- NEW: add 'refPoint' - Attribute
+--			- FIX: Incomeprice can now be negative
+--		- Add new Gui-elements
+--		- VisibilityNodes: Collisions will check now also on Server
+--		- Adaption to Courseplay
+--		- many more things
+--
+-- 	v1.1.0.0 (24.08.2019):
 --		- add language russian
 --		- fix Shopmanager for actual patch
 --		- Objectinfo: Add support for pallets of VertexDesign
@@ -22,7 +35,7 @@
 --		- adaption to autoDrive
 --		- add dynamicStorage
 --
--- 	v1.0.0.0 (11.05.2018):
+-- 	v1.0.0.0 (11.05.2019):
 --		- first Release
 --
 -- Notes:
@@ -35,10 +48,10 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.1.0.0";
-GlobalCompany.versionDate = "24.08.2019";
-GlobalCompany.currentVersionId = 1100; -- Mod Manager ID. (Version number without periods.)
-GlobalCompany.isDevelopmentVersion = false; -- This is for versions loaded from GIT.
+GlobalCompany.version = "1.1.1.0";
+GlobalCompany.versionDate = "30.10.2019";
+GlobalCompany.currentVersionId = 1110; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
 
 function GlobalCompany.initialLoad()
 	if GlobalCompany.initialLoadComplete ~= nil then
@@ -72,7 +85,12 @@ function GlobalCompany.initialLoad()
 
 	local modNameCurrent = g_currentModName;
 	if g_company.modManager:doLoadCheck(modNameCurrent, duplicateLoad, GlobalCompany.isDevelopmentVersion) then
-		g_company.debug:singleLogWrite(GC_DebugUtils.BLANK, "Loading Version: %s (%s)", GlobalCompany.version, GlobalCompany.versionDate);
+		local text = "Loading Version: %s (%s)"
+		if GlobalCompany.isDevelopmentVersion then
+			text = "Loading Developer-Version: %s (%s)"
+		end
+		g_company.debug:singleLogWrite(GC_DebugUtils.BLANK, text, GlobalCompany.version, GlobalCompany.versionDate);
+
 		addModEventListener(GlobalCompany);
 		
 		GlobalCompany.loadedFactories = {}

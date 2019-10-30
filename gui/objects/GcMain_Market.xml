@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+
+<GUI>
+	<GuiElement type="image" template="gcMenuMarketBackground">   
+		
+        <GuiElement type="table" template="gcMenuMarketTypeLayout"> 
+            <GuiElement type="button" template="gcMenuMarketTypeButton" text="Waren" />
+            <GuiElement type="button" template="gcMenuMarketTypeButton" text="Fahrzeuge" />
+        </GuiElement>
+
+        <GuiElement type="flowLayout" template="gcMenuMarketTableSortLayout" id="gui_sorter_goods">  
+            <GuiElement type="tableSort" template="gcMenuMarketTableSort" id="gui_tableSort" text="$l10n_GC_market_date" onClick="onClickChangeSortDirection" />
+            <GuiElement type="tableSort" template="gcMenuMarketTableSort" id="gui_tableSort" text="$l10n_GC_market_name" onClick="onClickChangeSortDirection" />
+            <GuiElement type="tableSort" template="gcMenuMarketTableSort" id="gui_tableSort" text="$l10n_GC_market_type" onClick="onClickChangeSortDirection" />
+            <GuiElement type="tableSort" template="gcMenuMarketTableSort" id="gui_tableSort" text="$l10n_GC_market_liter" onClick="onClickChangeSortDirection" />
+            <GuiElement type="tableSort" template="gcMenuMarketTableSort" id="gui_tableSort" text="$l10n_GC_market_money" onClick="onClickChangeSortDirection" />
+        </GuiElement>
+
+        <GuiElement type="flowLayout" template="gcMenuMarketTableSortLayout" id="gui_sorter_vehicles">  
+            <GuiElement type="tableSort" template="gcMenuMarketTableSort" id="gui_tableSort" text="$l10n_GC_market_date" onClick="onClickChangeSortDirection" />
+            <GuiElement type="tableSort" template="gcMenuMarketTableSort" id="gui_tableSort" text="$l10n_GC_market_name" onClick="onClickChangeSortDirection" />
+            <GuiElement type="tableSort" template="gcMenuMarketTableSort" id="gui_tableSort" text="$l10n_GC_market_designation" onClick="onClickChangeSortDirection" />
+            <GuiElement type="tableSort" template="gcMenuMarketTableSort" id="gui_tableSort" text="$l10n_GC_market_liter" onClick="onClickChangeSortDirection" />
+            <GuiElement type="tableSort" template="gcMenuMarketTableSort" id="gui_tableSort" text="$l10n_GC_market_money" onClick="onClickChangeSortDirection" />
+        </GuiElement>
+
+        <GuiElement type="table" template="gcMenuMarketTableGoods" id="gui_table_goods">
+            <GuiElement type="button" template="gcMenuMarketTableGoodsItem" id="gui_factorySelectFactory" onClick="onClickSelectFactory" isTableTemplate="true">
+                <GuiElement type="flowLayout" template="gcMenuMarketTableGoodsItemLayout">
+	                <GuiElement type="image" template="gcMenuMarketTableGoodsItemButtonOverlay">   
+                        <GuiElement type="text" template="gcMenuMarketTableGoodsItemButtonText" />            
+                    </GuiElement>
+	                <GuiElement type="image" template="gcMenuMarketTableGoodsItemButtonOverlay">   
+                        <GuiElement type="text" template="gcMenuMarketTableGoodsItemButtonText" />            
+                    </GuiElement>
+	                <GuiElement type="image" template="gcMenuMarketTableGoodsItemButtonOverlay">   
+                        <GuiElement type="text" template="gcMenuMarketTableGoodsItemButtonText" />            
+                    </GuiElement>
+	                <GuiElement type="image" template="gcMenuMarketTableGoodsItemButtonOverlay">   
+                        <GuiElement type="text" template="gcMenuMarketTableGoodsItemButtonText" />            
+                    </GuiElement>
+	                <GuiElement type="image" template="gcMenuMarketTableGoodsItemButtonOverlay">   
+                        <GuiElement type="text" template="gcMenuMarketTableGoodsItemButtonText" />            
+                    </GuiElement>
+                </GuiElement>
+            </GuiElement>
+        </GuiElement>
+
+        <GuiElement type="table" template="gcMenuMarketTableGoods" id="gui_table_vehciles">
+            <GuiElement type="button" template="gcMenuMarketTableGoodsItem" id="gui_factorySelectFactory" onClick="onClickSelectFactory" isTableTemplate="true">
+                <GuiElement type="flowLayout" template="gcMenuMarketTableGoodsItemLayout">
+	                <GuiElement type="image" template="gcMenuMarketTableGoodsItemButtonOverlay">   
+                        <GuiElement type="text" template="gcMenuMarketTableGoodsItemButtonText" />            
+                    </GuiElement>
+	                <GuiElement type="image" template="gcMenuMarketTableGoodsItemButtonOverlay">   
+                        <GuiElement type="text" template="gcMenuMarketTableGoodsItemButtonText" />            
+                    </GuiElement>
+	                <GuiElement type="image" template="gcMenuMarketTableGoodsItemButtonOverlay">   
+                        <GuiElement type="text" template="gcMenuMarketTableGoodsItemButtonText" />            
+                    </GuiElement>
+	                <GuiElement type="image" template="gcMenuMarketTableGoodsItemButtonOverlay">   
+                        <GuiElement type="text" template="gcMenuMarketTableGoodsItemButtonText" />            
+                    </GuiElement>
+	                <GuiElement type="image" template="gcMenuMarketTableGoodsItemButtonOverlay">   
+                        <GuiElement type="text" template="gcMenuMarketTableGoodsItemButtonText" />            
+                    </GuiElement>
+                </GuiElement>
+            </GuiElement>
+        </GuiElement>
+    
+	</GuiElement>
+		
+    <GuiElement type="flowLayout" template="gcMenuMarketLayoutBottom"> 
+        <GuiElement type="button" template="gcMenuFactoriesButtonBack" onClick="onClickClose" />
+        <GuiElement type="text" template="gcBaseGuiButtonText" text="$l10n_button_back"/>
+        <GuiElement type="button" position="80px 0px" template="gcBaseGuiButtonNext" inputAction="MENU_ACCEPT" onClick="onClickDetails" />
+        <GuiElement type="text" template="gcBaseGuiButtonText" text="$l10n_GC_market_showDetails" />            
+    </GuiElement>
+</GUI>

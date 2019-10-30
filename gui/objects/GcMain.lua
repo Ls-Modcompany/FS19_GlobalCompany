@@ -28,6 +28,7 @@ source(g_company.dir .. "gui/objects/GcMain_Errors.lua");
 source(g_company.dir .. "gui/objects/GcMain_Settings.lua");
 source(g_company.dir .. "gui/objects/GcMain_Factories.lua");
 source(g_company.dir .. "gui/objects/GcMain_DynamicStorages.lua");
+--source(g_company.dir .. "gui/objects/GcMain_Market.lua");
 
 local Gc_Gui_MainGui_mt = Class(Gc_Gui_MainGui);
 
@@ -39,11 +40,13 @@ function Gc_Gui_MainGui:new(target, custom_mt)
 
     g_company.gui:loadGui(Gc_Gui_MainSettings, "gcMainSettings");
     g_company.gui:loadGui(Gc_Gui_Errors, "gcMainErrors");    
-	g_company.gui:loadGui(Gc_Gui_DynamicStorages, "gcMainDynamicStorages");
 	g_company.gui:loadGui(Gc_Gui_Factories, "gcMainFactories");
+	g_company.gui:loadGui(Gc_Gui_DynamicStorages, "gcMainDynamicStorages");
+	--g_company.gui:loadGui(Gc_Gui_Market, "gcMainMarket");
 	
 	local factoryMenu = {imageFilename = "g_gcUi2", imageUVs = "icon_factories", gui = g_company.gui:getGui("gcMainFactories")};    
 	local dynStorageMenu = {imageFilename = "g_gcUi2", imageUVs = "icon_dynamicStorages", gui = g_company.gui:getGui("gcMainDynamicStorages")};   
+	--local marketMenu = {imageFilename = "g_gcUi2", imageUVs = "icon_market", gui = g_company.gui:getGui("gcMainMarket")};   
 	self.backupItems = {factoryMenu, dynStorageMenu}; 
 	
 	return self;
@@ -55,6 +58,10 @@ function Gc_Gui_MainGui:onCreate()
     for _, d in pairs(self.backupItems) do
         self:addMenuItem(d.imageFilename, d.imageUVs, d.gui, true);
     end;
+    for _, d in pairs(GlobalCompanyGui.gcMenuModSites) do
+        self:addMenuItem(d.imageFilename, d.imageUVs, d.gui, true);
+    end;
+    
     self.loadSpecial = true;
 end;
 

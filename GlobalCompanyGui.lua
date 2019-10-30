@@ -44,6 +44,8 @@ GlobalCompanyGui.template.uvs = {};
 GlobalCompanyGui.template.templates = {};
 GlobalCompanyGui.template.uiElements = {};
 
+GlobalCompanyGui.gcMenuModSites = {}
+
 GlobalCompanyGui.MULTIDIALOG_MODE_OK = 0;
 GlobalCompanyGui.MULTIDIALOG_MODE_YES_NO = 1;
 GlobalCompanyGui.MULTIDIALOG_MODE_INPUT = 2;
@@ -966,6 +968,10 @@ end;
 function GlobalCompanyGui:checkClickZoneNormal(x,y, drawX, drawY, sX, sY)
 	return x > drawX and y > drawY and x < drawX + sX and y < drawY + sY;
 end;
+
+function GlobalCompanyGui:registerSiteForGcMenu(imageFilename, imageUVs, gui)
+	table.insert(GlobalCompanyGui.gcMenuModSites, {imageFilename=imageFilename, imageUVs=imageUVs, gui=gui})
+end
 
 g_company.gui:loadGuiTemplates(g_company.dir .. "gui/guiTemplates.xml");
 g_company.addInit(GlobalCompanyGui, GlobalCompanyGui.init);

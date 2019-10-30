@@ -147,6 +147,15 @@ Kosten:  %s"/>
 		<e k="GC_placeableDigDisplay_header" v="Digitales Display"/>
 		<e k="GC_placeableDigDisplay_headerInfo" v="Hier kannst du einen beliebigen Text festlegen, der auf dem Display erscheinen soll."/>
 		<e k="GC_placeableDigDisplay_btnSave" v="Speichern"/>
+		
+		<!-- Market -->
+		<!--e k="GC_market_showDetails" v="Details"/>
+		<e k="GC_market_date" v="Datum"/>
+		<e k="GC_market_name" v="Name"/>
+		<e k="GC_market_type" v="Art"/>
+		<e k="GC_market_liter" v="Liter"/>
+		<e k="GC_market_money" v="Preis"/>
+		<e k="GC_market_designation" v="Bezeichnung"/-->
 
 	</elements>
 </l10n>

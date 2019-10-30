@@ -40,7 +40,6 @@ function Gc_Gui_MainSettings:loadSettings()
     self.gui_btn_settings_3:setActive(g_company.settings:getSetting("horseHelper"));
     self.gui_btn_settings_4:setActive(g_company.settings:getSetting("moreTrees"));
     self.gui_btn_settings_5:setActive(g_company.settings:getSetting("cutBales"));
-    self.gui_btn_settings_6:setActive(g_company.settings:getSetting("addOnVehicleControllShowInteractionGui"));
 
     local isDisabled = self:getDisabled();
     self.gui_btn_settings_1:setDisabled(isDisabled);
@@ -49,11 +48,6 @@ function Gc_Gui_MainSettings:loadSettings()
     self.gui_btn_settings_4:setDisabled(isDisabled);
     self.gui_btn_settings_5:setDisabled(isDisabled);
 
-
-    if not isDisabled and not g_company.settings:haveSetting("addOnVehicleControllShowInteractionGui") then
-       isDisabled = true;
-    end;
-    self.gui_btn_settings_6:setDisabled(isDisabled);    
 end;
 
 function Gc_Gui_MainSettings:onClickBtnSetting(btn, parameter)

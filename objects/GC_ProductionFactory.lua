@@ -186,6 +186,13 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 		spawnTextTwo = Utils.getNoNil(getXMLString(xmlFile, xmlKey .. ".guiInformation#spawnTextTwo"), "GC_gui_spawnText2")
 	}
 
+	local refPoint = getXMLString(xmlFile, xmlKey .. "#refPoint")
+	if refPoint ~= nil and refPoint ~= "" then
+		self.refPoint = I3DUtil.indexToObject(self.rootNode, refPoint, self.i3dMappings)
+	else
+		self.refPoint = self.rootNode
+	end
+
 	self.disableAllOutputGUI = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. ".operation#disableAllOutputGUI"), false)
 	self.showInGlobalGUI = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. ".operation#showInGlobalGUI"), true)
 	self.updateDelay = math.max(Utils.getNoNil(getXMLInt(xmlFile, xmlKey .. ".operation#updateDelayMinutes"), 10), 1)

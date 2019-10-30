@@ -7,7 +7,19 @@
 -- @Version: 1.0.0.0
 -- 
 -- @Support: LS-Modcompany
--- 
+--
+-- Changelog:
+--
+-- 	v1.0.0.0 (28.10.2019):
+-- 		- initial Script Fs19 (kevink98)
+--
+-- Notes:
+--
+--
+-- ToDo:
+-- 		Direction of slider (x or y) -> actually its y
+--	
+--
 local debugIndex = g_company.debug:registerScriptName("GlobalCompany-Gui-Slider");
 
 GC_Gui_slider = {};
@@ -90,7 +102,8 @@ function GC_Gui_slider:updateItems()
 			self:setVisible(false);
 		else
 			self:setVisible(true);
-			self.stepsize = self.size[2] / ( 1 + (#self.controller.items - (self.controller.maxItemsX * self.controller.maxItemsY)));
+			--self.stepsize = self.size[2] / ( 1 + (#self.controller.items - (self.controller.maxItemsX * self.controller.maxItemsY))); --set correct direction!
+			self.stepsize = self.size[2] / math.ceil( 1 + (math.ceil(#self.controller.items / self.controller.maxItemsX) / (self.controller.maxItemsY))); --set correct direction!
 			local size = math.max(self.stepsize, self.minHeight[1]);
 			self.buttonElement.size[2] = size;
 			if self.buttonElement.overlayElement ~= nil then
