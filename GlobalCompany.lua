@@ -4,7 +4,7 @@
 -- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
 -- @Date: 30.10.2019
--- @Version: 1.1.1.0
+-- @Version: 1.1.1.1
 --
 -- @Support: LS-Modcompany
 --
@@ -48,9 +48,9 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.1.1.0";
+GlobalCompany.version = "1.1.1.1";
 GlobalCompany.versionDate = "30.10.2019";
-GlobalCompany.currentVersionId = 1110; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.currentVersionId = 1111; -- Mod Manager ID. (Version number without periods.)
 GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
 
 function GlobalCompany.initialLoad()
