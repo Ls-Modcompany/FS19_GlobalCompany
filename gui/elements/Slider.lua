@@ -103,7 +103,11 @@ function GC_Gui_slider:updateItems()
 		else
 			self:setVisible(true);
 			--self.stepsize = self.size[2] / ( 1 + (#self.controller.items - (self.controller.maxItemsX * self.controller.maxItemsY))); --set correct direction!
-			self.stepsize = self.size[2] / math.ceil( 1 + (math.ceil(#self.controller.items / self.controller.maxItemsX) / (self.controller.maxItemsY))); --set correct direction!
+			if self.controller.maxItemsX > 1 then
+				self.stepsize = self.size[2] / math.ceil( 1 + (math.ceil(#self.controller.items / self.controller.maxItemsX) / (self.controller.maxItemsY)));
+			else
+				self.stepsize = self.size[2] / ( 1 + (#self.controller.items - self.controller.maxItemsY));
+			end 
 			local size = math.max(self.stepsize, self.minHeight[1]);
 			self.buttonElement.size[2] = size;
 			if self.buttonElement.overlayElement ~= nil then
