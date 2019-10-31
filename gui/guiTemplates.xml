@@ -448,6 +448,7 @@
 			<value name="hasBorders" value="true" />
 			<value name="borderBottomSize" value="6px" />
 			<value name="borderBottomColor" value="orange" />
+			<value name="position" value="0px -100px" />
 		</template>
 		<template name="gcObjectInfoLayout" anchor="leftTop" extends="gcBase">
 			<value name="orientation" value="y" />
