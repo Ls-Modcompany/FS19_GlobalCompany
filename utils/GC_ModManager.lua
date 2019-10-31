@@ -254,12 +254,12 @@ function GC_ModManager:getCanDelete()
 end;
 
 function GC_ModManager:showDevelopmentGUI()
-	local url = " www.ls-modcompany.com ";
+	local url = " https://ls-modcompany.com ";
 	if g_languageShort == "de" then
-		url = " www.ls-modcompany.de ";
+		url = " https://ls-modcompany.de ";
 	end;
 
-	local errorReportLink = " -- "; -- We need the public gitHub link or release link here.
+	local errorReportLink = " https://github.com/Ls-Modcompany/FS19_GlobalCompany ";
 	local text = string.format(self.texts.betaVersionWarning, errorReportLink, url);
 
 	g_gui:showYesNoDialog({title = self.texts.guiTitle,
@@ -272,9 +272,9 @@ function GC_ModManager:showDevelopmentGUI()
 end;
 
 function GC_ModManager:showModWarningGUI(modName, version, author, isModMap)
-	local url = " www.ls-modcompany.com ";
+	local url = " https://ls-modcompany.com ";
 	if g_languageShort == "de" then
-		url = " www.ls-modcompany.de ";
+		url = " https://ls-modcompany.de ";
 	end;
 
 	local text = string.format(self.texts.modWarning, modName, author, version, url);
@@ -313,9 +313,9 @@ function GC_ModManager:showModConflictWarningGui(modName, author)
 end;
 
 function GC_ModManager:showLoadWarningGUI(strg, warningType)
-	local url = " www.ls-modcompany.com ";
+	local url = " https://ls-modcompany.com ";
 	if g_languageShort == "de" then
-		url = " www.ls-modcompany.de ";
+		url = " https://ls-modcompany.de ";
 	end;
 
 	local text = "";

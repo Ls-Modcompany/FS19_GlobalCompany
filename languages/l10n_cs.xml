@@ -17,6 +17,7 @@
 		<e k="GC_gui_buttons_ok" v="好的"/>
 		<e k="GC_gui_buttons_yes" v="确定"/>
 		<e k="GC_gui_buttons_no" v="不"/>
+		<e k="GC_gui_buttons_back" v="返回"/>
 		<e k="GC_gui_modHubLink" v="ModHub 下载链接"/>
 		<e k="GC_gui_buttons_nextWarning" v="下一条警告"/>
 		<e k="GC_gui_buttons_nextConflict" v="下一个冲突"/>
@@ -34,7 +35,6 @@
 		<e k="GC_settings6_title" v="车辆控制: 车间互动帮助"/>
 		
 		<!-- Factory -->
-		<e k="GC_gui_buttons_back" v="返回"/>
 		<e k="GC_gui_overview" v="概览"/>
 		<e k="GC_gui_productLines" v="产品线"/>
 		<e k="GC_gui_description" v="说明"/>
@@ -44,7 +44,6 @@
 		<e k="GC_gui_filllevel" v="填充量:"/>
 		<e k="GC_gui_liter" v="%s 升"/>
 		<e k="GC_gui_buyText" v="购买 (%s)"/>
-		
 		<e k="GC_gui_activate" v="启用"/>
 		<e k="GC_gui_deactivate" v="停用"/>
 		<e k="GC_gui_state" v="状态:"/>
@@ -71,13 +70,24 @@
 		<e k="GC_gui_disabled" v="禁用"/>
 		<e k="GC_gui_add" v="添加"/>
 		<e k="GC_gui_remove" v="移除"/>
+		<e k="GC_gui_rename" v="重命名"/>
 		<e k="GC_gui_max" v="最大量"/>
 		<e k="GC_gui_percent" v="比例"/>
 		<e k="GC_gui_lifeTimeIncome" v="总收入"/>
 		<e k="GC_gui_changeFactoryTitle" v="在下面输入新的工厂参考名称."/>
 
+		<e k="GC_gui_factories" v="生产"/>
+		<e k="GC_gui_activeProductLines" v="活跃产品线:"/>
+		<e k="GC_gui_emptyInputs" v="空原料:"/>
+		<e k="GC_gui_fullOutputs" v="满产品:"/>
+
+		<e k="GC_gui_dynamicStorages" v="动态仓库"/>
+		<e k="GC_gui_freeSlots" v="空闲槽:"/>
+
 		<e k="GC_gui_placeableObject" v="可放置物体"/>
 		<e k="GC_gui_farmlandObject" v="农场物体"/>
+		<e k="GC_gui_changeDynamicStorageTitle" v="在下面输入新的仓库名称."/>
+		<e k="GC_gui_dynamicStorage_titleBackup" v="动态贮存"/>
 		
 		<!-- Formatting required -->
 		<e k="GC_Factory_Sell_Warning" v="该工厂仍含有产品. 这些产品将按以下金额批量出售:
@@ -89,7 +99,6 @@
 输入产品:  %s
 容量:  %s
 费用:  %s"/>
-
 
 		<!-- BaleShreader -->
 		<e k="GC_baleShreader_openSteer" v="开启转向"/>
@@ -125,12 +134,27 @@
 		<!-- DynamicStorage -->
 		<e k="GC_dynamicStorage_unloadSettings" v="卸载设置"/>
 		<e k="GC_dynamicStorage_gui_header_unloading" v="选择卸载位置"/>
-		<e k="GC_dynamicStorage_gui_header_loading" v="选择填充框"/>
-		<e k="GC_dynamicStorage_gui_info_unloading" v="选择应在哪个框中卸载. 请注意,每个盒子只能卸下一种类型."/>
-		<e k="GC_dynamicStorage_gui_info_loading" v="选择要加载的框."/>
+		<e k="GC_dynamicStorage_gui_header_loading" v="选择填充槽"/>
+		<e k="GC_dynamicStorage_gui_info_unloading" v="选择应在哪个槽中卸载. 请注意,每个槽只能卸下一种类型."/>
+		<e k="GC_dynamicStorage_gui_info_loading" v="选择要加载的槽."/>
 		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s 升"/>
 		<e k="GC_dynamicStorage_gui_empty" v="空的"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="确认卸载位置"/>
-		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="确认填充框"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="确认填充槽"/>
+
+		<!-- PlaceableDigitalDisplay -->
+		<e k="GC_placeableDigDisplay_openGui" v="调整数字显示器"/>
+		<e k="GC_placeableDigDisplay_header" v="数字显示器"/>
+		<e k="GC_placeableDigDisplay_headerInfo" v="在这里您可以指定要在显示器上显示的任何文本."/>
+		<e k="GC_placeableDigDisplay_btnSave" v="保存"/>
+
+		<!-- Market -->
+		<!--e k="GC_market_showDetails" v="Details"/>
+		<e k="GC_market_date" v="Datum"/>
+		<e k="GC_market_name" v="Name"/>
+		<e k="GC_market_type" v="Art"/>
+		<e k="GC_market_liter" v="Liter"/>
+		<e k="GC_market_money" v="Preis"/>
+		<e k="GC_market_designation" v="Bezeichnung"/-->
 	</elements>
 </l10n>

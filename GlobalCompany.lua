@@ -3,12 +3,18 @@
 --
 -- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
--- @Date: 30.10.2019
--- @Version: 1.1.1.1
+-- @Date: 31.10.2019
+-- @Version: 1.1.2.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+--
+-- 	v1.1.2.0 (31.10.2019):
+--		- FIX: 'Error: Server:registerObjectInStream is only allowed in writeStream calls' Error on MP
+--		- FIX: language texts
+--		- FIX: Objektinfo: Change position, now we can see the hand
+--
 --
 -- 	v1.1.1.0 (30.10.2019):
 --		- GC-Menu
