@@ -174,6 +174,10 @@ end
 function GC_TriggerManager:writeStream(streamId, connection)
     if not connection:getIsServer() then
 		if self:getHasTriggers() then
+			
+			g_server.currentWriteStreamConnection = connection
+			g_server.currentWriteStreamConnectionIsInitial = true
+
 			for _, trigger in ipairs(self.registeredTriggers) do
 				if trigger.registerTriggerInStream == true then
 					NetworkUtil.writeNodeObjectId(streamId, NetworkUtil.getObjectId(trigger))
@@ -181,6 +185,10 @@ function GC_TriggerManager:writeStream(streamId, connection)
 					g_server:registerObjectInStream(connection, trigger)
 				end
 			end
+			
+			g_server.currentWriteStreamConnection = nil
+			g_server.currentWriteStreamConnectionIsInitial = false
+
 		end
     end
 end
