@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<l10n>
+	<elements>
+
+		<!-- Warnings / Errors -->
+		<e k="GC_mapVersionWarning" v="Mod '%s' od %s vyžaduje pro správnou funkci Globální společnost - Verze %s nebo vyšší. Navštivte odkaz ke stažení modHub pro nejnovější oficiální verzi nebo navštivte '%s' pro podporu."/>
+		<e k="GC_modVersionWarning" v="Mod '%s' od %s vyžaduje pro správnou funkci Globální společnost - Verze %s nebo vyšší. Navštivte odkaz ke stažení modHub pro nejnovější oficiální verzi nebo navštivte '%s' pro podporu."/>
+		<e k="GC_loadingError" v="Při načítání globální společnosti se něco pokazilo! Navštivte odkaz ke stažení modHub pro nejnovější oficiální verzi nebo navštivte '%s' pro podporu."/>
+		<e k="GC_duplicateError" v="Pokoušíte se načíst globální společnost dvakrát! Odstraňte prosím duplikát ze složky mod '%s' a znovu načtěte hru."/>
+		<e k="GC_combinedError" v="Pokoušíte se načíst globální společnost jako součást modové mapy '%s'! To není možné a způsobí to vážné chyby. Navštivte odkaz ke stažení modHub pro nejnovější oficiální verzi nebo navštivte '%s' pro podporu."/>
+		<e k="GC_invalidModWarning" v="Mod %s od %s není podporován! Aby se předešlo chybám, měl by být tento mod odstraněn!"/>
+		<e k="GC_quitToMainMenu" v="Opravdu chcete opustit hlavní nabídku?"/>
+		<e k="GC_betaVersionWarning" v="Byla načtena vývojová verze. Prosím nahláste varování nebo chyby na %s. Navštivte odkaz ke stažení modHub pro nejnovější oficiální verzi vydání nebo navštivte podporu '%s'."/>
+		<e k="GC_namingError" v="Pro vývojovou verzi bylo nalezeno neplatné 'jméno souboru / zip '%s'! Pro název souboru / zip použijte 'FS19_GlobalCompany'. Navštivte odkaz ke stažení modHub pro nejnovější oficiální verzi vydání nebo navštivte podporu '%s'."/>
+
+		<!-- GUI -->
+		<e k="GC_gui_buttons_ok" v="OK"/>
+		<e k="GC_gui_buttons_yes" v="Ano"/>
+		<e k="GC_gui_buttons_no" v="Ne"/>
+		<e k="GC_gui_buttons_back" v="Zpět"/>
+		<e k="GC_gui_modHubLink" v="ModHub odkaz na stažení"/>
+		<e k="GC_gui_buttons_nextWarning" v="Další varování"/>
+		<e k="GC_gui_buttons_nextConflict" v="Další konflikt"/>
+
+		<!-- General -->
+		<e k="GC_category_globalCompanyPlaceable" v="Globální společnost"/>
+
+		<!-- Settings -->
+		<e k="GC_settings_header" v="Globální společnost - Nastavení"/>
+		<e k="GC_settings1_title" v="Aktivujte rozšířené umístění"/>
+		<e k="GC_settings2_title" v="Zobrazit informace o objektu"/>
+		<e k="GC_settings3_title" v="Koňský pomocník ($300 / Koně / Den)"/>
+		<e k="GC_settings4_title" v="Aktivujte více stromů"/>
+		<e k="GC_settings5_title" v="Aktivujte řezané balíky"/>
+		<e k="GC_settings6_title" v="VehicleControl: Pomoc v obchodě"/>
+		
+		<!-- Factory -->
+		<e k="GC_gui_overview" v="Přehled"/>
+		<e k="GC_gui_productLines" v="Produktové řady"/>
+		<e k="GC_gui_description" v="Popis"/>
+		<e k="GC_gui_active" v="Aktivní"/>
+		<e k="GC_gui_productionPerHour" v="Produkce: %s Litrů/Hod"/>
+		<e k="GC_gui_capacity" v="Kapacita:"/>
+		<e k="GC_gui_filllevel" v="Úroveň naplnění:"/>
+		<e k="GC_gui_liter" v="%s Litrů"/>
+		<e k="GC_gui_buyText" v="Pořídit (%s)"/>
+		<e k="GC_gui_activate" v="Aktivace"/>
+		<e k="GC_gui_deactivate" v="Deaktivace"/>
+		<e k="GC_gui_state" v="Stav:"/>
+		<e k="GC_gui_automatic" v="Automaticky:"/>
+		<e k="GC_gui_state_on" v="Běží"/>
+		<e k="GC_gui_state_off" v="Zastaven"/>
+		<e k="GC_gui_pallet1" v="%s paleta"/>
+		<e k="GC_gui_pallet2" v="%s Palety"/>
+		<e k="GC_gui_spawnText1" v="Vzít %s paletu"/>
+		<e k="GC_gui_spawnText2" v="Vzít %s Palety"/>
+        <e k="GC_gui_autoStart" v="Auto Start:"/>
+		
+		<e k="GC_Productline_Title_Backup" v="Výrobní linka %d"/>
+		<e k="GC_Input_Title_Backup" v="Vstup %d"/>
+		<e k="GC_Output_Title_Backup" v="Výstup %d"/>
+		<e k="GC_Input_Header_Backup" v="Vstupy"/>
+		<e k="GC_Output_Header_Backup" v="Výstupy"/>
+		
+		<e k="GC_Open_Product_Menu" v="Otevřete nabídku produktu"/>
+		<e k="GC_Open_Overview_Menu" v="Otevřít menu"/>
+		
+		<e k="GC_Factory_Animal_Dialogue" v="Vyberte počet zvířat, která mají být vyložena do továrny."/>
+
+		<e k="GC_gui_disabled" v="Zakázán"/>
+		<e k="GC_gui_add" v="Přidat"/>
+		<e k="GC_gui_remove" v="Odstranit"/>
+		<e k="GC_gui_rename" v="Přejmenovat"/>
+		<e k="GC_gui_max" v="Maximum"/>
+		<e k="GC_gui_percent" v="Procent"/>
+		<e k="GC_gui_lifeTimeIncome" v="Celoživotní příjem"/>
+		<e k="GC_gui_changeFactoryTitle" v="Níže zadejte nový referenční název výrobce."/>
+		
+		<e k="GC_gui_factories" v="Výroba"/>
+		<e k="GC_gui_activeProductLines" v="aktivní produkce:"/>
+		<e k="GC_gui_emptyInputs" v="prázdné suroviny:"/>
+		<e k="GC_gui_fullOutputs" v="Plné produkty:"/>
+
+		<e k="GC_gui_dynamicStorages" v="Dynamické sklady"/>
+		<e k="GC_gui_freeSlots" v="krabice zdarma:"/>
+
+		<e k="GC_gui_placeableObject" v="Umístitelný objekt"/>
+		<e k="GC_gui_farmlandObject" v="Zemědělská půda objekt"/>
+		<e k="GC_gui_changeDynamicStorageTitle" v="Níže zadejte nový název skladu."/>
+		<e k="GC_gui_dynamicStorage_titleBackup" v="Dynamický sklad"/>
+		
+		<!-- Formatting required -->
+		<e k="GC_Factory_Sell_Warning" v="Tato továrna stále obsahuje produkty. Budou prodávány hromadně za následující částku:
+
+Hromadná cena:  %s"/>		
+		
+		<e k="GC_Factory_Purchase_Warning" v="Potvrďte následující nákup produktu.
+
+Vstupní produkt:  %s
+Objem:  %s
+Cena:  %s"/>
+
+		<!-- BaleShreader -->
+		<e k="GC_baleShreader_openSteer" v="Otevřít řízení"/>
+		<e k="GC_baleShreader_closeSteer" v="Zavřít řízení"/>
+		<e k="GC_baleShreader_startWork" v="Spustit lis"/>
+		<e k="GC_baleShreader_endWork" v="Zastavit lis"/>
+		<e k="GC_baleShreader_toggleOnWorkLight" v="Zapnout světla"/>
+		<e k="GC_baleShreader_toggleOffWorkLight" v="Vypnout světla"/>
+
+		<!-- Baler -->
+		<e k="GC_baler_title" v="Lis"/>
+		<e k="GC_baler_title_witStack" v="Lis na balíky"/>
+		<e k="GC_baler_cleaner" v="Vyčistěte lis"/>
+		<e k="GC_baler_openGui" v="Otevřít Hud"/>
+		<e k="GC_baler_closeGui" v="Zavřít Hud"/>
+		<e k="GC_baler_makeEmpty" v="Prázdný"/>
+		<e k="GC_baler_turnOn" v="Zapnout"/>
+		<e k="GC_baler_turnOff" v="Vypnout"/>
+		<e k="GC_baler_info_machineData" v="Data rostlin"/>
+		<e k="GC_baler_info_fillLevel" v="Úroveň naplnění"/>
+		<e k="GC_baler_info_fillLevelBunker" v="Úroveň naplnění bunkru"/>
+		<e k="GC_baler_info_counter" v="Počítadlo balíků"/>
+		<e k="GC_baler_info_automatic" v="Automatické spuštění"/>
+		<e k="GC_baler_actualTyp" v="Aktuální typ náplně:"/>
+		<e k="GC_baler_canStack" v="Počet balíků do zásobníku:"/>
+
+		<!-- ObjectInfo -->
+		<e k="GC_ObjectInfo_filltype" v="Náplň: %s"/>
+		<e k="GC_ObjectInfo_level" v="Náplň: %s Litrů"/>
+		<e k="GC_ObjectInfo_level2" v="Náplň: %s Litrů (%s%%)"/>
+		<e k="GC_ObjectInfo_owner" v="Majitel: %s"/>
+
+		<!-- DynamicStorage -->
+		<e k="GC_dynamicStorage_unloadSettings" v="Uvolnit nastavení"/>
+		<e k="GC_dynamicStorage_gui_header_unloading" v="Vyberte polohu vykládky"/>
+		<e k="GC_dynamicStorage_gui_header_loading" v="Vyberte vykládací box"/>
+		<e k="GC_dynamicStorage_gui_info_unloading" v="Vyberte, ve kterém poli má být vyloženo. Uvědomte si, že v každém boxu lze vyložit pouze jedno ovoce."/>
+		<e k="GC_dynamicStorage_gui_info_loading" v="Vyberte, ze kterého pole se má načíst."/>
+		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s Litrů"/>
+		<e k="GC_dynamicStorage_gui_empty" v="prázdné"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Potvrďte polohu vykládky"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Potvrďte vykládací box"/>
+		
+		<!-- PlaceableDigitalDisplay -->
+		<e k="GC_placeableDigDisplay_openGui" v="Přizpůsobte digitální displej"/>
+		<e k="GC_placeableDigDisplay_header" v="Digitální displej"/>
+		<e k="GC_placeableDigDisplay_headerInfo" v="Zde můžete zadat libovolný text, který by se měl objevit na displeji."/>
+		<e k="GC_placeableDigDisplay_btnSave" v="Uložit"/>
+		
+		<!-- Market -->
+		<!--e k="GC_market_showDetails" v="Podrobnosti"/>
+		<e k="GC_market_date" v="Datum"/>
+		<e k="GC_market_name" v="Jméno"/>
+		<e k="GC_market_type" v="Typ"/>
+		<e k="GC_market_liter" v="Litry"/>
+		<e k="GC_market_money" v="Cena"/>
+		<e k="GC_market_designation" v="Označení"/-->
+		
+	</elements>
+</l10n>
