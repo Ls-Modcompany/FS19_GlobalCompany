@@ -34,6 +34,14 @@
 		<e k="GC_settings5_title" v="Активировать резку тюков"/>
 		
 		<!-- Factory -->
+		<e k="GC_gui_dynamicStorages" v="Обзор Хранилищ"/>
+		<e k="GC_gui_factories" v="Обзор Предприятий"/>
+		<e k="GC_gui_activeProductLines" v="Активные линии"/>
+		<e k="GC_gui_emptyInputs" v="Требуется ресурсов"/>
+		<e k="GC_gui_fullOutputs" v="Готовые продукты"/>
+		<e k="GC_gui_rename" v="Переименовать"/>
+		<e k="GC_gui_autoStart" v="Автостарт"/>
+		
 		<e k="GC_gui_overview" v="Обзор"/>
 		<e k="GC_gui_productLines" v="производственная линия"/>
 		<e k="GC_gui_description" v="Описание"/>
