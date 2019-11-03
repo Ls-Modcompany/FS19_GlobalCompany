@@ -1,14 +1,17 @@
 -- 
 -- GlobalCompany - Utils - GC_shopManager
 -- 
--- @Interface: 1.4.1.0 b5332
+-- @Interface: 1.5.1.0 b6732
 -- @Author: LS-Modcompany / kevink98
--- @Date: 05.08.2019
--- @Version: 1.1.0.0
+-- @Date: 03.11.2019
+-- @Version: 1.2.0.0
 -- 
 -- @Support: LS-Modcompany
 -- 
 -- Changelog:
+--
+-- 	v1.2.0.0 (03.11.2019):
+-- 		- add warning when xmlfilename not exist at remove
 --		
 -- 	v1.1.0.0 (05.08.2019):
 -- 		- adaptation to patch 1.4.1.0 b5332
@@ -22,9 +25,9 @@
 -- ToDo:
 -- sortCategories: type not used in script
 -- 
-local debugIndex = g_company.debug:registerScriptName("GlobalCompany-GC_shopManager");
 
 GC_shopManager = {};
+GC_shopManager.debugIndex = g_company.debug:registerScriptName("GlobalCompany-GC_shopManager");
 g_company.shopManager = GC_shopManager;
 g_company.shopManager.addCategorys = {};
 g_company.shopManager.sortCategories = {};
@@ -32,6 +35,8 @@ g_company.shopManager.removeItems = {};
 g_company.shopManager.changeCategorys = {};
 
 function GC_shopManager:loadFromXML(modName, xmlFile)
+	GC_shopManager.debugData = g_company.debug:getDebugData(GC_shopManager.debugIndex, g_company);
+
 	local key = "globalCompany.shopManager";
 	if hasXMLProperty(xmlFile, key) then
 		local externalXml = getXMLString(xmlFile, string.format("%s#xmlFilename", key));
@@ -160,8 +165,12 @@ function GC_shopManager:load()
 	
 	for _, xmlFilename in pairs(g_company.shopManager.removeItems) do
 		local item = g_storeManager:getItemByXMLFilename(xmlFilename);
-		g_storeManager:removeItemByIndex(item.id);
-	end;
+		if item ~= nil then
+			g_storeManager:removeItemByIndex(item.id);
+		else
+			g_company.debug:writeWarning(GC_shopManager.debugData, "Can't remove storeitem %s (not exist or already removed)", xmlFilename)
+		end
+	end
 
 	for _, data in pairs(g_company.shopManager.changeCategorys) do
 		local item = g_storeManager:getItemByXMLFilename(data.xmlFilename);
