@@ -165,7 +165,7 @@ function GC_ProductionFactoryPlaceable:writeStream(streamId, connection)
 			NetworkUtil.writeNodeObjectId(streamId, NetworkUtil.getObjectId(factory))
 			factory:writeStream(streamId, connection)
 			g_server:registerObjectInStream(connection, factory)
-		end
+		end		
 	end
 end
 

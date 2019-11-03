@@ -46,14 +46,6 @@ function GC_BitmapManager:getNextId()
     return self.bitmapId
 end;
 
-function GC_BitmapManager:getBitmapById(id)
-    for k, bitmap in pairs(self.bitmaps) do
-        if bitmap.id == id then
-            return bitmap
-        end
-    end
-end
-
 function GC_BitmapManager:loadBitMap(name, filename, numChannels, autosave)
     local haveWrongParams = false
     local success = false
@@ -114,11 +106,10 @@ function GC_BitmapManager:loadBitMap(name, filename, numChannels, autosave)
 end
 
 function GC_BitmapManager:saveBitmaps()
-    print("saveBitmaps")
     for _,bitmap in pairs(self.bitmaps) do
         if bitmap.autosave and bitmap.map ~= 0 then
             saveBitVectorMapToFile(bitmap.map, bitmap.fullPath)
-            print(bitmap.fullPath)
+            --print(bitmap.fullPath)
         end
     end
 end

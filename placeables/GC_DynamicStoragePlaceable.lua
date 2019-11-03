@@ -120,6 +120,7 @@ function GC_DynamicStoragePlaceable:finalizePlacement()
 	GC_DynamicStoragePlaceable:superClass().finalizePlacement(self)
 
 	for _, storage in ipairs(self.dynamicStorages) do
+		storage:finalizePlacement();
 		storage:register(true);
 	end;
 end;

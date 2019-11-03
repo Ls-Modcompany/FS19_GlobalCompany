@@ -248,15 +248,17 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 
     self.dynamicStorageDirtyFlag = self:getNextDirtyFlag();
         
-	self.eventId_setActiveUnloadingBox = g_company.eventManager:registerEvent(self, self.setActiveUnloadingBoxEvent);
-    self.eventId_setActiveLoadingBox = g_company.eventManager:registerEvent(self, self.setActiveLoadingBoxEvent);
-    
     g_company.addRaisedUpdateable(self);
 
     self.globalIndex = g_company.addDynamicStorage(self)
 
 	return true;
 end;
+
+function GC_DynamicStorage:finalizePlacement()
+	self.eventId_setActiveUnloadingBox = g_company.eventManager:registerEvent(self, self.setActiveUnloadingBoxEvent);
+    self.eventId_setActiveLoadingBox = g_company.eventManager:registerEvent(self, self.setActiveLoadingBoxEvent);
+end
 
 function GC_DynamicStorage:delete()
     g_company.removeDynamicStorage(self, self.globalIndex)
@@ -284,7 +286,7 @@ end;
 function GC_DynamicStorage:readStream(streamId, connection)
 	GC_DynamicStorage:superClass().readStream(self, streamId, connection);
 
-    self:setActiveUnloadingBox(streamReadInt8(streamId));
+    self:setActiveUnloadingBox(streamReadInt8(streamId), false);
 
 	if connection:getIsServer() then
         for _,place in pairs (self.places) do
@@ -361,7 +363,7 @@ function GC_DynamicStorage:loadFromXMLFile(xmlFile, key)
         self:setCustomTitle(customTitle, true)
     end
 
-    self:setActiveUnloadingBox(getXMLInt(xmlFile, key .. "#activeUnloadingBox"));
+    self:setActiveUnloadingBox(getXMLInt(xmlFile, key .. "#activeUnloadingBox"), false);
 
     local index = 0;
 	while true do
@@ -524,7 +526,7 @@ function GC_DynamicStorage:getNumOfPlaces()
     return table.getn(self.places);
 end;
 
-function GC_DynamicStorage:setActiveUnloadingBox(number)
+function GC_DynamicStorage:setActiveUnloadingBox(number, noEventSend)
 	self:setActiveUnloadingBoxEvent({number}, noEventSend);
 end;
 
