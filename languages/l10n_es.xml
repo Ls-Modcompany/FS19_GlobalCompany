@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <l10n>
 	<elements>
-
+		
 		<!-- Warnings / Errors -->
 		<e k="GC_mapVersionWarning" v="El mapa '%s' de %s requiere Global Company - Se necesita la Versión %s o superior para funcionar correctamente. Por favor, visite el enlace de descarga de modHub para la última versión oficial o visite '%s' para obtener soporte. "/>
 		<e k="GC_modVersionWarning" v="El mod '%s' de %s requiere Global Company - Se necesita la Versión %s o superior para funcionar correctamente. Por favor, visite el enlace de descarga de modHub para la última versión oficial o visite '%s' para obtener soporte."/>
@@ -12,18 +12,19 @@
 		<e k="GC_quitToMainMenu" v="¿Estáseguro de que desea salir al menú principal?"/>
 		<e k="GC_betaVersionWarning" v=" Se ha cargado la versión de desarrollo. Por favor, informe de advertencias o errores en %s. Visite el enlace de descarga de modHub para la última versión oficial o visite '%s' para obtener asistencia. "/>
 		<e k="GC_namingError" v="Nombre no válido 'archivo / zip' '%s' encontrado para la versión de desarrollo! Utilice 'FS19_GlobalCompany' para el nombre de archivo / zip. Visita el enlace de descarga de modHub para la última versión oficial o visita '%s' para obtener soporte."/>
-
+		
 		<!-- GUI -->
 		<e k="GC_gui_buttons_ok" v="OK"/>
 		<e k="GC_gui_buttons_yes" v="Si"/>
 		<e k="GC_gui_buttons_no" v="No"/>
+		<e k="GC_gui_buttons_back" v="Atrás"/>
 		<e k="GC_gui_modHubLink" v="Link descarga ModHub"/>
 		<e k="GC_gui_buttons_nextWarning" v="Siguiente advertencia"/>
 		<e k="GC_gui_buttons_nextConflict" v="Siguiente conflicto"/>
-
+		
 		<!-- General -->
 		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
-
+		
 		<!-- Settings -->
 		<e k="GC_settings_header" v="GlobalCompany - Configuración"/>
 		<e k="GC_settings1_title" v="Activar placeable extendido"/>
@@ -34,7 +35,6 @@
 		<e k="GC_settings6_title" v="Control Vehículo: Ayuda Interactiva tienda"/>
 		
 		<!-- Factory -->
-		<e k="GC_gui_buttons_back" v="Atrás"/>
 		<e k="GC_gui_overview" v="Visión general"/>
 		<e k="GC_gui_productLines" v="Líneas de producción"/>
 		<e k="GC_gui_description" v="Descripción"/>
@@ -44,7 +44,6 @@
 		<e k="GC_gui_filllevel" v="Nivel de llenado:"/>
 		<e k="GC_gui_liter" v="%s Litros"/>
 		<e k="GC_gui_buyText" v="Compra (%s)"/>
-		
 		<e k="GC_gui_activate" v="Activar"/>
 		<e k="GC_gui_deactivate" v="Desactivar"/>
 		<e k="GC_gui_state" v="Situación:"/>
@@ -56,41 +55,41 @@
 		<e k="GC_gui_spawnText1" v="Creado Palet d %s"/>
 		<e k="GC_gui_spawnText2" v="Creados Palets d %s"/>
 		<e k="GC_gui_autoStart" v="Inicio automático:"/>		
-		
 		<e k="GC_Productline_Title_Backup" v="Línea de producción %d"/>
 		<e k="GC_Input_Title_Backup" v="Entrada %d"/>
 		<e k="GC_Output_Title_Backup" v="Salida  %d"/>
 		<e k="GC_Input_Header_Backup" v="Entradas"/>
 		<e k="GC_Output_Header_Backup" v="Salidas"/>
-		
 		<e k="GC_Open_Product_Menu" v="Abrir menú de productos"/>
 		<e k="GC_Open_Overview_Menu" v="Abrir menú de visión general"/>
-		
 		<e k="GC_Factory_Animal_Dialogue" v="Seleccioneel número de animales que se descargará en la fábrica."/>
-
 		<e k="GC_gui_disabled" v="Deshabilitado"/>
 		<e k="GC_gui_add" v="Añadir"/>
 		<e k="GC_gui_remove" v="Eliminar"/>
+		<e k="GC_gui_rename" v="Renombrar"/>
 		<e k="GC_gui_max" v="Máximo"/>
 		<e k="GC_gui_percent" v="Porcentaje"/>
 		<e k="GC_gui_lifeTimeIncome" v="Ingresos de por vida"/>
 		<e k="GC_gui_changeFactoryTitle" v="Introduzca el nuevo nombre de referencia de la fábrica a continuación."/>
-
+		<e k="GC_gui_factories" v="Factorías"/>
+		<e k="GC_gui_activeProductLines" v="Factorías activas:"/>
+		<e k="GC_gui_emptyInputs" v="Materias Primas:"/>
+		<e k="GC_gui_fullOutputs" v="Producto Final:"/>
+		<e k="GC_gui_dynamicStorages" v="Almacenes Dinámicos"/>
+		<e k="GC_gui_freeSlots" v="Slots libres:"/>
 		<e k="GC_gui_placeableObject" v="Objeto colocable"/>
-		<e k="GC_gui_farmlandObject" v="Objeto de Farmland"/>
+		<e k="GC_gui_farmlandObject" v="Objeto de Granja"/>
+		<e k="GC_gui_changeDynamicStorageTitle" v="Ingrese un nuevo nombre de almacén a continuación"/>
+		<e k="GC_gui_dynamicStorage_titleBackup" v="Almacén Dinámico"/>
 		
 		<!-- Formatting required -->
 		<e k="GC_Factory_Sell_Warning" v="Esta fábrica todavía contiene productos. Estos se venderán a granel por la siguiente cantidad:
-
-Precio a granel: %s"/>		
-		
+			Precio a granel: %s"/>		
 		<e k="GC_Factory_Purchase_Warning" v="Por favor, confirme la siguiente compra del producto.
-
-Producto de entrada: %s
-Volumen: %s
-Costo: %s"/>
-
-
+			Producto de entrada: %s
+			Volumen: %s
+			Costo: %s"/>
+		
 		<!-- BaleShreader -->
 		<e k="GC_baleShreader_openSteer" v="Abrir tapa"/>
 		<e k="GC_baleShreader_closeSteer" v="Cerrar tapa"/>
@@ -98,7 +97,7 @@ Costo: %s"/>
 		<e k="GC_baleShreader_endWork" v="Detener enfardado"/>
 		<e k="GC_baleShreader_toggleOnWorkLight" v="Encender luces"/>
 		<e k="GC_baleShreader_toggleOffWorkLight" v="Apagar luces"/>
-
+		
 		<!-- Baler -->
 		<e k="GC_baler_title" v="Enfardador"/>
 		<e k="GC_baler_title_witStack" v="Enfardador con apilador"/>
@@ -115,13 +114,13 @@ Costo: %s"/>
 		<e k="GC_baler_info_automatic" v="Inicio automático"/>
 		<e k="GC_baler_actualTyp" v="Tipo fruta actual:"/>
 		<e k="GC_baler_canStack" v="Número de pacas a apilar:"/>
-
+		
 		<!-- ObjectInfo -->
 		<e k="GC_ObjectInfo_filltype" v="FillType: %s"/>
 		<e k="GC_ObjectInfo_level" v="FillType: %s Litros"/>
 		<e k="GC_ObjectInfo_level2" v="FillType: %s Litros (%s%%)"/>
 		<e k="GC_ObjectInfo_owner" v="Propietario: %s"/>
-
+		
 		<!-- DynamicStorage -->
 		<e k="GC_dynamicStorage_unloadSettings" v="Ajustes de descarga"/>
 		<e k="GC_dynamicStorage_gui_header_unloading" v="Seleccionar posición de descarga"/>
@@ -132,11 +131,20 @@ Costo: %s"/>
 		<e k="GC_dynamicStorage_gui_empty" v="vacío"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Confirmar posición de descarga"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Confirmar la caja a cargar"/>
-
+		
 		<!-- PlaceableDigitalDisplay -->
 		<e k="GC_placeableDigDisplay_openGui" v="Ajustar la pantalla digital"/>
 		<e k="GC_placeableDigDisplay_header" v="Pantallas digitales"/>
 		<e k="GC_placeableDigDisplay_headerInfo" v="Aquí puede especificar cualquier texto que desee que aparezca en la pantalla digital."/>
 		<e k="GC_placeableDigDisplay_btnSave" v="Salvar"/>
+		
+		<!-- Market -->
+		<!--e k="GC_market_showDetails" v="Details"/>
+		<e k="GC_market_date" v="Datum"/>
+		<e k="GC_market_name" v="Name"/>
+		<e k="GC_market_type" v="Art"/>
+		<e k="GC_market_liter" v="Liter"/>
+		<e k="GC_market_money" v="Preis"/>
+		<e k="GC_market_designation" v="Bezeichnung"/-->
 	</elements>
 </l10n>
