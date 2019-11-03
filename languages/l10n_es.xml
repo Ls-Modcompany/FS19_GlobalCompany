@@ -82,7 +82,7 @@
 		<!-- Formatting required -->
 		<e k="GC_Factory_Sell_Warning" v="Esta fábrica todavía contiene productos. Estos se venderán a granel por la siguiente cantidad:
 
-Precio a granel: %s""/>		
+Precio a granel: %s"/>		
 		
 		<e k="GC_Factory_Purchase_Warning" v="Por favor, confirme la siguiente compra del producto.
 
