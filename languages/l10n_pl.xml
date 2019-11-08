@@ -17,6 +17,7 @@
 		<e k="GC_gui_buttons_ok" v="OK"/>
 		<e k="GC_gui_buttons_yes" v="Tak"/>
 		<e k="GC_gui_buttons_no" v="Nie"/>
+		<e k="GC_gui_buttons_back" v="Wstecz"/>
 		<e k="GC_gui_modHubLink" v="Link pobrania z ModHub"/>
 		<e k="GC_gui_buttons_nextWarning" v="Następne ostrzeżenie"/>
 		<e k="GC_gui_buttons_nextConflict" v="Następny konflikt"/>
@@ -34,7 +35,6 @@
 		<e k="GC_settings6_title" v="VehicleControl: Pomoc w interakcjach sklepowych"/>
 		
 		<!-- Factory -->
-		<e k="GC_gui_buttons_back" v="Wstecz"/>
 		<e k="GC_gui_overview" v="Podgląd"/>
 		<e k="GC_gui_productLines" v="Linie produktów"/>
 		<e k="GC_gui_description" v="Opis"/>
@@ -43,9 +43,8 @@
 		<e k="GC_gui_capacity" v="Pojemność:"/>
 		<e k="GC_gui_filllevel" v="Poziom napełnienia:"/>
 		<e k="GC_gui_liter" v="%s l"/>
-		<e k="GC_gui_buyText" v="Zakup (%s)"/>
-		
-		<e k="GC_gui_activate" v="Aktywuj"/>
+		<e k="GC_gui_buyText" v="Zakup (%s)"/>		
+		<e k="GC_gui_activate" v="Aktywuj"/>		
 		<e k="GC_gui_deactivate" v="Dezaktywuj"/>
 		<e k="GC_gui_state" v="Status:"/>
 		<e k="GC_gui_automatic" v="Automatyczny:"/>
@@ -66,21 +65,33 @@
 		<e k="GC_Open_Product_Menu" v="Otwórz menu obiektu"/>
 		<e k="GC_Open_Overview_Menu" v="Otwórz menu podglądu"/>
 		
-		<e k="GC_Factory_Animal_Dialogue" v="Wybierz liczbę zwierząt przekazanych do fabryki."/>
+		<e k="GC_Factory_Animal_Dialogue" v="Wybierz liczbę zwierząt przekazanych do obiektu."/>
 
 		<e k="GC_gui_disabled" v="Wyłączone"/>
 		<e k="GC_gui_add" v="Dodaj"/>
 		<e k="GC_gui_remove" v="Usuń"/>
+		<e k="GC_gui_rename" v="Zmień nazwę"/>
 		<e k="GC_gui_max" v="Maksimum"/>
 		<e k="GC_gui_percent" v="Procent"/>
 		<e k="GC_gui_lifeTimeIncome" v="Dożywotni dochód"/>
-		<e k="GC_gui_changeFactoryTitle" v="Wprowadź poniżej nową nazwę referencyjną fabryki."/>
+		<e k="GC_gui_changeFactoryTitle" v="Wprowadź poniżej nową nazwę referencyjną obiektu."/>
+		
+		<e k="GC_gui_factories" v="Obiekty produkcyjne"/>
+		<e k="GC_gui_activeProductLines" v="Aktywne linie produktów:"/>
+		<e k="GC_gui_activeProductLines" v="Aktywne obiekty prod.:"/>
+		<e k="GC_gui_emptyInputs" v="Brakujące surowce:"/>
+		<e k="GC_gui_fullOutputs" v="Gotowe produkty:"/>
+		
+		<e k="GC_gui_dynamicStorages" v="Dynamiczne magazyny"/>
+		<e k="GC_gui_freeSlots" v="Wolne miejsce:"/>
 
 		<e k="GC_gui_placeableObject" v="Obiekt kupowany"/>
 		<e k="GC_gui_farmlandObject" v="Obiekt użytkowy"/>
+		<e k="GC_gui_changeDynamicStorageTitle" v="Wpisz poniżej nową nazwę magazynu."/>
+		<e k="GC_gui_dynamicStorage_titleBackup" v="Dynamiczne magazyny"/>
 		
 		<!-- Formatting required -->
-		<e k="GC_Factory_Sell_Warning" v="Ta fabryka wciąż zawiera produkty. Będą one sprzedawane luzem w następującej ilości:
+		<e k="GC_Factory_Sell_Warning" v="Ten obiekt wciąż zawiera produkty. Będą one sprzedawane luzem w następującej ilości:
 
 Cena hurtowa: %s"/>		
 		
@@ -89,7 +100,6 @@ Cena hurtowa: %s"/>
 Produkt: %s
 Ilość: %s
 Koszt: %s"/>
-
 
 		<!-- BaleShreader -->
 		<e k="GC_baleShreader_openSteer" v="Otwórz klapę"/>
@@ -117,9 +127,9 @@ Koszt: %s"/>
 		<e k="GC_baler_canStack" v="Liczba bel w stogu:"/>
 
 		<!-- ObjectInfo -->
-		<e k="GC_ObjectInfo_filltype" v="Ładunek: %s"/>
-		<e k="GC_ObjectInfo_level" v="Ładunek: %s l"/>
-		<e k="GC_ObjectInfo_level2" v="Ładunek: %s l (%s%%)"/>
+		<e k="GC_ObjectInfo_filltype" v="Zawartość: %s"/>
+		<e k="GC_ObjectInfo_level" v="Ilość: %s l"/>
+		<e k="GC_ObjectInfo_level2" v="Ilość: %s l (%s%%)"/>
 		<e k="GC_ObjectInfo_owner" v="Właściciel: %s"/>
 
 		<!-- DynamicStorage -->
@@ -138,5 +148,15 @@ Koszt: %s"/>
 		<e k="GC_placeableDigDisplay_header" v="Wyświetlanie cyfr"/>
 		<e k="GC_placeableDigDisplay_headerInfo" v="Tutaj możesz określić dowolny tekst, który ma się pojawiać na wyświetlaczu."/>
 		<e k="GC_placeableDigDisplay_btnSave" v="Zapisz"/>
+		
+		<!-- Market -->
+		<!--e k="GC_market_showDetails" v="Szczegóły"/>
+		<e k="GC_market_date" v="Data"/>
+		<e k="GC_market_name" v="Nazwa"/>
+		<e k="GC_market_type" v="Artykół"/>
+		<e k="GC_market_liter" v="Litry"/>
+		<e k="GC_market_money" v="Cena"/>
+		<e k="GC_market_designation" v="Opis"/-->
+		
 	</elements>
 </l10n>
