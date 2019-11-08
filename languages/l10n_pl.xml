@@ -77,7 +77,6 @@
 		<e k="GC_gui_changeFactoryTitle" v="Wprowadź poniżej nową nazwę referencyjną obiektu."/>
 		
 		<e k="GC_gui_factories" v="Obiekty produkcyjne"/>
-		<e k="GC_gui_activeProductLines" v="Aktywne linie produktów:"/>
 		<e k="GC_gui_activeProductLines" v="Aktywne obiekty prod.:"/>
 		<e k="GC_gui_emptyInputs" v="Brakujące surowce:"/>
 		<e k="GC_gui_fullOutputs" v="Gotowe produkty:"/>
