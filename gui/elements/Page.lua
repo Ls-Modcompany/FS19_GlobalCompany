@@ -44,8 +44,10 @@ end
 function GC_Gui_page:loadTemplate(templateName, xmlFile, key)
 	GC_Gui_page:superClass().loadTemplate(self, templateName, xmlFile, key)
     
-	self.pageName = g_company.gui:getTemplateValueXML(xmlFile, "pageName", key, nil);
-	self.pageHeader = g_company.gui:getTemplateValueXML(xmlFile, "pageHeader", key, nil);
+	if xmlFile ~= nil then
+		self.pageName = g_company.gui:getTemplateValueXML(xmlFile, "pageName", key, nil);
+		self.pageHeader = g_company.gui:getTemplateValueXML(xmlFile, "pageHeader", key, nil);
+	end
 	
 	if self.pageName == nil then
 		g_company.debug:writeError(self.debugData, "No pagename defined.")
