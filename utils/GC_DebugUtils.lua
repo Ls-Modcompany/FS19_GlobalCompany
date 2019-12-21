@@ -33,7 +33,7 @@ local GC_DebugUtils_mt = Class(GC_DebugUtils);
 
 GC_DebugUtils.defaultLevel = 1;
 
-GC_DebugUtils.numLevels = 6;
+GC_DebugUtils.numLevels = 7;
 GC_DebugUtils.maxLevels = 20;
 
 GC_DebugUtils.BLANK = -3;
@@ -46,6 +46,7 @@ GC_DebugUtils.ONCREATE = 3;
 GC_DebugUtils.TABLET = 4;
 GC_DebugUtils.DEV = 5;
 GC_DebugUtils.DEVDEBUG = 6;
+GC_DebugUtils.NETWORK = 7;
 
 function GC_DebugUtils:new(customMt)
 	if g_company.debug ~= nil then
@@ -93,6 +94,7 @@ function GC_DebugUtils:new(customMt)
 	self.printLevelPrefix[GC_DebugUtils.TABLET] = "TABLET: ";
 	self.printLevelPrefix[GC_DebugUtils.DEV] = "DEVELOPMENT: ";
 	self.printLevelPrefix[GC_DebugUtils.DEVDEBUG] = "DEVELOPMENT DEBUG: ";
+	self.printLevelPrefix[GC_DebugUtils.NETWORK] = "NETWORK DEBUG: ";
 	
 	self.savedErrors = {};
 
@@ -227,6 +229,10 @@ function GC_DebugUtils:writeDevDebug(data, message, ...)
 	self:logWrite(data, 6, message, ...);
 end;
 
+function GC_DebugUtils:writeNetworkDebug(data, message, ...)
+	self:logWrite(data, 7, message, ...);
+end;
+
 ---------------------
 -- Other Functions --
 ---------------------
@@ -335,7 +341,8 @@ function GC_DebugUtils:getDebugData(scriptId, target, customEnvironment)
 				ONCREATE = 3,
 				TABLET = 4,
 				DEV = 5,
-				DEVDEBUG = 6};
+				DEVDEBUG = 6,
+				NETWORK = 7};
 	end;
 
 	return nil;
