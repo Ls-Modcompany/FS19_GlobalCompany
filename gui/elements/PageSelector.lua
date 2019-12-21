@@ -44,7 +44,9 @@ end;
 function GC_Gui_pageSelector:loadTemplate(templateName, xmlFile, key)
 	GC_Gui_pageSelector:superClass().loadTemplate(self, templateName, xmlFile, key)
 
-	self.currentPage = g_company.gui:getTemplateValueXML(xmlFile, "pageNameOnOpen", key, nil);
+	if xmlFile ~= nil then
+		self.currentPage = g_company.gui:getTemplateValueXML(xmlFile, "pageNameOnOpen", key, nil);
+	end
 
 	self:loadOnCreate()
 end

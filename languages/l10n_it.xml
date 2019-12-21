@@ -3,15 +3,15 @@
 	<elements>
 
 		<!-- Warnings / Errors -->
-		<e k="GC_mapVersionWarning" v="Mappa '%s' by %s richiede Global Company - Versione %s o superiore per funzionare correttamente. Please visit modHub download link for the latest official version or visit '%s' for support."/>
-		<e k="GC_modVersionWarning" v="Mod '%s' by %s richiede Global Company - Versione %s o superiore per funzionare correttamente. Please visit modHub download link for the latest official version or visit '%s' for support."/>
-		<e k="GC_loadingError" v="Si è verificato un errore durante il caricamento di Global Company! Please visit modHub download link for the latest official version or visit '%s' for support."/>
-		<e k="GC_duplicateError" v="Prova di caricare due volte la Global Company! Please remove '%s' from your mod folder and load your game again."/>
+		<e k="GC_mapVersionWarning" v="La Mappa '%s' di %s richiede Global Company - Versione %s o superiore per funzionare correttamente. Visitare il link nel modHub per scaricarel'ultima versione ufficiale o visitare '%s' per il support."/>
+		<e k="GC_modVersionWarning" v="La Mod '%s' di %s richiede Global Company - Versione %s o superiore per funzionare correttamente. Visitare il link nel modHub per scaricarel'ultima versione ufficiale o visitare '%s' per il support."/>
+		<e k="GC_loadingError" v="Si è verificato un errore durante il caricamento di Global Company! Visitare il link nel modHub per scaricarel'ultima versione ufficiale o visitare'%s' per il support."/>
+		<e k="GC_duplicateError" v="Prova di caricare due volte la Global Company! Rimuovere '%s' dalle cartella delle mod e ricaricare il gioco."/>
 		<e k="GC_combinedError" v="Stai provando a caricare Global Company come parte di una mappa mod '%s'! Questo non è possibile e causerà gravi errori. Please visit modHub download link for the latest official version or visit '%s' for support."/>
-		<e k="GC_invalidModWarning" v="Mod %s by %s non supportata! Per evitare errori, questa mod dovrebbe essere rimossa!"/>
+		<e k="GC_invalidModWarning" v="Mod %s di %s non supportata! Per evitare errori, questa mod dovrebbe essere rimossa!"/>
 		<e k="GC_quitToMainMenu" v="Sei sicuro di voler uscire dal menu principale?"/>
-		<e k="GC_betaVersionWarning" v="La versione di sviluppo è stata caricata. Si prega di segnalare avvisi o errori a %s. Visit modHub download link for the latest official release version or visit '%s' for support."/>
-		<e k="GC_namingError" v="Trovato 'file / zip' name '%s' invalido per la versione di sviluppo! Usare 'FS19_GlobalCompany' per il nome del file / zip. Visit modHub download link for the latest official release version or visit '%s' for support."/>
+		<e k="GC_betaVersionWarning" v="La versione di sviluppo è stata caricata. Si prega di segnalare avvisi o errori a %s. Visitare il link nel modHub per scaricarel'ultima versione ufficiale o visitare '%s' per il support."/>
+		<e k="GC_namingError" v="Trovato nome 'file / zip' '%s' invalido per la versione di sviluppo! Usare 'FS19_GlobalCompany' per il nome del file / zip. Visitare il link nel modHub per scaricarel'ultima versione ufficiale o visitare '%s' per il support."/>
 
 		<!-- GUI -->
 		<e k="GC_gui_buttons_ok" v="OK"/>
@@ -73,8 +73,8 @@
 		<e k="GC_gui_rename" v="Rinomina"/>
 		<e k="GC_gui_max" v="Massimo"/>
 		<e k="GC_gui_percent" v="Percentuale"/>
-		<e k="GC_gui_lifeTimeIncome" v="Reddita a vita"/>
-		<e k="GC_gui_changeFactoryTitle" v="Inserire sotto nuovo nome."/>
+		<e k="GC_gui_lifeTimeIncome" v="Rendita a vita"/>
+		<e k="GC_gui_changeFactoryTitle" v="Inserire sotto il nuovo nome."/>
 
 		<e k="GC_gui_factories" v="Produzione"/>
 		<e k="GC_gui_activeProductLines" v="Linea produzione attiva:"/>

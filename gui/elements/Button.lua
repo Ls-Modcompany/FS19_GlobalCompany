@@ -56,20 +56,24 @@ function GC_Gui_button:loadTemplate(templateName, xmlFile, key)
 	self.checkParent = g_company.gui:getTemplateValueBool(templateName, "checkParent", self.checkParent);		
 	self.clickZone = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValue(templateName, "clickZone"), self.outputSize, nil);
 		
-	self.callback_onClick = g_company.gui:getTemplateValueXML(xmlFile, "onClick", key, nil);
-	self.callback_onDoubleClick = g_company.gui:getTemplateValueXML(xmlFile, "onDoubleClick", key, nil);
-	self.callback_onEnter = g_company.gui:getTemplateValueXML(xmlFile, "onEnter", key, nil);
-	self.callback_onLeave = g_company.gui:getTemplateValueXML(xmlFile, "onLeave", key, nil);
-
-	self.openPage = g_company.gui:getTemplateValueXML(xmlFile, "openPage", key, nil);
-	
 	self.isTableTemplate = g_company.gui:getTemplateValueBool(templateName, "isTableTemplate", self.isTableTemplate);
-	self.isTableTemplate = g_company.gui:getTemplateValueBoolXML(xmlFile, "isTableTemplate", key, self.isTableTemplate);
 	self.hasOverlay = g_company.gui:getTemplateValueBool(templateName, "hasOverlay", false);
 	self.hasText = g_company.gui:getTemplateValueBool(templateName, "hasText", false);
-
 	local inputAction = g_company.gui:getTemplateValue(templateName, "inputAction");
-	inputAction = g_company.gui:getTemplateValueXML(xmlFile, "inputAction", key, inputAction);
+
+	if xmlFile ~= nil then
+		self.callback_onClick = g_company.gui:getTemplateValueXML(xmlFile, "onClick", key, nil);
+		self.callback_onDoubleClick = g_company.gui:getTemplateValueXML(xmlFile, "onDoubleClick", key, nil);
+		self.callback_onEnter = g_company.gui:getTemplateValueXML(xmlFile, "onEnter", key, nil);
+		self.callback_onLeave = g_company.gui:getTemplateValueXML(xmlFile, "onLeave", key, nil);
+
+		self.openPage = g_company.gui:getTemplateValueXML(xmlFile, "openPage", key, nil);
+		
+		self.isTableTemplate = g_company.gui:getTemplateValueBoolXML(xmlFile, "isTableTemplate", key, self.isTableTemplate);
+
+		inputAction = g_company.gui:getTemplateValueXML(xmlFile, "inputAction", key, inputAction);
+	end
+
 	if inputAction ~= nil and InputAction[inputAction] ~= nil then
 		self.inputAction = InputAction[inputAction];
 		self.hasText = true;

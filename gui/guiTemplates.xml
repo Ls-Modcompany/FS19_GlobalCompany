@@ -178,7 +178,7 @@
 			<Value name="imageUVs" value="colorBg"/>
 			<Value name="imageColor" value="glass1_50"/>
 		</template>
-		<!--template name="gcButton" anchor="middleCenter" extends="gcBase">
+		<template name="gcButton" anchor="middleCenter" extends="gcBase">
 			<value name="imageColor" value="glass0_1" />
 			<value name="imageColor_selected" value="glass0_2" />
 			<value name="hasOverlay" value="true" />
@@ -186,7 +186,7 @@
 			<value name="textAlignment" value="center" />
 			<value name="textSize" value="23px" />
 			<value name="textMargin" value="0px 4px 0px 0px" />
-		</template-->
+		</template>
 
 		<!-- MultiDialog -->
 		<template name="gcMdMainLayerBackground" anchor="middleCenter" extends="gcBase">

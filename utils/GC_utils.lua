@@ -331,6 +331,15 @@ function GlobalCompanyUtils.getCorrectNumberValue(value, newValue, minValue, max
 	return value
 end
 
+function GlobalCompanyUtils.getEdgeNumber(value, minValue, maxValue)
+	if value < minValue then
+		return minValue
+	elseif value > maxValue then
+		return maxValue
+	end
+	return value
+end
+
 -- Part code from http://lua-users.org/wiki/StringRecipes
 -- add insert to table option and first line indent matching.
 function GlobalCompanyUtils.stringWrap(str, limit, indent, returnTable)
@@ -393,4 +402,53 @@ end
 
 function GlobalCompanyUtils.floatEqual(lhs, rhs, epsilon)
 	return math.abs(lhs - rhs) < epsilon
+end
+
+function GlobalCompanyUtils.deleteFile(path)
+	getfenv(0)["deleteFile"](path)
+end
+
+function GlobalCompanyUtils.deleteFileIfExists(path)
+	if fileExists(path) then
+		GlobalCompanyUtils.deleteFile(path)
+		return true
+	end
+	return false
+end
+
+function GlobalCompanyUtils.teleportVehicleWithRotation(posX, posZ, rotY)
+	local targetX, targetY, targetZ = 53,0,280;
+	local vehicleCombos = {}
+	local vehicles = {}
+	local function addVehiclePositions(vehicle)
+		local x,y,z = getWorldTranslation(vehicle.rootNode)
+		table.insert(vehicles, {vehicle=vehicle, offset={worldToLocal(g_currentMission.controlledVehicle.rootNode, x,y,z)}})
+
+		for _, impl in pairs(vehicle:getAttachedImplements()) do
+			addVehiclePositions(impl.object)
+			table.insert(vehicleCombos, {vehicle=vehicle, object=impl.object, jointDescIndex=impl.jointDescIndex, inputAttacherJointDescIndex=impl.object:getActiveInputAttacherJointDescIndex()})
+		end
+
+		for i=table.getn(vehicle:getAttachedImplements()), 1, -1 do
+			vehicle:detachImplement(1, true)
+		end
+		vehicle:removeFromPhysics()
+	end
+
+	addVehiclePositions(g_currentMission.controlledVehicle)
+
+	for k, data in pairs(vehicles) do
+		local x,z = posX, posZ
+		if k > 1 then
+			x,_,z = localToWorld(g_currentMission.controlledVehicle.rootNode, unpack(data.offset))
+		end
+		local _,ry,_ = getWorldRotation(data.vehicle.rootNode)
+		ry = Utils.getNoNil(rotY, ry)
+		data.vehicle:setRelativePosition(x, 0.5, z, ry, true)
+		data.vehicle:addToPhysics()
+	end
+
+	for _, combo in pairs(vehicleCombos) do
+		combo.vehicle:attachImplement(combo.object, combo.inputAttacherJointDescIndex, combo.jointDescIndex, true, nil, nil, false);
+	end
 end

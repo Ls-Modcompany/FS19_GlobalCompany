@@ -61,7 +61,7 @@ function GC_EventManager:registerEvent(target, func, clientToServer)
 end;
 
 function GC_EventManager:createEvent(targetId, data, useOwnIndex, noEventSend)    
-	if targetId ~= nil and (noEventSend == nil or noEventSend == false) then
+    if targetId ~= nil and (noEventSend == nil or noEventSend == false) then
         if self.isServer then      
             g_server:broadcastEvent(GC_DefaultEvent:new(targetId, data, useOwnIndex))
         else 
@@ -233,7 +233,7 @@ function GC_DefaultEvent:readStream(streamId, connection)
             table.insert(self.data, v);
         end;
     end;
-
+  
     if not connection:getIsServer() and not g_company.eventManager.events[self.targetId].clientToServer then
         g_server:broadcastEvent(self, false, connection, nil);
     end;        

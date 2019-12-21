@@ -79,8 +79,8 @@ Changelog 1.1.0.0.0 :
 	</extraSourceFiles>
 
     <l10n>		
-		<text name="input_GC_MAIN"><en>GlobalCompany</en><de>GlobalCompany</de></text>
-		<text name="input_GC_BALEADDON_CUT"><en>Cut Bale</en><de>Ballen aufschneiden</de></text>
+	    <text name="input_GC_MAIN"><en>GlobalCompany</en><de>GlobalCompany</de><pl>Menu GlobalCompany</pl></text>
+	    <text name="input_GC_BALEADDON_CUT"><en>Cut Bale</en><de>Ballen aufschneiden</de><pl>Rozetnij belę</pl></text>
 		<text name="input_GC_DYNSTORAGE_VEHICLEINTERACTION"><en>dynStorageVehInterAct</en></text>
 	</l10n>		
 	

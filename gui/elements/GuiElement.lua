@@ -54,18 +54,22 @@ function GC_Gui_element:loadTemplate(templateName, xmlFile, key)
 	self.debugEnabled = g_company.gui:getTemplateValueBool(templateName, "debugEnabled", self.debugEnabled);
 	self.newLayer = g_company.gui:getTemplateValueBool(templateName, "newLayer", self.newLayer);
 		
-	self.visible = g_company.gui:getTemplateValueBoolXML(xmlFile, "visible", key, self.visible);
-	self.disabled = g_company.gui:getTemplateValueBoolXML(xmlFile, "disabled", key, self.disabled);
+	if xmlFile ~= nil then
+		self.visible = g_company.gui:getTemplateValueBoolXML(xmlFile, "visible", key, self.visible);
+		self.disabled = g_company.gui:getTemplateValueBoolXML(xmlFile, "disabled", key, self.disabled);
+		
+		self.position = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValueXML(xmlFile, "position", key), self.outputSize, self.position);
+		self.size = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValueXML(xmlFile, "size", key), self.outputSize, self.size);
+		self.margin = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValueXML(xmlFile, "margin", key), self.outputSize, self.margin);
+		
+		self.anchor = g_company.gui:getTemplateValueXML(xmlFile, "anchor", key, self.anchor);
+		self.parameter = g_company.gui:getTemplateValueXML(xmlFile, "parameter", key);
+		
+		self.callback_onOpen = g_company.gui:getTemplateValueXML(xmlFile, "onOpen", key);
+		self.callback_onCreate = g_company.gui:getTemplateValueXML(xmlFile, "onCreate", key);
+		self.callback_onDraw = g_company.gui:getTemplateValueXML(xmlFile, "onDraw", key);
+	end
 	
-	self.position = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValueXML(xmlFile, "position", key), self.outputSize, self.position);
-	self.size = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValueXML(xmlFile, "size", key), self.outputSize, self.size);
-	self.margin = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValueXML(xmlFile, "margin", key), self.outputSize, self.margin);
-	
-	self.anchor = g_company.gui:getTemplateValueXML(xmlFile, "anchor", key, self.anchor);
-	self.parameter = g_company.gui:getTemplateValueXML(xmlFile, "parameter", key);
-	
-	self.callback_onOpen = g_company.gui:getTemplateValueXML(xmlFile, "onOpen", key);
-	self.callback_onCreate = g_company.gui:getTemplateValueXML(xmlFile, "onCreate", key);
 	if self.isOnlyElement then
 		self:loadOnCreate();
 	end;
@@ -173,6 +177,10 @@ function GC_Gui_element:draw(index, gui)
 		renderOverlay(GuiElement.debugOverlay, self.drawPosition[1]+self.size[1], self.drawPosition[2], xPixel, self.size[2]);
 	end
 
+	if self.callback_onDraw ~= nil then
+		self.gui[self.callback_onDraw](self.gui, self, self.parameter);
+	end;
+
 	for k,v in ipairs(self.elements) do
 		if v:getVisible() then
 			v:draw(k);
@@ -256,6 +264,10 @@ end;
 function GC_Gui_element:getAnchor()
 	return self.anchor;
 end;
+
+function GC_Gui_element:setPosition(str)
+	self.position = GuiUtils.getNormalizedValues(str, self.outputSize, self.position)
+end
 
 
 
