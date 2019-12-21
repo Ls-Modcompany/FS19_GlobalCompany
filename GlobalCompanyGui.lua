@@ -21,7 +21,7 @@
 -- 
 -- ToDo:
 -- 		xmlIinformations at fakegui (kevin)
--- 
+-- 		declare better when input only work on walk or in vehicle or booth
 
 GlobalCompanyGui = {};
 g_company.gui = GlobalCompanyGui;
@@ -81,13 +81,27 @@ function GlobalCompanyGui:init()
 	for _,inAc in pairs(self.toInit_actionEvents) do
 		g_gui.inputManager:registerActionEvent(inAc.inputAction, GlobalCompanyGui, inAc.func, false, true, false, true);
 	end;
-	Player.registerActionEvents = Utils.appendedFunction(Player.registerActionEvents, GlobalCompanyGui.registerActionEvents);
+	FSBaseMission.registerActionEvents = Utils.appendedFunction(FSBaseMission.registerActionEvents, GlobalCompanyGui.registerActionEventsVehicle);
 end;
 
-function GlobalCompanyGui:registerActionEvents()
+function GlobalCompanyGui:registerActionEventsPlayer()
 	if g_company.gui.toInit_actionEvents ~= nil then
 		for _,inAc in pairs(g_company.gui.toInit_actionEvents) do
 			g_gui.inputManager:registerActionEvent(inAc.inputAction, GlobalCompanyGui, inAc.func, false, true, false, true);
+		end;
+	end;
+end;
+
+function GlobalCompanyGui:registerActionEventsVehicle()
+	if g_company.gui.toInit_actionEvents ~= nil then
+		for _,inAc in pairs(g_company.gui.toInit_actionEvents) do
+			if g_currentMission.controlledVehicle ~= nil then
+				if inAc.inVehicle then
+					g_gui.inputManager:registerActionEvent(inAc.inputAction, GlobalCompanyGui, inAc.func, false, true, false, true);
+				end
+			else
+				g_gui.inputManager:registerActionEvent(inAc.inputAction, GlobalCompanyGui, inAc.func, false, true, false, true);
+			end
 		end;
 	end;
 end;
@@ -114,9 +128,9 @@ function GlobalCompanyGui:load()
 	self.mainGui = g_company.gui:registerGui("gc_main", InputAction.GC_MAIN, Gc_Gui_MainGui, true, true, true).classGui;
 	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
 	--g_company.gui:registerGui("gcPlaceable_baler", nil, Gc_Gui_Baler, true, true);
-	g_company.gui:registerGui("gcObjectInfo", nil, Gc_Gui_ObjectInfo, false, false);
-	g_company.gui:registerGui("gc_dynamicStorage", nil, Gc_Gui_DynamicStorage, true, true);
-	g_company.gui:registerGui("gc_placeableDigitalDisplay", nil, Gc_Gui_PlaceableDigitalDisplay, true, true);
+	g_company.gui:registerGui("gcObjectInfo", nil, Gc_Gui_ObjectInfo, false, false, false);
+	g_company.gui:registerGui("gc_dynamicStorage", nil, Gc_Gui_DynamicStorage, true, true, true);
+	g_company.gui:registerGui("gc_placeableDigitalDisplay", nil, Gc_Gui_PlaceableDigitalDisplay, true, true, false);
 	
 	self.activeGuiDialogs = {};
 	self.registeredActonEvents = false;
@@ -270,7 +284,7 @@ function GlobalCompanyGui:loadGui(class, name)
 	return newGui;
 end;
 
-function GlobalCompanyGui:registerGui(name, inputAction, class, isFullGui, canExit, onWalkActive)
+function GlobalCompanyGui:registerGui(name, inputAction, class, isFullGui, canExit, inVehicle)
 	if self.guis[name] ~= nil then
 		g_company.debug:writeError(g_company.gui.debugData, "Gui %s already exist.", name); --gui
 		return;
@@ -284,7 +298,7 @@ function GlobalCompanyGui:registerGui(name, inputAction, class, isFullGui, canEx
 	self.guis[name].gui = newGui;
 	self.guis[name].isFullGui = Utils.getNoNil(isFullGui, true);
 	self.guis[name].canExit = canExit;
-	self.guis[name].onWalkActive = onWalkActive;
+	--self.guis[name].onWalkActive = onWalkActive;
 		
 	if not self.guis[name].isFullGui then
 		self.smallGuis[name] = false;		
@@ -292,7 +306,7 @@ function GlobalCompanyGui:registerGui(name, inputAction, class, isFullGui, canEx
 	
 	if inputAction ~= nil then
 		local func = function() GlobalCompanyGui:openGui(name) end;	
-		table.insert(self.toInit_actionEvents, {inputAction=inputAction, func=func});
+		table.insert(self.toInit_actionEvents, {inputAction=inputAction, func=func, inVehicle=inVehicle});
 	end;
 	
 	newGui:loadFromXML();
@@ -970,7 +984,7 @@ function GlobalCompanyGui:checkClickZoneNormal(x,y, drawX, drawY, sX, sY)
 end;
 
 function GlobalCompanyGui:registerSiteForGcMenu(imageFilename, imageUVs, gui)
-	table.insert(GlobalCompanyGui.gcMenuModSites, {imageFilename=imageFilename, imageUVs=imageUVs, gui=gui})
+	table.insert(GlobalCompanyGui.gcMenuModSites, {imageFilename=imageFilename, imageUVs=imageUVs, gui=gui, added=false})
 end
 
 g_company.gui:loadGuiTemplates(g_company.dir .. "gui/guiTemplates.xml");
