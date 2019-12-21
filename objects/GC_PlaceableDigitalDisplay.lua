@@ -1,26 +1,17 @@
 --
 -- GlobalCompany - Objects - GC_PlaceableDigitalDisplay
 --
--- @Interface: 1.4.0.0 b5007
+-- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
--- @Date: 22.03.2018
+-- @Date: 21.12.2019
 -- @Version: 1.0.0.0
 --
 -- @Support: https://ls-modcompany.com
 --
 -- Changelog:
 --
--- 	v1.2.0.0 (04.08.2019):
--- 		- Add option for multiple 'loadingTriggers' and 'unloadingTriggers' for each product.
---		- Fixed access to menu and triggers for onCreate when first loading game without a save.
---		- Added ability to set an input to be always 100%. 'registerInputProducts.inputProduct#isAlwaysFull' FillType must still be set and no 'inputMethods' can be used.
---		- Remove input- and outputpercent limit
--- 	v1.1.0.0 (21.06.2019):
--- 		- release version
---
--- 	v1.0.0.0 (22.03.2018):
--- 		- initial fs17 ()
---
+-- 	v1.0.0.0 (21.12.2019):
+-- 		- initial fs19 ()
 --
 -- Notes:
 --
@@ -28,7 +19,6 @@
 -- ToDo:
 --
 --
-
 
 GC_PlaceableDigitalDisplay = {}
 local GC_PlaceableDigitalDisplay_mt = Class(GC_PlaceableDigitalDisplay, Object)
@@ -44,8 +34,6 @@ function GC_PlaceableDigitalDisplay:new(isServer, isClient, customMt, xmlFilenam
 	self.xmlFilename = xmlFilename
 	self.baseDirectory = baseDirectory
 	self.customEnvironment = customEnvironment
-
-	
 
 	self.debugData = g_company.debug:getDebugData(GC_PlaceableDigitalDisplay.debugIndex, nil, customEnvironment)
 
