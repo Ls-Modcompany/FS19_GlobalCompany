@@ -46,6 +46,8 @@ function GC_EventManager:new()
     self.id = -1;
     self.events = {};
     
+    self.debugData = g_company.debug:getDebugData(GC_EventManager.debugIndex)
+    
     return self;
 end;
 
@@ -57,10 +59,12 @@ end;
 function GC_EventManager:registerEvent(target, func, clientToServer)
     local id = self:getNextEventId();
     self.events[id] = {target=target, func=func, clientToServer=Utils.getNoNil(clientToServer, false)};
+    g_company.debug:writeNetworkDebug(self.debugData, "Register Event %s", id)    
     return id;
 end;
 
 function GC_EventManager:createEvent(targetId, data, useOwnIndex, noEventSend)    
+    g_company.debug:writeNetworkDebug(self.debugData, "Create Event %s", targetId)    
     if targetId ~= nil and (noEventSend == nil or noEventSend == false) then
         if self.isServer then      
             g_server:broadcastEvent(GC_DefaultEvent:new(targetId, data, useOwnIndex))
@@ -189,9 +193,11 @@ end
 GC_DefaultEvent = {};
 GC_DefaultEvent_mt = Class(GC_DefaultEvent, Event);
 InitEventClass(GC_DefaultEvent, "GC_DefaultEvent");
+GC_EventManager.debugIndex = g_company.debug:registerScriptName("GC_DefaultEvent");
 
 function GC_DefaultEvent:emptyNew()
     local self = Event:new(GC_DefaultEvent_mt);
+    self.debugData = g_company.debug:getDebugData(GC_DefaultEvent.debugIndex)
     return self;
 end
 
@@ -204,6 +210,7 @@ function GC_DefaultEvent:new(targetId, data, useOwnIndex)
 end;
 
 function GC_DefaultEvent:writeStream(streamId, connection)
+    g_company.debug:writeNetworkDebug(self.debugData, "Write Stream")    
     streamWriteUInt16(streamId, self.targetId);
     streamWriteBool(streamId, self.useOwnIndex);
     streamWriteUInt16(streamId, g_company.eventManager:countTable(self.data));
@@ -217,6 +224,7 @@ function GC_DefaultEvent:writeStream(streamId, connection)
 end;
 
 function GC_DefaultEvent:readStream(streamId, connection)
+    g_company.debug:writeNetworkDebug(self.debugData, "Read Stream")    
     self.data = {};
 
     self.targetId = streamReadUInt16(streamId);
