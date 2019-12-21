@@ -47,7 +47,7 @@ function GC_JobManager:getNextId()
     return self.jobId
 end;
 
-function GC_JobManager:addJob_Map(func, target, terrainSize, size, width, height)
+function GC_JobManager:addJob_Map(func, target, terrainSize, size, width, height, loops)
     local newJob = {}
     newJob.id = self:getNextId()
 
@@ -64,6 +64,12 @@ function GC_JobManager:addJob_Map(func, target, terrainSize, size, width, height
     newJob.size = size
     newJob.width = Utils.getNoNil(width, 32)
     newJob.height = Utils.getNoNil(height, 32)
+    newJob.loops = Utils.getNoNil(loops, 1)
+
+    newJob.currentState_max = size * size
+    newJob.currentState_step = newJob.width * newJob.height * newJob.loops
+    newJob.currentState_timer = 0
+    newJob.currentState_timerPrint = 0
 
     table.insert(self.jobs, newJob)
 
@@ -101,30 +107,40 @@ function GC_JobManager:update(dt)
     for _,job in pairs(self.jobs)do
         if job.isActive then          
             if job.type == GC_JobManager.TYPE_MAP then  
-                local pixelSize = job.terrainSize / job.size
+                for i=1, job.loops do
+                    local pixelSize = job.terrainSize / job.size
 
-                local startWorldX = job.x * job.width - job.terrainSize / 2 + pixelSize
-                local startWorldZ = job.z * job.height - job.terrainSize / 2 + pixelSize
-                local widthWorldX = startWorldX + job.width - pixelSize * 2
-                local widthWorldZ = startWorldZ
-                local heightWorldX = startWorldX
-                local heightWorldZ = startWorldZ + job.height - pixelSize * 2
+                    local startWorldX = job.x * job.width - job.terrainSize / 2 + pixelSize
+                    local startWorldZ = job.z * job.height - job.terrainSize / 2 + pixelSize
+                    local widthWorldX = startWorldX + job.width - pixelSize * 2
+                    local widthWorldZ = startWorldZ
+                    local heightWorldX = startWorldX
+                    local heightWorldZ = startWorldZ + job.height - pixelSize * 2
 
-                job.func(job.target, startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ)
-                
-                if job.x < (job.size / job.width) - 1 then
-                    job.x = job.x + 1
-                elseif job.z < (job.size / job.height) - 1 then
-                    job.z = job.z + 1
-                    job.x = 0
-                else
-                    job.runCounter = job.runCounter - 1
-                    job.x = 0
-                    job.z = 0
-                    if job.runCounter == 0 then
-                        job.isActive = false
+                    job.func(job.target, startWorldX, startWorldZ, widthWorldX, widthWorldZ, heightWorldX, heightWorldZ)
+                    
+                    if job.x < (job.size / job.width) - 1 then
+                        job.x = job.x + 1
+                    elseif job.z < (job.size / job.height) - 1 then
+                        job.z = job.z + 1
+                        job.x = 0
+                    else
+                        job.runCounter = job.runCounter - 1
+                        job.x = 0
+                        job.z = 0
+                        if job.runCounter == 0 then
+                            job.isActive = false
+                        end
                     end
                 end
+                local oldTimerP = job.currentState_timerP
+                
+                job.currentState_timer = job.currentState_timer + job.currentState_step
+                job.currentState_timerP = job.currentState_timer / job.currentState_max
+                if job.currentState_timerP ~= oldTimerP then
+                   -- print(job.currentState_timerP)
+                end
+
             end
         end
     end
