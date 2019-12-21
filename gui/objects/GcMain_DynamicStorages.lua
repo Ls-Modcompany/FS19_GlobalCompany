@@ -16,16 +16,6 @@ function Gc_Gui_DynamicStorages:new()
 	self.doSelectedReset = true
 	self.canGoToOverview = false
 
-	self.pdaWith = 2048
-	if fileExists(g_currentMission.missionInfo.baseDirectory.."modDesc.xml") then
-		local path = g_currentMission.missionInfo.baseDirectory .. g_currentMission.missionInfo.mapXMLFilename
-		if fileExists(path) then
-			local xml = loadXMLFile("map",path,"map")
-			self.pdaWith = getXMLInt(xml, "map#width")
-			delete(xml)
-		end
-	end
-
 	self.time = 0
 
 	return self
@@ -118,9 +108,7 @@ function Gc_Gui_DynamicStorages:onClickSelectStorage(element)
 	self.currentSelectedDynamicStorage = element.storage	
 
 	local x,_,y = getWorldTranslation(self.currentSelectedDynamicStorage.rootNode)
-	local posX = 440 / (self.pdaWith / 2) * x 
-	local posY = 440 / (self.pdaWith / 2) * -y
-	self.gui_pdaMarker.position = GuiUtils.getNormalizedValues(string.format("%spx %spx", posX, posY), self.gui_pdaMarker.outputSize, self.gui_pdaMarker.position)
+	self.gui_ingameMap:setPdaMarkerPosition(self.ingamemap_pdaMarker_pos, x,y)
 end
 
 function Gc_Gui_DynamicStorages:onClickOpenOverview()
@@ -183,6 +171,7 @@ function Gc_Gui_DynamicStorages:onClose()
 end
 
 function Gc_Gui_DynamicStorages:onCreate()
+	self.ingamemap_pdaMarker_pos = self.gui_ingameMap:addPdaMarker(self.gui_pdaMarker)
 end
 
 function Gc_Gui_DynamicStorages:onClickClose()
