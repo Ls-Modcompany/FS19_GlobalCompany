@@ -3,12 +3,15 @@
 --
 -- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany
--- @Date: 22.03.2018
--- @Version: 1.0.0.0
+-- @Date: 22.12.2019
+-- @Version: 1.3.0.0
 --
 -- @Support: https://ls-modcompany.com
 --
 -- Changelog:
+--
+-- 	v1.3.0.0 (22.12.2019):
+--		- add seasons support (outputPerHour)
 --
 -- 	v1.2.0.0 (04.08.2019):
 -- 		- Add option for multiple 'loadingTriggers' and 'unloadingTriggers' for each product.
@@ -764,6 +767,12 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			productLine.userStopped = false
 			productLine.autoStart = Utils.getNoNil(getXMLBool(xmlFile, productLineKey .. "#autoLineStart"), false)
 			productLine.outputPerHour = Utils.getNoNil(getXMLInt(xmlFile, productLineKey .. "#outputPerHour"), 1000)
+			productLine.getOutputPerHour = function() return self:getOutputPerHour(productLine) end
+
+			if g_seasons ~= nil then
+				productLine.productivity = productLine.outputPerHour * 6 / g_seasons.environment.daysPerSeason
+				g_messageCenter:subscribe(SeasonsMessageType.SEASON_LENGTH_CHANGED, self.onSeasonLengthChanged, self)
+			end
 
 			productLine.unitLang = g_company.languageManager:getText(getXMLString(xmlFile, productLineKey .. "#unitLang"))
 
@@ -914,6 +923,22 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 					productLine.playerTrigger = playerTrigger
 					self.drawProductLineUI[nextId] = Utils.getNoNil(getXMLBool(xmlFile, linePlayerTriggerKey .. "#showPopupUI"), true)
 				end
+			end
+
+			--v1.3.0.0
+			local seasonsKey = productLineKey .. ".seasons"
+			if hasXMLProperty(xmlFile, seasonsKey) then
+				productLine.seasonsData = {}
+				productLine.seasonsData.spring = {}
+				productLine.seasonsData.summer = {}
+				productLine.seasonsData.autumn = {}
+				productLine.seasonsData.winter = {}
+
+				productLine.seasonsData.spring.outputPerHour = getXMLInt(xmlFile, seasonsKey .. ".spring" .. "#outputPerHour")
+				productLine.seasonsData.summer.outputPerHour = getXMLInt(xmlFile, seasonsKey .. ".summer" .. "#outputPerHour")
+				productLine.seasonsData.autumn.outputPerHour = getXMLInt(xmlFile, seasonsKey .. ".autumn" .. "#outputPerHour")
+				productLine.seasonsData.winter.outputPerHour = getXMLInt(xmlFile, seasonsKey .. ".winter" .. "#outputPerHour")
+				
 			end
 
 			table.insert(self.productLines, productLine)
@@ -1621,7 +1646,7 @@ function GC_ProductionFactory:hourChanged()
 
 					if productLine.active then
 						local stopProductLine = false
-						local productPerHour = productLine.outputPerHour
+						local productPerHour = productLine.getOutputPerHour()
 						local hasProduct, producedFactor = self:getHasInputProducts(productLine, productPerHour)
 
 						if hasProduct then
@@ -1726,7 +1751,9 @@ function GC_ProductionFactory:minuteChanged()
 					if productLine.productSale == nil then
 						if productLine.active then
 							local stopProductLine = false
-							local productionFactor = (productLine.outputPerHour / 60) * self.updateDelay
+
+							local productPerHour = productLine.getOutputPerHour()
+							local productionFactor = (productPerHour / 60) * self.updateDelay
 							local hasSpace, factor = self:getHasOutputSpace(productLine, productionFactor)
 							local hasProduct, producedFactor = self:getHasInputProducts(productLine, factor)
 
@@ -2628,4 +2655,28 @@ function GC_ProductionFactory:getIsValidFarmlandId(playerFarmId)
 	end
 
 	return false
+end
+
+function GC_ProductionFactory:getOutputPerHour(productLine)
+	if g_seasons ~= nil then
+		if productLine.seasonsData ~= nil then
+			if g_seasons.environment.season == g_seasons.environment.SPRING and productLine.seasonsData.spring ~= nil and productLine.seasonsData.spring.outputPerHour ~= nil then
+				return productLine.seasonsData.spring.outputPerHour
+			elseif g_seasons.environment.season == g_seasons.environment.SUMMER and productLine.seasonsData.summer ~= nil and productLine.seasonsData.summer.outputPerHour ~= nil then
+				return productLine.seasonsData.summer.outputPerHour
+			elseif g_seasons.environment.season == g_seasons.environment.AUTUMN and productLine.seasonsData.autumn ~= nil and productLine.seasonsData.autumn.outputPerHour ~= nil then
+				return productLine.seasonsData.autumn.outputPerHour
+			elseif g_seasons.environment.season == g_seasons.environment.WINTER and productLine.seasonsData.winter ~= nil and productLine.seasonsData.winter.outputPerHour ~= nil then
+				return productLine.seasonsData.winter.outputPerHour
+			end
+		end
+		return productLine.productivity
+	end	
+	return productLine.outputPerHour
+end
+
+function GC_ProductionFactory:onSeasonLengthChanged()
+	for _,productLine in pairs(self.productLines) do
+		productLine.productivity = productLine.outputPerHour * 6 / g_seasons.environment.daysPerSeason
+	end
 end
