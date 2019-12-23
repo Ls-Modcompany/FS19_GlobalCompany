@@ -38,7 +38,8 @@ function GC_AnimalLoadingTrigger:new(isServer, isClient)
 	self.title = g_i18n:getText("ui_farm")
 	self.activateText = g_i18n:getText("animals_openAnimalScreen")
 	
-	self.text = g_company.languageManager:getText("GC_Factory_Animal_Dialogue")
+	self.text1 = g_company.languageManager:getText("GC_Factory_Animal_Dialogue1")
+	self.text2 = g_company.languageManager:getText("GC_Factory_Animal_Dialogue2")
 
 	self.triggerNode = nil
 	
@@ -56,8 +57,19 @@ function GC_AnimalLoadingTrigger:new(isServer, isClient)
 	
 	self.registerTriggerInStream = true
 	self.extraParamater = nil
+
+	self.isInput = true
+	self.subFillType = nil
    
    return self
+end
+
+function GC_AnimalLoadingTrigger:setDirection(isInput)
+	self.isInput = Utils.getNoNil(isInput, true)
+end
+
+function GC_AnimalLoadingTrigger:setSubFillType(subFillType)
+	self.subFillType = subFillType
 end
 
 function GC_AnimalLoadingTrigger:load(nodeId, target, xmlFile, xmlKey, conversionData)
@@ -115,7 +127,7 @@ function GC_AnimalLoadingTrigger:triggerCallback(triggerId, otherId, onEnter, on
         local vehicle = g_currentMission.nodeToObject[otherId]
         if vehicle ~= nil and vehicle.getSupportsAnimalType ~= nil then
             if onEnter then
-				if vehicle:getCurrentAnimalType() ~= nil then
+				if (self.isInput and vehicle:getCurrentAnimalType() ~= nil) or not self.isInput then
 					self:setLoadingTrailer(vehicle)
 				end
             elseif onLeave then
@@ -194,11 +206,11 @@ function GC_AnimalLoadingTrigger:getConversionDataPerAnimal(typeName)
 	return 1
 end
 
-function GC_AnimalLoadingTrigger:getFreeCapacity(typeName, subType, farmId)
-	if subType ~= nil and subType.fillType ~= nil then	
+function GC_AnimalLoadingTrigger:getFreeCapacity(typeName, farmId)
+	if self.subFillType ~= nil and self.subFillType.fillType ~= nil then	
 		local factor = self.conversionData[typeName]		
 		if factor ~= nil then
-			local freeCapacity = self.target:getFreeCapacity(subType.fillType, farmId, self.extraParamater)
+			local freeCapacity = self.target:getFreeCapacity(self.subFillType.fillType, farmId, self.extraParamater)
 			local mod = freeCapacity % factor
 			
 			-- Allow overfilling if it is less than half.
@@ -213,6 +225,24 @@ function GC_AnimalLoadingTrigger:getFreeCapacity(typeName, subType, farmId)
 	return 0
 end
 
+function GC_AnimalLoadingTrigger:getNumAnimals(typeName, farmId)
+	local animals = self.target:getAnimlsNum(self.subFillType.fillType, farmId, self.extraParamater)
+	return math.floor(animals/self.conversionData[typeName])
+end
+
+function GC_AnimalLoadingTrigger:getAnimalsNumAndFreeCapacity(typeName)
+	local animals, freeCapacity
+	if self.isInput then
+		animals = g_company.utils.getTableLength(self.activatedTarget:getAnimals())
+		freeCapacity = self:getFreeCapacity(typeName, self.activatedTarget:getOwnerFarmId())
+	else
+		animals = self:getNumAnimals(typeName, self.activatedTarget:getOwnerFarmId())
+		local place = self.activatedTarget.spec_livestockTrailer.animalTypeToPlaces[self.subFillType.type]
+		freeCapacity = g_company.utils.getTableLength(place.slots) - place.numUsed
+	end
+	return animals, freeCapacity
+end
+
 function GC_AnimalLoadingTrigger:onActivateObject()
     g_currentMission:removeActivatableObject(self)
     
@@ -220,16 +250,18 @@ function GC_AnimalLoadingTrigger:onActivateObject()
     self.objectActivated = true
     self.activatedTarget = self.loadingVehicle
 	
-	local typeName = self.activatedTarget:getCurrentAnimalType()
-	if self:getAnimalTypeAccepted(typeName) then
-		local animals = self.activatedTarget:getAnimals()
-		local freeCapacity = self:getFreeCapacity(typeName, animals[1]:getSubType(), self.activatedTarget:getOwnerFarmId())
+	if (self.isInput and self:getAnimalTypeAccepted(self.subFillType.type)) or not self.isInput then
+		local animals, freeCapacity = self:getAnimalsNumAndFreeCapacity(self.subFillType.type)
 	
 		local dialog = g_gui:showDialog("GC_AnimalDeliveryDialog")
 		if dialog ~= nil then
 			dialog.target:setTitle(self.title)
-			dialog.target:setText(self.text)
-			dialog.target:setDialogData(animals, freeCapacity)
+			if self.isInput then
+				dialog.target:setText(self.text1)
+			else
+				dialog.target:setText(self.text2)
+			end
+			dialog.target:setDialogData(animals, freeCapacity, self.subFillType, self.isInput)
 			dialog.target:setCallback(self.doDeliveryCallback, self)
 		end
 	else
@@ -262,28 +294,52 @@ function GC_AnimalLoadingTrigger:deliverAnimals(animalTrailer, numberToDeliver)
 	local animals = animalTrailer:getAnimals()
 	local numAnimal = #animals
 	
-	if numAnimal > 0 then
-		local typeName = animalTrailer:getCurrentAnimalType()
-		if self:getAnimalTypeAccepted(typeName) then
-			local subType = animals[1]:getSubType()
-			local fillTypeIndex = subType.fillType
-			if fillTypeIndex ~= nil then
-				local farmId = animalTrailer:getOwnerFarmId()
-				local litresPerAnimal = self:getConversionDataPerAnimal(typeName)
-				local freeCapacity = self:getFreeCapacity(typeName, subType, farmId)
-			
-				local maxAvailableAnimals = math.min(numberToDeliver, numAnimal)
-				local numberToRemove = math.min(maxAvailableAnimals, freeCapacity)
-	
-				local animalsToRemove = {}
-				for i = 1, numberToRemove do
-					table.insert(animalsToRemove, animals[i])
-				end
-	
-				animalTrailer:removeAnimals(animalsToRemove)			
+	if self.isInput then
+		if numAnimal > 0 then
+			local typeName = animalTrailer:getCurrentAnimalType()
+			if self:getAnimalTypeAccepted(typeName) then
+				local fillTypeIndex = self.subFillType.fillType
+				if fillTypeIndex ~= nil then
+					local farmId = animalTrailer:getOwnerFarmId()
+					local litresPerAnimal = self:getConversionDataPerAnimal(typeName)
+					local freeCapacity = self:getFreeCapacity(typeName, subType, farmId)
 				
-				self.target:addFillLevel(farmId, litresPerAnimal * numberToRemove, fillTypeIndex, ToolType.UNDEFINED, nil, self.extraParamater)
+					local maxAvailableAnimals = math.min(numberToDeliver, numAnimal)
+					local numberToRemove = math.min(maxAvailableAnimals, freeCapacity)
+		
+					local animalsToRemove = {}
+					for i = 1, numberToRemove do
+						table.insert(animalsToRemove, animals[i])
+					end
+
+					print(litresPerAnimal)
+					print(numberToRemove)
+					animalTrailer:removeAnimals(animalsToRemove)
+					self.target:addFillLevel(farmId, litresPerAnimal * numberToRemove, fillTypeIndex, ToolType.UNDEFINED, nil, self.extraParamater)
+				end
 			end
+		end
+	else
+		local fillTypeIndex = self.subFillType.fillType
+		if fillTypeIndex ~= nil then
+			local farmId = animalTrailer:getOwnerFarmId()
+			local litresPerAnimal = self:getConversionDataPerAnimal(self.subFillType.type)		
+
+			local place = animalTrailer.spec_livestockTrailer.animalTypeToPlaces[self.subFillType.type]
+			local freeCapacity = g_company.utils.getTableLength(place.slots) - place.numUsed	
+								
+			numAnimal = self:getNumAnimals(self.subFillType.type, self.activatedTarget:getOwnerFarmId())
+			local maxAvailableAnimals = math.min(numberToDeliver, numAnimal)
+			local numberToAdd = math.min(maxAvailableAnimals, freeCapacity)
+
+			for i = 1, numberToAdd do
+				local newAnimal = Animal.createFromFillType(self.isServer, self.isClient, nil, fillTypeIndex)
+				newAnimal:register()
+				animalTrailer:addAnimal(newAnimal)
+			end
+			print(litresPerAnimal)
+			print(numberToAdd)
+			self.target:removeFillLevel(farmId, litresPerAnimal * numberToAdd, fillTypeIndex, self.extraParamater)
 		end
 	end
 end

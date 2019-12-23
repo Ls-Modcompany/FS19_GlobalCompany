@@ -65,7 +65,8 @@
 		<e k="GC_Open_Product_Menu" v="Öffne Produktmenü"/>
 		<e k="GC_Open_Overview_Menu" v="Öffne Übersichtsmenü"/>
 		
-		<e k="GC_Factory_Animal_Dialogue" v="Wählen die Anzahl der Tiere, die in die Fabrik entladen werden sollen."/>
+		<e k="GC_Factory_Animal_Dialogue1" v="Wähle die Anzahl der Tiere, die in die Fabrik entladen werden sollen."/>
+		<e k="GC_Factory_Animal_Dialogue2" v="Wähle die Anzahl der Tiere, die in das Fahrzeug entladen werden sollen."/>
 		
 		<e k="GC_gui_disabled" v="Deaktiviert"/>
 		<e k="GC_gui_add" v="Hinzufügen"/>

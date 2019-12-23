@@ -62,7 +62,8 @@
 		<e k="GC_Output_Header_Backup" v="Outputs"/>
 		<e k="GC_Open_Product_Menu" v="Open product menu"/>
 		<e k="GC_Open_Overview_Menu" v="Open overview menu"/>
-		<e k="GC_Factory_Animal_Dialogue" v="Select the number of animals to unload to factory."/>
+		<e k="GC_Factory_Animal_Dialogue1" v="Select the number of animals to unload to factory."/>
+		<e k="GC_Factory_Animal_Dialogue2" v="Select the number of animals to unload to vehicle."/>
 		<e k="GC_gui_disabled" v="Disabled"/>
 		<e k="GC_gui_add" v="Add"/>
 		<e k="GC_gui_remove" v="Remove"/>
