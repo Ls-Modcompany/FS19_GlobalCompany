@@ -28,7 +28,6 @@ function GC_Gui_ingameMap:new(gui, custom_mt)
 	self.lastPxPosX = 0
 	self.lastPxPosY = 0
 	self.lastPxPosY = 0
-	self.lastSize = self.zoomFactor * 128
 
 	self.bitmaps = {}
 	self.pdaMarkerCount = -1
@@ -43,6 +42,9 @@ function GC_Gui_ingameMap:new(gui, custom_mt)
 			delete(xml)
 		end
 	end
+
+	self.lastSize = self.zoomFactor * 128
+	self.sizeFactor = self.pdaWith / 2048
 	
 	return self;
 end;
@@ -250,8 +252,8 @@ end
 function GC_Gui_ingameMap:setPdaMarkerPosition(id, x, y)
 	for _,marker in pairs(self.pdaMarkers) do
 		if marker.id == id then
-			marker.worldPosX = x
-			marker.worldPosY = y
+			marker.worldPosX = x / self.sizeFactor
+			marker.worldPosY = y / self.sizeFactor
 		end
 	end
 	self:checkPdaMarkers()
@@ -261,8 +263,8 @@ function GC_Gui_ingameMap:checkPdaMarkers()
 	for _,marker in pairs(self.pdaMarkers) do
 		local sizeH = marker.size[1] / 2
 		
-		local pdaPosX = (marker.worldPosX + self.pdaWith / 2) / 2
-		local pdaPosY = (marker.worldPosY + self.pdaWith / 2) / 2
+		local pdaPosX = (marker.worldPosX + self.pdaWith / 2 / self.sizeFactor) / 2
+		local pdaPosY = (marker.worldPosY + self.pdaWith / 2 / self.sizeFactor) / 2
 		
 		if self.lastPxPosX < pdaPosX and pdaPosX < (self.lastPxPosX + self.lastSize) and self.lastPxPosY < pdaPosY and pdaPosY < (self.lastPxPosY + self.lastSize)  then
 
