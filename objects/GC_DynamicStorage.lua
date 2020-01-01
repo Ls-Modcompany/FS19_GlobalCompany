@@ -289,6 +289,10 @@ function GC_DynamicStorage:readStream(streamId, connection)
     self:setActiveUnloadingBox(streamReadInt8(streamId), false);
 
 	if connection:getIsServer() then
+		if self.triggerManager ~= nil then
+			self.triggerManager:readStream(streamId, connection)
+        end
+        
         for _,place in pairs (self.places) do
             local fillLevel =  streamReadFloat32(streamId);
             local fillTypeIndex =  streamReadInt16(streamId);
@@ -311,6 +315,10 @@ function GC_DynamicStorage:writeStream(streamId, connection)
     streamWriteInt8(streamId, self.activeUnloadingBox);
 
 	if not connection:getIsServer() then
+		if self.triggerManager ~= nil then
+			self.triggerManager:writeStream(streamId, connection)
+		end
+
         for _,place in pairs (self.places) do     
             streamWriteFloat32(streamId, place.fillLevel);
             streamWriteInt16(streamId, place.activeFillTypeIndex);

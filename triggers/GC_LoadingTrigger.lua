@@ -240,10 +240,8 @@ function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes
 		-- When used the filling can only be started when not in vehicle.
 		local playerTriggerNode = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, xmlKey .. ".externalOperation#playerTriggerNode"), source.i3dMappings)
 		if playerTriggerNode ~= nil then
-			if playerTriggerNode ~= nil then
-				self.playerTriggerNode = playerTriggerNode
-				addTrigger(self.playerTriggerNode, "playerTriggerCallback", self)
-			end
+			self.playerTriggerNode = playerTriggerNode
+			addTrigger(self.playerTriggerNode, "playerTriggerCallback", self)
 		end
 
 		return true
@@ -510,7 +508,6 @@ end
 
 function GC_LoadingTrigger:setIsLoading(isLoading, targetObject, fillUnitIndex, fillType, noEventSend)
 	GC_LoadingTrigger:superClass().setIsLoading(self, isLoading, targetObject, fillUnitIndex, fillType, noEventSend)
-
 	if self.isClient then
 		if self.triggerStatus ~= nil then
 			if isLoading then
