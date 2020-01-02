@@ -55,6 +55,8 @@ function GC_UnloadingTrigger:new(isServer, isClient, customMt)
 	self.nonDischargeNodePallets = {}
 	self.palletsInTrigger = 0
 
+	self.useTargetGetIsFillTypeAllowed = true
+
 	return self
 end
 
@@ -290,7 +292,7 @@ function GC_UnloadingTrigger:getIsFillTypeSupported(fillTypeIndex)
 	local accepted = self.target ~= nil
 
 	if accepted then
-		if self.target.getIsFillTypeAllowed ~= nil then
+		if self.useTargetGetIsFillTypeAllowed and self.target.getIsFillTypeAllowed ~= nil then
 			if not self.target:getIsFillTypeAllowed(fillTypeIndex, self.extraParamater) then
 				accepted = false
 			end
