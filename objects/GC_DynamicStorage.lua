@@ -239,6 +239,8 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 					delete(xmlSoundFile)
                 end
             end;
+
+            place.effectIsOn = false
         end;
         
         table.insert(self.places, place);
@@ -265,6 +267,7 @@ end;
 function GC_DynamicStorage:finalizePlacement()
 	self.eventId_setActiveUnloadingBox = g_company.eventManager:registerEvent(self, self.setActiveUnloadingBoxEvent);
     self.eventId_setActiveLoadingBox = g_company.eventManager:registerEvent(self, self.setActiveLoadingBoxEvent);
+    self.eventId_setEffectState = g_company.eventManager:registerEvent(self, self.setEffectStateEvent);
 end
 
 function GC_DynamicStorage:delete()
@@ -396,6 +399,10 @@ function GC_DynamicStorage:loadFromXMLFile(xmlFile, key)
                 if place.number == num then
                     place.activeFillTypeIndex = activeFillTypeIndex;
                     place.shovelTrigger.fillTypeIndex = activeFillTypeIndex;
+
+                    --place.unloadingTrigger.fillTypes = nil
+                    --place.unloadingTrigger:setAcceptedFillTypeState(activeFillTypeIndex, true);
+
                     local material = self.materials[g_fillTypeManager:getFillTypeNameByIndex(activeFillTypeIndex):lower()];            
                     if material ~= nil then
                         for _,mover in pairs(place.movers.movers) do
@@ -440,13 +447,14 @@ function GC_DynamicStorage:saveToXMLFile(xmlFile, key, usedModNames)
 end;
 
 function GC_DynamicStorage:update(dt)     
-    if self.isClient and self.placeEffectsAreActive then
-        for _,place in pairs(self.places) do
+    if self.isClient then      
+        for _,place in pairs(self.places) do  
             if place.unloadingEffectsTimer > 0 then
                 place.unloadingEffectsTimer = place.unloadingEffectsTimer - dt;
                 if place.unloadingEffectsTimer <= 0 then
                     g_effectManager:stopEffects(place.unloadingEffects);
                     g_soundManager:stopSample(place.samplesLoad);
+                    place.effectIsOn = false     
                 else
                     self:raiseUpdate();
                 end;
@@ -561,6 +569,21 @@ end;
 function GC_DynamicStorage:setActiveLoadingBoxEvent(data, noEventSend)
 	g_company.eventManager:createEvent(self.eventId_setActiveLoadingBox, data, false, noEventSend);
     self.activeLoadingBox = Utils.getNoNil(data[1], 1);
+end;
+
+function GC_DynamicStorage:setEffectStateEvent(data, noEventSend)
+    g_company.eventManager:createEvent(self.eventId_setEffectState, data, false, noEventSend);
+    if self.isClient then
+        local place = self.places[data[1]]
+        if not place.effectIsOn then
+            g_effectManager:setFillType(place.unloadingEffects, place.activeFillTypeIndex)
+            g_effectManager:startEffects(place.unloadingEffects)
+            g_soundManager:playSample(place.samplesLoad)
+            place.effectIsOn = true        
+        end
+        place.unloadingEffectsTimer = 1000
+        self:raiseUpdate()
+    end
 end;
 
 function GC_DynamicStorage:onActivableObject()
