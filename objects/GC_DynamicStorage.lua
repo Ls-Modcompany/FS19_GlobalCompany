@@ -3,14 +3,14 @@
 --
 -- @Interface: --
 -- @Author: LS-Modcompany / kevink98
--- @Date: 24.07.2019
--- @Version: 1.0.0.0
+-- @Date: 02.01.2020
+-- @Version: 1.1.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
 --
--- 	v1.0.0.0 (24.07.2019):
+-- 	v1.1.0.0 (02.01.2020):
 -- 		- initial fs19 (kevink98)
 --
 --
@@ -164,6 +164,7 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
     local unloadingTriggerKey = string.format("%s.unloadingTrigger", xmlKey);    
     local unloadingTrigger = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.rootNode, self, xmlFile, unloadingTriggerKey, self.fillTypes);
     if unloadingTrigger ~= nil then
+        unloadingTrigger.useTargetGetIsFillTypeAllowed = false
         self.unloadingTrigger = unloadingTrigger;
     end;
 
@@ -174,8 +175,6 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
         self.loadingTrigger = loadingTrigger;
     end;
   
-    self.placeEffectsAreActive = false;
-
     i = 0;
     while true do
         local placeKey = string.format("%s.places.place(%d)", xmlKey, i);
@@ -207,6 +206,14 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
                 place.digitalDisplays:updateLevelDisplays(place.fillLevel, place.capacity);
             end;
         end;
+
+        if hasXMLProperty(xmlFile, placeKey .. ".unloadingTrigger") then            
+            local unloadingTrigger = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.rootNode, self, xmlFile, placeKey .. ".unloadingTrigger", {})
+            if unloadingTrigger ~= nil then
+                unloadingTrigger.extraParamater = {isUnloadingTrigger = true, id=place.number}
+                place.unloadingTrigger = unloadingTrigger
+            end
+        end        
         
         if self.isClient then
             place.unloadingEffects = g_effectManager:loadEffect(xmlFile, placeKey .. ".loading.effects", nodeId, self, self.i3dMappings);
@@ -448,30 +455,34 @@ function GC_DynamicStorage:update(dt)
     end;
 end;
 
-function GC_DynamicStorage:getFreeCapacity(fillTypeIndex, farmId, triggerId)
-    if self.places[self.activeUnloadingBox].fillLevel > 0 then
-        if fillTypeIndex == self.places[self.activeUnloadingBox].activeFillTypeIndex then
-            return self.places[self.activeUnloadingBox].capacity - self.places[self.activeUnloadingBox].fillLevel;
+function GC_DynamicStorage:getFreeCapacity(fillTypeIndex, farmId, triggerId)        
+    local activeUnloadingBox = self.activeUnloadingBox   
+    if triggerId ~= nil and triggerId.isUnloadingTrigger then
+        activeUnloadingBox = triggerId.id            
+    end
+
+    if self.places[activeUnloadingBox].fillLevel > 0 then
+        if fillTypeIndex == self.places[activeUnloadingBox].activeFillTypeIndex then
+            return self.places[activeUnloadingBox].capacity - self.places[activeUnloadingBox].fillLevel;
         else
             return 0;
         end;
     else
-        return self.places[self.activeUnloadingBox].capacity;
+        return self.places[activeUnloadingBox].capacity;
     end;
 end;
 
 function GC_DynamicStorage:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, toolType, fillPositionData, triggerId)
-    if fillLevelDelta > 0 then
-        self:updatePlace(self.places[self.activeUnloadingBox], self.places[self.activeUnloadingBox].fillLevel + fillLevelDelta, fillTypeIndex);
+    if fillLevelDelta > 0 then        
+        local activeUnloadingBox = self.activeUnloadingBox       
+        if triggerId ~= nil and triggerId.isUnloadingTrigger then
+            activeUnloadingBox = triggerId.id            
+        end
 
-        if self.isClient and not self.places[self.activeUnloadingBox].unloadingEffectsIsOn then
-            g_effectManager:setFillType(self.places[self.activeUnloadingBox].unloadingEffects, fillTypeIndex);
-            g_effectManager:startEffects(self.places[self.activeUnloadingBox].unloadingEffects);
-            g_soundManager:playSample(self.places[self.activeUnloadingBox].samplesLoad);
-            self.places[self.activeUnloadingBox].unloadingEffectsTimer = 1000;
-            self.placeEffectsAreActive = true;
-            self:raiseUpdate();
-        end;
+        self:updatePlace(self.places[activeUnloadingBox], self.places[activeUnloadingBox].fillLevel + fillLevelDelta, fillTypeIndex);        
+        if triggerId == nil or not triggerId.isUnloadingTrigger then
+            self:setEffectStateEvent({activeUnloadingBox})
+        end
 
         if self.isServer then
             self:raiseDirtyFlags(self.dynamicStorageDirtyFlag);
@@ -616,4 +627,9 @@ function GC_DynamicStorage:getCustomTitle()
 	end
 
 	return title
+end
+
+function GC_DynamicStorage:getIsFillTypeAllowed(fillTypeIndex, triggerData)
+    local place = self.places[triggerData.id]
+    return place.fillLevel == 0 or place.activeFillTypeIndex == fillTypeIndex
 end
