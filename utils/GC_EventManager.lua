@@ -67,8 +67,10 @@ function GC_EventManager:createEvent(targetId, data, useOwnIndex, noEventSend)
     g_company.debug:writeNetworkDebug(self.debugData, "Create Event %s", targetId)    
     if targetId ~= nil and (noEventSend == nil or noEventSend == false) then
         if self.isServer then      
+            g_company.debug:writeNetworkDebug(self.debugData, "Create Event %s - server", targetId)    
             g_server:broadcastEvent(GC_DefaultEvent:new(targetId, data, useOwnIndex))
         else 
+            g_company.debug:writeNetworkDebug(self.debugData, "Create Event %s - client", targetId)    
 			g_client:getServerConnection():sendEvent(GC_DefaultEvent:new(targetId, data, useOwnIndex))
         end;
     end;
@@ -202,6 +204,7 @@ function GC_DefaultEvent:emptyNew()
 end
 
 function GC_DefaultEvent:new(targetId, data, useOwnIndex)
+    g_company.debug:writeNetworkDebug(self.debugData, "GC_DefaultEvent new")    
     local self = GC_DefaultEvent:emptyNew();
     self.targetId = targetId;
     self.data = data;
@@ -210,7 +213,7 @@ function GC_DefaultEvent:new(targetId, data, useOwnIndex)
 end;
 
 function GC_DefaultEvent:writeStream(streamId, connection)
-    g_company.debug:writeNetworkDebug(self.debugData, "Write Stream")    
+    g_company.debug:writeNetworkDebug(self.debugData, " GC_DefaultEvent Write Stream")    
     streamWriteUInt16(streamId, self.targetId);
     streamWriteBool(streamId, self.useOwnIndex);
     streamWriteUInt16(streamId, g_company.eventManager:countTable(self.data));
@@ -224,7 +227,7 @@ function GC_DefaultEvent:writeStream(streamId, connection)
 end;
 
 function GC_DefaultEvent:readStream(streamId, connection)
-    g_company.debug:writeNetworkDebug(self.debugData, "Read Stream")    
+    g_company.debug:writeNetworkDebug(self.debugData, "GC_DefaultEvent Read Stream")    
     self.data = {};
 
     self.targetId = streamReadUInt16(streamId);
@@ -241,7 +244,7 @@ function GC_DefaultEvent:readStream(streamId, connection)
             table.insert(self.data, v);
         end;
     end;
-  
+    
     if not connection:getIsServer() and not g_company.eventManager.events[self.targetId].clientToServer then
         g_server:broadcastEvent(self, false, connection, nil);
     end;        

@@ -2,7 +2,7 @@
 <modDesc descVersion="44">
 	<author>LS-Modcompany / kevink98, aPuehri, Eribus</author>
 	
-    <version>1.1.4.0</version>
+    <version>1.1.5.0</version>
     
 	<title>
         <en>GlobalCompany</en>
@@ -12,6 +12,29 @@
         <en><![CDATA[Global Company - A large script extension for Farming Simulator!
 
 GlobalCompany is the base for many scripts. No matter if production, warehouse or whatever - with this it is easy to implement.
+
+Changelog 1.2.0.0:
+- FIX: DynamicStorage: Fix effects on dediserver
+- FIX: DynamicStorage: Change key t to lctrl+t
+- FIX: 'Error: Server:registerObjectInStream is only allowed in writeStream calls' Error on MP
+- FIX: language texts
+- FIX: Objektinfo: Change position, now we can see the hand
+- FIX: Factory: Incomeprice can now be negative
+- FIX: VisibilityNodes: Collisions will check now also on Server
+- FIX: Adaption to Courseplay
+
+- NEW: DynamicStorage: Add unloadtriggers at places
+- NEW: Add dynamic ingamemap to gc menu
+- NEW: Factory: Add animaloutput
+- NEW: Factory: Add Seasons support
+- NEW: Add languanges: pt, it, pl
+- NEW: GC-Menu: Overview for DynamicStorage
+- NEW: GC-Menu: Better overview for Factorys
+- NEW: GC-Menu: AddOns can now create Tabs
+- NEW: Factory: add 'refPoint' - Attribute
+- NEW: Add new Gui-elements
+
+- And many more
 
 Changelog 1.1.0.0:
 - NEW: French and Russian languages added
@@ -28,6 +51,29 @@ Changelog 1.1.0.0:
 
 GlobalCompany ist die Grundlage für viele Scripte. Egal ob Produktionen, Lager oder was auch immer - hiermit lässt es sich einfach umsetzen.
 
+Changelog 1.2.0.0:
+- FIX: DynamicStorage: Effektfehler auf Dediserver behoben
+- FIX: DynamicStorage: Tastenkombi auf LCtrl + T geändert
+- FIX: 'Error: Server:registerObjectInStream is only allowed in writeStream calls' Fehler auf Server
+- FIX: Sprachtexte
+- FIX: Objektinfo: Position geändert
+- FIX: Factory: Incomeprice kann nun negativ sein
+- FIX: VisibilityNodes: Kollisionsüberprüfung jetzt auch serverseitig
+- FIX: Anpassung an Courseplay
+
+- NEW: DynamicStorage: Abladetrigger für jede Box hinzugefügt
+- NEW: Dynamische Ingamemap ins GC-Menü hinzugefügt
+- NEW: Factory: Tieroutput hinzugefügt
+- NEW: Factory: Support für Seasons hinzugefügt
+- NEW: Sprachentexte hinzugefügt: pt, it, pl
+- NEW: GC-Menu: Übersicht für Dynamische Lager
+- NEW: GC-Menu: Übersicht für Fabriken überarbeitet
+- NEW: GC-Menu: AddOns können nun eigene Tabs erstellen
+- NEW: Factory: 'refPoint' - Attribute hinzugefügt
+- NEW: Gui-Elemente hinzugefügt
+
+- Und viele weitere Sachen
+
 Changelog 1.1.0.0:
 - NEU: Sprachen Französisch und Russisch hinzugefügt
 - FIX: Shopmanager an aktuellen Patch angepasst
@@ -43,6 +89,29 @@ Changelog 1.1.0.0:
 
 GlobalCompany основа для многих скриптов. Будь то производства, хранилища или что то еще - с ним возможно многое.
 
+Блог изменений 1.2.0.0:
+- FIX: DynamicStorage: Исправить эффекты на дедисервере
+- FIX: DynamicStorage: Изменить клавишу t на lctrl+t
+- Ошибка: Server:registerObjectInStream разрешен только при writeStream calls' Error on MP
+- FIX: языковые тексты
+- Объектинфо: Смена позиции, теперь мы видим руку
+- FIX: Фабрика: Недооценка теперь может быть отрицательной
+- FIX: Узлы видимости: Коллизии теперь будут проверяться и на сервере
+- FIX: адаптация к игре курса
+
+- NEW: DynamicStorage: Добавить разгрузочные триггеры в местах
+- НОВИНКА: Добавить динамическую карту ingamemap в меню gc
+- Фабрика: Добавить животный выход
+- Фабрика: Добавить поддержку сезонов
+- Новое: Добавьте языки: pt, it, pl
+- Новое: ГК-меню: Обзор для DynamicStorage
+- Новое: ГК-меню: Лучший обзор для Factorys
+- Новое: ГК-меню: Добавления теперь могут создавать Tabs
+- НОВОЕ: Завод: добавить 'refPoint' - Атрибут
+- НОВИНКА: Добавить новые Gui-элементы
+
+- И многое другое
+
 Блог изменений 1.1.0.0:
 - НОВИНКА: Добавлены французский и русский языки
 - FIX: Shopmanager адаптирован к текущему патчу.
@@ -57,6 +126,29 @@ GlobalCompany основа для многих скриптов. Будь то �
         <fr><![CDATA[Global Company - Une grande extension de script pour Farming Simulator !
 
 GlobalCompany est la base de nombreux scripts. Que ce soit pour la production, l'entreposage ou autre - avec ce mod, il est facile de tout implémenter.
+
+Changelog 1.2.0.0 :
+- CORRECTIF : DynamicStorage : Correction des effets sur le dé-diseur
+- CORRECTIF : DynamicStorage : Changer la touche t en lctrl+t
+- CORRECTION : 'Erreur : Server:registerObjectInStream n'est autorisé que dans les appels writeStream' Erreur sur MP
+- CORRECTIF : textes en langue
+- FIX : Objektinfo : Changement de position, maintenant on peut voir la main
+- FIX : Usine : Le prix du revenu peut maintenant être négatif
+- CORRECTIF : VisibilityNodes : Les collisions seront maintenant vérifiées aussi sur le serveur
+- CORRECTIF : Adaptation au jeu de parcours
+
+- NOUVEAU : DynamicStorage : Ajout de triggers de déchargement à certains endroits
+- NOUVEAU : Ajout de l'ingamemap dynamique au menu gc
+- NOUVEAU : Usine : Ajout de la sortie animal
+- NOUVEAU : Usine : Ajout du support Seasons
+- NOUVEAU : Ajouter des langues : pt, it, pl
+- NOUVEAU : Menu GC : Vue d'ensemble pour DynamicStorage
+- NOUVEAU : Menu GC : Une meilleure vue d'ensemble pour Factorys
+- NOUVEAU : Menu GC : Les AddOns peuvent maintenant créer des onglets
+- NOUVEAU : Usine : ajout de 'refPoint' - Attribut
+- NOUVEAU : Ajouter de nouveaux Gui-éléments
+
+- Et beaucoup d'autres
 
 Changelog 1.1.0.0.0 :
 - NOUVEAU : ajout des langues française et russe
@@ -98,7 +190,7 @@ Changelog 1.1.0.0.0 :
             <binding device="KB_MOUSE_DEFAULT" input="MOUSE_BUTTON_RIGHT" axisComponent="+" neutralInput="0" index="3"/>
         </actionBinding>
 		<actionBinding action="GC_DYNSTORAGE_VEHICLEINTERACTION">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_t" axisComponent="+" neutralInput="0" index="1"/>
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_t" axisComponent="+" neutralInput="0" index="1"/>
         </actionBinding>	
     </inputBinding>
 </modDesc>

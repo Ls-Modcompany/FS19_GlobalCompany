@@ -126,6 +126,7 @@ function GC_PlaceableDigitalDisplayPlaceable:finalizePlacement()
 	GC_PlaceableDigitalDisplayPlaceable:superClass().finalizePlacement(self)
 
 	for _, object in ipairs(self.list) do
+		object:finalizePlacement();
 		object:register(true)
 	end
 end
@@ -220,26 +221,9 @@ function GC_PlaceableDigitalDisplayPlaceable:setOwnerFarmId(ownerFarmId, noEvent
 end
 
 function GC_PlaceableDigitalDisplayPlaceable:canBeSold()
-	self.totalSellPrice = 0
-
-	for _, object in ipairs(self.list) do
-		self.totalSellPrice = self.totalSellPrice + object:doBulkProductSell(true)
-	end
-
-	if self.totalSellPrice > 0 then
-		local text = g_company.languageManager:getText("GC_Factory_Sell_Warning", nil, "Bulk Product Sale Price:  %s")
-		local warning = string.format(text, g_i18n:formatMoney(self.totalSellPrice, 0, true, true))
-		return true, warning
-	end
-
-	return true, nil
+	return true
 end
 
 function GC_PlaceableDigitalDisplayPlaceable:onSell()
-	if self.isServer and self.totalSellPrice > 0 then
-		g_currentMission:addMoney(self.totalSellPrice, self:getOwnerFarmId(), MoneyType.OTHER, true, true)
-		self.totalSellPrice = 0
-	end
-
 	GC_PlaceableDigitalDisplayPlaceable:superClass().onSell(self)
 end

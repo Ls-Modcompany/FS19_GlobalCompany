@@ -3,12 +3,20 @@
 --
 -- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
--- @Date: 23.12.2019
--- @Version: 1.1.4.1
+-- @Date: 02.01.2020
+-- @Version: 1.1.5.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+--
+-- 	v1.1.5.0 (02.01.2020):
+--		- DynamicStorage: Fix effects on dediserver
+--		- DynamicStorage: Add unloadtriggers at places
+--		- Ingamemap: Add support for 4x maps
+--
+-- 	v1.1.4.2 (24.12.2019):
+--		- DynamicStorage: Change key t to lctrl+t
 --
 -- 	v1.1.4.1 (23.12.2019):
 --		- Factory: Add animaloutput
@@ -17,7 +25,7 @@
 --		- Factory: Add Seasons support
 --		- GC-Menu: Improve dynamic ingamemap
 --		- Add languanges: pt, it, pl
--- 		- Update for green week berling 2020
+-- 		- Update for green week berlin 2020
 -- 		- Further improvements
 --
 -- 	v1.1.3.0 (03.11.2019):
@@ -68,9 +76,9 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.1.4.1";
-GlobalCompany.versionDate = "23.12.2019";
-GlobalCompany.currentVersionId = 1141; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.version = "1.1.5.0";
+GlobalCompany.versionDate = "02.01.2020";
+GlobalCompany.currentVersionId = 1150; -- Mod Manager ID. (Version number without periods.)
 GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
 GlobalCompany.isGreenWeekVersion = false;
 

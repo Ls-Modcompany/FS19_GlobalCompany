@@ -55,6 +55,7 @@ function GC_PlaceableDigitalDisplay:load(nodeId, xmlFile, xmlKey, indexName, isP
 	end
 
 	self.lines = {}
+	self.lenghts = {}
 	self.lineNums = 0
 	while true do
 		local lineKey = string.format("%s.lines.line(%d)", xmlKey, self.lineNums)
@@ -64,9 +65,11 @@ function GC_PlaceableDigitalDisplay:load(nodeId, xmlFile, xmlKey, indexName, isP
 		self.lineNums = self.lineNums + 1
 
 		local nodeStr = getXMLString(xmlFile, lineKey .. "#node")
+		local lenght = getXMLFloat(xmlFile, lineKey .. "#lenght")
 		if nodeStr ~= nil and nodeStr ~= "" then
 			local node = I3DUtil.indexToObject(self.rootNode, nodeStr, self.i3dMappings)
 			self.lines[self.lineNums] = node
+			self.lenghts[self.lineNums] = lenght
 		end
 	end	
 	
@@ -74,13 +77,16 @@ function GC_PlaceableDigitalDisplay:load(nodeId, xmlFile, xmlKey, indexName, isP
 			
 	self.screenTexts = {}
 
-	self.eventId_setSceenText = g_company.eventManager:registerEvent(self, self.setScreenTextEvent);
 
 	g_company.addRaisedUpdateable(self)
 
 	self.productionFactoryDirtyFlag = self:getNextDirtyFlag()
 
 	return true
+end
+
+function GC_PlaceableDigitalDisplay:finalizePlacement()
+	self.eventId_setSceenText = g_company.eventManager:registerEvent(self, self.setScreenTextEvent);
 end
 
 function GC_PlaceableDigitalDisplay:delete()
@@ -169,7 +175,14 @@ function GC_PlaceableDigitalDisplay:update(dt)
 			local rx, ry, rz = getWorldRotation(node)
 			setTextAlignment(RenderText.ALIGN_LEFT)
 			setTextColor(0, 1, 0, 1)
-			renderText3D(x,y,z, rx,ry,rz, 0.2, self.screenTexts[i])
+
+			local text = self.screenTexts[i]
+			if self.lenghts[i] ~= nil then
+				text = Utils.limitTextToWidth(text, 0.2, self.lenghts[i], false, "")
+			end
+			--print(getTextLength(0.2, text, 1))
+			renderText3D(x,y,z, rx,ry,rz, 0.2, text)
+			
 			self:raiseUpdate()
 		end
 	end
@@ -198,10 +211,14 @@ function GC_PlaceableDigitalDisplay:setScreenTexts(texts, onlyChanges)
 end
 
 function GC_PlaceableDigitalDisplay:setScreenTextEvent(data, noEventSend)
+	print(string.format("setScreenTextEvent %s", noEventSend))
 	g_company.eventManager:createEvent(self.eventId_setSceenText, data, true, noEventSend);
 	
 	for i, text in pairs(data) do
 		self.screenTexts[i] = text
 	end	
-	self:raiseUpdate()
+	if self.isClient then
+		self:raiseUpdate()
+		print("raiseUpdate")
+	end
 end
