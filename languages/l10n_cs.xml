@@ -65,7 +65,8 @@
 		<e k="GC_Open_Product_Menu" v="打开产品菜单"/>
 		<e k="GC_Open_Overview_Menu" v="打开概览菜单"/>
 		
-		<e k="GC_Factory_Animal_Dialogue" v="选择要卸载到工厂的动物数量."/>
+		<e k="GC_Factory_Animal_Dialogue1" v="选择要卸载到工厂的动物数量."/>
+		<e k="GC_Factory_Animal_Dialogue2" v="选择要卸载到车辆中的动物数量."/>
 
 		<e k="GC_gui_disabled" v="禁用"/>
 		<e k="GC_gui_add" v="添加"/>

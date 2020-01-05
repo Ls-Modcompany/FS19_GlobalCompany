@@ -285,14 +285,21 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 								if inputProduct.animalTypeToLitres == nil then
 									inputProduct.animalTypeToLitres = {}
 								end
-
 								for id, subType in pairs (animalType.subTypes) do
-									if subType.fillTypeDesc.name == allowSubType:upper() then
+									if allowSubType ~= nil then
+										if subType.fillTypeDesc.name == allowSubType:upper() then
+											usedFillTypeNames[subType.fillTypeDesc.name] = inputProductName
+											inputProduct.animalFillTypeIndexs[subType.fillType] = true
+											fillType = subType.fillTypeDesc
+											inputProduct.subFillType = subType
+											break
+										end
+									else
 										usedFillTypeNames[subType.fillTypeDesc.name] = inputProductName
 										inputProduct.animalFillTypeIndexs[subType.fillType] = true
-										fillType = subType.fillTypeDesc
-										inputProduct.subFillType = subType
-										break
+										if id == 1 then
+											fillType = subType.fillTypeDesc
+										end
 									end
 								end
 
@@ -461,7 +468,9 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 							local trigger = self.triggerManager:addTrigger(GC_AnimalLoadingTrigger, self.rootNode, self, xmlFile, livestockTriggerKey, inputProduct.animalTypeToLitres)
 							if trigger ~= nil then
 								trigger:setTitleName(factoryTitle)
-								trigger:setSubFillType(inputProduct.subFillType)
+								if inputProduct.subFillType ~= nil then
+									trigger:setSubFillType(inputProduct.subFillType)
+								end
 
 								local triggerId = trigger.managerId
 								trigger.extraParamater = triggerId

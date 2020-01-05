@@ -3,12 +3,16 @@
 --
 -- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
--- @Date: 02.01.2020
--- @Version: 1.1.5.0
+-- @Date: 05.01.2020
+-- @Version: 1.1.5.1
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+--
+-- 	v1.1.5.1 (05.01.2020):
+--		- Update cs language
+--		- Factory: Add old animalinput
 --
 -- 	v1.1.5.0 (02.01.2020):
 --		- DynamicStorage: Fix effects on dediserver
@@ -76,9 +80,9 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.1.5.0";
-GlobalCompany.versionDate = "02.01.2020";
-GlobalCompany.currentVersionId = 1150; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.version = "1.1.5.1";
+GlobalCompany.versionDate = "05.01.2020";
+GlobalCompany.currentVersionId = 1151; -- Mod Manager ID. (Version number without periods.)
 GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
 GlobalCompany.isGreenWeekVersion = false;
 

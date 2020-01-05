@@ -196,7 +196,7 @@ function GC_BaleAddon:cutBaleEvent(data, foundObject, noEventSend)
         object = NetworkUtil.getObject(data[1]);
     end;
 
-    if (object~= nil) then
+    if object~= nil and type(object) == "table" then
         if object:isa(Bale) then
             if (object.fillLevel ~= nil) and (object.fillType ~= nil) then
                 local sx,sy,sz = getWorldTranslation(object.nodeId);

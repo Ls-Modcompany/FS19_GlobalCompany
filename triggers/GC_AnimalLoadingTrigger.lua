@@ -248,7 +248,11 @@ function GC_AnimalLoadingTrigger:onActivateObject()
     
 	self.isActivatableAdded = false
     self.objectActivated = true
-    self.activatedTarget = self.loadingVehicle
+	self.activatedTarget = self.loadingVehicle
+	
+	if self.subFillType == nil then
+		self.subFillType = self.activatedTarget:getAnimals()[1]:getSubType()
+	end
 	
 	if (self.isInput and self:getAnimalTypeAccepted(self.subFillType.type)) or not self.isInput then
 		local animals, freeCapacity = self:getAnimalsNumAndFreeCapacity(self.subFillType.type)
