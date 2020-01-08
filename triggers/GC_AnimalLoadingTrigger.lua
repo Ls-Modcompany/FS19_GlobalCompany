@@ -297,6 +297,10 @@ function GC_AnimalLoadingTrigger:deliverAnimals(animalTrailer, numberToDeliver)
 
 	local animals = animalTrailer:getAnimals()
 	local numAnimal = #animals
+
+	if self.subFillType == nil then
+		self.subFillType = animals[1]:getSubType()
+	end
 	
 	if self.isInput then
 		if numAnimal > 0 then
