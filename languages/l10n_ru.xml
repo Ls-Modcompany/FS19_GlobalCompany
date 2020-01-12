@@ -71,7 +71,8 @@
 		<e k="GC_Open_Product_Menu" v="Открыть меню производства"/>
 		<e k="GC_Open_Overview_Menu" v="Открыть обзорное меню"/>
 		
-		<e k="GC_Factory_Animal_Dialogue" v="Выберите количество животных для выгрузки на завод."/>
+		<e k="GC_Factory_Animal_Dialogue1" v="Выберите количество животных для выгрузки на завод."/>
+		<e k="GC_Factory_Animal_Dialogue2" v="Select the number of animals to unload to vehicle."/>
 		
 		<e k="GC_gui_disabled" v="Остановлено"/>
 		<e k="GC_gui_add" v="Добавить"/>
@@ -80,6 +81,7 @@
 		<e k="GC_gui_percent" v="Процент"/>
 		<e k="GC_gui_lifeTimeIncome" v="Доход"/>
 		<e k="GC_gui_changeFactoryTitle" v="Введите новое имя фабрики ниже."/>
+		<e k="GC_gui_freeSlots" v="Free Slots:"/>
 		
 		<e k="GC_gui_placeableObject" v="Размещаемый объект"/>
 		<e k="GC_gui_farmlandObject" v="Farmland объект"/>
@@ -136,6 +138,12 @@
 		<e k="GC_dynamicStorage_gui_empty" v="пустой"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Подтвердите позицию разгрузки"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Подтвердите зарядку коробки"/>
+
+		<!-- PlaceableDigitalDisplay -->
+		<e k="GC_placeableDigDisplay_openGui" v="Adjust digital display"/>
+		<e k="GC_placeableDigDisplay_header" v="Digitales display"/>
+		<e k="GC_placeableDigDisplay_headerInfo" v="Here you can specify any text you want to appear on the display."/>
+		<e k="GC_placeableDigDisplay_btnSave" v="Save"/>
 
 	</elements>
 </l10n>

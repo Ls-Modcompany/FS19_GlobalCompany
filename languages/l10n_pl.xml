@@ -32,7 +32,6 @@
 		<e k="GC_settings3_title" v="Stajenny ($300 / konia / dzień)"/>
 		<e k="GC_settings4_title" v="Aktywuj więcej drzew"/>
 		<e k="GC_settings5_title" v="Aktywuj rozcinanie bel"/>
-		<e k="GC_settings6_title" v="VehicleControl: Pomoc w interakcjach sklepowych"/>
 		
 		<!-- Factory -->
 		<e k="GC_gui_overview" v="Podgląd"/>
@@ -65,7 +64,8 @@
 		<e k="GC_Open_Product_Menu" v="Otwórz menu obiektu"/>
 		<e k="GC_Open_Overview_Menu" v="Otwórz menu podglądu"/>
 		
-		<e k="GC_Factory_Animal_Dialogue" v="Wybierz liczbę zwierząt przekazanych do obiektu."/>
+		<e k="GC_Factory_Animal_Dialogue1" v="Wybierz liczbę zwierząt przekazanych do obiektu."/>
+		<e k="GC_Factory_Animal_Dialogue2" v="Select the number of animals to unload to vehicle."/>
 
 		<e k="GC_gui_disabled" v="Wyłączone"/>
 		<e k="GC_gui_add" v="Dodaj"/>

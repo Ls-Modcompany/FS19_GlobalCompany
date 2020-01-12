@@ -31,7 +31,6 @@
 		<e k="GC_settings3_title" v="Horse Helper ($300 / Horse / Day)"/>
 		<e k="GC_settings4_title" v="Activate More Trees"/>
 		<e k="GC_settings5_title" v="Activate Cut Bales"/>
-		<e k="GC_settings6_title" v="VehicleControl: Shop Interaktionshelp"/>
 		
 		<!-- Factory -->
 		<e k="GC_gui_buttons_back" v="Back"/>
@@ -138,14 +137,5 @@
 		<e k="GC_placeableDigDisplay_header" v="Digitales display"/>
 		<e k="GC_placeableDigDisplay_headerInfo" v="Here you can specify any text you want to appear on the display."/>
 		<e k="GC_placeableDigDisplay_btnSave" v="Save"/>
-		
-				<!-- Market -->
-		<!--e k="GC_market_showDetails" v="Details"/>
-		<e k="GC_market_date" v="Date"/>
-		<e k="GC_market_name" v="Name"/>
-		<e k="GC_market_type" v="Art"/>
-		<e k="GC_market_liter" v="Litres"/>
-		<e k="GC_market_money" v="Price"/>
-		<e k="GC_market_designation" v="Market name"/-->
 	</elements>
 </l10n>

@@ -32,7 +32,6 @@
 		<e k="GC_settings3_title" v="Koňský pomocník ($300 / Koně / Den)"/>
 		<e k="GC_settings4_title" v="Aktivujte více stromů"/>
 		<e k="GC_settings5_title" v="Aktivujte řezané balíky"/>
-		<e k="GC_settings6_title" v="VehicleControl: Pomoc v obchodě"/>
 		
 		<!-- Factory -->
 		<e k="GC_gui_overview" v="Přehled"/>
@@ -65,7 +64,8 @@
 		<e k="GC_Open_Product_Menu" v="Otevřete nabídku produktu"/>
 		<e k="GC_Open_Overview_Menu" v="Otevřít menu"/>
 		
-		<e k="GC_Factory_Animal_Dialogue" v="Vyberte počet zvířat, která mají být vyložena do továrny."/>
+		<e k="GC_Factory_Animal_Dialogue1" v="Vyberte počet zvířat, která mají být vyložena do továrny."/>
+		<e k="GC_Factory_Animal_Dialogue2" v="Select the number of animals to unload to vehicle."/>
 
 		<e k="GC_gui_disabled" v="Zakázán"/>
 		<e k="GC_gui_add" v="Přidat"/>

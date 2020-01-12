@@ -32,7 +32,6 @@
 		<e k="GC_settings3_title" v="Engager un employé pour les chevaux (300 € / cheval / jour)"/>
 		<e k="GC_settings4_title" v="Activer le dépassement de la quantité limite d'arbres"/>
 		<e k="GC_settings5_title" v="Activer le découpage des balles"/>
-		<e k="GC_settings6_title" v="Mod VehicleControl: Afficher l'aide à l'interaction"/>
 		
 		<!-- Factory -->
 		<e k="GC_gui_overview" v="Aperçu"/>
@@ -65,7 +64,8 @@
 		<e k="GC_Open_Product_Menu" v="Menu des produits"/>
 		<e k="GC_Open_Overview_Menu" v="Aperçu"/>
 		
-		<e k="GC_Factory_Animal_Dialogue" v="Sélectionnez le nombre d'animaux à décharger."/>
+		<e k="GC_Factory_Animal_Dialogue1" v="Sélectionnez le nombre d'animaux à décharger."/>
+		<e k="GC_Factory_Animal_Dialogue2" v="Select the number of animals to unload to vehicle."/>
 
 		<e k="GC_gui_disabled" v="Désactivé"/>
 		<e k="GC_gui_add" v="Ajouter"/>

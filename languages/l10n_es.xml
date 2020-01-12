@@ -32,7 +32,6 @@
 		<e k="GC_settings3_title" v="Ayudante para caballos ($300 / Caballo / Día)"/>
 		<e k="GC_settings4_title" v="Activar Más árboles"/>
 		<e k="GC_settings5_title" v="Activar deshacer pacas"/>
-		<e k="GC_settings6_title" v="Control Vehículo: Ayuda Interactiva tienda"/>
 		
 		<!-- Factory -->
 		<e k="GC_gui_overview" v="Visión general"/>
@@ -62,7 +61,8 @@
 		<e k="GC_Output_Header_Backup" v="Salidas"/>
 		<e k="GC_Open_Product_Menu" v="Abrir menú de productos"/>
 		<e k="GC_Open_Overview_Menu" v="Abrir menú de visión general"/>
-		<e k="GC_Factory_Animal_Dialogue" v="Seleccioneel número de animales que se descargará en la fábrica."/>
+		<e k="GC_Factory_Animal_Dialogue1" v="Seleccioneel número de animales que se descargará en la fábrica."/>
+		<e k="GC_Factory_Animal_Dialogue2" v="Select the number of animals to unload to vehicle."/>
 		<e k="GC_gui_disabled" v="Deshabilitado"/>
 		<e k="GC_gui_add" v="Añadir"/>
 		<e k="GC_gui_remove" v="Eliminar"/>

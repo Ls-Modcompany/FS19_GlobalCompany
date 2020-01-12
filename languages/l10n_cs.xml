@@ -32,7 +32,6 @@
 		<e k="GC_settings3_title" v="骑马助手 ($300 / 马 / 天)"/>
 		<e k="GC_settings4_title" v="启用更多树"/>
 		<e k="GC_settings5_title" v="启用切割捆"/>
-		<e k="GC_settings6_title" v="车辆控制: 车间互动帮助"/>
 		
 		<!-- Factory -->
 		<e k="GC_gui_overview" v="概览"/>

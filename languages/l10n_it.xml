@@ -32,7 +32,6 @@
 		<e k="GC_settings3_title" v="Aiuto Cavalli ($300 / Cavallo / Giorno)"/>
 		<e k="GC_settings4_title" v="Attiva più alberi"/>
 		<e k="GC_settings5_title" v="Attiva taglio Balle"/>
-		<e k="GC_settings6_title" v="Controllo Veicolo: Visualizza aiuto integrazione"/>
 		
 		<!-- Factory -->
 		<e k="GC_gui_overview" v="Generale"/>
@@ -65,7 +64,8 @@
 		<e k="GC_Open_Product_Menu" v="Apri Menu Prodotti"/>
 		<e k="GC_Open_Overview_Menu" v="Apri Menu Generale"/>
 		
-		<e k="GC_Factory_Animal_Dialogue" v="Seleziona il numero di animali da scaricare in Fattoria."/>
+		<e k="GC_Factory_Animal_Dialogue1" v="Seleziona il numero di animali da scaricare in Fattoria."/>
+		<e k="GC_Factory_Animal_Dialogue2" v="Select the number of animals to unload to vehicle."/>
 
 		<e k="GC_gui_disabled" v="Disabilita"/>
 		<e k="GC_gui_add" v="Aggiungi"/>
