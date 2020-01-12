@@ -85,6 +85,8 @@
 		
 		<e k="GC_gui_placeableObject" v="Размещаемый объект"/>
 		<e k="GC_gui_farmlandObject" v="Farmland объект"/>
+		<e k="GC_gui_changeDynamicStorageTitle" v="Define a name for the Storage"/>
+		<e k="GC_gui_dynamicStorage_titleBackup" v="Dynamic Storage"/>
 		
 		<!-- Formatting required -->
 		<e k="GC_Factory_Sell_Warning" v="Эта фабрика до сих пор содержит продукты. Это будет продано оптом на следующую сумму:
