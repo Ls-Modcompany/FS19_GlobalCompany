@@ -120,9 +120,16 @@ end
 function GC_BitmapManager:saveBitmaps()
     for _,bitmap in pairs(self.bitmaps) do
         if bitmap.autosave and bitmap.map ~= 0 then
-            saveBitVectorMapToFile(bitmap.map, bitmap.fullPath)
-            --print(bitmap.fullPath)
-            if bitmap.deletePng ~= "" then
+            if g_company.isGreenWeekVersion then
+                if bitmap.name ~= "NDVI" and bitmap.name ~= "Fertilizer" then
+                    saveBitVectorMapToFile(bitmap.map, bitmap.fullPath)
+                    if fileExists(bitmap.deletePng) then
+                        deleteFile(bitmap.deletePng)
+                    end
+                    bitmap.deletePng = false
+                end
+            elseif bitmap.deletePng ~= "" then
+                saveBitVectorMapToFile(bitmap.map, bitmap.fullPath)
                 if fileExists(bitmap.deletePng) then
                     deleteFile(bitmap.deletePng)
                 end

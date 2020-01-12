@@ -417,7 +417,6 @@ function GlobalCompanyUtils.deleteFileIfExists(path)
 end
 
 function GlobalCompanyUtils.teleportVehicleWithRotation(posX, posZ, rotY)
-	local targetX, targetY, targetZ = 53,0,280;
 	local vehicleCombos = {}
 	local vehicles = {}
 	local function addVehiclePositions(vehicle)

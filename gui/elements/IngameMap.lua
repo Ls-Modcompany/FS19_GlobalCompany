@@ -201,7 +201,7 @@ function GC_Gui_ingameMap:registerBitmap(name, bitmapId, state)
 	self.bitmaps[bitmapId] = {name=name, overlay=nil, active=state or false}
 end
 
-function GC_Gui_ingameMap:unregisterBitmap()
+function GC_Gui_ingameMap:unregisterBitmap(bitmapId)
 	self.bitmaps[bitmapId] = nil
 end
 
