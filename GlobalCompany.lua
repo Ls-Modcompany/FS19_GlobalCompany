@@ -161,7 +161,11 @@ function GlobalCompany.initialLoad()
 		g_company.jobManager = GC_JobManager:new();
 
 		GlobalCompany.loadEnviroment(modNameCurrent, GlobalCompany.dir .. "xml/globalCompany.xml", false);
-		g_company.modManager:initSelectedMods();
+		if not g_company.modManager:initSelectedMods()  then	
+			g_gui:showYesNoDialog({text = "This map is not supported by the GC. Please use an other map.", callback = GlobalCompany.leaveToMenuCallback, target = self});
+			g_company == nil
+		end
+
 		g_company.languageManager:loadModLanguageFiles(GlobalCompany.modLanguageFiles);
 
 		local xmlFileCurrentMod = nil;
@@ -184,6 +188,11 @@ function GlobalCompany.initialLoad()
 	end;
 
 	GlobalCompany.initialLoadComplete = true;
+end;
+
+function GlobalCompany:leaveToMenuCallback()
+	local inGameMenuTarget = g_gui.guis["InGameMenu"].target;
+	InGameMenu.onYesNoEnd(inGameMenuTarget, true);
 end;
 
 function GlobalCompany.loadEnviroment(modName, path, isMod)

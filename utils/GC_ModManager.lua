@@ -91,6 +91,10 @@ function GC_ModManager:initSelectedMods()
 		local modName = mod.modName;
 		local modDir = mod.modDir;
 
+		if string.find(modName, "Hof") and string.find(modName, "Bergmann") then 
+			return false
+		end
+
 		if self.ignoreFiles[modName] == nil then
 			if mod.modFile ~= nil and modDir ~= nil then
 				local xmlFile = loadXMLFile("TempModDesc", mod.modFile);
@@ -176,6 +180,7 @@ function GC_ModManager:initSelectedMods()
 			end;
 		end;
 	end;
+	return true
 end;
 
 function GC_ModManager:delete()
