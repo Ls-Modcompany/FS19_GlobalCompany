@@ -101,9 +101,13 @@ function GlobalCompany.initialLoad()
 		getfenv(0)["g_company"] = GlobalCompany;
 
 		source(GlobalCompany.dir .. "utils/GC_utils.lua");
+		source(GlobalCompany.dir .. "class/GC_Class.lua");
+		source(GlobalCompany.dir .. "class/GC_StaticClass.lua");
 
 		source(GlobalCompany.dir .. "utils/GC_DebugUtils.lua");
+		source(GlobalCompany.dir .. "utils/GC_DebugManager.lua");
 		g_company.debug = GC_DebugUtils:new();
+		g_company.debugManager = GC_DebugManager:new();
 		GlobalCompany.debugIndex = g_company.debug:registerScriptName("GlobalCompany");
 
 		source(GlobalCompany.dir .. "utils/GC_languageManager.lua");
@@ -144,6 +148,10 @@ function GlobalCompany.initialLoad()
 		GlobalCompany.modClassNames = {};
 		GlobalCompany.modLanguageFiles = {};
 		GlobalCompany.saveables = {};
+
+		GlobalCompany.objects = {}
+		GlobalCompany.objectId = 1
+		GlobalCompany.staticObjects = {}
 
 		g_company.modManager:initDevelopmentWarning(GlobalCompany.isDevelopmentVersion);
 
@@ -409,6 +417,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "additionals/GC_ExtendedPlaceable.lua");
 
 	--|| Events ||--
+	source(GlobalCompany.dir .. "events/GC_SynchEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_PalletCreatorWarningEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_AnimationManagerStopEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_AnimalLoadingTriggerEvent.lua");
@@ -438,6 +447,53 @@ function GlobalCompany.loadPlaceables()
 	GlobalCompany:addPlaceableType("GC_ProductionFactoryPlaceable", "GC_ProductionFactoryPlaceable", placeablesDir .. "GC_ProductionFactoryPlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_PlaceableDigitalDisplayPlaceable", "GC_PlaceableDigitalDisplayPlaceable", placeablesDir .. "GC_PlaceableDigitalDisplayPlaceable.lua");
 end;
+
+function GlobalCompany:registerObject(object)
+	--if GlobalCompany:getIsServer() then		
+		object.gcId = GlobalCompany.objectId
+		table.insert(GlobalCompany.objects, object)
+		GlobalCompany.objectId = GlobalCompany.objectId + 1
+	--end
+end
+
+function GlobalCompany:unregisterObject(objectToDelete)
+	for id,object in pairs(GlobalCompany.objects) do
+		if object == objectToDelete then
+			table.remove(GlobalCompany.objects, id)
+			break
+		end
+	end
+end
+
+function GlobalCompany:getObject(id)
+	for _,object in pairs(GlobalCompany.objects) do
+		if object.gcId == id then
+			return object
+		end
+	end
+end
+
+function GlobalCompany:registerStaticObject(object, staticId)
+	object.gcId = staticId
+	table.insert(GlobalCompany.staticObjects, object)
+end
+
+function GlobalCompany:unregisterStaticObject(objectToDelete)
+	for id,object in pairs(GlobalCompany.staticObjects) do
+		if object == objectToDelete then
+			table.remove(GlobalCompany.staticObjects, id)
+			break
+		end
+	end
+end
+
+function GlobalCompany:getStaticObject(id)
+	for _,object in pairs(GlobalCompany.staticObjects) do
+		if object.gcId == id then
+			return object
+		end
+	end
+end
 
 --| Main |--
 function GlobalCompany:init()
