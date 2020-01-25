@@ -20,28 +20,21 @@
 --
 --
 
-GC_PlaceableDigitalDisplay = {}
-local GC_PlaceableDigitalDisplay_mt = Class(GC_PlaceableDigitalDisplay, Object)
-InitObjectClass(GC_PlaceableDigitalDisplay, "GC_PlaceableDigitalDisplay")
+local scriptDebugInfo = g_company.debugManager:registerClass("GC_PlaceableDigitalDisplay")
 
-GC_PlaceableDigitalDisplay.debugIndex = g_company.debug:registerScriptName("GC_PlaceableDigitalDisplay")
+GC_PlaceableDigitalDisplay = {}
+GC_PlaceableDigitalDisplay._mt = Class(GC_PlaceableDigitalDisplay, g_company.gc_class)
+InitObjectClass(GC_PlaceableDigitalDisplay, "GC_PlaceableDigitalDisplay")
 
 getfenv(0)["GC_PlaceableDigitalDisplay"] = GC_PlaceableDigitalDisplay
 
 function GC_PlaceableDigitalDisplay:new(isServer, isClient, customMt, xmlFilename, baseDirectory, customEnvironment)
-	local self = Object:new(isServer, isClient, customMt or GC_PlaceableDigitalDisplay_mt)
-
-	self.xmlFilename = xmlFilename
-	self.baseDirectory = baseDirectory
-	self.customEnvironment = customEnvironment
-
-	self.debugData = g_company.debug:getDebugData(GC_PlaceableDigitalDisplay.debugIndex, nil, customEnvironment)
-
-	return self
+	return GC_PlaceableDigitalDisplay:superClass():new(GC_PlaceableDigitalDisplay._mt, isServer, isClient, scriptDebugInfo, xmlFilename, baseDirectory, customEnvironment, "GC_PlaceableDigitalDisplay");
 end
 
 function GC_PlaceableDigitalDisplay:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
-	
+	GC_PlaceableDigitalDisplay:superClass().load(self)
+
 	self.rootNode = nodeId
 	self.indexName = indexName
 	self.isPlaceable = isPlaceable
@@ -77,16 +70,14 @@ function GC_PlaceableDigitalDisplay:load(nodeId, xmlFile, xmlKey, indexName, isP
 			
 	self.screenTexts = {}
 
-
 	g_company.addRaisedUpdateable(self)
-
-	self.productionFactoryDirtyFlag = self:getNextDirtyFlag()
 
 	return true
 end
 
 function GC_PlaceableDigitalDisplay:finalizePlacement()
-	self.eventId_setSceenText = g_company.eventManager:registerEvent(self, self.setScreenTextEvent);
+	GC_PlaceableDigitalDisplay:superClass().finalizePlacement(self)	
+	self.eventId_setSceenText = self:registerEvent(self, self.setScreenTextEvent, true, false);
 end
 
 function GC_PlaceableDigitalDisplay:delete()
@@ -140,6 +131,7 @@ function GC_PlaceableDigitalDisplay:writeUpdateStream(streamId, connection, dirt
 end
 
 function GC_PlaceableDigitalDisplay:loadFromXMLFile(xmlFile, key)
+	GC_PlaceableDigitalDisplay:superClass().loadFromXMLFile(self, xmlFile, key)
 	local j = 0
 	while true do 
 		local lineKey = string.format("%s.lines.line(%d)", key, j)
@@ -158,6 +150,7 @@ function GC_PlaceableDigitalDisplay:loadFromXMLFile(xmlFile, key)
 end
 
 function GC_PlaceableDigitalDisplay:saveToXMLFile(xmlFile, key, usedModNames)	
+	GC_PlaceableDigitalDisplay:superClass().saveToXMLFile(self, xmlFile, key, usedModNames)
 	local j = 0
 	for i, text in pairs(self.screenTexts) do
 		if text ~= nil and text ~= "" then
@@ -169,6 +162,7 @@ function GC_PlaceableDigitalDisplay:saveToXMLFile(xmlFile, key, usedModNames)
 end
 
 function GC_PlaceableDigitalDisplay:update(dt)
+	GC_PlaceableDigitalDisplay:superClass().update(self, dt)
 	for i, node in pairs(self.lines) do
 		if self.screenTexts[i] ~= nil and self.screenTexts[i] ~= "" then
 			local x, y, z = getWorldTranslation(node)
@@ -178,9 +172,9 @@ function GC_PlaceableDigitalDisplay:update(dt)
 
 			local text = self.screenTexts[i]
 			if self.lenghts[i] ~= nil then
-				text = Utils.limitTextToWidth(text, 0.2, self.lenghts[i], false, "")
+				text = g_company.utils.limitTextToWidth(text, 0.2, self.lenghts[i], false, "..")
 			end
-			--print(getTextLength(0.2, text, 1))
+			
 			renderText3D(x,y,z, rx,ry,rz, 0.2, text)
 			
 			self:raiseUpdate()
@@ -211,14 +205,12 @@ function GC_PlaceableDigitalDisplay:setScreenTexts(texts, onlyChanges)
 end
 
 function GC_PlaceableDigitalDisplay:setScreenTextEvent(data, noEventSend)
-	print(string.format("setScreenTextEvent %s", noEventSend))
-	g_company.eventManager:createEvent(self.eventId_setSceenText, data, true, noEventSend);
-	
+	self:raiseEvent(self.eventId_setSceenText, data, noEventSend)
+
 	for i, text in pairs(data) do
 		self.screenTexts[i] = text
 	end	
 	if self.isClient then
 		self:raiseUpdate()
-		print("raiseUpdate")
 	end
 end

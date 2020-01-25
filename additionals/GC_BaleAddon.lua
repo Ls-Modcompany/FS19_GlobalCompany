@@ -33,13 +33,12 @@
 --
 
 GC_BaleAddon = {};
-local GC_BaleAddon_mt = Class(GC_BaleAddon);
+GC_BaleAddon._mt = Class(GC_BaleAddon, g_company.gc_staticClass);
 InitObjectClass(GC_BaleAddon, "GC_BaleAddon");
 
 GC_BaleAddon.debugIndex = g_company.debug:registerScriptName("GC_BaleAddon");
 GC_BaleAddon.enableCutBale = false;
 GC_BaleAddon.object = nil;
-GC_BaleAddon.eventId = nil;
 GC_BaleAddon.lastFoundBaleNetworkId = nil;
 
 function GC_BaleAddon:load()
@@ -50,17 +49,15 @@ function GC_BaleAddon:load()
 end;
 
 function GC_BaleAddon:init()
-    local self = setmetatable({}, GC_BaleAddon_mt);
-
-    self.isServer = g_server ~= nil;
-    self.isClient = g_dedicatedServerInfo == nil;
+    local self =  GC_BaleAddon:superClass():new(GC_BaleAddon._mt, g_server ~= nil, g_dedicatedServerInfo == nil);
+    
     self.isMultiplayer = g_currentMission.missionDynamicInfo.isMultiplayer;
     
     self.debugData = g_company.debug:getDebugData(GC_BaleAddon.debugIndex, g_company);
 
-    self.eventId_CutBale = g_company.eventManager:registerEvent(self, self.cutBaleEvent);
-    self.eventId_getCanCutBale = g_company.eventManager:registerEvent(self, self.getCanCutBaleEvent);
-    self.eventId_sendCanCutBale = g_company.eventManager:registerEvent(self, self.sendCanCutBaleEvent, true);
+    self.eventId_CutBale = self:registerEvent(self, self.cutBaleEvent, false, false)
+    self.eventId_getCanCutBale = self:registerEvent(self, self.getCanCutBaleEvent, false, false)
+    self.eventId_sendCanCutBale = self:registerEvent(self, self.sendCanCutBaleEvent, false, true)
 
     if self.isClient then
         g_company.addUpdateable(self, self.update);			
@@ -86,7 +83,6 @@ end;
 function GC_BaleAddon:update(dt)
     if self.isClient then
         GC_BaleAddon.enableCutBale = false;
-        GC_BaleAddon.eventId = self.eventId_CutBale;
         if g_company.settings:getSetting("cutBales", true) and g_currentMission.player.isControlled and not g_currentMission.player.isCarryingObject and not g_currentMission.player.superStrengthEnabled then
             if not self.isMultiplayer and g_currentMission.player.isObjectInRange then
                 local foundObjectId = g_currentMission.player.lastFoundObject;
@@ -154,21 +150,21 @@ end;
 
 function GC_BaleAddon:actionCut(actionName, keyStatus, arg3, arg4, arg5)
     if GC_BaleAddon.enableCutBale and (GC_BaleAddon.object ~= nil) then
-        GC_BaleAddon:cutBale(GC_BaleAddon.object, self.isServer, self.isClient, GC_BaleAddon.eventId, false);
+        GC_BaleAddon:cutBale(GC_BaleAddon.object, self.isServer, self.isClient, false);
     end;
 end;
 
-function GC_BaleAddon:cutBale(foundObject, isServer, isClient, eventId, noEventSend)   
+function GC_BaleAddon:cutBale(foundObject, isServer, isClient, noEventSend)   
     self.isServer = isServer;
     self.isClient = isClient;
-    self.eventId = eventId;
     self.foundObjectNetworkId = NetworkUtil.getObjectId(foundObject);
     
     self:cutBaleEvent({self.foundObjectNetworkId}, foundObject, noEventSend);
 end;
 
 function GC_BaleAddon:cutBaleEvent(data, foundObject, noEventSend)      
-    g_company.eventManager:createEvent(self.eventId, data, false, noEventSend);
+    self:raiseEvent(self.eventId_CutBale, data, noEventSend)
+
     -- Arguments
     -- table	vehicle	vehicle that is tipping
     -- float	delta	delta to tip
@@ -217,7 +213,7 @@ function GC_BaleAddon:cutBaleEvent(data, foundObject, noEventSend)
 end;
 
 function GC_BaleAddon:getCanCutBaleEvent(data, noEventSend)
-    g_company.eventManager:createEvent(self.eventId_getCanCutBale, data, false, noEventSend);
+    self:raiseEvent(self.eventId_getCanCutBale, data, noEventSend)
 
     local object = nil;
     if self.isServer then
@@ -235,7 +231,7 @@ end;
 
 function GC_BaleAddon:sendCanCutBaleEvent(data, noEventSend)   
 	if self.isServer then
-		g_company.eventManager:createEvent(self.eventId_sendCanCutBale, data, false, noEventSend);
+        self:raiseEvent(self.eventId_sendCanCutBale, data, noEventSend)
 	else
         self.canCut = data[1];
 	end;

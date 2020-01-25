@@ -23,7 +23,7 @@
 --
 
 GC_DynamicStorage = {};
-local GC_DynamicStorage_mt = Class(GC_DynamicStorage, Object);
+GC_DynamicStorage._mt = Class(GC_DynamicStorage, g_company.gc_class);
 InitObjectClass(GC_DynamicStorage, "GC_DynamicStorage");
 
 GC_DynamicStorage.BACKUP_TITLE = ""
@@ -80,19 +80,12 @@ function GC_DynamicStorage:onCreate(transformId)
 	end;
 end;
 
-function GC_DynamicStorage:new(isServer, isClient, customMt, xmlFilename, baseDirectory, customEnvironment)
-	local self = Object:new(isServer, isClient, customMt or GC_DynamicStorage_mt);
-
-	self.xmlFilename = xmlFilename;
-	self.baseDirectory = baseDirectory;
-	self.customEnvironment = customEnvironment;
-
-	self.debugData = g_company.debug:getDebugData(GC_DynamicStorage.debugIndex, nil, customEnvironment);
-
-	return self;
+function GC_DynamicStorage:new(isServer, isClient, customMt, xmlFilename, baseDirectory, customEnvironment)    
+    return GC_DynamicStorage:superClass():new(GC_DynamicStorage._mt, isServer, isClient, scriptDebugInfo, xmlFilename, baseDirectory, customEnvironment);
 end;
 
 function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
+	GC_PlaceableDigitalDisplay:superClass().load(self)
 	local canLoad, addMinuteChange, addHourChange = true, false, false;
 
 	self.rootNode = nodeId;
@@ -152,9 +145,9 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
                 self.fillTypes[fillType.index] = fillType.index;
             else
                 if fillType == nil then
-                    g_company.debug:writeModding(self.debugData, "[DYNAMICSTORAGE - %s] Unknown fillType ( %s ), ignoring!", fillTypeName);
+                    --g_company.debug:writeModding(self.debugData, "[DYNAMICSTORAGE - %s] Unknown fillType ( %s ), ignoring!", fillTypeName);
                 else
-                    g_company.debug:writeModding(self.debugData, "[DYNAMICSTORAGE - %s] Duplicate fillType ( %s )!", fillTypeName);
+                    --g_company.debug:writeModding(self.debugData, "[DYNAMICSTORAGE - %s] Duplicate fillType ( %s )!", fillTypeName);
                 end;
             end;
         end;
@@ -265,9 +258,10 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 end;
 
 function GC_DynamicStorage:finalizePlacement()
-	self.eventId_setActiveUnloadingBox = g_company.eventManager:registerEvent(self, self.setActiveUnloadingBoxEvent);
-    self.eventId_setActiveLoadingBox = g_company.eventManager:registerEvent(self, self.setActiveLoadingBoxEvent);
-    self.eventId_setEffectState = g_company.eventManager:registerEvent(self, self.setEffectStateEvent);
+	GC_PlaceableDigitalDisplay:superClass().finalizePlacement(self)	
+    self.eventId_setActiveUnloadingBox = self:registerEvent(self, self.setActiveUnloadingBoxEvent, false, false)
+    self.eventId_setActiveLoadingBox = self:registerEvent(self, self.setActiveLoadingBoxEvent, false, false)
+    self.eventId_setEffectState = self:registerEvent(self, self.setEffectStateEvent, false, false)    
 end
 
 function GC_DynamicStorage:delete()
@@ -372,6 +366,7 @@ function GC_DynamicStorage:writeUpdateStream(streamId, connection, dirtyMask)
 end;
 
 function GC_DynamicStorage:loadFromXMLFile(xmlFile, key)
+	GC_PlaceableDigitalDisplay:superClass().loadFromXMLFile(self, xmlFile, key)
     if not self.isPlaceable then
 		key = string.format("%s.dynamicStorage", key);
     end
@@ -424,6 +419,7 @@ function GC_DynamicStorage:loadFromXMLFile(xmlFile, key)
 end;
 
 function GC_DynamicStorage:saveToXMLFile(xmlFile, key, usedModNames)
+	GC_PlaceableDigitalDisplay:superClass().saveToXMLFile(self, xmlFile, key, usedModNames)
 	if not self.isPlaceable then
 		key = string.format("%s.dynamicStorage", key);
 		setXMLInt(xmlFile, key .. "#farmId", self:getOwnerFarmId());
@@ -447,6 +443,7 @@ function GC_DynamicStorage:saveToXMLFile(xmlFile, key, usedModNames)
 end;
 
 function GC_DynamicStorage:update(dt)     
+	GC_PlaceableDigitalDisplay:superClass().update(self, dt)
     if self.isClient then      
         for _,place in pairs(self.places) do  
             if place.unloadingEffectsTimer > 0 then
@@ -557,8 +554,8 @@ function GC_DynamicStorage:setActiveUnloadingBox(number, noEventSend)
 	self:setActiveUnloadingBoxEvent({number}, noEventSend);
 end;
 
-function GC_DynamicStorage:setActiveUnloadingBoxEvent(data, noEventSend)
-	g_company.eventManager:createEvent(self.eventId_setActiveUnloadingBox, data, false, noEventSend);
+function GC_DynamicStorage:setActiveUnloadingBoxEvent(data, noEventSend) 
+    self:raiseEvent(self.eventId_setActiveUnloadingBox, data, noEventSend)
     self.activeUnloadingBox = Utils.getNoNil(data[1], 1);
 end;
 
@@ -567,12 +564,12 @@ function GC_DynamicStorage:setActiveLoadingBox(number)
 end;
 
 function GC_DynamicStorage:setActiveLoadingBoxEvent(data, noEventSend)
-	g_company.eventManager:createEvent(self.eventId_setActiveLoadingBox, data, false, noEventSend);
+    self:raiseEvent(self.eventId_setActiveLoadingBox, data, noEventSend)
     self.activeLoadingBox = Utils.getNoNil(data[1], 1);
 end;
 
 function GC_DynamicStorage:setEffectStateEvent(data, noEventSend)
-    g_company.eventManager:createEvent(self.eventId_setEffectState, data, false, noEventSend);
+    self:raiseEvent(self.eventId_setEffectState, data, noEventSend)
     if self.isClient then
         local place = self.places[data[1]]
         if not place.effectIsOn then

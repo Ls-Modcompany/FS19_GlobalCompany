@@ -21,31 +21,29 @@
 --
 --
 
-GlobalCompanySettings = {};
-local GlobalCompanySettings_mt = Class(GlobalCompanySettings);
-InitObjectClass(GlobalCompanySettings, "GlobalCompanySettings");
+GlobalCompanySettings = {}
+GlobalCompanySettings._mt = Class(GlobalCompanySettings, g_company.gc_staticClass)
+InitObjectClass(GlobalCompanySettings, "GlobalCompanySettings")
 
-GlobalCompanySettings.debugIndex = g_company.debug:registerScriptName("GlobalCompany-Settings");
+GlobalCompanySettings.debugIndex = g_company.debug:registerScriptName("GlobalCompany-Settings")
 
 
 function GlobalCompanySettings:load()
-    local self = setmetatable({}, GlobalCompanySettings_mt);
+    local self =  GlobalCompanySettings:superClass():new(GlobalCompanySettings._mt, g_server ~= nil, g_dedicatedServerInfo == nil)
 
-	self.isServer = g_server ~= nil;
-	--self.isClient = g_client ~= nil;    
+	self.debugData = g_company.debug:getDebugData(GlobalCompanySettings.debugIndex, g_company)
+
+    self.settings = {}
+    self.loadedSettings = {}
+
+    self.needSynch = false
+    g_company.addUpdateable(self, self.update);
     
-	self.debugData = g_company.debug:getDebugData(GlobalCompanySettings.debugIndex, g_company);
-
-    self.settings = {};
-    self.loadedSettings = {};
-
-    self.needSynch = false;
-    g_company.addUpdateable(self, self.update);	
-
-	self.eventId_setSetting = g_company.eventManager:registerEvent(self, self.setSettingEvent);
-	self.eventId_loadSettings = g_company.eventManager:registerEvent(self, self.loadSettingsEvent, true);
-	self.eventId_loadSettings2 = g_company.eventManager:registerEvent(self, self.loadSettingsEvent2, true);
-    return self;
+    self.eventId_setSetting = self:registerEvent(self, self.setSettingEvent, false, false)
+    self.eventId_loadSettings = self:registerEvent(self, self.loadSettingsEvent, false, true)
+    self.eventId_loadSettings2 = self:registerEvent(self, self.loadSettingsEvent2, true, true)
+    
+    return self
 end
 
 function GlobalCompanySettings:initSetting(name, default)
@@ -67,7 +65,7 @@ function GlobalCompanySettings:setSetting(name, value, noEventSend)
 end
 
 function GlobalCompanySettings:setSettingEvent(data, noEventSend)
-	g_company.eventManager:createEvent(self.eventId_setSetting, data, false, noEventSend);
+    self:raiseEvent(self.eventId_setSetting, data, noEventSend)
     if self.settings[data[1]] ~= nil and data[2] ~= nil then
         self.settings[data[1]] = data[2];
     else
@@ -118,8 +116,8 @@ function GlobalCompanySettings:loadSettings()
 end
 
 function GlobalCompanySettings:loadSettingsEvent(data, noEventSend)   
-    if g_server == nil then
-        g_company.eventManager:createEvent(self.eventId_loadSettings, {}, false, noEventSend);
+    if g_server == nil then 
+        self:raiseEvent(self.eventId_loadSettings, {}, noEventSend)
     else
         self:loadSettingsEvent2();
     end;
@@ -127,7 +125,7 @@ end;
 
 function GlobalCompanySettings:loadSettingsEvent2(data, noEventSend)   
     if g_server ~= nil then
-        g_company.eventManager:createEvent(self.eventId_loadSettings2, self.settings, true, noEventSend);
+        self:raiseEvent(self.eventId_loadSettings2, self.settings, noEventSend)
     else
         self.settings = data;
     end;
