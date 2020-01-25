@@ -451,3 +451,23 @@ function GlobalCompanyUtils.teleportVehicleWithRotation(posX, posZ, rotY)
 		combo.vehicle:attachImplement(combo.object, combo.inputAttacherJointDescIndex, combo.jointDescIndex, true, nil, nil, false);
 	end
 end
+
+--Code from ls17 of giants
+function GlobalCompanyUtils.limitTextToWidth(text, textSize, width, trimFront, trimReplaceText)
+    local replaceTextWidth = getTextWidth(textSize, trimReplaceText)
+    local indexOfFirstCharacter = 1
+    local indexOfLastCharacter = utf8Strlen(text)
+    if width >= 0 then
+        local totalWidth = getTextWidth(textSize, text)
+        if totalWidth > width then
+            if trimFront then
+                indexOfFirstCharacter = getTextLineLength(textSize, text, totalWidth-width+replaceTextWidth)
+                text = trimReplaceText .. utf8Substr(text, indexOfFirstCharacter)
+			else
+                indexOfLastCharacter = getTextLineLength(textSize, text, width-replaceTextWidth)
+                text = utf8Substr(text, 0, indexOfLastCharacter) .. trimReplaceText
+            end
+        end
+    end
+    return text, indexOfFirstCharacter, indexOfLastCharacter
+end
