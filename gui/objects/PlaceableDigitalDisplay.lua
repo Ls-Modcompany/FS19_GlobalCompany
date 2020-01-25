@@ -44,7 +44,9 @@ end
 function Gc_Gui_PlaceableDigitalDisplay:onCreate() end
 
 function Gc_Gui_PlaceableDigitalDisplay:keyEvent(unicode, sym, modifier, isDown, eventUsed)
-     
+    if sym == 13 and not isDown then
+        self:onClickSave();
+    end
 end
 
 function Gc_Gui_PlaceableDigitalDisplay:setCloseCallback(target, func) 

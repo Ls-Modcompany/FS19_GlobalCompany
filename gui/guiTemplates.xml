@@ -1189,7 +1189,7 @@
 		</template>
 		<template name="gcPlaceDigDisplayInput_overlay" anchor="middleTop" extends="gcPlaceDigDisplayInput">			
 			<value name="imageColor" value="0.718 0.716 0.715 0.02" />
-			<value name="imageColor_selected" value="0.718 0.716 0.715 0.03" />
+			<value name="imageColor_selected" value="0.9910 0.3865 0.0100 0.03" />
 			<value name="margin" value="0px 0px 0px 0px" />
 		</template>
 		<template name="gcPlaceDigDisplayButtonsLayout" anchor="middleBottom" extends="gcBase">
