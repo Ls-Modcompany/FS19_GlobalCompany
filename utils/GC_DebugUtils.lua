@@ -98,6 +98,8 @@ function GC_DebugUtils:new(customMt)
 	
 	self.savedErrors = {};
 
+	self.printLevel[GC_DebugUtils.NETWORK] = true;
+
 	return self;
 end;
 
