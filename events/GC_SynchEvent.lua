@@ -81,7 +81,7 @@ function GC_SynchEvent:writeStream(streamId, connection)
     streamWriteUInt8(streamId, self.targetEventId)
     streamWriteUInt8(streamId, self.classType)
     
-    streamWriteUInt16(streamId, g_company.eventManager:countTable(self.data));
+    streamWriteUInt16(streamId, g_company.utils.getTableLength(self.data));
 
     if self.classType == g_company.classType.CLASS then
         self.gcObject = g_company:getObject(self.gcId)
