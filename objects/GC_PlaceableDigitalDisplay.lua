@@ -84,6 +84,7 @@ function GC_PlaceableDigitalDisplay:delete()
 	if self.triggerManager ~= nil then
 		self.triggerManager:removeAllTriggers()
 	end
+	g_company.removeRaisedUpdateable(self)
 
 	GC_PlaceableDigitalDisplay:superClass().delete(self)
 end

@@ -2,7 +2,7 @@
 <modDesc descVersion="44">
 	<author>LS-Modcompany / kevink98, aPuehri, Eribus</author>
 	
-    <version>1.2.0.1</version>
+    <version>1.2.1.0</version>
     
 	<title>
         <en>GlobalCompany</en>
@@ -12,6 +12,11 @@
         <en><![CDATA[Global Company - A large script extension for Farming Simulator!
 
 GlobalCompany is the base for many scripts. No matter if production, warehouse or whatever - with this it is easy to implement.
+
+Changelog 1.2.1.0:
+- FIX: PlaceableDisplay
+- NEW: Synchronisationsystem for MP
+- NEW: GC-Class / GC-Staticclass
 
 Changelog 1.2.0.0:
 - FIX: DynamicStorage: Fix effects on dediserver

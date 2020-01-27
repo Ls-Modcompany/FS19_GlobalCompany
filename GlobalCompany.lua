@@ -3,12 +3,16 @@
 --
 -- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
--- @Date: 25.01.2020
--- @Version: 1.2.0.1
+-- @Date: 27.01.2020
+-- @Version: 1.2.1.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+-- 	v1.2.1.0 (27.01.2020):
+--		- Add new Mp-Synch and GC-Object System
+-- 		- Fix PlaceableDisplay
+--
 -- 	v1.2.0.0 (12.01.2020):
 --		- Release v1.2.0.0 on Modhub
 --
@@ -82,10 +86,10 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.2.0.1";
-GlobalCompany.versionDate = "25.01.2020";
-GlobalCompany.currentVersionId = 1201; -- Mod Manager ID. (Version number without periods.)
-GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
+GlobalCompany.version = "1.2.1.0";
+GlobalCompany.versionDate = "27.01.2020";
+GlobalCompany.currentVersionId = 1210; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.isDevelopmentVersion = false; -- This is for versions loaded from GIT.
 GlobalCompany.isGreenWeekVersion = false;
 
 function GlobalCompany.initialLoad()
