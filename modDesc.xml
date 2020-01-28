@@ -56,6 +56,11 @@ Changelog 1.1.0.0:
 
 GlobalCompany ist die Grundlage für viele Scripte. Egal ob Produktionen, Lager oder was auch immer - hiermit lässt es sich einfach umsetzen.
 
+Changelog 1.2.1.0:
+- FIX: PlaceableDisplay
+- NEU: System für Synchronisierung im Multiplayer
+- NEU: GC-Class / GC-Staticclass
+
 Changelog 1.2.0.0:
 - FIX: DynamicStorage: Effektfehler auf Dediserver behoben
 - FIX: DynamicStorage: Tastenkombi auf LCtrl + T geändert
@@ -66,16 +71,16 @@ Changelog 1.2.0.0:
 - FIX: VisibilityNodes: Kollisionsüberprüfung jetzt auch serverseitig
 - FIX: Anpassung an Courseplay
 
-- NEW: DynamicStorage: Abladetrigger für jede Box hinzugefügt
-- NEW: Dynamische Ingamemap ins GC-Menü hinzugefügt
-- NEW: Factory: Tieroutput hinzugefügt
-- NEW: Factory: Support für Seasons hinzugefügt
-- NEW: Sprachentexte hinzugefügt: pt, it, pl
-- NEW: GC-Menu: Übersicht für Dynamische Lager
-- NEW: GC-Menu: Übersicht für Fabriken überarbeitet
-- NEW: GC-Menu: AddOns können nun eigene Tabs erstellen
-- NEW: Factory: 'refPoint' - Attribute hinzugefügt
-- NEW: Gui-Elemente hinzugefügt
+- NEU: DynamicStorage: Abladetrigger für jede Box hinzugefügt
+- NEU: Dynamische Ingamemap ins GC-Menü hinzugefügt
+- NEU: Factory: Tieroutput hinzugefügt
+- NEU: Factory: Support für Seasons hinzugefügt
+- NEU: Sprachentexte hinzugefügt: pt, it, pl
+- NEU: GC-Menu: Übersicht für Dynamische Lager
+- NEU: GC-Menu: Übersicht für Fabriken überarbeitet
+- NEU: GC-Menu: AddOns können nun eigene Tabs erstellen
+- NEU: Factory: 'refPoint' - Attribute hinzugefügt
+- NEU: Gui-Elemente hinzugefügt
 
 - Und viele weitere Sachen
 
@@ -93,6 +98,11 @@ Changelog 1.1.0.0:
 		<ru><![CDATA[Global Company - самой большое собрание скриптов для Farming Simulator!
 
 GlobalCompany основа для многих скриптов. Будь то производства, хранилища или что то еще - с ним возможно многое.
+
+Блог изменений 1.2.1.0:
+- FIX: PlaceableDisplay
+- НОВОЕ: Система синхронизации для MP
+- НОВИНКА: GC-класс / GC-статик-класс
 
 Блог изменений 1.2.0.0:
 - FIX: DynamicStorage: Исправить эффекты на дедисервере
@@ -131,6 +141,11 @@ GlobalCompany основа для многих скриптов. Будь то �
         <fr><![CDATA[Global Company - Une grande extension de script pour Farming Simulator !
 
 GlobalCompany est la base de nombreux scripts. Que ce soit pour la production, l'entreposage ou autre - avec ce mod, il est facile de tout implémenter.
+
+Changelog 1.2.1.0 :
+- CORRECTIF : Affichage de la place disponible
+- NOUVEAU : Système de synchronisation pour les députés
+- NOUVEAU : Classe GC / Staticclasse GC
 
 Changelog 1.2.0.0 :
 - CORRECTIF : DynamicStorage : Correction des effets sur le dé-diseur
