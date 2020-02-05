@@ -38,7 +38,11 @@ function GC_Gui_tableSort:loadTemplate(templateName, xmlFile, key)
     
     self.overlayElement = GC_Gui_overlay:new(self.gui);
     self.overlayElement:loadTemplate(string.format("%s_overlay", templateName), xmlFile, key);
-    self:addElement(self.overlayElement);
+	self:addElement(self.overlayElement);
+	
+	self.size = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValueXML(xmlFile, "tableSortSize", key), self.outputSize, self.size);
+	self.buttonElement.size = self.size
+	self.buttonElement.overlayElement.size = self.size
 	
 	if self.isTableTemplate then
 		self.parent:setTableTemplate(self);

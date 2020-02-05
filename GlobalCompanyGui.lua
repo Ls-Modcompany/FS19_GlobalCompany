@@ -726,10 +726,12 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 			if element.parent.alignment == GC_Gui_flowLayout.ALIGNMENT_LEFT then
 				x = 0;
 				for i, elementF in pairs(element.parent.elements) do
-					if i == index then
-						break;
-					else
-						x = x + elementF.size[1] + elementF.margin[1] + elementF.margin[3] + elementF.position[1];
+					if elementF:getVisible() then
+						if i == index then
+							break;
+						else
+							x = x + elementF.size[1] + elementF.margin[1] + elementF.margin[3] + elementF.position[1];
+						end;
 					end;
 				end;
 				
@@ -737,17 +739,21 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 			elseif element.parent.alignment == GC_Gui_flowLayout.ALIGNMENT_MIDDLE then			
 				local fullSize = 0;
 				for i, elementF in pairs(element.parent.elements) do
-					fullSize = fullSize + elementF.size[1] + elementF.margin[1] + elementF.margin[3] + elementF.position[1];
+					if elementF:getVisible() then
+						fullSize = fullSize + elementF.size[1] + elementF.margin[1] + elementF.margin[3] + elementF.position[1];
+					end
 				end;	
 				local leftToStart = (element.parent.size[1] - fullSize) / 2;
 				
 				x = 0;
 				for i, elementF in pairs(element.parent.elements) do
-					if i == index then
-						break;
-					else
-						x = x + elementF.size[1] + elementF.margin[1] + elementF.margin[3];
-					end;
+					if elementF:getVisible() then
+						if i == index then
+							break;
+						else
+							x = x + elementF.size[1] + elementF.margin[1] + elementF.margin[3];
+						end;
+					end
 				end;
 
 				x = x + leftToStart + element.parent.drawPosition[1] + element.margin[1] + element.position[1];			
@@ -755,12 +761,14 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 				x = 0;
 				local search = true;
 				for i, elementF in pairs(element.parent.elements) do
-					if search then
-						if i == index then
-							search = false;
+					if elementF:getVisible() then
+						if search then
+							if i == index then
+								search = false;
+							end;
+						else
+							x = x + elementF.size[1] + elementF.margin[1] + elementF.margin[3] + elementF.position[1];
 						end;
-					else
-						x = x + elementF.size[1] + elementF.margin[1] + elementF.margin[3] + elementF.position[1];
 					end;
 				end;
 				
@@ -778,13 +786,15 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 			if element.parent.alignment == GC_Gui_flowLayout.ALIGNMENT_TOP then
 				y = 0;
 				for i, elementF in pairs(element.parent.elements) do
-					if i == index then
-						break;
-					else
-						if elementF.name == "text" then							
-							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+					if elementF:getVisible() then
+						if i == index then
+							break;
 						else
-							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							if elementF.name == "text" then							
+								y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							else
+								y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							end;
 						end;
 					end;
 				end;
@@ -793,19 +803,23 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 			elseif element.parent.alignment == GC_Gui_flowLayout.ALIGNMENT_CENTER then
 				local fullSize = 0;
 				for i, elementF in pairs(element.parent.elements) do
-					fullSize = fullSize + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
+					if elementF:getVisible() then
+						fullSize = fullSize + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
+					end
 				end;	
 				local topToStart = (element.parent.size[2] - fullSize) / 2;
 				
 				y = 0;
 				for i, elementF in pairs(element.parent.elements) do
-					if i == index then
-						break;
-					else
-						if elementF.name == "text" then							
-							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+					if elementF:getVisible() then
+						if i == index then
+							break;
 						else
-							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							if elementF.name == "text" then							
+								y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							else
+								y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							end;
 						end;
 					end;
 				end;
@@ -814,19 +828,23 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 			elseif element.parent.alignment == GC_Gui_flowLayout.ALIGNMENT_BOTTOM then
 				local fullSize = 0;
 				for i, elementF in pairs(element.parent.elements) do
-					fullSize = fullSize + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
+					if elementF:getVisible() then
+						fullSize = fullSize + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
+					end
 				end;	
 				local topToStart = element.parent.size[2] - fullSize;
 				
 				y = 0;
 				for i, elementF in pairs(element.parent.elements) do
-					if i == index then
-						break;
-					else
-						if elementF.name == "text" then							
-							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+					if elementF:getVisible() then
+						if i == index then
+							break;
 						else
-							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							if elementF.name == "text" then							
+								y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							else
+								y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							end;
 						end;
 					end;
 				end;
