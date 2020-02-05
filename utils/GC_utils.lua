@@ -464,10 +464,29 @@ function GlobalCompanyUtils.limitTextToWidth(text, textSize, width, trimFront, t
                 indexOfFirstCharacter = getTextLineLength(textSize, text, totalWidth-width+replaceTextWidth)
                 text = trimReplaceText .. utf8Substr(text, indexOfFirstCharacter)
 			else
-                indexOfLastCharacter = getTextLineLength(textSize, text, width-replaceTextWidth)
+                indexOfLastCharacter = getTextLineLenggetIsActivatableth(textSize, text, width-replaceTextWidth)
                 text = utf8Substr(text, 0, indexOfLastCharacter) .. trimReplaceText
             end
         end
     end
     return text, indexOfFirstCharacter, indexOfLastCharacter
 end
+
+function GlobalCompanyUtils.fillStringLeft(text, num, fill)
+	while(string.len(text) < num) do
+		text = fill .. text
+	end
+	return text
+end
+
+function GlobalCompanyUtils.appendedFunction(oldFunc, newFunc, t)
+    if oldFunc ~= nil then
+        return function (s, ...)
+            local val = oldFunc(s, ...)
+			val = newFunc(t, s, val, ...)
+			return val
+        end;
+    else
+        return newFunc
+    end;
+end;
