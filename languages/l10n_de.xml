@@ -148,6 +148,43 @@ Kosten:  %s"/>
 		<e k="GC_placeableDigDisplay_headerInfo" v="Hier kannst du einen beliebigen Text festlegen, der auf dem Display erscheinen soll."/>
 		<e k="GC_placeableDigDisplay_btnSave" v="Speichern"/>
 		
+		<!-- GlobalMarket -->
+		<e k="GC_globalMarket_openGui" v="GlobalerMarkt öffnen"/>
+		<e k="GC_globalMarket_header" v="Globaler Markt 2020"/>
+		<e k="GC_globalMarket_headerInfo" v="Hier kannst du abgelieferte Ware verkaufen oder Ware ankaufen."/>
+		<e k="GC_globalMarket_btn_buyScreen" v="Kaufübersicht"/>
+		<e k="GC_globalMarket_btn_storageScreen" v="Lagerübersicht"/>
+		<e k="GC_globalMarket_btn_synch" v="Synchronisieren"/>
+
+		
+		<e k="GC_globalMarket_header2" v="Globaler Markt 2020 - Mengenauswahl"/>
+		<e k="GC_globalMarket_headerInfo2" v="Wähle hier die gewünschte Menge!"/>
+		<e k="GC_globalMarket_btn_ok" v="Bestätigen"/>
+		<e k="GC_globalMarket_btn_startLoad" v="Beladen starten"/>
+		
+		<e k="GC_globalMarket_header3" v="Globaler Markt 2020 - Auslagern"/>
+		<e k="GC_globalMarket_headerInfo3" v="Wähle aus, was geladen werden soll"/>
+		<e k="GC_globalMarket_btn_min" v="Minimal"/>
+		<e k="GC_globalMarket_btn_max" v="Maximal"/>
+
+		<e k="GC_globalMarket_txt_amount" v="Menge"/>
+		<e k="GC_globalMarket_txt_money" v="Wert"/>
+
+		<e k="GC_globalMarket_tbl_header_filltype" v="Fruchttyp"/>
+		<e k="GC_globalMarket_tbl_header_level" v="Liter"/>
+		<e k="GC_globalMarket_tbl_header_pallets" v="Palette"/>
+		<e k="GC_globalMarket_tbl_header_bales" v="Ballen"/>
+		<e k="GC_globalMarket_tbl_header_price" v="aktueller Preis"/>
+		<e k="GC_globalMarket_tbl_header_price2" v="aktueller Preis / 1000 Liter"/>
+		<e k="GC_globalMarket_btn_outsource" v="Auslagern"/>
+		<e k="GC_globalMarket_btn_sell" v="Verkaufen"/>
+		<e k="GC_globalMarket_btn_buy" v="Kaufen   "/>
+		<e k="GC_globalMarket_externIsOffline" v="Starte die benötigte externe Software, damit du Ware ankaufen kannst oder deine abgegebene Ware verkaufen kannst."/>
+		
+		
+		
+	
+
 		<!-- Market -->
 		<!--e k="GC_market_showDetails" v="Details"/>
 		<e k="GC_market_date" v="Datum"/>

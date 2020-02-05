@@ -164,13 +164,14 @@ function GlobalCompany.initialLoad()
 		GlobalCompany.loadSourceFiles();
 		GlobalCompany.loadPlaceables();
 
-		g_company.farmlandOwnerListener = GC_FarmlandOwnerListener:new();
-		g_company.fillTypeManager = GC_FillTypeManager:new();
-		g_company.densityMapHeightManager = GC_densityMapHeightManager:new();
-		g_company.treeTypeManager = GC_TreeTypeManager:new();
-		g_company.physicManager = GC_PhysicManager:new();
-		g_company.bitmapManager = GC_BitmapManager:new();
-		g_company.jobManager = GC_JobManager:new();
+		g_company.farmlandOwnerListener = GC_FarmlandOwnerListener:new()
+		g_company.fillTypeManager = GC_FillTypeManager:new()
+		g_company.densityMapHeightManager = GC_densityMapHeightManager:new()
+		g_company.treeTypeManager = GC_TreeTypeManager:new()
+		g_company.physicManager = GC_PhysicManager:new()
+		g_company.bitmapManager = GC_BitmapManager:new()
+		g_company.jobManager = GC_JobManager:new()
+		g_company.globalMarket = GC_GlobalMarket:new()
 
 		GlobalCompany.loadEnviroment(modNameCurrent, GlobalCompany.dir .. "xml/globalCompany.xml", false);
 		
@@ -397,6 +398,8 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicStorage.lua");
 	source(GlobalCompany.dir .. "objects/GC_PlaceableDigitalDisplay.lua");
+	source(GlobalCompany.dir .. "objects/GC_GlobalMarket.lua");
+	source(GlobalCompany.dir .. "objects/GC_GlobalMarketObject.lua");
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
@@ -413,6 +416,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_DynamicStoragePlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_PlaceableDigitalDisplayPlaceable.lua");
+	source(GlobalCompany.dir .. "placeables/GC_GlobalMarketPlaceable.lua");
 
 	--|| Additionals ||--
 	source(GlobalCompany.dir .. "additionals/GC_BaleAddon.lua");
@@ -451,6 +455,7 @@ function GlobalCompany.loadPlaceables()
 	GlobalCompany:addPlaceableType("GC_DynamicStoragePlaceable", "GC_DynamicStoragePlaceable", placeablesDir .. "GC_DynamicStoragePlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_ProductionFactoryPlaceable", "GC_ProductionFactoryPlaceable", placeablesDir .. "GC_ProductionFactoryPlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_PlaceableDigitalDisplayPlaceable", "GC_PlaceableDigitalDisplayPlaceable", placeablesDir .. "GC_PlaceableDigitalDisplayPlaceable.lua");
+	GlobalCompany:addPlaceableType("GC_GlobalMarketPlaceable", "GC_GlobalMarketPlaceable", placeablesDir .. "GC_GlobalMarketPlaceable.lua");
 end;
 
 function GlobalCompany:registerObject(object)

@@ -32,7 +32,7 @@ GlobalCompanyGui.debugData = g_company.debug:getDebugData(GlobalCompanyGui.debug
 GlobalCompanyGui.DevelopementVersionTemplatesFilename = {};
 addModEventListener(GlobalCompanyGui);
 
-GlobalCompanyGui.devVersion = false;
+GlobalCompanyGui.devVersion = false
 
 GlobalCompanyGui.guis = {};
 GlobalCompanyGui.smallGuis = {};
@@ -76,6 +76,9 @@ source(g_currentModDirectory .. "gui/objects/ObjectInfo.lua");
 source(g_currentModDirectory .. "gui/objects/GcMain.lua");
 source(g_currentModDirectory .. "gui/objects/DynamicStorage.lua");
 source(g_currentModDirectory .. "gui/objects/PlaceableDigitalDisplay.lua");
+source(g_currentModDirectory .. "gui/objects/GlobalMarket.lua");
+source(g_currentModDirectory .. "gui/objects/GlobalMarketLevelDialog.lua");
+source(g_currentModDirectory .. "gui/objects/GlobalMarketLoading.lua");
 
 function GlobalCompanyGui:init()	
 	for _,inAc in pairs(self.toInit_actionEvents) do
@@ -131,7 +134,9 @@ function GlobalCompanyGui:load()
 	g_company.gui:registerGui("gcObjectInfo", nil, Gc_Gui_ObjectInfo, false, false, false);
 	g_company.gui:registerGui("gc_dynamicStorage", nil, Gc_Gui_DynamicStorage, true, true, true);
 	g_company.gui:registerGui("gc_placeableDigitalDisplay", nil, Gc_Gui_PlaceableDigitalDisplay, true, true, false);
-	
+	g_company.gui:registerGui("gc_globalMarket", nil, Gc_Gui_GlobalMarket, true, true, false);
+	g_company.gui:registerGui("gc_globalMarketLevelDialog", nil, Gc_Gui_GlobalMarketLevelDialog, true, true, false);	
+	g_company.gui:registerGui("gc_globalMarketLoading", nil, Gc_Gui_GlobalMarketLoading, true, true, true);	
 	self.activeGuiDialogs = {};
 	self.registeredActonEvents = false;
 end;

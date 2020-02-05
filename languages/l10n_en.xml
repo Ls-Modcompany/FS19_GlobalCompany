@@ -137,5 +137,8 @@
 		<e k="GC_placeableDigDisplay_header" v="Digitales display"/>
 		<e k="GC_placeableDigDisplay_headerInfo" v="Here you can specify any text you want to appear on the display."/>
 		<e k="GC_placeableDigDisplay_btnSave" v="Save"/>
+		
+		<!-- GlobalMarket -->
+		<e k="GC_globalMarket_openGui" v="Open Global Market"/>
 	</elements>
 </l10n>
