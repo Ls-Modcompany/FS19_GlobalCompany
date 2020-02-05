@@ -103,11 +103,13 @@ function GC_ObjectSpawner:getSpaceByObjectInfo(object, maxWanted, ignoreShapesHi
 	return totalFreeAreas
 end
 
-function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesHit)
+function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesHit, object2, numberToSpawn2)
 	local numSpawned = 0
 	local owner = self:getOwnerFarmId()
 
-	numberToSpawn = g_company.utils.getLess(1, numberToSpawn, 255)
+	local numberToSpawn1 = numberToSpawn
+	numberToSpawn2 = Utils.getNoNil(numberToSpawn2, 0)
+	numberToSpawn = g_company.utils.getLess(1, numberToSpawn + numberToSpawn2, 255)
 	local wantedCount = numberToSpawn
 	
 	if object.filename ~= nil and object.width ~= nil and object.length ~= nil then		
@@ -115,7 +117,7 @@ function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesH
 		local placesToSpawn = {}
 		for _, spawnArea in ipairs (self.spawnAreas) do
 			if #placesToSpawn < wantedCount then
-				spawned = self:getSpawnAreaDataBySize(spawnArea, object.width, object.length, object.offset, numberToSpawn, placesToSpawn)
+				spawned = self:getSpawnAreaDataBySize(spawnArea, object.width, object.length, object.offset, numberToSpawn, placesToSpawn, ignoreShapesHit)
 				numberToSpawn = numberToSpawn - spawned
 			else
 				break
@@ -142,7 +144,9 @@ function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesH
 						local pallet = g_currentMission:loadVehicle(object.filename, x, y, z, 0, ry, true, 0, Vehicle.PROPERTY_STATE_OWNED, owner, configs, nil)
 						if pallet ~= nil then
 							if object.fillUnitIndex ~= nil and object.fillTypeIndex ~= nil then
-								pallet:addFillUnitFillLevel(owner, object.fillUnitIndex, object.fillLevel, object.fillTypeIndex, ToolType.UNDEFINED)
+								local currentFillLevel = pallet:getFillUnitFillLevel(object.fillUnitIndex)
+								local deltaFillLevel = (currentFillLevel * -1) + object.fillLevel
+								pallet:addFillUnitFillLevel(owner, object.fillUnitIndex, deltaFillLevel, object.fillTypeIndex, ToolType.UNDEFINED)
 							end
 
 							numSpawned = numSpawned + 1
@@ -152,13 +156,16 @@ function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesH
 						local price = Utils.getNoNil(object.price, 0)
 						local propertyState = Utils.getNoNil(object.propertyState, Vehicle.PROPERTY_STATE_OWNED)
 
-						local vehicle = g_currentMission:loadVehicle(objectData.filename, x, y, z, 0, ry, save, price, propertyState, owner, object.configurations, nil)
+						local vehicle = g_currentMission:loadVehicle(object.filename, x, y, z, 0, ry, save, price, propertyState, owner, object.configurations, nil)
 						if vehicle ~= nil then
-							if numberToSpawn > 1 then
+							--if numberToSpawn > 1 then
 								numSpawned = numSpawned + 1
-							else
-								return vehicle
-							end
+								if numSpawned == numberToSpawn1 then
+									object = object2
+								end
+							--else
+							--	return vehicle
+							--end
 						end
 					end
 				end
@@ -170,8 +177,8 @@ function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesH
 end
 
 function GC_ObjectSpawner:getSpawnAreaDataBySize(spawnArea, width, length, customOffset, count, placesToSpawn, ignoreShapesHit)
-	local halfWidth = width * 0.5
-	local halfLength = length * 0.5
+	local halfWidth = width * 0.2
+	local halfLength = length * 0.2
 
 	local offset = width * Utils.getNoNil(customOffset, 0.5)
 
