@@ -71,6 +71,7 @@ function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes
 		g_currentMission:addNodeObject(triggerNode, self)
 
 		self.fillLitersPerMS = xmlUtils.getXMLValue(getXMLInt, xmlFile, xmlKey .. "#fillLitersPerSecond", 1000) / 1000
+		self.fillLitersPerMSFuel = xmlUtils.getXMLValue(getXMLInt, xmlFile, xmlKey .. "#fillLitersPerSecondFuel", 20) / 1000
 		self.soundNode = createTransformGroup("loadTriggerSoundNode")
 
 		self.autoStart = xmlUtils.getXMLValue(getXMLBool, xmlFile, xmlKey .. "#autoStart", false)
@@ -306,7 +307,12 @@ function GC_LoadingTrigger:update(dt)
 	if self.isServer then
 		if self.isLoading then
 			if self.currentFillableObject ~= nil then
-				local fillDelta = self:addFillLevelToFillableObject(self.currentFillableObject, self.fillUnitIndex, self.selectedFillType, self.fillLitersPerMS * dt, self.dischargeInfo, ToolType.TRIGGER)
+				local fillLitersPerMS = self.fillLitersPerMS
+				if self.selectedFillType == FillType.DIESEL or self.selectedFillType == FillType.FUEL then
+					local fillLitersPerMS = self.fillLitersPerMSFuel
+				end
+				local fillDelta = self:addFillLevelToFillableObject(self.currentFillableObject, self.fillUnitIndex, self.selectedFillType, fillLitersPerMS * dt, self.dischargeInfo, ToolType.TRIGGER)
+				
 				if fillDelta == nil or fillDelta < 0.001 then
 					self:setIsLoading(false)
 				end
