@@ -31,12 +31,12 @@ function GC_SynchEvent:emptyNew()
 	return self
 end
 
-function GC_SynchEvent:new(gcId, targetEventId, data, classType)
+function GC_SynchEvent:new(gcId, targetEventId, data, targetClassType)
 	local self = GC_SynchEvent:emptyNew()
 	self.gcId = gcId
 	self.targetEventId = targetEventId
 	self.data = data
-	self.classType = classType
+	self.targetClassType = targetClassType
 
 	return self
 end
@@ -44,14 +44,14 @@ end
 function GC_SynchEvent:readStream(streamId, connection)
 	self.gcId = streamReadUInt8(streamId)
     self.targetEventId = streamReadUInt8(streamId)
-    local classType = streamReadUInt8(streamId)
+    self.targetClassType = streamReadUInt8(streamId)
 
-    if classType == g_company.classType.CLASS then
+    if self.targetClassType == 1 then
         self.gcObject = g_company:getObject(self.gcId)
-    elseif classType == g_company.classType.STATICCLASS then
+    elseif self.targetClassType == 2 then
         self.gcObject = g_company:getStaticObject(self.gcId)
     else
-        print(string.format("Invalid classType %s", classType))
+        print(string.format("Invalid classType %s", self.targetClassType))
     end
 
     local event = self.gcObject.events[self.targetEventId]
@@ -79,16 +79,16 @@ end
 function GC_SynchEvent:writeStream(streamId, connection)
 	streamWriteUInt8(streamId, self.gcId)
     streamWriteUInt8(streamId, self.targetEventId)
-    streamWriteUInt8(streamId, self.classType)
+    streamWriteUInt8(streamId, self.targetClassType)
     
     streamWriteUInt16(streamId, g_company.utils.getTableLength(self.data));
 
-    if self.classType == g_company.classType.CLASS then
+    if self.targetClassType == 1 then
         self.gcObject = g_company:getObject(self.gcId)
-    elseif self.classType == g_company.classType.STATICCLASS then
+    elseif self.targetClassType == 2 then
         self.gcObject = g_company:getStaticObject(self.gcId)
     else
-        print(string.format("Invalid classType %s", self.classType))
+        print(string.format("Invalid classType %s", self.targetClassType))
     end
 
     local useOwnIndex = self.gcObject.events[self.targetEventId].useOwnIndex

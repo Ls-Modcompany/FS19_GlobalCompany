@@ -12,9 +12,6 @@
 -- 	v1.0.0.0 (18.01.2020):
 --
 
-g_company.classType = {}
-g_company.classType.CLASS = 1
-g_company.classType.STATICCLASS = 2
 
 GC_Class = {}
 GC_Class._mt = Class(GC_Class, Object)
@@ -111,7 +108,6 @@ function GC_Class:registerEvent(target, func, useOwnIndex, clientToServer)
     {
         id = self.eventId,
         target = target,
-        classType = g_company.classType.CLASS,
         func = func,
         useOwnIndex = useOwnIndex,
         clientToServer = Utils.getNoNil(clientToServer, false)
@@ -123,11 +119,10 @@ end
 function GC_Class:raiseEvent(eventId, data, noEventSend)
     if eventId ~= nil and (noEventSend == nil or noEventSend == false) then
         local useOwnIndex = self.events[eventId].useOwnIndex
-        local classType = self.events[eventId].classType
         if g_company:getIsServer() then       
-            g_server:broadcastEvent(GC_SynchEvent:new(self.gcId, eventId, data, classType))
+            g_server:broadcastEvent(GC_SynchEvent:new(self.gcId, eventId, data, 1))
         else 
-			g_client:getServerConnection():sendEvent(GC_SynchEvent:new(self.gcId, eventId, data, classType))
+			g_client:getServerConnection():sendEvent(GC_SynchEvent:new(self.gcId, eventId, data, 1))
         end;
     end;
 end
