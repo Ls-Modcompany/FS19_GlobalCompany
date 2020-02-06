@@ -31,6 +31,7 @@ GC_GlobalMarket.fillTypeTypes.PALLET = 3
 GC_GlobalMarket.fillTypeTypes.BALE = 4 
 GC_GlobalMarket.fillTypeTypes.LIQUID = 5
 GC_GlobalMarket.fillTypeTypes.WOOD = 6
+GC_GlobalMarket.fillTypeTypes.CONVEYORANDBALE = 7
 
 GC_GlobalMarket.priceTrends = {}
 GC_GlobalMarket.priceTrends.DOWN = 1
@@ -41,13 +42,28 @@ GC_GlobalMarket.ownFillTypes = {}
 GC_GlobalMarket.ownFillTypes.WOOD = -10
 
 GC_GlobalMarket.baleToFilename = {}
---GC_GlobalMarket.baleToFilename["ROUNDBALE_GRASS"] = "$data/objects/buyableBales"
-GC_GlobalMarket.baleToFilename["ROUNDBALE_DRYGRASS"] = "data/objects/buyableBales/buyableBales_dryGrassRound.xml"
-GC_GlobalMarket.baleToFilename["ROUNDBALE_WHEAT"] = "data/objects/buyableBales/buyableBales_strawRound.xml"
-GC_GlobalMarket.baleToFilename["ROUNDBALE_BARLEY"] = "data/objects/buyableBales/buyableBales_strawRound.xml"
+GC_GlobalMarket.baleToFilename["GRASS_WINDROW"] = {g_company.dir .. "shop/buyableBales_grassRound.xml", g_company.dir .. "shop/buyableBales_grass.xml" }
+GC_GlobalMarket.baleToFilename["DRYGRASS_WINDROW"] = {"data/objects/buyableBales/buyableBales_dryGrassRound.xml", "data/objects/buyableBales/buyableBales_dryGrass.xml"}
+GC_GlobalMarket.baleToFilename["STRAW"] = {"data/objects/buyableBales/buyableBales_strawRound.xml", "data/objects/buyableBales/buyableBales_straw.xml"}
+GC_GlobalMarket.baleToFilename["SILAGE"] = {"data/objects/buyableBales/buyableBales_silage.xml"}
+GC_GlobalMarket.baleToFilename["COTTON"] = {nil, g_company.dir .. "shop/buyableBales_cotton.xml"}
 
-GC_GlobalMarket.baleToFilename["SQUAREBALE_WHEAT"] = "data/objects/buyableBales/buyableBales_straw.xml"
-GC_GlobalMarket.baleToFilename["SQUAREBALE_BARLEY"] = "data/objects/buyableBales/buyableBales_straw.xml"
+
+GC_GlobalMarket.fillTypeToFilename = {}
+GC_GlobalMarket.fillTypeToFilename["TREESAPLINGS"] = "data/objects/pallets/treeSaplingPallet/treeSaplingPallet.xml"
+GC_GlobalMarket.fillTypeToFilename["WOOL"] = "data/objects/pallets/woolPallet/woolPallet.xml"
+GC_GlobalMarket.fillTypeToFilename["EGG"] = "data/objects/pallets/eggBox/eggBox.xml"
+GC_GlobalMarket.fillTypeToFilename["POPLAR"] = "data/objects/pallets/palletPoplar/palletPoplar.xml"
+
+GC_GlobalMarket.fillTypeMapping = {}
+GC_GlobalMarket.fillTypeMapping["GRASS"] = "GRASS_WINDROW"
+GC_GlobalMarket.fillTypeMapping["DRYGRASS"] = "DRYGRASS_WINDROW"
+GC_GlobalMarket.fillTypeMapping["ROUNDBALE_GRASS"] = "GRASS_WINDROW"
+GC_GlobalMarket.fillTypeMapping["ROUNDBALE_DRYGRASS"] = "DRYGRASS_WINDROW"
+GC_GlobalMarket.fillTypeMapping["ROUNDBALE_WHEAT"] = "STRAW"
+GC_GlobalMarket.fillTypeMapping["ROUNDBALE_BARLEY"] = "STRAW"
+GC_GlobalMarket.fillTypeMapping["SQUAREBALE_WHEAT"] = "STRAW"
+GC_GlobalMarket.fillTypeMapping["SQUAREBALE_BARLEY"] = "STRAW"
 
 function GC_GlobalMarket:new()
     local self = setmetatable({}, GC_GlobalMarket._mt)
@@ -209,9 +225,11 @@ function GC_GlobalMarket:getProvidedFillTypes(fillTyp)
 
     local fillTypes = {}
     for typ, tab in pairs(self.fillTypes) do
-        if typ == fillTyp then
-            for index, _ in pairs(tab) do
-                fillTypes[index] = true
+        for _,typ2 in pairs(fillTyp) do
+            if typ == typ2 then
+                for index, _ in pairs(tab) do
+                    fillTypes[index] = true
+                end
             end
         end
     end
@@ -222,8 +240,25 @@ function GC_GlobalMarket:getFillTypesByType(typ)
     return self.fillTypes[typ]
 end
 
-function GC_GlobalMarket:getIsFillTypeFromType(fillTypeIndex, typ)
-    return self.fillTypes[typ] ~= nil and self.fillTypes[typ][fillTypeIndex] ~= nil
+function GC_GlobalMarket:getIsFillTypeFromType(fillTypeIndex, types)
+    for _,typ in pairs(types) do
+        if self.fillTypes[typ] ~= nil and self.fillTypes[typ][fillTypeIndex] ~= nil then
+            return true
+        end
+    end
+    return false
+end
+
+function GC_GlobalMarket:getPalletFilenameFromFillTypeIndex(fillTypeIndex) 
+    local path = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex).palletFilename
+    local name = string.upper(g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex))
+    if path == nil then
+        path = self.fillTypeToFilename[name]
+    end
+    if name == "COTTON" then
+        path = nil
+    end
+    return path
 end
 
 function GC_GlobalMarket:getPriceTrendByFillType(fillTypeIndex)
@@ -288,7 +323,7 @@ function GC_GlobalMarket:getCapacityByStoreXml(path, isPallet)
     if self.storeXmlToCapacity[paths] ~= nil then
         capacity = self.storeXmlToCapacity[paths]
     else
-        local xmlFile = loadXMLFile("tempXml", path)     
+        local xmlFile = loadXMLFile("tempXml", path)  
         if isPallet then   
             local key = "vehicle.fillUnit.fillUnitConfigurations.fillUnitConfiguration.fillUnits.fillUnit"
             if hasXMLProperty(xmlFile, key) then

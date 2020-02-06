@@ -172,16 +172,21 @@ Kosten:  %s"/>
 
 		<e k="GC_globalMarket_tbl_header_filltype" v="Fruchttyp"/>
 		<e k="GC_globalMarket_tbl_header_level" v="Liter"/>
-		<e k="GC_globalMarket_tbl_header_pallets" v="Palette"/>
+		<e k="GC_globalMarket_tbl_header_pallets" v="Paletten"/>
 		<e k="GC_globalMarket_tbl_header_bales" v="Ballen"/>
 		<e k="GC_globalMarket_tbl_header_price" v="aktueller Preis"/>
 		<e k="GC_globalMarket_tbl_header_price2" v="aktueller Preis / 1000 Liter"/>
 		<e k="GC_globalMarket_btn_outsource" v="Auslagern"/>
+		<e k="GC_globalMarket_btn_outsourceBale1" v="Rundballen"/>
+		<e k="GC_globalMarket_btn_outsourceBale2" v="Quaderballen"/>
 		<e k="GC_globalMarket_btn_sell" v="Verkaufen"/>
 		<e k="GC_globalMarket_btn_buy" v="Kaufen   "/>
 		<e k="GC_globalMarket_externIsOffline" v="Starte die benötigte externe Software, damit du Ware ankaufen kannst oder deine abgegebene Ware verkaufen kannst."/>
 		
 		
+		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Quaderballen Gras"/>
+		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Rundballen Gras"/>
+		<e k="GC_globalMarket_storeItem_cotton" v="Baumwolle"/>
 		
 	
 

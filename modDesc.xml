@@ -213,4 +213,10 @@ Changelog 1.1.0.0.0 :
             <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_t" axisComponent="+" neutralInput="0" index="1"/>
         </actionBinding>	
     </inputBinding>
+
+    <storeItems>
+        <storeItem xmlFilename="shop/buyableBales_grassRound.xml" />
+        <storeItem xmlFilename="shop/buyableBales_grass.xml" />
+        <storeItem xmlFilename="shop/buyableBales_cotton.xml" />
+    </storeItems>
 </modDesc>

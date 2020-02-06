@@ -64,8 +64,15 @@
             <GuiElement type="text" template="gcBaseGuiButtonText" text="$l10n_GC_globalMarket_btn_storageScreen" />   
             <GuiElement type="button" position="50px 0px" template="gcBaseGuiButtonNext" inputAction="MENU_EXTRA_2" onClick="onClickBuyScreen" />
             <GuiElement type="text" template="gcBaseGuiButtonText" text="$l10n_GC_globalMarket_btn_buyScreen" />  
+
 			<GuiElement type="button" position="80px 0px" template="gcBaseGuiButtonNext" id="gui_btn_outsource" inputAction="MENU_ACTIVATE" onClick="onClickOutsource" />
-        	<GuiElement type="text" template="gcBaseGuiButtonText" id="gui_btn_outsourceText" text="$l10n_GC_globalMarket_btn_outsource" />    
+        	<GuiElement type="text" template="gcBaseGuiButtonText" id="gui_btn_outsourceText" text="$l10n_GC_globalMarket_btn_outsource" /> 
+            
+			<GuiElement type="button" position="80px 0px" template="gcBaseGuiButtonNext" id="gui_btn_outsourceBale1" inputAction="MENU_PAGE_PREV" onClick="onClickOutsourceBale1" />
+        	<GuiElement type="text" template="gcBaseGuiButtonText" id="gui_btn_outsourceBale1Text" text="$l10n_GC_globalMarket_btn_outsourceBale1" />             
+			<GuiElement type="button" position="80px 0px" template="gcBaseGuiButtonNext" id="gui_btn_outsourceBale2" inputAction="MENU_PAGE_NEXT" onClick="onClickOutsourceBale2" />
+        	<GuiElement type="text" template="gcBaseGuiButtonText" id="gui_btn_outsourceBale2Text" text="$l10n_GC_globalMarket_btn_outsourceBale2" /> 
+
 			<GuiElement type="button" position="80px 0px" template="gcBaseGuiButtonNext" id="gui_btn_sellBuy" inputAction="MENU_ACCEPT" onClick="onClickSellBuy" />
         	<GuiElement type="text" template="gcBaseGuiButtonText" id="gui_btn_sellBuyText" />  
         </GuiElement>

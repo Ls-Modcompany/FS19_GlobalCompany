@@ -293,7 +293,7 @@ function GC_UnloadingTrigger:getIsFillTypeSupported(fillTypeIndex)
 
 	if accepted then
 		if self.useTargetGetIsFillTypeAllowed and self.target.getIsFillTypeAllowed ~= nil then
-			if not self.target:getIsFillTypeAllowed(fillTypeIndex, self.extraParamater) then
+			if not self.target:getIsFillTypeAllowed(fillTypeIndex, self.extraParamater, self) then
 				accepted = false
 			end
 		else
@@ -342,7 +342,6 @@ function GC_UnloadingTrigger:baleTriggerCallback(triggerId, otherId, onEnter, on
 		if object ~= nil and object:isa(Bale) then
 			if onEnter  then
 				local fillTypeIndex = object:getFillType()
-
 				if self:getIsFillTypeAllowed(fillTypeIndex) and self:getIsToolTypeAllowed(ToolType.BALE) then
 					if self.target:getFreeCapacity(fillTypeIndex, object:getOwnerFarmId(), self.extraParamater) > 0 then
 						table.insert(self.balesInTrigger, object)

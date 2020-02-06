@@ -67,26 +67,38 @@ function Gc_Gui_GlobalMarketLevelDialog:setCloseCallback(target, func)
     self.closeCallback = {target=target, func=func}
 end
 
-function Gc_Gui_GlobalMarketLevelDialog:setData(market, fillLevel, fillTypeIndex, sell, isOutsource)
+function Gc_Gui_GlobalMarketLevelDialog:setData(market, fillLevel, fillTypeIndex, sell, isOutsource, asRoundBale)
     self.market = market       
     self.fillTypeIndex = fillTypeIndex
     self.sell = sell
     self.maximum = fillLevel
     self.isOutsource = isOutsource
+    self.asRoundBale = asRoundBale
 
+    local isPallet = true
     if isOutsource then
-        local path = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex).palletFilename
-        local isPallet = true
+        local path = g_company.globalMarket:getPalletFilenameFromFillTypeIndex(fillTypeIndex)
         if path == nil then
             path = g_company.globalMarket.baleToFilename[string.upper(g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex))]
+            if asRoundBale then
+                path = path[1]
+            else
+                path = path[2]
+            end
             isPallet = false
         end
         self.capacityPerPallet, self.numBales = g_company.globalMarket:getCapacityByStoreXml(path, isPallet)
-        self.maximum = math.ceil(fillLevel / self.capacityPerPallet)       
+        if isPallet then
+            self.maximum = math.ceil(fillLevel / self.capacityPerPallet)       
+        else
+            self.maximum = math.floor(fillLevel / self.capacityPerPallet)       
+        end
         
         if not isPallet then
             if fillLevel < self.capacityPerPallet then
                 self.maximum = 0
+                self:onClickClose();
+                return
             --elseif self.maximum > self.numBales then
             --    self.maximum = self.numBales
             end
@@ -204,7 +216,7 @@ end
 
 function Gc_Gui_GlobalMarketLevelDialog:onClickSellBuy()
     if self.isOutsource then
-        self.market:spawnPallets(self.fillTypeIndex, self:getCurrentAmount(), g_currentMission:getFarmId(), self.capacityPerPallet, self.numBales)
+        self.market:spawnPallets(self.fillTypeIndex, self:getCurrentAmount(), g_currentMission:getFarmId(), self.capacityPerPallet, self.numBales, self.asRoundBale)
         g_company.gui:closeActiveGui("gc_globalMarket", false, self.market)
     else
         self.market:sellBuyOnMarket(self.fillTypeIndex, self:getCurrentAmount(), g_currentMission:getFarmId(), self.sell)

@@ -103,7 +103,7 @@ function GC_ObjectSpawner:getSpaceByObjectInfo(object, maxWanted, ignoreShapesHi
 	return totalFreeAreas
 end
 
-function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesHit, object2, numberToSpawn2)
+function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesHit, object2, numberToSpawn2, ownFillLevel)
 	local numSpawned = 0
 	local owner = self:getOwnerFarmId()
 
@@ -163,6 +163,12 @@ function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesH
 								if numSpawned == numberToSpawn1 then
 									object = object2
 								end
+
+								if ownFillLevel ~= nil and vehicle.spec_buyableBale ~= nil then
+									for _,bale in pairs(vehicle.spec_buyableBale.loadedBales) do
+										bale:setFillLevel(ownFillLevel);
+									end
+								end
 							--else
 							--	return vehicle
 							--end
@@ -177,8 +183,8 @@ function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesH
 end
 
 function GC_ObjectSpawner:getSpawnAreaDataBySize(spawnArea, width, length, customOffset, count, placesToSpawn, ignoreShapesHit)
-	local halfWidth = width * 0.2
-	local halfLength = length * 0.2
+	local halfWidth = width * 0.5
+	local halfLength = length * 0.5
 
 	local offset = width * Utils.getNoNil(customOffset, 0.5)
 

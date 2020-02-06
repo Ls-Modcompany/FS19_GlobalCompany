@@ -99,21 +99,21 @@ function GC_GlobalMarketObject:load(nodeId, xmlFile, xmlKey, indexName, isPlacea
     local unloadingTriggerKey = string.format("%s.unloadingTrigger", xmlKey);    
     local unloadingTrigger = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.rootNode, self, xmlFile, unloadingTriggerKey);
     if unloadingTrigger ~= nil then
-		unloadingTrigger.extraParamater = {g_company.globalMarket.fillTypeTypes.SILO}
+		--unloadingTrigger.extraParamater = {g_company.globalMarket.fillTypeTypes.SILO}
         self.unloadingTrigger = unloadingTrigger
 	end
 	
     local unloadingTriggerLiquidKey = string.format("%s.unloadingTriggerLiquid", xmlKey);    
     local unloadingTriggerLiquid = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.rootNode, self, xmlFile, unloadingTriggerLiquidKey);
     if unloadingTriggerLiquid ~= nil then
-		unloadingTriggerLiquid.extraParamater = {g_company.globalMarket.fillTypeTypes.LIQUID}
+		--unloadingTriggerLiquid.extraParamater = {g_company.globalMarket.fillTypeTypes.LIQUID}
         self.unloadingTriggerLiquid = unloadingTriggerLiquid
 	end
 	
     local unloadingTriggerPalletBaleKey = string.format("%s.unloadingTriggerPalletBale", xmlKey);    
     local unloadingTriggerPalletBale = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.rootNode, self, xmlFile, unloadingTriggerPalletBaleKey);
     if unloadingTriggerPalletBale ~= nil then
-		unloadingTriggerPalletBale.extraParamater = {g_company.globalMarket.fillTypeTypes.PALLET, g_company.globalMarket.fillTypeTypes.BALE}
+		--unloadingTriggerPalletBale.extraParamater = {g_company.globalMarket.fillTypeTypes.PALLET, g_company.globalMarket.fillTypeTypes.BALE}
         self.unloadingTriggerPalletBale = unloadingTriggerPalletBale
 	end	
 
@@ -121,7 +121,7 @@ function GC_GlobalMarketObject:load(nodeId, xmlFile, xmlKey, indexName, isPlacea
     local loadingTrigger = self.triggerManager:addTrigger(GC_LoadingTrigger, self.rootNode, self, xmlFile, loadingTriggerKey, {}, false, true);
     if loadingTrigger ~= nil then        
 		loadingTrigger.onActivateObject = function() self:onActivateObjectLoadingTrigger(loadingTrigger) end
-		loadingTrigger.extraParamater = g_company.globalMarket.fillTypeTypes.SILO
+		loadingTrigger.extraParamater = {g_company.globalMarket.fillTypeTypes.SILO}
 		loadingTrigger.getIsActivatable = g_company.utils.appendedFunction(loadingTrigger.getIsActivatable, self.loadingTriggerGetIsActivatable, self)
         self.loadingTrigger = loadingTrigger
 	end
@@ -130,7 +130,7 @@ function GC_GlobalMarketObject:load(nodeId, xmlFile, xmlKey, indexName, isPlacea
     local loadingTrigger2 = self.triggerManager:addTrigger(GC_LoadingTrigger, self.rootNode, self, xmlFile, loadingTrigger2Key, {}, false, true);
     if loadingTrigger2 ~= nil then        
 		loadingTrigger2.onActivateObject = function() self:onActivateObjectLoadingTrigger(loadingTrigger2) end
-		loadingTrigger2.extraParamater = g_company.globalMarket.fillTypeTypes.CONVEYOR
+		loadingTrigger2.extraParamater = {g_company.globalMarket.fillTypeTypes.CONVEYOR, g_company.globalMarket.fillTypeTypes.CONVEYORANDBALE}
 		loadingTrigger2.getIsActivatable = g_company.utils.appendedFunction(loadingTrigger2.getIsActivatable, self.loadingTriggerGetIsActivatable, self)
         self.loadingTrigger2 = loadingTrigger2
 	end
@@ -139,7 +139,7 @@ function GC_GlobalMarketObject:load(nodeId, xmlFile, xmlKey, indexName, isPlacea
     local loadingTriggerLiquid = self.triggerManager:addTrigger(GC_LoadingTrigger, self.rootNode, self, xmlFile, loadingTriggerLiquidKey, {}, false, true);
     if loadingTriggerLiquid ~= nil then        
 		loadingTriggerLiquid.onActivateObject = function() self:onActivateObjectLoadingTrigger(loadingTriggerLiquid) end
-		loadingTriggerLiquid.extraParamater = g_company.globalMarket.fillTypeTypes.LIQUID
+		loadingTriggerLiquid.extraParamater = {g_company.globalMarket.fillTypeTypes.LIQUID}
 		loadingTriggerLiquid.getIsActivatable = g_company.utils.appendedFunction(loadingTriggerLiquid.getIsActivatable, self.loadingTriggerGetIsActivatable, self)
         self.loadingTriggerLiquid = loadingTriggerLiquid
 	end
@@ -320,10 +320,25 @@ function GC_GlobalMarketObject:onChangeFillTypes(fillTypes)
 	for fillTypeIndex,_ in pairs(fillTypes[g_company.globalMarket.fillTypeTypes.BALE]) do
 		self.unloadingTriggerPalletBale:setAcceptedFillTypeState(fillTypeIndex, true)
 	end
+	for fillTypeIndex,_ in pairs(fillTypes[g_company.globalMarket.fillTypeTypes.CONVEYORANDBALE]) do
+		self.unloadingTriggerPalletBale:setAcceptedFillTypeState(fillTypeIndex, true)
+	end
+end
+
+function GC_GlobalMarketObject:getIsFillTypeAllowed(fillTypeIndex, triggerId, trigger) 
+	local fillTypeName = string.upper(g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex))
+	if g_company.globalMarket.fillTypeMapping[fillTypeName] ~= nil then
+		fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(g_company.globalMarket.fillTypeMapping[fillTypeName])
+	end  
+	return trigger.fillTypes[fillTypeIndex]
 end
 
 --call from unloading trigger
-function GC_GlobalMarketObject:getFreeCapacity(fillTypeIndex, farmId, triggerId)        
+function GC_GlobalMarketObject:getFreeCapacity(fillTypeIndex, farmId, triggerId)    
+	local fillTypeName = string.upper(g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex))
+	if g_company.globalMarket.fillTypeMapping[fillTypeName] ~= nil then
+		fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(g_company.globalMarket.fillTypeMapping[fillTypeName])
+	end    
 	if self.fillLevels[fillTypeIndex] == nil then
 		return self.data.capacityPerFillType
 	end
@@ -337,6 +352,10 @@ end
 
 --call from unloading trigger
 function GC_GlobalMarketObject:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, toolType, fillPositionData, triggerId)
+	local fillTypeName = string.upper(g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex))
+	if g_company.globalMarket.fillTypeMapping[fillTypeName] ~= nil then
+		fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(g_company.globalMarket.fillTypeMapping[fillTypeName])
+	end
 	if self.fillLevels[fillTypeIndex] == nil then
 		self.fillLevels[fillTypeIndex] = {}
 	end
@@ -377,8 +396,7 @@ function GC_GlobalMarketObject:loadingTriggerGetIsActivatable(trigger, val)
 		for fillTypeIndex, levels in pairs(self.fillLevels) do
 			
 			local triggerAllow = trigger.validFillableObject:getFillUnitAllowsFillType(trigger.validFillableFillUnitIndex, fillTypeIndex)         
-			local isForTriggerAvailable = g_company.globalMarket:getIsFillTypeFromType(fillTypeIndex, trigger.extraParamater)             
-
+			local isForTriggerAvailable = g_company.globalMarket:getIsFillTypeFromType(fillTypeIndex, trigger.extraParamater)   
 			if levels[farmId] > 0 and triggerAllow and isForTriggerAvailable then
 				table.insert(items, fillTypeIndex)
 			end
@@ -448,19 +466,24 @@ function GC_GlobalMarketObject:setOwnerFarmId(ownerFarmId, noEventSend)
 	end;
 end;
 
-function GC_GlobalMarketObject:spawnPallets(fillTypeIndex, numPallets, farmId, capacityPerPallet, maxNumBales)
+function GC_GlobalMarketObject:spawnPallets(fillTypeIndex, numPallets, farmId, capacityPerPallet, maxNumBales, asRoundBale)
 	if self.isServer then
-		local palletFilename = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex).palletFilename
+		local palletFilename = g_company.globalMarket:getPalletFilenameFromFillTypeIndex(fillTypeIndex) 
 		local isPallet = true
 		if palletFilename == nil then
 			palletFilename = g_company.globalMarket.baleToFilename[string.upper(g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex))]
+			if asRoundBale then
+                palletFilename = palletFilename[1]
+            else
+                palletFilename = palletFilename[2]
+            end
 			isPallet = false
 		end
 		local width, length, _, _ = StoreItemUtil.getSizeValues(palletFilename, "vehicle", 0, {})
-
+		
 		local numberSpawned = 0
 		local spawnedFillLevel = 0
-		if self.isPallet then
+		if isPallet then
 			local fullSpawn = math.min(math.floor(self.fillLevels[fillTypeIndex][farmId] / capacityPerPallet), numPallets)
 			
 			local object = {
@@ -482,10 +505,15 @@ function GC_GlobalMarketObject:spawnPallets(fillTypeIndex, numPallets, farmId, c
 				spawnedFillLevel = spawnedFillLevel + object.fillLevel
 			end
 		else
-			local fullSpawn = math.min(math.floor(self.fillLevels[fillTypeIndex][farmId] / capacityPerPallet), numPallets) -- 2
-			local fullSpawnBales = math.floor(fullSpawn/maxNumBales) -- 0
-			local baleAmount = math.min(fullSpawn, maxNumBales) -- 2
+			local fullSpawn = math.min(math.floor(self.fillLevels[fillTypeIndex][farmId] / capacityPerPallet), numPallets)
+			local fullSpawnBales = math.floor(fullSpawn/maxNumBales)
+			local baleAmount = math.min(fullSpawn, maxNumBales)
 			
+			local ownFillLevel = nil
+			if capacityPerPallet ~= 4000 then --4000 is the default for bales
+				ownFillLevel = capacityPerPallet
+			end
+
 			local object = {
 				filename = palletFilename,
 				fillUnitIndex = 1,
@@ -516,10 +544,10 @@ function GC_GlobalMarketObject:spawnPallets(fillTypeIndex, numPallets, farmId, c
 			end
 
 			if object2 ~= nil then
-				numberSpawned = self.palletOutput:spawnByObjectInfo(object, fullSpawnBales, false, object2, 1)
+				numberSpawned = self.palletOutput:spawnByObjectInfo(object, fullSpawnBales, false, object2, 1, ownFillLevel)
 				spawnedFillLevel = capacityPerPallet * fullSpawnBales * baleAmount
 			else
-				numberSpawned = self.palletOutput:spawnByObjectInfo(object, fullSpawnBales)
+				numberSpawned = self.palletOutput:spawnByObjectInfo(object, fullSpawnBales, false, nil, nil, ownFillLevel)
 				spawnedFillLevel = capacityPerPallet * (fullSpawn - fullSpawnBales * baleAmount)
 			end
 			spawnedFillLevel = spawnedFillLevel + capacityPerPallet * numberSpawned * baleAmount

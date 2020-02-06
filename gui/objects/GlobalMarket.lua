@@ -53,6 +53,11 @@ function Gc_Gui_GlobalMarket:onOpen()
     self.gui_btn_sellBuy:setVisible(false)
     self.gui_btn_sellBuyText:setVisible(false)
     self.gui_btn_outsource:setVisible(false)
+    self.gui_btn_outsourceText:setVisible(false)
+    self.gui_btn_outsourceBale1:setVisible(false)
+    self.gui_btn_outsourceBale1Text:setVisible(false)
+    self.gui_btn_outsourceBale2:setVisible(false)
+    self.gui_btn_outsourceBale2Text:setVisible(false)
 end
 
 function Gc_Gui_GlobalMarket:onClose() 
@@ -62,15 +67,19 @@ end
 function Gc_Gui_GlobalMarket:onCreate() end
 
 function Gc_Gui_GlobalMarket:keyEvent(unicode, sym, modifier, isDown, eventUsed)
-   if sym == 120 and isDown then
+    if sym == 120 and isDown then
         self:openTab(Gc_Gui_GlobalMarket.tabs.STORAGE) 
-   elseif sym == 99 and isDown then
+    elseif sym == 99 and isDown then
         self:openTab(Gc_Gui_GlobalMarket.tabs.BUY) 
-    elseif sym == 13 then
+    elseif sym == 13 and self.gui_btn_sellBuy:getVisible() then
         self:onClickSellBuy()
-    elseif sym == 32 then
+    elseif sym == 32 and self.gui_btn_outsource:getVisible() then
         self:onClickOutsource()
-   end    
+    elseif sym == 113 and self.gui_btn_outsourceBale1:getVisible() then
+        self:onClickOutsourceBale1()
+    elseif sym == 101 and self.gui_btn_outsourceBale2:getVisible() then
+        self:onClickOutsourceBale2()
+    end    
 end
 
 function Gc_Gui_GlobalMarket:setCloseCallback(target, func) 
@@ -88,14 +97,42 @@ end
 function Gc_Gui_GlobalMarket:onClickStorageItem(element) 
     self.currentSelectedItem = element    
     self.gui_btn_sellBuy:setVisible(true)
-    self.gui_btn_sellBuyText:setVisible(true)      
-    self.gui_btn_outsource:setVisible(self.activeTab == Gc_Gui_GlobalMarket.tabs.STORAGE and self:getCanOutsource())
+    self.gui_btn_sellBuyText:setVisible(true)   
+    
+    local havePallet, haveBale1, haveBale2 = self:getCanOutsource()
+    self.gui_btn_outsource:setVisible(self.activeTab == Gc_Gui_GlobalMarket.tabs.STORAGE and havePallet)
+    self.gui_btn_outsourceText:setVisible(self.activeTab == Gc_Gui_GlobalMarket.tabs.STORAGE and havePallet)    
+    self.gui_btn_outsourceBale1:setVisible(self.activeTab == Gc_Gui_GlobalMarket.tabs.STORAGE and haveBale1)
+    self.gui_btn_outsourceBale1Text:setVisible(self.activeTab == Gc_Gui_GlobalMarket.tabs.STORAGE and haveBale1)    
+    self.gui_btn_outsourceBale2:setVisible(self.activeTab == Gc_Gui_GlobalMarket.tabs.STORAGE and haveBale2)
+    self.gui_btn_outsourceBale2Text:setVisible(self.activeTab == Gc_Gui_GlobalMarket.tabs.STORAGE and haveBale2)
 end
 
 function Gc_Gui_GlobalMarket:getCanOutsource(item)
-    local havePallet = g_fillTypeManager:getFillTypeByIndex(self.currentSelectedItem.fillTypeIndex).palletFilename ~= nil
-    local haveBale = g_company.globalMarket.baleToFilename[string.upper(g_fillTypeManager:getFillTypeNameByIndex(self.currentSelectedItem.fillTypeIndex))] ~= nil
-    return havePallet or haveBale
+    local havePallet = false
+    local haveBale1 = false
+    local haveBale2 = false
+    if self.activeTab == Gc_Gui_GlobalMarket.tabs.STORAGE then
+        havePallet = g_company.globalMarket:getPalletFilenameFromFillTypeIndex(self.currentSelectedItem.fillTypeIndex) ~= nil
+        local balePaths = g_company.globalMarket.baleToFilename[string.upper(g_fillTypeManager:getFillTypeNameByIndex(self.currentSelectedItem.fillTypeIndex))]
+        haveBale = balePaths ~= nil
+
+        if haveBale then
+            if balePaths[1] ~= nil then
+                local capacityPerPallet1, numBales1 = g_company.globalMarket:getCapacityByStoreXml(balePaths[1], false)
+                haveBale1 = self.currentSelectedItem.fillTypeLevel >= capacityPerPallet1
+            else
+                haveBale1 = false
+            end
+            if balePaths[2] ~= nil then
+                local capacityPerPallet2, numBales2 = g_company.globalMarket:getCapacityByStoreXml(balePaths[2], false)
+                haveBale2 = self.currentSelectedItem.fillTypeLevel >= capacityPerPallet2
+            else
+                haveBale2 = false
+            end
+        end        
+    end
+    return havePallet, haveBale1, haveBale2
 end
 
 function Gc_Gui_GlobalMarket:onClickTabStorage(element) 
@@ -182,6 +219,24 @@ function Gc_Gui_GlobalMarket:onClickOutsource()
     g_company.gui:setCanExit("gc_globalMarketLevelDialog", false)
     if self.activeTab == Gc_Gui_GlobalMarket.tabs.STORAGE then
         g_company.gui:closeActiveGui("gc_globalMarketLevelDialog", false, self.market, self.currentSelectedItem.fillTypeLevel, self.currentSelectedItem.fillTypeIndex, true, true)
+    end
+    self:loadTableBuy()
+    self:loadTableSell()
+end
+
+function Gc_Gui_GlobalMarket:onClickOutsourceBale1()    
+    g_company.gui:setCanExit("gc_globalMarketLevelDialog", false)
+    if self.activeTab == Gc_Gui_GlobalMarket.tabs.STORAGE then
+        g_company.gui:closeActiveGui("gc_globalMarketLevelDialog", false, self.market, self.currentSelectedItem.fillTypeLevel, self.currentSelectedItem.fillTypeIndex, true, true, true)
+    end
+    self:loadTableBuy()
+    self:loadTableSell()
+end
+
+function Gc_Gui_GlobalMarket:onClickOutsourceBale2()    
+    g_company.gui:setCanExit("gc_globalMarketLevelDialog", false)
+    if self.activeTab == Gc_Gui_GlobalMarket.tabs.STORAGE then
+        g_company.gui:closeActiveGui("gc_globalMarketLevelDialog", false, self.market, self.currentSelectedItem.fillTypeLevel, self.currentSelectedItem.fillTypeIndex, true, true, false)
     end
     self:loadTableBuy()
     self:loadTableSell()
