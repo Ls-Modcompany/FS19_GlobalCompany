@@ -91,10 +91,6 @@ function GC_ModManager:initSelectedMods()
 		local modName = mod.modName;
 		local modDir = mod.modDir;
 
-		if modName == "FS19_HofBergmann" then 
-			return true
-		end
-
 		if self.ignoreFiles[modName] == nil then
 			if mod.modFile ~= nil and modDir ~= nil then
 				local xmlFile = loadXMLFile("TempModDesc", mod.modFile);
@@ -180,7 +176,6 @@ function GC_ModManager:initSelectedMods()
 			end;
 		end;
 	end;
-	return false
 end;
 
 function GC_ModManager:delete()

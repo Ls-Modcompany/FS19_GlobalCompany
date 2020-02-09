@@ -175,10 +175,7 @@ function GlobalCompany.initialLoad()
 
 		GlobalCompany.loadEnviroment(modNameCurrent, GlobalCompany.dir .. "xml/globalCompany.xml", false);
 		
-		if g_company.modManager:initSelectedMods() then	
-			g_gui:showYesNoDialog({text = "This map is not supported by the GC. Remove FS19_HofBergmann.zip for the best gaming experience!", callback = GlobalCompany.leaveToMenuCallback, target = self});
-			g_company = nil
-		end
+		g_company.modManager:initSelectedMods()	
 		
 		g_company.languageManager:loadModLanguageFiles(GlobalCompany.modLanguageFiles);
 
