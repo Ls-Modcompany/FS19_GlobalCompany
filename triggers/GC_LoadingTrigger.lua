@@ -64,6 +64,8 @@ function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes
 
 	local xmlUtils = g_company.xmlUtils
 
+	self.allowEverybodyAccess = false
+
 	local triggerNode = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, xmlKey .. "#triggerNode"), source.i3dMappings)
 	if triggerNode ~= nil and source.getProvidedFillTypes ~= nil and source.getAllProvidedFillLevels ~= nil and source.getProvidedFillLevel ~= nil and source.removeFillLevel ~= nil then
 		self.triggerNode = triggerNode
@@ -469,7 +471,7 @@ function GC_LoadingTrigger:getIsActivatable()
 
 					if canActivate then
 						if fillableObject.object:getFillUnitSupportsToolType(fillableObject.fillUnitIndex, ToolType.TRIGGER) then
-							if self:getIsFillAllowedToFarm(self:farmIdForFillableObject(fillableObject.object)) then
+							if self:getIsFillAllowedToFarm(self:farmIdForFillableObject(fillableObject.object)) or self.allowEverybodyAccess then
 								self.validFillableObject = fillableObject.object
 								self.validFillableFillUnitIndex = fillableObject.fillUnitIndex
 
@@ -484,6 +486,7 @@ function GC_LoadingTrigger:getIsActivatable()
 		end
 	end
 
+	print("getIsActivatable 5")
 	return false
 end
 

@@ -181,7 +181,9 @@ Kosten:  %s"/>
 		<e k="GC_globalMarket_btn_outsourceBale2" v="Quaderballen"/>
 		<e k="GC_globalMarket_btn_sell" v="Verkaufen"/>
 		<e k="GC_globalMarket_btn_buy" v="Kaufen   "/>
+
 		<e k="GC_globalMarket_externIsOffline" v="Starte die benötigte externe Software, damit du Ware ankaufen kannst oder deine abgegebene Ware verkaufen kannst."/>
+		<e k="GC_globalMarket_externIsFalseVersion" v="Du hast nicht die aktuellste Version der externen Software."/>
 		
 		
 		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Quaderballen Gras"/>

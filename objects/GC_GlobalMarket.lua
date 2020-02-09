@@ -24,6 +24,8 @@
 GC_GlobalMarket = {}
 GC_GlobalMarket._mt = Class(GC_GlobalMarket)
 
+GC_GlobalMarket.neededExeVersion = 1000;
+
 GC_GlobalMarket.fillTypeTypes = {} 
 GC_GlobalMarket.fillTypeTypes.SILO = 1 
 GC_GlobalMarket.fillTypeTypes.CONVEYOR = 2 
@@ -54,6 +56,14 @@ GC_GlobalMarket.fillTypeToFilename["TREESAPLINGS"] = "data/objects/pallets/treeS
 GC_GlobalMarket.fillTypeToFilename["WOOL"] = "data/objects/pallets/woolPallet/woolPallet.xml"
 GC_GlobalMarket.fillTypeToFilename["EGG"] = "data/objects/pallets/eggBox/eggBox.xml"
 GC_GlobalMarket.fillTypeToFilename["POPLAR"] = "data/objects/pallets/palletPoplar/palletPoplar.xml"
+GC_GlobalMarket.fillTypeToFilename["WOODCHIPS"] = "data/objects/pallets/fillablePallet/fillablePallet.xml"
+GC_GlobalMarket.fillTypeToFilename["SUGARBEET"] = "data/objects/pallets/fillablePallet/fillablePallet.xml"
+GC_GlobalMarket.fillTypeToFilename["FORAGE"] = "data/objects/pallets/fillablePallet/fillablePallet.xml"
+GC_GlobalMarket.fillTypeToFilename["FORAGE_MIXING"] = "data/objects/pallets/fillablePallet/fillablePallet.xml"
+GC_GlobalMarket.fillTypeToFilename["CHAFF"] = "data/objects/pallets/fillablePallet/fillablePallet.xml"
+--GC_GlobalMarket.fillTypeToFilename["SILAGE"] = "data/objects/pallets/fillablePallet/fillablePallet.xml"
+GC_GlobalMarket.fillTypeToFilename["MANURE"] = "data/objects/pallets/fillablePallet/fillablePallet.xml"
+GC_GlobalMarket.fillTypeToFilename["PIGFOOD"] = "data/objects/bigBagContainer/bigBagContainerPigFood.xml"
 
 GC_GlobalMarket.fillTypeMapping = {}
 GC_GlobalMarket.fillTypeMapping["GRASS"] = "GRASS_WINDROW"
@@ -82,6 +92,7 @@ function GC_GlobalMarket:new()
     createFolder(self.paths.folderSendToServer);
 
     self.isFirstOnline = false
+    self.haveFile = false
 
     self.onChangeFillTypes = {}
     self.runManualSynch = {}
@@ -99,7 +110,15 @@ function GC_GlobalMarket:new()
 end
 
 function GC_GlobalMarket:getIsOnline()
-    return fileExists(self.paths.isOnlineFile)
+    if fileExists(self.paths.isOnlineFile) then
+        self.haveFile = true
+        local xmlFile = loadXMLFile("gc_globalMarket", self.paths.isOnlineFile)
+        local version = getXMLInt(xmlFile, "gc_globalMarket.version")
+        delete(xmlFile)
+        return version >= g_company.globalMarket.neededExeVersion
+    end
+    self.haveFile = false
+    return false
 end
 
 function GC_GlobalMarket:registerMarket(market)
@@ -138,11 +157,19 @@ function GC_GlobalMarket:update(dt)
 
             local farmId = g_currentMission:getFarmId()
             if sell == 1 then
-                g_currentMission:addMoney(money, farmId, MoneyType.HARVEST_INCOME, true, false)
+                if self.isServer then
+                    g_currentMission:addMoney(money, farmId, MoneyType.HARVEST_INCOME, true, false)
+                else
+                    g_client:getServerConnection():sendEvent(GC_GmSendMoneyEvent:new(money, farmId))		
+                end
             else
-                g_currentMission:addMoney(-money, farmId, MoneyType.HARVEST_INCOME, true, false)
+                if self.isServer then
+                    g_currentMission:addMoney(-money, farmId, MoneyType.HARVEST_INCOME, true, false)
+                else
+                    g_client:getServerConnection():sendEvent(GC_GmSendMoneyEvent:new(-money, farmId))		
+                end
                 if self.markets[marketId] ~= nil then
-                    self.markets[marketId]:addFillLevel(farmId, fillLevel, fillTypeIndex)
+                    self.markets[marketId]:addFillLevelFromClient(farmId, fillLevel, fillTypeIndex)
                 else
                     print(string.format("Invalid market id %s", marketId))                    
                 end
@@ -175,9 +202,11 @@ function GC_GlobalMarket:loadFillTypes()
     end
 
     self.fillTypes = {}
+    local changeFillTypes = {}
     self.fillTypeToType = {}
     for _,i in pairs(GC_GlobalMarket.fillTypeTypes) do
         self.fillTypes[i] = {}
+        changeFillTypes[i] = {}
     end
 
     if not fileExists(self.paths.fillTypesData) then
@@ -207,15 +236,28 @@ function GC_GlobalMarket:loadFillTypes()
         else
             fillType.index = g_fillTypeManager:getFillTypeIndexByName(fillType.name)
         end
-        self.fillTypeToType[fillType.index] = fillType.type
-        self.fillTypes[fillType.type][fillType.index] = fillType
+        if fillType.index ~= nil then
+            self.fillTypeToType[fillType.index] = fillType.type
+            self.fillTypes[fillType.type][fillType.index] = fillType
+            changeFillTypes[fillType.type][fillType.index] = true
+        end
 
         i = i + 1
     end
     
-	for _, changeFillTypes in pairs(self.onChangeFillTypes) do
-		changeFillTypes.func(changeFillTypes.target, self.fillTypes)
+	for _, changeFillTypesE in pairs(self.onChangeFillTypes) do
+		changeFillTypesE.func(changeFillTypesE.target, changeFillTypes)
 	end
+end
+
+function GC_GlobalMarket:setFillTypesForServer(fillTypes)
+    self.fillTypes = {}
+    for typ, tab in pairs(fillTypes) do
+        self.fillTypes[typ] = {}
+        for fillTypeIndex, _ in pairs(tab) do
+            self.fillTypes[typ][fillTypeIndex] = {}
+        end
+    end
 end
 
 function GC_GlobalMarket:getProvidedFillTypes(fillTyp)
@@ -273,7 +315,7 @@ function GC_GlobalMarket:calculateActualPrice(fillTypeIndex, level)
     return self.fillTypes[self.fillTypeToType[fillTypeIndex]][fillTypeIndex].actualPrice * level
 end
 
-function GC_GlobalMarket:sellBuyOnMarket(fillTypeIndex, fillLevelDelta, sell, marketId)   
+function GC_GlobalMarket:sellBuyOnMarket(fillTypeIndex, fillLevelDelta, sell, marketId)  
     local freeFile = ""
     local i = 0
     while true do

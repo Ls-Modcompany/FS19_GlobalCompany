@@ -66,6 +66,8 @@ function GC_UnloadingTrigger:load(nodeId, target, xmlFile, xmlKey, forcedFillTyp
 
 	self.debugData = g_company.debug:getDebugData(GC_UnloadingTrigger.debugIndex, target)	
 
+	self.allowEverybodyAccess = false
+
 	local exactFillRootNode = getXMLString(xmlFile, xmlKey .. "#exactFillRootNode")
 	if exactFillRootNode ~= nil then
 		self.exactFillRootNode = I3DUtil.indexToObject(nodeId, exactFillRootNode, target.i3dMappings)
@@ -424,5 +426,5 @@ function GC_UnloadingTrigger:setCustomDischargeNotAllowedWarning(text)
 end
 
 function GC_UnloadingTrigger:getIsFillAllowedFromFarm(farmId)
-	return g_currentMission.accessHandler:canFarmAccess(farmId, self.target)
+	return g_currentMission.accessHandler:canFarmAccess(farmId, self.target) or self.allowEverybodyAccess
 end

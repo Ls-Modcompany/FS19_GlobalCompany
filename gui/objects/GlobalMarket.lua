@@ -174,7 +174,7 @@ function Gc_Gui_GlobalMarket:loadTableSell()
     local haveStorageItems = false
     local farmId = g_currentMission:getFarmId()
     for fillTypeIndex, levels in pairs(self.market.fillLevels) do
-        if levels[farmId] > 0 then
+        if levels[farmId] ~= nil and levels[farmId] > 0 then
             self.currentFillTypeIndex = fillTypeIndex
             self.currentFillLevel = levels[farmId]
             local item = self.gui_table_storage:createItem()

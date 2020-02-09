@@ -99,21 +99,21 @@ function GC_GlobalMarketObject:load(nodeId, xmlFile, xmlKey, indexName, isPlacea
     local unloadingTriggerKey = string.format("%s.unloadingTrigger", xmlKey);    
     local unloadingTrigger = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.rootNode, self, xmlFile, unloadingTriggerKey);
     if unloadingTrigger ~= nil then
-		--unloadingTrigger.extraParamater = {g_company.globalMarket.fillTypeTypes.SILO}
+		unloadingTrigger.allowEverybodyAccess = true
         self.unloadingTrigger = unloadingTrigger
 	end
 	
     local unloadingTriggerLiquidKey = string.format("%s.unloadingTriggerLiquid", xmlKey);    
     local unloadingTriggerLiquid = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.rootNode, self, xmlFile, unloadingTriggerLiquidKey);
     if unloadingTriggerLiquid ~= nil then
-		--unloadingTriggerLiquid.extraParamater = {g_company.globalMarket.fillTypeTypes.LIQUID}
+		unloadingTriggerLiquid.allowEverybodyAccess = true
         self.unloadingTriggerLiquid = unloadingTriggerLiquid
 	end
 	
     local unloadingTriggerPalletBaleKey = string.format("%s.unloadingTriggerPalletBale", xmlKey);    
     local unloadingTriggerPalletBale = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.rootNode, self, xmlFile, unloadingTriggerPalletBaleKey);
     if unloadingTriggerPalletBale ~= nil then
-		--unloadingTriggerPalletBale.extraParamater = {g_company.globalMarket.fillTypeTypes.PALLET, g_company.globalMarket.fillTypeTypes.BALE}
+		unloadingTriggerPalletBale.allowEverybodyAccess = true
         self.unloadingTriggerPalletBale = unloadingTriggerPalletBale
 	end	
 
@@ -123,7 +123,8 @@ function GC_GlobalMarketObject:load(nodeId, xmlFile, xmlKey, indexName, isPlacea
 		loadingTrigger.onActivateObject = function() self:onActivateObjectLoadingTrigger(loadingTrigger) end
 		loadingTrigger.extraParamater = {g_company.globalMarket.fillTypeTypes.SILO}
 		loadingTrigger.getIsActivatable = g_company.utils.appendedFunction(loadingTrigger.getIsActivatable, self.loadingTriggerGetIsActivatable, self)
-        self.loadingTrigger = loadingTrigger
+		loadingTrigger.allowEverybodyAccess = true
+		self.loadingTrigger = loadingTrigger
 	end
 
     local loadingTrigger2Key = string.format("%s.loadingTrigger2", xmlKey)
@@ -132,7 +133,8 @@ function GC_GlobalMarketObject:load(nodeId, xmlFile, xmlKey, indexName, isPlacea
 		loadingTrigger2.onActivateObject = function() self:onActivateObjectLoadingTrigger(loadingTrigger2) end
 		loadingTrigger2.extraParamater = {g_company.globalMarket.fillTypeTypes.CONVEYOR, g_company.globalMarket.fillTypeTypes.CONVEYORANDBALE}
 		loadingTrigger2.getIsActivatable = g_company.utils.appendedFunction(loadingTrigger2.getIsActivatable, self.loadingTriggerGetIsActivatable, self)
-        self.loadingTrigger2 = loadingTrigger2
+		loadingTrigger2.allowEverybodyAccess = true
+		self.loadingTrigger2 = loadingTrigger2
 	end
 	
     local loadingTriggerLiquidKey = string.format("%s.loadingTriggerLiquid", xmlKey)
@@ -141,7 +143,8 @@ function GC_GlobalMarketObject:load(nodeId, xmlFile, xmlKey, indexName, isPlacea
 		loadingTriggerLiquid.onActivateObject = function() self:onActivateObjectLoadingTrigger(loadingTriggerLiquid) end
 		loadingTriggerLiquid.extraParamater = {g_company.globalMarket.fillTypeTypes.LIQUID}
 		loadingTriggerLiquid.getIsActivatable = g_company.utils.appendedFunction(loadingTriggerLiquid.getIsActivatable, self.loadingTriggerGetIsActivatable, self)
-        self.loadingTriggerLiquid = loadingTriggerLiquid
+		loadingTriggerLiquid.allowEverybodyAccess = true
+		self.loadingTriggerLiquid = loadingTriggerLiquid
 	end
 
 	
@@ -151,7 +154,7 @@ function GC_GlobalMarketObject:load(nodeId, xmlFile, xmlKey, indexName, isPlacea
 	end
   
 	self.playerTrigger = self.triggerManager:addTrigger(GC_PlayerTrigger, self.rootNode, self , xmlFile, string.format("%s.playerTrigger", xmlKey), nil, true, g_company.languageManager:getText("GC_globalMarket_openGui"))
-	
+	self.playerTrigger.allowEverybodyAccess = true
 
 	local dataKey = xmlKey .. ".data"
 	self.data = {}
@@ -171,7 +174,12 @@ function GC_GlobalMarketObject:finalizePlacement()
     GC_GlobalMarketObject:superClass().finalizePlacement(self)	
 	
 	self.marketId = g_company.globalMarket:registerMarket(self)
-	g_company.globalMarket:addOnChangeFillTypes(self, self.onChangeFillTypes)
+	g_company.globalMarket:addOnChangeFillTypes(self, self.onChangeFillTypesEvent)
+	
+    self.eventId_onChangeFillTypes = self:registerEvent(self, self.onChangeFillTypesEvent, true, true)
+    self.eventId_sellBuyOnMarket = self:registerEvent(self, self.sellBuyOnMarketEvent, false, true)
+    self.eventId_spawnPallets = self:registerEvent(self, self.spawnPalletsEvent, false, true)
+    self.eventId_sendFillLevel = self:registerEvent(self, self.sendFillLevelEvent, false, true)
 end
 
 function GC_GlobalMarketObject:delete()    
@@ -197,10 +205,22 @@ function GC_GlobalMarketObject:readStream(streamId, connection)
 	if connection:getIsServer() then
 		if self.triggerManager ~= nil then
 			self.triggerManager:readStream(streamId, connection)
-        end
-        
-    end;
-end;
+		end
+		
+		self.fillLevels = {}
+		local num = streamReadInt8(streamId)
+		for i=1, num do
+			local fillTypeIndex = streamReadInt16(streamId)			
+			self.fillLevels[fillTypeIndex] = {}
+			local numFarms = streamReadInt8(streamId)
+			for j=1, numFarms do
+				local farmId = streamReadInt8(streamId)
+				local level = streamReadInt32(streamId)
+				self.fillLevels[fillTypeIndex][farmId] = level	
+			end
+		end
+    end
+end
 
 function GC_GlobalMarketObject:writeStream(streamId, connection)
 	GC_GlobalMarketObject:superClass().writeStream(self, streamId, connection);
@@ -210,31 +230,56 @@ function GC_GlobalMarketObject:writeStream(streamId, connection)
 			self.triggerManager:writeStream(streamId, connection)
 		end
 
-      
-	end;
-end;
+		streamWriteInt8(streamId, g_company.utils.getTableLength(self.fillLevels))
+		for fillTypeIndex, farms in pairs(self.fillLevels) do
+			streamWriteInt16(streamId, fillTypeIndex)
+			streamWriteInt8(streamId, g_company.utils.getTableLength(farms))
+			for farmId, level in pairs(farms) do
+				streamWriteInt8(streamId, farmId)
+				streamWriteInt32(streamId, level)
+			end
+		end
+	end
+end
 
 function GC_GlobalMarketObject:readUpdateStream(streamId, timestamp, connection)
 	GC_GlobalMarketObject:superClass().readUpdateStream(self, streamId, timestamp, connection);
 
 	if connection:getIsServer() then
         if streamReadBool(streamId) then
-            
-            
-        end;		
-	end;
-end;
+			self.fillLevels = {}
+            local num = streamReadInt8(streamId)
+			for i=1, num do
+				local fillTypeIndex = streamReadInt16(streamId)			
+				self.fillLevels[fillTypeIndex] = {}
+				local numFarms = streamReadInt8(streamId)
+				for j=1, numFarms do
+					local farmId = streamReadInt8(streamId)
+					local level = streamReadInt32(streamId)
+					self.fillLevels[fillTypeIndex][farmId] = level	
+				end
+			end            
+        end		
+	end
+end
 
 function GC_GlobalMarketObject:writeUpdateStream(streamId, connection, dirtyMask)
 	GC_GlobalMarketObject:superClass().writeUpdateStream(self, streamId, connection, dirtyMask);
 
 	if not connection:getIsServer() then
 		if streamWriteBool(streamId, bitAND(dirtyMask, self.globalMarketDirtyFlag) ~= 0) then
-            
-            
-        end;
-	end;
-end;
+            streamWriteInt8(streamId, g_company.utils.getTableLength(self.fillLevels))
+			for fillTypeIndex, farms in pairs(self.fillLevels) do
+				streamWriteInt16(streamId, fillTypeIndex)
+				streamWriteInt8(streamId, g_company.utils.getTableLength(farms))
+				for farmId, level in pairs(farms) do
+					streamWriteInt8(streamId, farmId)
+					streamWriteInt32(streamId, level)
+				end
+			end
+        end
+	end
+end
 
 function GC_GlobalMarketObject:loadFromXMLFile(xmlFile, key)
 	GC_GlobalMarketObject:superClass().loadFromXMLFile(self, xmlFile, key)
@@ -285,8 +330,6 @@ end
 
 function GC_GlobalMarketObject:update(dt)     
 	GC_GlobalMarketObject:superClass().update(self, dt)
-    
-    
 end;
 
 function GC_GlobalMarketObject:playerTriggerCanAddActivatable()
@@ -297,11 +340,16 @@ function GC_GlobalMarketObject:playerTriggerActivated()
 	if g_company.globalMarket:getIsOnline() then
 		g_company.gui:openGuiWithData("gc_globalMarket", false, self)
 	else
-		g_gui:showInfoDialog({text = g_company.languageManager:getText("GC_globalMarket_externIsOffline")});
+		if g_company.globalMarket.haveFile then
+			g_gui:showInfoDialog({text = g_company.languageManager:getText("GC_globalMarket_externIsFalseVersion")})
+		else
+			g_gui:showInfoDialog({text = g_company.languageManager:getText("GC_globalMarket_externIsOffline")})
+		end
 	end
 end
 
-function GC_GlobalMarketObject:onChangeFillTypes(fillTypes)	
+function GC_GlobalMarketObject:onChangeFillTypesEvent(fillTypes, noEventSend)	
+    self:raiseEvent(self.eventId_onChangeFillTypes, fillTypes, noEventSend)
 	for fillTypeIndex,_ in pairs(fillTypes[g_company.globalMarket.fillTypeTypes.SILO]) do
 		self.unloadingTrigger:setAcceptedFillTypeState(fillTypeIndex, true)
 		self.unloadingTriggerPalletBale:setAcceptedFillTypeState(fillTypeIndex, true)
@@ -321,7 +369,12 @@ function GC_GlobalMarketObject:onChangeFillTypes(fillTypes)
 		self.unloadingTriggerPalletBale:setAcceptedFillTypeState(fillTypeIndex, true)
 	end
 	for fillTypeIndex,_ in pairs(fillTypes[g_company.globalMarket.fillTypeTypes.CONVEYORANDBALE]) do
+		self.unloadingTrigger:setAcceptedFillTypeState(fillTypeIndex, true)
 		self.unloadingTriggerPalletBale:setAcceptedFillTypeState(fillTypeIndex, true)
+	end
+
+	if self.isServer and not self.isClient then
+		g_company.globalMarket:setFillTypesForServer(fillTypes)
 	end
 end
 
@@ -350,24 +403,42 @@ function GC_GlobalMarketObject:getFreeCapacity(fillTypeIndex, farmId, triggerId)
 	return self.data.capacityPerFillType - completeLevel
 end
 
+function GC_GlobalMarketObject:addFillLevelFromClient(farmId, fillLevel, fillTypeIndex)
+	self:sendFillLevelEvent({farmId, fillLevel, fillTypeIndex})	
+end
+
+function GC_GlobalMarketObject:sendFillLevelEvent(data, noEventSend)
+    self:raiseEvent(self.eventId_sendFillLevel, data, noEventSend)
+	if self.isServer then
+		self:addFillLevel(data[1], data[2], data[3])	
+	end	
+end
+
 --call from unloading trigger
-function GC_GlobalMarketObject:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, toolType, fillPositionData, triggerId)
-	local fillTypeName = string.upper(g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex))
-	if g_company.globalMarket.fillTypeMapping[fillTypeName] ~= nil then
-		fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(g_company.globalMarket.fillTypeMapping[fillTypeName])
+function GC_GlobalMarketObject:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, toolType, fillPositionData, triggerId)	
+	if self.isServer then
+		local fillTypeName = string.upper(g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex))
+		if g_company.globalMarket.fillTypeMapping[fillTypeName] ~= nil then
+			fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(g_company.globalMarket.fillTypeMapping[fillTypeName])
+		end
+		if self.fillLevels[fillTypeIndex] == nil then
+			self.fillLevels[fillTypeIndex] = {}
+		end
+		if self.fillLevels[fillTypeIndex][farmId] == nil then
+			self.fillLevels[fillTypeIndex][farmId] = 0
+		end
+		self.fillLevels[fillTypeIndex][farmId] = self.fillLevels[fillTypeIndex][farmId] + fillLevelDelta  	
+
+		self:raiseDirtyFlags(self.globalMarketDirtyFlag)
 	end
-	if self.fillLevels[fillTypeIndex] == nil then
-		self.fillLevels[fillTypeIndex] = {}
-	end
-	if self.fillLevels[fillTypeIndex][farmId] == nil then
-		self.fillLevels[fillTypeIndex][farmId] = 0
-	end
-	self.fillLevels[fillTypeIndex][farmId] = self.fillLevels[fillTypeIndex][farmId] + fillLevelDelta  	
-end;
+end
 
 --call from load trigger
 function GC_GlobalMarketObject:removeFillLevel(farmId, fillLevelDelta, fillTypeIndex, extraParamater)
-	self.fillLevels[fillTypeIndex][farmId] = self.fillLevels[fillTypeIndex][farmId] - fillLevelDelta  	
+	self.fillLevels[fillTypeIndex][farmId] = self.fillLevels[fillTypeIndex][farmId] - fillLevelDelta  
+	if self.isServer then
+		self:raiseDirtyFlags(self.globalMarketDirtyFlag)
+	end	
 	return self.fillLevels[fillTypeIndex][farmId]
 end
 
@@ -392,12 +463,14 @@ end
 function GC_GlobalMarketObject:loadingTriggerGetIsActivatable(trigger, val)
 	if val then
 		local items = {}
+
 		local farmId = g_currentMission:getFarmId()
+
 		for fillTypeIndex, levels in pairs(self.fillLevels) do
 			
 			local triggerAllow = trigger.validFillableObject:getFillUnitAllowsFillType(trigger.validFillableFillUnitIndex, fillTypeIndex)         
 			local isForTriggerAvailable = g_company.globalMarket:getIsFillTypeFromType(fillTypeIndex, trigger.extraParamater)   
-			if levels[farmId] > 0 and triggerAllow and isForTriggerAvailable then
+			if levels[farmId] ~= nil and levels[farmId] > 0 and triggerAllow and isForTriggerAvailable then
 				table.insert(items, fillTypeIndex)
 			end
 		end
@@ -414,7 +487,6 @@ function GC_GlobalMarketObject:loadingTriggerGetIsActivatable(trigger, val)
 	end
 	return val
 end
-
 
 function GC_GlobalMarketObject:onActivateObjectLoadingTrigger(trigger)
 	g_currentMission:addActivatableObject(trigger)
@@ -440,20 +512,26 @@ function GC_GlobalMarketObject:loadingTriggerOnActivateObjectCallback(trigger)
 end
 
 function GC_GlobalMarketObject:sellBuyOnMarket(fillTypeIndex, fillLevelDelta, farmId, sell)
-	local delta = 0
-	if sell then
-		delta = math.min(self.fillLevels[fillTypeIndex][farmId], fillLevelDelta)
-
-		--event
-
-		self.fillLevels[fillTypeIndex][farmId] = self.fillLevels[fillTypeIndex][farmId] - fillLevelDelta
-	else
-		delta = fillLevelDelta
-	end
-	g_company.globalMarket:sellBuyOnMarket(fillTypeIndex, math.ceil(delta), sell, self.marketId)
+    self:sellBuyOnMarketEvent({fillTypeIndex, fillLevelDelta, farmId, sell})
 end
 
+function GC_GlobalMarketObject:sellBuyOnMarketEvent(data, noEventSend)
+    self:raiseEvent(self.eventId_sellBuyOnMarket, data, noEventSend)
+	if self.isServer then
+		--local delta = 0
+		if data[4] then
+			--delta = math.min(self.fillLevels[data[1]][data[3]], data[2])
+			self.fillLevels[data[1]][data[3]] = self.fillLevels[data[1]][data[3]] - data[2]
+			self:raiseDirtyFlags(self.globalMarketDirtyFlag)
+		--else
+		--	delta = data[2]
+		end
+	end
 
+	if self.isClient then
+		g_company.globalMarket:sellBuyOnMarket(data[1], math.ceil(data[2]), data[4], self.marketId)
+	end
+end
 
 function GC_GlobalMarketObject:onSetFarmlandStateChanged(farmId)
 	self:setOwnerFarmId(farmId, false)
@@ -467,7 +545,19 @@ function GC_GlobalMarketObject:setOwnerFarmId(ownerFarmId, noEventSend)
 end;
 
 function GC_GlobalMarketObject:spawnPallets(fillTypeIndex, numPallets, farmId, capacityPerPallet, maxNumBales, asRoundBale)
+    self:spawnPalletsEvent({fillTypeIndex, numPallets, farmId, capacityPerPallet, maxNumBales, asRoundBale})	
+end
+
+function GC_GlobalMarketObject:spawnPalletsEvent(data, noEventSend)
+    self:raiseEvent(self.eventId_spawnPallets, data, noEventSend)
 	if self.isServer then
+		local fillTypeIndex = data[1]
+		local numPallets = data[2] 
+		local farmId = data[3] 
+		local capacityPerPallet = data[4]
+		local maxNumBales = data[5] 
+		local asRoundBale = data[6]
+
 		local palletFilename = g_company.globalMarket:getPalletFilenameFromFillTypeIndex(fillTypeIndex) 
 		local isPallet = true
 		if palletFilename == nil then
@@ -555,9 +645,5 @@ function GC_GlobalMarketObject:spawnPallets(fillTypeIndex, numPallets, farmId, c
 		end
 
 		self:removeFillLevel(farmId, spawnedFillLevel, fillTypeIndex)
-
-		return numberSpawned
-	else
-		--g_client:getServerConnection():sendEvent(GC_ProductionFactorySpawnPalletEvent:new(self, output.id, numberToSpawn))
 	end
 end

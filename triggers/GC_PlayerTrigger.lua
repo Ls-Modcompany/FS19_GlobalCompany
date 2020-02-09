@@ -68,6 +68,7 @@ function GC_PlayerTrigger:load(nodeId, target, xmlFile, xmlKey, triggerReference
 
 	self.playerInTrigger = false
 	self.isActivatable = Utils.getNoNil(isActivatable, false)
+	self.allowEverybodyAccess = false
 
 	if xmlFile ~= nil and xmlKey ~= nil then
 		local playerTriggerNode = getXMLString(xmlFile, xmlKey .. "#playerTriggerNode")
@@ -188,7 +189,7 @@ function GC_PlayerTrigger:playerTriggerCallback(triggerId, otherId, onEnter, onL
 		if onEnter or onLeave then
 			if onEnter then
 				if not self.playerInTrigger then
-					if g_currentMission.accessHandler:canFarmAccess(g_currentMission:getFarmId(), self.target) then				
+					if g_currentMission.accessHandler:canFarmAccess(g_currentMission:getFarmId(), self.target) or self.allowEverybodyAccess then				
 						self.playerInTrigger = true
 						if self:canAddActivatable() then
 							g_currentMission:addActivatableObject(self)
