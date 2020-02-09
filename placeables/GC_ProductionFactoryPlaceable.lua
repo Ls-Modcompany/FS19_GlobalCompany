@@ -132,6 +132,7 @@ function GC_ProductionFactoryPlaceable:finalizePlacement()
 	GC_ProductionFactoryPlaceable:superClass().finalizePlacement(self)
 
 	for _, factory in ipairs(self.productionFactories) do
+		factory:finalizePlacement()
 		factory:register(true)
 	end
 end

@@ -461,7 +461,16 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 							end
 						end
 					end
-
+					
+					local animalTroughKey = inputProductKey .. ".inputMethods.animalTrough"
+					if hasXMLProperty(xmlFile, animalTroughKey) then										
+						local animalTrough = GC_AnimalTrough:new(self.isServer, self.isClient)
+						if animalTrough ~= nil and animalTrough:load(self.rootNode, self, xmlFile, animalTroughKey, inputProductId) then
+							animalTrough.direction = GC_AnimalTrough.DIRECTIONTOTARGET
+							inputProduct.animalTrough = animalTrough
+						end		
+					end
+					
 					if inputProduct.isAnimalTypes and inputProduct.animalTypeToLitres ~= nil then
 						local livestockTriggerKey = inputProductKey .. ".inputMethods.livestockTrigger"
 						if hasXMLProperty(xmlFile, livestockTriggerKey) then
@@ -699,6 +708,15 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 										multiOut = multiOut + 1
 									end
 								end
+							end
+
+							local animalTroughKey = outputMethodsKey .. ".animalTrough"
+							if hasXMLProperty(xmlFile, animalTroughKey) then										
+								local animalTrough = GC_AnimalTrough:new(self.isServer, self.isClient)
+								if animalTrough ~= nil and animalTrough:load(self.rootNode, self, xmlFile, animalTroughKey, outputProductId) then
+									outputProduct.animalTrough = animalTrough
+									table.insert(triggersLoaded, "animalTrough")
+								end		
 							end
 
 							local shovelFillTriggerKey = outputMethodsKey .. ".shovelFillTrigger"
@@ -1205,6 +1223,19 @@ function GC_ProductionFactory:loadOperatingParts(xmlFile, key, parent, isProduct
 			parent.operateAnimationClips = animationClips
 		end
 	end
+end
+
+function GC_ProductionFactory:finalizePlacement()	
+	for _,outputProduct in pairs(self.outputProducts) do
+		if outputProduct.animalTrough ~= nil then
+			outputProduct.animalTrough:finalizePlacement()
+		end
+	end	
+	for _,inputProduct in pairs(self.inputProducts) do
+		if inputProduct.animalTrough ~= nil then
+			inputProduct.animalTrough:finalizePlacement()
+		end
+	end	
 end
 
 function GC_ProductionFactory:delete()
@@ -2171,6 +2202,44 @@ function GC_ProductionFactory:getProductFromTriggerId(triggerId, fillTypeIndex, 
 	end
 
 	return
+end
+
+function GC_ProductionFactory:getFillLevelFromOutputProduct(outputProductId)
+	return self.outputProducts[outputProductId].fillLevel
+end
+
+function GC_ProductionFactory:getFillTypeIndexFromOutputProduct(outputProductId)
+	return self.outputProducts[outputProductId].fillTypeIndex
+end
+
+function GC_ProductionFactory:getFillTypeIndexFromInputProduct(inputProductId)
+	for fillTypeIndex,_ in pairs(self.inputProducts[inputProductId].fillTypes) do
+		return fillTypeIndex;
+	end
+end
+
+function GC_ProductionFactory:addFillLevelFromAnimalTroughInput(fillLevelDelta, fillTypeIndex, inputProductId)
+	local product = self.inputProducts[inputProductId]
+
+	if product ~= nil then
+		product.lastFillTypeIndex = fillTypeIndex
+		fillLevelDelta = math.min(fillLevelDelta, product.capacity - product.fillLevel)
+		delta = self:updateFactoryLevels(product.fillLevel + fillLevelDelta, product, fillTypeIndex, true)
+
+		self:doAutoStart(fillTypeIndex, triggerId)
+	end
+	return fillLevelDelta
+end
+
+function GC_ProductionFactory:addFillLevelFromAnimalTroughOutput(fillLevelDelta, fillTypeIndex, outputProductId)
+	local product = self.outputProducts[outputProductId]
+
+	if product ~= nil then
+		product.lastFillTypeIndex = fillTypeIndex
+		self:updateFactoryLevels(product.fillLevel + fillLevelDelta, product, fillTypeIndex, true)
+
+		self:doAutoStart(fillTypeIndex, triggerId)
+	end
 end
 
 function GC_ProductionFactory:palletCreatorInteraction(level, blockedLevel, deltaWaiting, fillTypeIndex, triggerId)

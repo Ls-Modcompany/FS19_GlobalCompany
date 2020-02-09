@@ -397,6 +397,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_PlaceableDigitalDisplay.lua");
 	source(GlobalCompany.dir .. "objects/GC_GlobalMarket.lua");
 	source(GlobalCompany.dir .. "objects/GC_GlobalMarketObject.lua");
+	source(GlobalCompany.dir .. "objects/GC_AnimalTrough.lua");
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
@@ -433,6 +434,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "events/GC_ProductionFactorySpawnPalletEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryProductPurchaseEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionDynamicStorageCustomTitleEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_GmSendMoneyEvent.lua");
 	
 
 	--|| Specializations ||--
