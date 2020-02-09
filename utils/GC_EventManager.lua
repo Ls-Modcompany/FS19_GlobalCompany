@@ -37,6 +37,7 @@ GC_EventManager.TYP_INT32 = 5
 GC_EventManager.TYP_UINT8 = 6
 GC_EventManager.TYP_UINT16 = 7
 GC_EventManager.TYP_STRING = 8
+GC_EventManager.TYP_TABLE = 9
 
 GC_EventManager.BIT_8 = 0
 GC_EventManager.BIT_16 = 1
@@ -54,7 +55,7 @@ function GC_EventManager:getTypeByValue(value)
     if value == nil or type(value) == "function"  then
         return self.TYP_NIL
     elseif type(value) == "table" then
-        --should we synch recursive?
+        return self.TYP_TABLE
     elseif type(value) == "boolean" then
         return self.TYP_BOOL
     elseif type(value) == "string" then
@@ -129,6 +130,12 @@ function GC_EventManager:doWrite(streamId, value)
         streamWriteUInt16(streamId, value)
     elseif typ == self.TYP_STRING then
         streamWriteString(streamId, value)
+    elseif typ == self.TYP_TABLE then
+        streamWriteInt8(streamId, g_company.utils.getTableLength(value))
+        for k,v in pairs(value) do
+            self:doWrite(streamId, k)
+            self:doWrite(streamId, v)
+        end
     end
 end
 
@@ -150,5 +157,14 @@ function GC_EventManager:doRead(streamId)
         return streamReadUInt16(streamId)
     elseif typ == self.TYP_STRING then
         return streamReadString(streamId)
+    elseif typ == self.TYP_TABLE then
+        local num = streamReadInt8(streamId)
+        local data = {}
+        for i=1, num do
+            local k = self:doRead(streamId)
+            local v = self:doRead(streamId)
+            data[k] = v
+        end
+        return data
     end
 end
