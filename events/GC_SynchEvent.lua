@@ -54,10 +54,14 @@ function GC_SynchEvent:readStream(streamId, connection)
         print(string.format("Invalid classType %s", self.targetClassType))
     end
 
+    if self.gcObject == nil then
+        print(string.format("Synch-Event: Gc-Object is nil wit id %s classtype %s eventId %s", self.gcId, self.targetClassType, self.targetEventId))
+    end
+
     local event = self.gcObject.events[self.targetEventId]
 
     local useOwnIndex = event.useOwnIndex
-    local clientToServer = event.clientToServer
+    self.clientToServer = event.clientToServer
 
     local lenght = streamReadUInt16(streamId);
 
