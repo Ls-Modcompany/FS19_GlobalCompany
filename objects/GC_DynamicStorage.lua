@@ -224,7 +224,7 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 					end
 
 					place.samplesLoad = g_soundManager:loadSampleFromXML(xmlSoundFile, "sound.object", fillSoundIdentifier, directory, getRootNode(), 0, AudioGroup.ENVIRONMENT, nil, nil)
-					if self.samplesLoad ~= nil then
+					if place.samplesLoad ~= nil then
 						link(nodeId, self.samplesLoad.soundNode)
 						setTranslation(self.samplesLoad.soundNode, 0, 0, 0)
 					end
@@ -258,7 +258,7 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 end;
 
 function GC_DynamicStorage:finalizePlacement()
-	GC_PlaceableDigitalDisplay:superClass().finalizePlacement(self)	
+	GC_DynamicStorage:superClass().finalizePlacement(self)	
     self.eventId_setActiveUnloadingBox = self:registerEvent(self, self.setActiveUnloadingBoxEvent, false, false)
     self.eventId_setActiveLoadingBox = self:registerEvent(self, self.setActiveLoadingBoxEvent, false, false)
     self.eventId_setEffectState = self:registerEvent(self, self.setEffectStateEvent, false, false)    
