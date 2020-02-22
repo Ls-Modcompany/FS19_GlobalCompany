@@ -464,7 +464,7 @@ function GlobalCompanyUtils.limitTextToWidth(text, textSize, width, trimFront, t
                 indexOfFirstCharacter = getTextLineLength(textSize, text, totalWidth-width+replaceTextWidth)
                 text = trimReplaceText .. utf8Substr(text, indexOfFirstCharacter)
 			else
-                indexOfLastCharacter = getTextLineLenggetIsActivatableth(textSize, text, width-replaceTextWidth)
+                indexOfLastCharacter = getTextLineLength(textSize, text, width-replaceTextWidth)
                 text = utf8Substr(text, 0, indexOfLastCharacter) .. trimReplaceText
             end
         end
@@ -489,4 +489,14 @@ function GlobalCompanyUtils.appendedFunction(oldFunc, newFunc, t)
     else
         return newFunc
     end;
-end;
+end
+
+function GlobalCompanyUtils.calcMoney(money)
+	local moneyUnit = g_gameSettings:getValue("moneyUnit")
+	if moneyUnit == GS_MONEY_POUND then
+		return money * 0.83
+	elseif moneyUnit == GS_MONEY_DOLLAR then
+		return money * 1.08
+	end
+	return money
+end
