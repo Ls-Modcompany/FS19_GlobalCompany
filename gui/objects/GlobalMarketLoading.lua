@@ -91,7 +91,7 @@ function Gc_Gui_GlobalMarketLoading:loadTable()
         local triggerAllow = self.trigger.validFillableObject:getFillUnitAllowsFillType(self.trigger.validFillableFillUnitIndex, fillTypeIndex)      
         local isForTriggerAvailable = g_company.globalMarket:getIsFillTypeFromType(fillTypeIndex, self.trigger.extraParamater)      
 
-        if levels[farmId] > 0 and triggerAllow and isForTriggerAvailable then
+        if levels[farmId] ~= nil and levels[farmId] > 0 and triggerAllow and isForTriggerAvailable then
             self.currentFillTypeIndex = fillTypeIndex
             self.currentFillLevel = levels[farmId]
             local item = self.gui_table_storage:createItem()

@@ -349,6 +349,10 @@ function GC_GlobalMarketObject:playerTriggerActivated()
 end
 
 function GC_GlobalMarketObject:onChangeFillTypesEvent(fillTypes, noEventSend)	
+	if not self.isServer and not g_company.globalMarket:getIsOnline() then
+		return
+	end
+
     self:raiseEvent(self.eventId_onChangeFillTypes, fillTypes, noEventSend)
 	for fillTypeIndex,_ in pairs(fillTypes[g_company.globalMarket.fillTypeTypes.SILO]) do
 		self.unloadingTrigger:setAcceptedFillTypeState(fillTypeIndex, true)
@@ -545,6 +549,7 @@ function GC_GlobalMarketObject:setOwnerFarmId(ownerFarmId, noEventSend)
 end;
 
 function GC_GlobalMarketObject:spawnPallets(fillTypeIndex, numPallets, farmId, capacityPerPallet, maxNumBales, asRoundBale)
+	--local farmId = g_currentMission:getFarmId()
     self:spawnPalletsEvent({fillTypeIndex, numPallets, farmId, capacityPerPallet, maxNumBales, asRoundBale})	
 end
 
@@ -583,7 +588,8 @@ function GC_GlobalMarketObject:spawnPalletsEvent(data, noEventSend)
 				fillTypeIndex = fillTypeIndex,
 				width = width,
 				length = length,
-				offset = 0.5
+				offset = 0.5,
+				farmId = farmId
 			}
 
 			numberSpawned = self.palletOutput:spawnByObjectInfo(object, fullSpawn)
@@ -611,7 +617,8 @@ function GC_GlobalMarketObject:spawnPalletsEvent(data, noEventSend)
 				fillTypeIndex = fillTypeIndex,
 				width = width,
 				length = length,
-				offset = 0.5
+				offset = 0.5,
+				farmId = farmId
 			}
 
 			object.configurations = {}

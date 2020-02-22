@@ -155,18 +155,24 @@ function GC_GlobalMarket:update(dt)
             local fillType = getXMLString(xmlFile, "gc_globalMarket_getFromServer.fillType")
             local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillType)
 
+            if money == nil or fillLevel == nil or sell == nil or marketId == nil or fillType == nil then
+                break
+            end
+
+            money = g_company.utils.calcMoney(money)
+
             local farmId = g_currentMission:getFarmId()
             if sell == 1 then
                 if self.isServer then
-                    g_currentMission:addMoney(money, farmId, MoneyType.HARVEST_INCOME, true, false)
+                    g_currentMission:addMoney(money * EconomyManager.getPriceMultiplier(), farmId, MoneyType.HARVEST_INCOME, true, false)
                 else
-                    g_client:getServerConnection():sendEvent(GC_GmSendMoneyEvent:new(money, farmId))		
+                    g_client:getServerConnection():sendEvent(GC_GmSendMoneyEvent:new(money * EconomyManager.getPriceMultiplier(), farmId))		
                 end
             else
                 if self.isServer then
-                    g_currentMission:addMoney(-money, farmId, MoneyType.HARVEST_INCOME, true, false)
+                    g_currentMission:addMoney(-money * EconomyManager.getPriceMultiplier(), farmId, MoneyType.HARVEST_INCOME, true, false)
                 else
-                    g_client:getServerConnection():sendEvent(GC_GmSendMoneyEvent:new(-money, farmId))		
+                    g_client:getServerConnection():sendEvent(GC_GmSendMoneyEvent:new(-money * EconomyManager.getPriceMultiplier(), farmId))		
                 end
                 if self.markets[marketId] ~= nil then
                     self.markets[marketId]:addFillLevelFromClient(farmId, fillLevel, fillTypeIndex)
@@ -225,9 +231,9 @@ function GC_GlobalMarket:loadFillTypes()
         local fillType = {}
         fillType.name = getXMLString(xmlFile, key .. "#name")
         fillType.fillLevel = getXMLInt(xmlFile, key .. "#fillLevel")
-        fillType.minPrice = getXMLInt(xmlFile, key .. "#minPrice") / 1000
-        fillType.maxPrice = getXMLInt(xmlFile, key .. "#maxPrice") / 1000
-        fillType.actualPrice = getXMLInt(xmlFile, key .. "#actualPrice") / 1000
+        fillType.minPrice = g_company.utils.calcMoney(getXMLInt(xmlFile, key .. "#minPrice") / 1000)
+        fillType.maxPrice = g_company.utils.calcMoney(getXMLInt(xmlFile, key .. "#maxPrice") / 1000)
+        fillType.actualPrice = g_company.utils.calcMoney(getXMLInt(xmlFile, key .. "#actualPrice") / 1000 * EconomyManager.getPriceMultiplier())
         fillType.type = getXMLInt(xmlFile, key .. "#type")
         fillType.priceTrend = getXMLInt(xmlFile, key .. "#priceTrend")
         
@@ -251,13 +257,16 @@ function GC_GlobalMarket:loadFillTypes()
 end
 
 function GC_GlobalMarket:setFillTypesForServer(fillTypes)
-    self.fillTypes = {}
-    for typ, tab in pairs(fillTypes) do
-        self.fillTypes[typ] = {}
-        for fillTypeIndex, _ in pairs(tab) do
-            self.fillTypes[typ][fillTypeIndex] = {}
+    --if self.needSetOnlyOnServer == nil then
+        self.fillTypes = {}
+        for typ, tab in pairs(fillTypes) do
+            self.fillTypes[typ] = {}
+            for fillTypeIndex, _ in pairs(tab) do
+                self.fillTypes[typ][fillTypeIndex] = {}
+            end
         end
-    end
+        --self.needSetOnlyOnServer = false
+    --end
 end
 
 function GC_GlobalMarket:getProvidedFillTypes(fillTyp)
