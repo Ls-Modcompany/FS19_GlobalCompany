@@ -29,8 +29,6 @@ GC_AnimalTrough._mt = Class(GC_AnimalTrough, g_company.gc_class);
 InitObjectClass(GC_AnimalTrough, "GC_AnimalTrough");
 GC_AnimalTrough.debugIndex = g_company.debug:registerScriptName("GC_AnimalTrough");
 
-g_company.activableObject = GC_AnimalTrough;
-
 function GC_AnimalTrough:new(isServer, isClient)
     return GC_AnimalTrough:superClass():new(GC_AnimalTrough._mt, isServer, isClient);
 end
@@ -105,8 +103,7 @@ function GC_AnimalTrough:update(dt)
 
     if self.canSearch and self.foundTroughModule == nil then
         local distance = 9999999999
-        for _, husbandry in pairs(g_currentMission:getHusbandries()) do
-
+        for _,husbandry in pairs(g_currentMission.husbandries) do
             for name,mod in pairs(husbandry.modulesByName) do  
                 if name == self.modulName then
                     local newDistance = self:calcDistance(mod.owner.nodeId)
