@@ -3,12 +3,17 @@
 --
 -- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
--- @Date: 27.01.2020
--- @Version: 1.2.1.0
+-- @Date: 18.02.2020
+-- @Version: 1.3.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+-- 	v1.3.0.0 (18.02.2020):
+--		- Fix synchro error
+-- 		- Add GlobalMarket
+--		- Change Design
+--
 -- 	v1.2.1.0 (27.01.2020):
 --		- Add new Mp-Synch and GC-Object System
 -- 		- Fix PlaceableDisplay
@@ -86,9 +91,9 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.2.1.1";
-GlobalCompany.versionDate = "05.02.2020";
-GlobalCompany.currentVersionId = 1211; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.version = "1.3.0.1";
+GlobalCompany.versionDate = "22.02.2020";
+GlobalCompany.currentVersionId = 1301; -- Mod Manager ID. (Version number without periods.)
 GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
 GlobalCompany.isGreenWeekVersion = false;
 
@@ -372,7 +377,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "GlobalCompanyGui.lua");
 
 	--|| Objects ||--
-	-- source(GlobalCompany.dir .. "objects/GC_Baler.lua");
+	source(GlobalCompany.dir .. "objects/GC_Baler.lua");
 	source(GlobalCompany.dir .. "objects/GC_Sounds.lua");
 	source(GlobalCompany.dir .. "objects/GC_Movers.lua");
 	source(GlobalCompany.dir .. "objects/GC_Shaders.lua");
@@ -410,7 +415,7 @@ function GlobalCompany.loadSourceFiles()
 	--source(GlobalCompany.dir .. "triggers/GC_PalletExtendedTrigger.lua");
 
 	--|| Placeables ||--
-	-- source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
+	source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_DynamicStoragePlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_PlaceableDigitalDisplayPlaceable.lua");
@@ -450,7 +455,7 @@ function GlobalCompany.loadPlaceables()
 
 	local placeablesDir = GlobalCompany.dir .. "placeables/";
 
-	-- GlobalCompany:addPlaceableType("GC_BalerPlaceable", "GC_BalerPlaceable", placeablesDir .. "GC_BalerPlaceable.lua");
+	GlobalCompany:addPlaceableType("GC_BalerPlaceable", "GC_BalerPlaceable", placeablesDir .. "GC_BalerPlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_DynamicStoragePlaceable", "GC_DynamicStoragePlaceable", placeablesDir .. "GC_DynamicStoragePlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_ProductionFactoryPlaceable", "GC_ProductionFactoryPlaceable", placeablesDir .. "GC_ProductionFactoryPlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_PlaceableDigitalDisplayPlaceable", "GC_PlaceableDigitalDisplayPlaceable", placeablesDir .. "GC_PlaceableDigitalDisplayPlaceable.lua");
