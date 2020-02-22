@@ -485,8 +485,6 @@ function GC_LoadingTrigger:getIsActivatable()
 			end
 		end
 	end
-
-	print("getIsActivatable 5")
 	return false
 end
 

@@ -188,7 +188,6 @@ function GC_UnloadingTrigger:addFillUnitFillLevel(farmId, fillUnitIndex, fillLev
 		local freeCapacity = self.target:getFreeCapacity(fillTypeIndex, farmId, self.extraParamater)
 		local maxFillDelta = math.min(fillLevelDelta - changed, freeCapacity)
 		changed = changed + maxFillDelta
-
 		self.target:addFillLevel(farmId, maxFillDelta, fillTypeIndex, toolType, fillPositionData, self.extraParamater)
 	end
 
