@@ -71,7 +71,7 @@ source(g_currentModDirectory .. "gui/elements/TableSort.lua");
 
 source(g_currentModDirectory .. "gui/FakeGui.lua");
 source(g_currentModDirectory .. "gui/MultiDialog.lua");
---source(g_currentModDirectory .. "gui/objects/Baler.lua");
+source(g_currentModDirectory .. "gui/objects/Baler.lua");
 source(g_currentModDirectory .. "gui/objects/ObjectInfo.lua");
 source(g_currentModDirectory .. "gui/objects/GcMain.lua");
 source(g_currentModDirectory .. "gui/objects/DynamicStorage.lua");
@@ -130,7 +130,7 @@ function GlobalCompanyGui:load()
 	
 	self.mainGui = g_company.gui:registerGui("gc_main", InputAction.GC_MAIN, Gc_Gui_MainGui, true, true, true).classGui;
 	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
-	--g_company.gui:registerGui("gcPlaceable_baler", nil, Gc_Gui_Baler, true, true);
+	g_company.gui:registerGui("gc_placeableBaler", nil, Gc_Gui_Baler, true, true, false);
 	g_company.gui:registerGui("gcObjectInfo", nil, Gc_Gui_ObjectInfo, false, false, false);
 	g_company.gui:registerGui("gc_dynamicStorage", nil, Gc_Gui_DynamicStorage, true, true, true);
 	g_company.gui:registerGui("gc_placeableDigitalDisplay", nil, Gc_Gui_PlaceableDigitalDisplay, true, true, false);

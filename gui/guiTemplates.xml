@@ -298,7 +298,7 @@
 
 
 		<!-- Baler -->
-		<!--template name="gcBalerBackground" anchor="middleCenter" extends="gcBase gcBorder">
+		<template name="gcBalerBackground" anchor="middleCenter" extends="gcBase gcBorder">
 			<value name="size" value="1000px 700px" />
 			<value name="imageColor" value="glass0_1" />
 			<value name="hasBorders" value="true" />
@@ -353,12 +353,14 @@
 		<template name="gcBalerFillTypesButton" anchor="middleCenter" extends="gcBase">
 			<value name="size" value="30px 30px" />
 			<value name="position" value="0px 0px" />
+			<value name="hasOverlay" value="true" />
+			<value name="isActivable" value="true" />
+		</template>
+		<template name="gcBalerFillTypesButton_overlay" anchor="middleCenter" extends="gcBalerFillTypesButton">
 			<value name="imageColor" value="transparent" />
 			<value name="imageColor_selected" value="gcBlue" />
 			<value name="imageColor_disabled" value="transparent" />
 			<value name="imageColor_disabledSelected" value="image_disabled" />
-			<value name="hasOverlay" value="true" />
-			<value name="isActivable" value="true" />
 		</template>
 		<template name="gcBalerFillTypesButtonText" anchor="leftCenter" extends="gcBase_text">
 			<value name="textSize" value="25px" />
@@ -383,12 +385,16 @@
 		<template name="gcBalerNumButton" anchor="middleBottom" extends="gcBase">
 			<value name="size" value="50px 50px" />
 			<value name="margin" value="10px 0px 0px 0px" />
-			<value name="imageColor" value="gray3" />
-			<value name="imageColor_selected" value="gray2" />
 			<value name="hasOverlay" value="true" />
 			<value name="hasText" value="true" />
+		</template>
+		<template name="gcBalerNumButton_text" anchor="middleBottom" extends="gcBalerNumButton">
 			<value name="textAlignment" value="center" />
 			<value name="textMargin" value="10px 0px 0px 15px" />
+		</template>
+		<template name="gcBalerNumButton_overlay" anchor="middleBottom" extends="gcBalerNumButton">
+			<value name="imageColor" value="gray3" />
+			<value name="imageColor_selected" value="gray2" />
 		</template>
 		<template name="gcBalerButtonLayout" anchor="middleBottom" extends="gcBase">
 			<value name="orientation" value="x" />
@@ -398,13 +404,18 @@
 		</template>
 		<template name="gcBalerButtonButton" anchor="middleBottom" extends="gcBase">
 			<value name="size" value="300px 50px" />
-			<value name="imageColor" value="gray3" />
-			<value name="imageColor_selected" value="gray2" />
 			<value name="hasOverlay" value="true" />
 			<value name="hasText" value="true" />
+		</template>
+		<template name="gcBalerButtonButton_text" anchor="middleBottom" extends="gcBalerButtonButton">
 			<value name="textAlignment" value="center" />
 			<value name="textMargin" value="0px 0px 0px 15px" />
 			<value name="textSize" value="23px" />
+		</template>
+		<template name="gcBalerButtonButton_overlay" anchor="middleBottom" extends="gcBalerButtonButton">
+			<value name="size" value="300px 50px" />
+			<value name="imageColor" value="gray3" />
+			<value name="imageColor_selected" value="gray3" />
 		</template>
 		<template name="gcBalerInfoBackground" anchor="rightTop" extends="gcBase">
 			<value name="size" value="300px 400px" />
@@ -449,7 +460,7 @@
 			<value name="textSize" value="22px" />
 			<value name="textAlignment" value="center" />
 			<value name="margin" value="20px 0px 0px 0px" />
-		</template-->
+		</template>
 
 		<!-- ObjectInfo -->
 		<template name="gcObjectInfoBackground" anchor="middleCenter" extends="gcBase gcBorder">
