@@ -55,7 +55,7 @@ function GC_SynchEvent:readStream(streamId, connection)
     end
 
     if self.gcObject == nil then
-        print(string.format("Synch-Event: Gc-Object is nil wit id %s classtype %s eventId %s", self.gcId, self.targetClassType, self.targetEventId))
+        print(string.format("Synch-Event: Gc-Object is nil with id %s classtype %s eventId %s", self.gcId, self.targetClassType, self.targetEventId))
     end
 
     local event = self.gcObject.events[self.targetEventId]

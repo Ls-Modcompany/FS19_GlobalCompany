@@ -32,6 +32,8 @@ function GC_Class:new(mt, isServer, isClient, scriptDebugInfo, xmlFilename, base
     self.eventId = 0
     self.events = {}
 
+    self.isRegister = false
+
     return self
 end
 
@@ -45,7 +47,7 @@ function GC_Class:finalizePlacement()
     if GC_Class:superClass().finalizePlacement ~= nil then
         GC_Class:superClass().finalizePlacement(self)
     end
-
+    self.isRegister = true
     g_company:registerObject(self)
 end
 
@@ -117,7 +119,7 @@ function GC_Class:registerEvent(target, func, useOwnIndex, clientToServer)
 end
 
 function GC_Class:raiseEvent(eventId, data, noEventSend)
-    if eventId ~= nil and (noEventSend == nil or noEventSend == false) then
+    if self.isRegister and eventId ~= nil and (noEventSend == nil or noEventSend == false) then
         local useOwnIndex = self.events[eventId].useOwnIndex
         if g_company:getIsServer() then       
             g_server:broadcastEvent(GC_SynchEvent:new(self.gcId, eventId, data, 1))

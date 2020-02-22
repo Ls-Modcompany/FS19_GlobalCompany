@@ -22,12 +22,13 @@ local function getNexStaticClassId()
 end
 
 GC_StaticClass = {}
+GC_StaticClass._mt = Class(GC_StaticClass)
 g_company.gc_staticClass = GC_StaticClass
 
 function GC_StaticClass:new(mt, isServer, isClient, scriptDebugInfo, target)
         
     if mt == nil then
-        mt = Class(GC_StaticClass)
+        mt = GC_StaticClass._mt
     end
     local self = setmetatable({}, mt)
 
