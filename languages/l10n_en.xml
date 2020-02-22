@@ -139,6 +139,44 @@
 		<e k="GC_placeableDigDisplay_btnSave" v="Save"/>
 		
 		<!-- GlobalMarket -->
-		<e k="GC_globalMarket_openGui" v="Open Global Market"/>
+		<e k="GC_globalMarket_openGui" v="Open GlobalMarket"/>
+		<e k="GC_globalMarket_header" v="Global Markt 2020"/>
+		<e k="GC_globalMarket_headerInfo" v="Here you can sell delivered goods or buy goods."/>
+		<e k="GC_globalMarket_btn_buyScreen" v="Purchase overview"/>
+		<e k="GC_globalMarket_btn_storageScreen" v="Stock overview"/>
+		<e k="GC_globalMarket_btn_synch" v="Synchronize"/>
+		
+		<e k="GC_globalMarket_header2" v="Global Markt 2020 - Quantity selection"/>
+		<e k="GC_globalMarket_headerInfo2" v="Select the desired quantity here!"/>
+		<e k="GC_globalMarket_btn_ok" v="Confirm"/>
+		<e k="GC_globalMarket_btn_startLoad" v="Start loading"/>
+		
+		<e k="GC_globalMarket_header3" v="Global Markt 2020 - Outsource"/>
+		<e k="GC_globalMarket_headerInfo3" v="Select what to load"/>
+		<e k="GC_globalMarket_btn_min" v="Minimum"/>
+		<e k="GC_globalMarket_btn_max" v="Maximum"/>
+
+		<e k="GC_globalMarket_txt_amount" v="Quantity"/>
+		<e k="GC_globalMarket_txt_money" v="Value"/>
+
+		<e k="GC_globalMarket_tbl_header_filltype" v="Fruit type"/>
+		<e k="GC_globalMarket_tbl_header_level" v="Litres"/>
+		<e k="GC_globalMarket_tbl_header_pallets" v="Pallets"/>
+		<e k="GC_globalMarket_tbl_header_bales" v="Bales"/>
+		<e k="GC_globalMarket_tbl_header_price" v="actual Price"/>
+		<e k="GC_globalMarket_tbl_header_price2" v="actual Price / 1000 Liter"/>
+		<e k="GC_globalMarket_btn_outsource" v="Outsource"/>
+		<e k="GC_globalMarket_btn_outsourceBale1" v="Round bale"/>
+		<e k="GC_globalMarket_btn_outsourceBale2" v="Square bale"/>
+		<e k="GC_globalMarket_btn_sell" v="Sell"/>
+		<e k="GC_globalMarket_btn_buy" v="Buy"/>
+
+		<e k="GC_globalMarket_externIsOffline" v="Start the necessary external software so that you can buy goods or sell your delivered goods."/>
+		<e k="GC_globalMarket_externIsFalseVersion" v="You do not have the latest version of the external software."/>
+		
+		
+		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Square bale grass"/>
+		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Round bale grass"/>
+		<e k="GC_globalMarket_storeItem_cotton" v="Cotton"/>
 	</elements>
 </l10n>

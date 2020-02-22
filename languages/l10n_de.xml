@@ -155,7 +155,6 @@ Kosten:  %s"/>
 		<e k="GC_globalMarket_btn_buyScreen" v="Kaufübersicht"/>
 		<e k="GC_globalMarket_btn_storageScreen" v="Lagerübersicht"/>
 		<e k="GC_globalMarket_btn_synch" v="Synchronisieren"/>
-
 		
 		<e k="GC_globalMarket_header2" v="Globaler Markt 2020 - Mengenauswahl"/>
 		<e k="GC_globalMarket_headerInfo2" v="Wähle hier die gewünschte Menge!"/>
