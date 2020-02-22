@@ -85,7 +85,7 @@ function GC_DynamicStorage:new(isServer, isClient, customMt, xmlFilename, baseDi
 end;
 
 function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
-	GC_PlaceableDigitalDisplay:superClass().load(self)
+	GC_DynamicStorage:superClass().load(self)
 	local canLoad, addMinuteChange, addHourChange = true, false, false;
 
 	self.rootNode = nodeId;
@@ -181,8 +181,13 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
         place.capacity = getXMLInt(xmlFile, placeKey .. "#capacity");
         place.activeFillTypeIndex = -1;
 
-        place.shovelTrigger = self.triggerManager:addTrigger(GC_ShovelFillTrigger, self.rootNode, self, xmlFile, placeKey .. ".shovelFillTrigger", place.activeFillTypeIndex);
-        place.shovelTrigger.extraParamater = place.number;
+        
+        if hasXMLProperty(xmlFile, placeKey .. ".shovelFillTrigger") then
+            place.shovelTrigger = self.triggerManager:addTrigger(GC_ShovelFillTrigger, self.rootNode, self, xmlFile, placeKey .. ".shovelFillTrigger", place.activeFillTypeIndex);
+            if place.shovelTrigger ~= nil then
+                place.shovelTrigger.extraParamater = place.number;
+            end
+        end
         
         if hasXMLProperty(xmlFile, placeKey .. ".movers") then
             local movers = GC_Movers:new(self.isServer, self.isClient);
@@ -206,7 +211,14 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
                 unloadingTrigger.extraParamater = {isUnloadingTrigger = true, id=place.number}
                 place.unloadingTrigger = unloadingTrigger
             end
-        end        
+        end     
+        
+        if hasXMLProperty(xmlFile, placeKey .. ".fillVolumes") then   
+            local fillVolumes = GC_FillVolume:new(self.isServer, self.isClient)
+            if fillVolumes:load(self.rootNode, self, xmlFile, placeKey, place.capacity, true, "WHEAT") then
+                place.fillVolumes = fillVolumes
+            end
+        end
         
         if self.isClient then
             place.unloadingEffects = g_effectManager:loadEffect(xmlFile, placeKey .. ".loading.effects", nodeId, self, self.i3dMappings);
@@ -225,8 +237,8 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 
 					place.samplesLoad = g_soundManager:loadSampleFromXML(xmlSoundFile, "sound.object", fillSoundIdentifier, directory, getRootNode(), 0, AudioGroup.ENVIRONMENT, nil, nil)
 					if place.samplesLoad ~= nil then
-						link(nodeId, self.samplesLoad.soundNode)
-						setTranslation(self.samplesLoad.soundNode, 0, 0, 0)
+						link(nodeId, place.samplesLoad.soundNode)
+						setTranslation(place.samplesLoad.soundNode, 0, 0, 0)
 					end
 
 					delete(xmlSoundFile)
@@ -280,6 +292,9 @@ function GC_DynamicStorage:delete()
     if self.isClient then  
         for _,place in pairs(self.places) do
             g_effectManager:deleteEffects(place.unloadingEffects);
+            if place.fillVolumes ~= nil then
+				place.fillVolumes:delete()
+            end
         end;
     end;
 
@@ -366,7 +381,7 @@ function GC_DynamicStorage:writeUpdateStream(streamId, connection, dirtyMask)
 end;
 
 function GC_DynamicStorage:loadFromXMLFile(xmlFile, key)
-	GC_PlaceableDigitalDisplay:superClass().loadFromXMLFile(self, xmlFile, key)
+	GC_DynamicStorage:superClass().loadFromXMLFile(self, xmlFile, key)
     if not self.isPlaceable then
 		key = string.format("%s.dynamicStorage", key);
     end
@@ -393,20 +408,33 @@ function GC_DynamicStorage:loadFromXMLFile(xmlFile, key)
             for _,place in pairs(self.places) do
                 if place.number == num then
                     place.activeFillTypeIndex = activeFillTypeIndex;
-                    place.shovelTrigger.fillTypeIndex = activeFillTypeIndex;
+                    if place.shovelTrigger ~= nil then
+                        place.shovelTrigger.fillTypeIndex = activeFillTypeIndex;
+                    end
 
                     --place.unloadingTrigger.fillTypes = nil
                     --place.unloadingTrigger:setAcceptedFillTypeState(activeFillTypeIndex, true);
 
                     local material = self.materials[g_fillTypeManager:getFillTypeNameByIndex(activeFillTypeIndex):lower()];            
-                    if material ~= nil then
-                        for _,mover in pairs(place.movers.movers) do
-                            setMaterial(mover.node, material, 0);
-                        end;
-                    end;
+                    
                     place.fillLevel = fillLevel;
-                    place.movers:updateMovers(place.fillLevel);
-                    place.digitalDisplays:updateLevelDisplays(place.fillLevel, place.capacity);                
+
+                    if place.movers ~= nil then
+                        if material ~= nil then
+                            for _,mover in pairs(place.movers.movers) do
+                                setMaterial(mover.node, material, 0);
+                            end;
+                        end;
+                        place.movers:updateMovers(place.fillLevel);
+                    end
+
+                    if place.fillVolumes ~= nil then
+                        place.fillVolumes:setFillType(activeFillTypeIndex)
+                        place.fillVolumes:addFillLevel(place.fillLevel)
+                    end
+
+                    place.digitalDisplays:updateLevelDisplays(place.fillLevel, place.capacity);      
+            
                     break;
                 end;
             end;
@@ -419,7 +447,7 @@ function GC_DynamicStorage:loadFromXMLFile(xmlFile, key)
 end;
 
 function GC_DynamicStorage:saveToXMLFile(xmlFile, key, usedModNames)
-	GC_PlaceableDigitalDisplay:superClass().saveToXMLFile(self, xmlFile, key, usedModNames)
+	GC_DynamicStorage:superClass().saveToXMLFile(self, xmlFile, key, usedModNames)
 	if not self.isPlaceable then
 		key = string.format("%s.dynamicStorage", key);
 		setXMLInt(xmlFile, key .. "#farmId", self:getOwnerFarmId());
@@ -443,7 +471,7 @@ function GC_DynamicStorage:saveToXMLFile(xmlFile, key, usedModNames)
 end;
 
 function GC_DynamicStorage:update(dt)     
-	GC_PlaceableDigitalDisplay:superClass().update(self, dt)
+	GC_DynamicStorage:superClass().update(self, dt)
     if self.isClient then      
         for _,place in pairs(self.places) do  
             if place.unloadingEffectsTimer > 0 then
@@ -516,17 +544,33 @@ end;
 function GC_DynamicStorage:updatePlace(place, fillLevel, fillTypeIndex)    
     if place.fillLevel == 0 and fillLevel > 0 then        
         place.activeFillTypeIndex = fillTypeIndex;
-        place.shovelTrigger.fillTypeIndex = fillTypeIndex;
-        local material = self.materials[g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex):lower()];            
-        if material ~= nil then
-            for _,mover in pairs(place.movers.movers) do
-                setMaterial(mover.node, material, 0);
+        if place.shovelTrigger ~= nil then
+            place.shovelTrigger.fillTypeIndex = fillTypeIndex;
+        end
+        local material = self.materials[g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex):lower()];    
+        if place.movers ~= nil then        
+            if material ~= nil then
+                for _,mover in pairs(place.movers.movers) do
+                    setMaterial(mover.node, material, 0);
+                end;
             end;
         end;
+
+        if place.fillVolumes ~= nil then
+            place.fillVolumes:setFillType(fillTypeIndex)
+        end
     end;
     if place.activeFillTypeIndex == fillTypeIndex then
         place.fillLevel = fillLevel;      
-        place.movers:updateMovers(place.fillLevel);
+        
+        if place.movers ~= nil then
+            place.movers:updateMovers(place.fillLevel);
+        end
+
+        if place.fillVolumes ~= nil then
+            place.fillVolumes:addFillLevel(place.fillLevel)
+        end
+
         place.digitalDisplays:updateLevelDisplays(place.fillLevel, place.capacity);        
     end;
 end

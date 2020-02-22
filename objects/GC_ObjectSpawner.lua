@@ -3,13 +3,15 @@
 --
 -- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany 
--- @Date: 06.03.2018
--- @Version: 1.0.0.0
+-- @Date: 22.02.2020
+-- @Version: 1.1.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
 --
+-- 	v1.1.0.0 (22.02.2020):
+--		- add more spawn options
 --
 -- 	v1.0.0.0 (06.03.2018):
 -- 		- initial fs19 ()
@@ -106,6 +108,9 @@ end
 function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesHit, object2, numberToSpawn2, ownFillLevel)
 	local numSpawned = 0
 	local owner = self:getOwnerFarmId()
+	if object.farmId ~= nil then
+		owner = object.farmId
+	end
 
 	local numberToSpawn1 = numberToSpawn
 	numberToSpawn2 = Utils.getNoNil(numberToSpawn2, 0)
@@ -161,7 +166,11 @@ function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesH
 							--if numberToSpawn > 1 then
 								numSpawned = numSpawned + 1
 								if numSpawned == numberToSpawn1 then
-									object = object2
+									if object2 ~= nil then
+										object = object2
+									else
+										return vehicle
+									end
 								end
 
 								if ownFillLevel ~= nil and vehicle.spec_buyableBale ~= nil then
