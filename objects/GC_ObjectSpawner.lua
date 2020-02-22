@@ -150,7 +150,10 @@ function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesH
 						if pallet ~= nil then
 							if object.fillUnitIndex ~= nil and object.fillTypeIndex ~= nil then
 								local currentFillLevel = pallet:getFillUnitFillLevel(object.fillUnitIndex)
-								local deltaFillLevel = (currentFillLevel * -1) + object.fillLevel
+								local deltaFillLevel = object.fillLevel
+								if currentFillLevel ~= nil then
+									deltaFillLevel = (currentFillLevel * -1) + object.fillLevel
+								end
 								pallet:addFillUnitFillLevel(owner, object.fillUnitIndex, deltaFillLevel, object.fillTypeIndex, ToolType.UNDEFINED)
 							end
 
