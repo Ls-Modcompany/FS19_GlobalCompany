@@ -297,8 +297,8 @@ function GC_Baler:finalizePlacement()
 	self.eventId_setFillLevelBunker = self:registerEvent(self, self.setFillLevelBunkerEvent, false, false)
 	self.eventId_setFillLevel = self:registerEvent(self, self.setFillLevelEvent, false, false)
 	self.eventId_setFillTyp = self:registerEvent(self, self.setFillTypEvent, false, false)
-	self.eventId_selfonTurnOnBaler = self:registerEvent(self, self.selfonTurnOnBalerEvent, false, false)
-	self.eventId_onTurnOffGC_Baler = self:registerEvent(self, self.onTurnOffGC_BalerEvent, false, false)
+	self.eventId_onTurnOnBaler = self:registerEvent(self, self.onTurnOnBalerEvent, false, false)
+	self.eventId_onTurnOffBaler = self:registerEvent(self, self.onTurnOffBalerEvent, false, false)
 	self.eventId_onTurnOnStacker = self:registerEvent(self, self.onTurnOnStackerEvent, false, false)
 	self.eventId_onTurnOffStacker = self:registerEvent(self, self.onTurnOffStackerEvent, false, false)
 	self.eventId_onTurnOnBaleMover = self:registerEvent(self, self.onTurnOnBaleMoverEvent, false, false)
@@ -549,7 +549,7 @@ function GC_Baler:update(dt)
 					self:inkBaleCounter()
 					self:setFillLevelBunker(self.fillLevelBunker * -1, true)
 					if self.shouldTurnOff or self.fillLevel + self.fillLevelBunker < 4000 then
-						self:onTurnOffGC_Baler()
+						self:onTurnOffBaler()
 						self.shouldTurnOff = false
 					end
 				elseif not self.hasStack then
@@ -561,19 +561,19 @@ function GC_Baler:update(dt)
 						self.animationManager:setAnimationTime("moveCollisionAnimation", 0)
 						setCollisionMask(self.moveCollisionAnimationNode, 0)
 					elseif self.animationManager:getAnimationTime("moveCollisionAnimation") == 0 and not self.moverBaleTrigger:getTriggerEmpty() and self.state_balerMove == GC_Baler.STATE_OFF then	
-						self:onTurnOffGC_Baler()
+						self:onTurnOffBaler()
 					end
 				else
-					self:onTurnOffGC_Baler()
+					self:onTurnOffBaler()
 				end
 			elseif self.fillLevel + self.fillLevelBunker >= 4000 then
 				self:setFillLevelBunker(math.min(dt / 1000 * self.pressPerSecond, 4000 - self.fillLevelBunker, self.fillLevel))
 			else --if self.animationManager:getAnimationTime("baleAnimation") == 0 then
-				self:onTurnOffGC_Baler()
+				self:onTurnOffBaler()
 			end
 		elseif self.fillLevelBunker >= 4000 and not self.hasStack then
 			if self:canUnloadBale() then
-				self:selfonTurnOnBaler()	
+				self:onTurnOnBaler()	
 				self:onTurnOnStacker()
 			elseif self.moverBaleTrigger:getTriggerEmpty() then
 				self.needMove = true
@@ -651,6 +651,9 @@ function GC_Baler:update(dt)
 				if self.stackerBaleTrigger:getTriggerNotEmpty() then
 					self.animationState = GC_Baler.ANIMATION_ISSTACKINGEND
 					self.animationManager:playAnimation("stackAnimation", 1, 2000 / self.animationManager:getAnimationDuration("stackAnimation"))
+				end				
+				if self.state_baler == GC_Baler.STATE_OFF and self.fillLevelBunker >= 4000 then
+					self:onTurnOnBaler()
 				end
 			elseif self.animationState == GC_Baler.ANIMATION_ISSTACKINGEND then
 				if self.animationManager:getRealAnimationTimeSeconds("stackAnimation") >= 4.59999 then
@@ -667,7 +670,7 @@ function GC_Baler:update(dt)
 					self:resetBaleTrigger()
 					self:onTurnOffBaleMover()
 					if self.state_baler == GC_Baler.STATE_OFF and self.fillLevelBunker >= 4000 then
-						self:selfonTurnOnBaler()
+						self:onTurnOnBaler()
 					elseif self.state_baler == GC_Baler.STATE_OFF and self.fillLevelBunker < 4000 then
 						self:onTurnOffStacker()
 					end
@@ -692,7 +695,7 @@ function GC_Baler:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, toolType, 
 	self:setFillLevel(self.fillLevel + fillLevelDelta)
 	
 	if self.autoOn and self.fillLevel > 4000 and self.state_baler == GC_Baler.STATE_OFF then
-		self:selfonTurnOnBaler()
+		self:onTurnOnBaler()
 		self:onTurnOnStacker()
 	end
 end
@@ -751,10 +754,11 @@ function GC_Baler:setFillLevel(level, noEventSend)
 end
 
 function GC_Baler:setFillLevelEvent(data, noEventSend)     
+
 	self:raiseEvent(self.eventId_setFillLevel, data, noEventSend)
 	self.fillLevel = data[1]
 	if g_dedicatedServerInfo == nil then
-		self.movers:updateMovers(data[1], self.activeFillTypeIndex)    
+		self.movers:updateMovers(self.fillLevel, self.activeFillTypeIndex)    
 		g_company.gui:updateGuiData("gc_placeableBaler")
 		self.digitalDisplayLevel:updateLevelDisplays(self.fillLevel, self.capacity)
 	end	
@@ -873,12 +877,12 @@ function GC_Baler:createBale(ref)
 	end
 end
 
-function GC_Baler:selfonTurnOnBaler(noEventSend)		
-	self:selfonTurnOnBalerEvent({}, noEventSend)   
+function GC_Baler:onTurnOnBaler(noEventSend)		
+	self:onTurnOnBalerEvent({}, noEventSend)   
 end
 
-function GC_Baler:selfonTurnOnBalerEvent(data, noEventSend)			
-	self:raiseEvent(self.eventId_selfonTurnOnBaler, data, noEventSend)
+function GC_Baler:onTurnOnBalerEvent(data, noEventSend)			
+	self:raiseEvent(self.eventId_onTurnOnBaler, data, noEventSend)
 	self.state_baler = GC_Baler.STATE_ON
 
 	if self.isServer then
@@ -892,12 +896,12 @@ function GC_Baler:selfonTurnOnBalerEvent(data, noEventSend)
 	--end
 end
 
-function GC_Baler:onTurnOffGC_Baler(noEventSend)	
-	self:onTurnOffGC_BalerEvent({}, noEventSend)   
+function GC_Baler:onTurnOffBaler(noEventSend)	
+	self:onTurnOffBalerEvent({}, noEventSend)   
 end
 
-function GC_Baler:onTurnOffGC_BalerEvent(data, noEventSend)	
-	self:raiseEvent(self.eventId_onTurnOffGC_Baler, data, noEventSend)
+function GC_Baler:onTurnOffBalerEvent(data, noEventSend)	
+	self:raiseEvent(self.eventId_onTurnOffBaler, data, noEventSend)
 	self.state_baler = GC_Baler.STATE_OFF
 
 	--if g_dedicatedServerInfo == nil then
@@ -980,13 +984,13 @@ function GC_Baler:setAutoOnEvent(data, noEventSend)
 	self:raiseEvent(self.eventId_setAutoOn, data, noEventSend)
 	self.autoOn = data[1]
 	if self.isServer and self.autoOn and self.fillLevel > 4000 and self.state_baler == GC_Baler.STATE_OFF then
-		self:selfonTurnOnBaler()
+		self:onTurnOnBaler()
 		self:onTurnOnStacker()
 	end
 end
 
 function GC_Baler:getCanChangeFillType()
-	return self.state_baler == GC_Baler.STATE_OFF and self.fillLevel == 0 and self.fillLevelBunker == 0	 
+	return self.state_baler == GC_Baler.STATE_OFF and self.fillLevel < 1 and self.fillLevelBunker < 1
 end
 
 function GC_Baler:getCanTurnOn()
@@ -994,7 +998,7 @@ function GC_Baler:getCanTurnOn()
 end
 
 function GC_Baler:doTurnOn()
-	self:selfonTurnOnBaler()
+	self:onTurnOnBaler()
 	self:onTurnOnStacker()
 end
 
