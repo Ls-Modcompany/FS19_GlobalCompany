@@ -148,6 +148,47 @@ Prezzo:  %s"/>
 		<e k="GC_placeableDigDisplay_headerInfo" v="Qui è possibile specificare qualsiasi testo che si desidera visualizzare sul display."/>
 		<e k="GC_placeableDigDisplay_btnSave" v="Salva"/>
 		
+		<!-- GlobalMarket -->
+		<e k="GC_globalMarket_openGui" v="Mercato globale aperto"/>
+		<e k="GC_globalMarket_header" v="Mercato globale 2020"/>
+		<e k="GC_globalMarket_headerInfo" v="Qui puoi vendere beni consegnati o acquistare beni."/>
+		<e k="GC_globalMarket_btn_buyScreen" v="Acquisto Sommario"/>
+		<e k="GC_globalMarket_btn_storageScreen" v="Panoramica di memorizzazione"/>
+		<e k="GC_globalMarket_btn_synch" v="Sincronizzare"/>
+		
+		<e k="GC_globalMarket_header2" v="Mercato globale 2020 - selezione della quantità"/>
+		<e k="GC_globalMarket_headerInfo2" v="Scegli qui la quantità desiderata!"/>
+		<e k="GC_globalMarket_btn_ok" v="Conferma"/>
+		<e k="GC_globalMarket_btn_startLoad" v="Inizia a caricare"/>
+		
+		<e k="GC_globalMarket_header3" v="Mercato globale 2020 - outsourcing"/>
+		<e k="GC_globalMarket_headerInfo3" v="Scegli cosa caricare"/>
+		<e k="GC_globalMarket_btn_min" v="Minimo"/>
+		<e k="GC_globalMarket_btn_max" v="Massimo"/>
+
+		<e k="GC_globalMarket_txt_amount" v="Lotto"/>
+		<e k="GC_globalMarket_txt_money" v="Valore"/>
+
+		<e k="GC_globalMarket_tbl_header_filltype" v="Tipo di frutta"/>
+		<e k="GC_globalMarket_tbl_header_level" v="Litri"/>
+		<e k="GC_globalMarket_tbl_header_pallets" v="Pallet"/>
+		<e k="GC_globalMarket_tbl_header_bales" v="Balla"/>
+		<e k="GC_globalMarket_tbl_header_price" v="Prezzo attuale"/>
+		<e k="GC_globalMarket_tbl_header_price2" v="Prezzo attuale / 1000 Litri"/>
+		<e k="GC_globalMarket_btn_outsource" v="Outsourcing"/>
+		<e k="GC_globalMarket_btn_outsourceBale1" v="Rotoballe"/>
+		<e k="GC_globalMarket_btn_outsourceBale2" v="Balle quadrate"/>
+		<e k="GC_globalMarket_btn_sell" v="Vendita"/>
+		<e k="GC_globalMarket_btn_buy" v="Acquista   "/>
+
+		<e k="GC_globalMarket_externIsOffline" v="Avvia il software esterno richiesto in modo da poter acquistare beni o vendere i tuoi beni."/>
+		<e k="GC_globalMarket_externIsFalseVersion" v="Non hai l'ultima versione del software esterno."/>
+		
+		
+		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Balle quadrate di erba"/>
+		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Balle rotonde di erba"/>
+		<e k="GC_globalMarket_storeItem_cotton" v="di cotone"/>
+		
 		<!-- Market -->
 		<!--e k="GC_market_showDetails" v="Dettaglio"/>
 		<e k="GC_market_date" v="Data"/>
