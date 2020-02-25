@@ -148,6 +148,48 @@
 		<e k="GC_placeableDigDisplay_headerInfo" v="在这里您可以指定要在显示器上显示的任何文本."/>
 		<e k="GC_placeableDigDisplay_btnSave" v="保存"/>
 
+		<!-- GlobalMarket -->
+		<e k="GC_globalMarket_openGui" v="打开GlobalerMarkt"/>
+		<e k="GC_globalMarket_header" v="Globaler Markt 2020"/>
+		<e k="GC_globalMarket_headerInfo" v="在这里您可以出售已交付的货物或购买货物."/>
+		<e k="GC_globalMarket_btn_buyScreen" v="购买概览"/>
+		<e k="GC_globalMarket_btn_storageScreen" v="库存概览"/>
+		<e k="GC_globalMarket_btn_synch" v="同步"/>
+		
+		<e k="GC_globalMarket_header2" v="Globaler Markt 2020 - 数量选择"/>
+		<e k="GC_globalMarket_headerInfo2" v="在这里选择所需的数量!"/>
+		<e k="GC_globalMarket_btn_ok" v="确认"/>
+		<e k="GC_globalMarket_btn_startLoad" v="开始装载"/>
+		
+		<e k="GC_globalMarket_header3" v="Globaler Markt 2020 - 提取"/>
+		<e k="GC_globalMarket_headerInfo3" v="选择要加载的内容"/>
+		<e k="GC_globalMarket_btn_min" v="最小"/>
+		<e k="GC_globalMarket_btn_max" v="最大"/>
+
+		<e k="GC_globalMarket_txt_amount" v="数量"/>
+		<e k="GC_globalMarket_txt_money" v="价值"/>
+
+		<e k="GC_globalMarket_tbl_header_filltype" v="填充类型"/>
+		<e k="GC_globalMarket_tbl_header_level" v="公升"/>
+		<e k="GC_globalMarket_tbl_header_pallets" v="托盘"/>
+		<e k="GC_globalMarket_tbl_header_bales" v="捆包"/>
+		<e k="GC_globalMarket_tbl_header_price" v="当前价格"/>
+		<e k="GC_globalMarket_tbl_header_price2" v="当前价格 / 1000 公升"/>
+		<e k="GC_globalMarket_btn_outsource" v="提取"/>
+		<e k="GC_globalMarket_btn_outsourceBale1" v="圆捆"/>
+		<e k="GC_globalMarket_btn_outsourceBale2" v="方捆"/>
+		<e k="GC_globalMarket_btn_sell" v="出售"/>
+		<e k="GC_globalMarket_btn_buy" v="购买"/>
+
+		<e k="GC_globalMarket_externIsOffline" v="启动必要的外部软件,以便您可以购买商品或出售已交付的商品."/>
+		<e k="GC_globalMarket_externIsFalseVersion" v="您没有最新版本的外部软件."/>
+		
+		
+		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="方草捆"/>
+		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="圆草捆"/>
+		<e k="GC_globalMarket_storeItem_cotton" v="棉花"/>
+
+
 		<!-- Market -->
 		<!--e k="GC_market_showDetails" v="Details"/>
 		<e k="GC_market_date" v="Datum"/>
@@ -156,44 +198,5 @@
 		<e k="GC_market_liter" v="Liter"/>
 		<e k="GC_market_money" v="Preis"/>
 		<e k="GC_market_designation" v="Bezeichnung"/-->
-		<e k="GC_globalMarket_openGui" v="打开 GlobalMarket"/>
-		<e k="GC_globalMarket_header" v="Global Markt 2020"/>
-		<e k="GC_globalMarket_headerInfo" v="您可以在这里出售已交付的货物或购买货物。"/>
-		<e k="GC_globalMarket_btn_buyScreen" v="交易总览"/>
-		<e k="GC_globalMarket_btn_storageScreen" v="库存总览"/>
-		<e k="GC_globalMarket_btn_synch" v="同步数据"/>
-		
-		<e k="GC_globalMarket_header2" v="Global Markt 2020 - 数量选择"/>
-		<e k="GC_globalMarket_headerInfo2" v="在这里选择所需的数量！"/>
-		<e k="GC_globalMarket_btn_ok" v="确认"/>
-		<e k="GC_globalMarket_btn_startLoad" v="开始载入"/>
-		
-		<e k="GC_globalMarket_header3" v="Global Markt 2020 - 外包"/>
-		<e k="GC_globalMarket_headerInfo3" v="选择要外包的内容"/>
-		<e k="GC_globalMarket_btn_min" v="最低额度"/>
-		<e k="GC_globalMarket_btn_max" v="最高额度"/>
-
-		<e k="GC_globalMarket_txt_amount" v="数量"/>
-		<e k="GC_globalMarket_txt_money" v="价值"/>
-
-		<e k="GC_globalMarket_tbl_header_filltype" v="货物类型"/>
-		<e k="GC_globalMarket_tbl_header_level" v="升"/>
-		<e k="GC_globalMarket_tbl_header_pallets" v="货盘"/>
-		<e k="GC_globalMarket_tbl_header_bales" v="捆"/>
-		<e k="GC_globalMarket_tbl_header_price" v="实时价格"/>
-		<e k="GC_globalMarket_tbl_header_price2" v="实时价格/1000升"/>
-		<e k="GC_globalMarket_btn_outsource" v="外包"/>
-		<e k="GC_globalMarket_btn_outsourceBale1" v="圆捆"/>
-		<e k="GC_globalMarket_btn_outsourceBale2" v="方捆"/>
-		<e k="GC_globalMarket_btn_sell" v="销售"/>
-		<e k="GC_globalMarket_btn_buy" v="购买"/>
-
-		<e k="GC_globalMarket_externIsOffline" v="启动必要的外部软件，以便您可以购买商品或出售已交付的商品。"/>
-		<e k="GC_globalMarket_externIsFalseVersion" v="您没有最新版本的外部软件。"/>
-		
-		
-		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="方草捆"/>
-		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="圆草捆"/>
-		<e k="GC_globalMarket_storeItem_cotton" v="棉花"/>
 	</elements>
 </l10n>
