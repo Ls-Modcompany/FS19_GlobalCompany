@@ -3,13 +3,15 @@
 --
 -- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany
--- @Date: 22.12.2019
--- @Version: 1.3.0.0
+-- @Date: 09.03.2020
+-- @Version: 1.3.1.0
 --
 -- @Support: https://ls-modcompany.com
 --
 -- Changelog:
 --
+-- 	v1.3.1.0 (09.03.2020):
+--		- remove productionline limit
 -- 	v1.3.0.0 (22.12.2019):
 --		- add seasons support (outputPerHour)
 --
@@ -38,7 +40,6 @@ local GC_ProductionFactory_mt = Class(GC_ProductionFactory, Object)
 InitObjectClass(GC_ProductionFactory, "GC_ProductionFactory")
 
 -- This is for performance and GUI support! Even this is High.
-GC_ProductionFactory.LIMIT = 20
 GC_ProductionFactory.MAX_INT = 2147483647
 
 GC_ProductionFactory.BACKUP_TITLE = ""
@@ -209,6 +210,20 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			self.animationManager = animationManager
 		else
 			animationManager:delete()
+		end
+	end
+
+	if hasXMLProperty(xmlFile, xmlKey .. ".programmFlow") then
+		local programmFlow = GC_ProgrammFlow:new(self.isServer, self.isClient)
+		if programmFlow:load(self.rootNode, self, xmlFile, xmlKey .. ".programmFlow") then
+			programmFlow:register(true)
+			self.programmFlow = programmFlow
+			self:registerProgrammFlow()
+			self.programmFlowOperatingParts = {}
+
+			self:loadOperatingParts(xmlFile, xmlKey .. ".programmFlow.operatingParts", self.programmFlowOperatingParts, false)
+		else
+			programmFlow:delete()
 		end
 	end
 
@@ -849,7 +864,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 		i = 0
 		while true do
 			local productLineKey = string.format("%s.productLines.productLine(%d)", xmlKey, i)
-			if not hasXMLProperty(xmlFile, productLineKey) or i >= GC_ProductionFactory.LIMIT then
+			if not hasXMLProperty(xmlFile, productLineKey) then
 				break
 			end
 
@@ -882,7 +897,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			local inputProductNameToInputId = {}
 			while true do
 				local inputKey = string.format("%s.inputs.inputProduct(%d)", productLineKey, inputKeyId)
-				if not hasXMLProperty(xmlFile, inputKey) or inputKeyId >= GC_ProductionFactory.LIMIT then
+				if not hasXMLProperty(xmlFile, inputKey) then
 					break
 				end
 
@@ -924,7 +939,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				local outputProductNameToOutputId = {}
 				while true do
 					local outputKey = string.format("%s.outputs.outputProduct(%d)", productLineKey, outputKeyId)
-					if not hasXMLProperty(xmlFile, outputKey) or outputKeyId >= GC_ProductionFactory.LIMIT then
+					if not hasXMLProperty(xmlFile, outputKey) then
 						break
 					end
 
@@ -1304,7 +1319,13 @@ function GC_ProductionFactory:delete()
 		if self.sharedOperatingParts ~= nil then
 			self:deleteOperatingParts(self.sharedOperatingParts)
 		end
+		
+		if self.programmFlowOperatingParts ~= nil then
+			self:deleteOperatingParts(self.programmFlowOperatingParts)
+		end
 	end
+
+	self.programmFlow:delete()
 
 	GC_ProductionFactory:superClass().delete(self)
 end
@@ -2441,20 +2462,12 @@ function GC_ProductionFactory:getFillLevelInformation(listRight, listLeft)
 	if inputs ~= nil then
 		for id, input in pairs (inputs) do
 			listRight[id] = {title = input.title, fillLevel = input.fillLevel, capacity = input.capacity}
-
-			if id >= GC_ProductionFactory.LIMIT then
-				break
-			end
 		end
 
 		local outputs = self:getOutputs(self.guiLineId)
 		if outputs ~= nil then
 			for id, output in pairs (outputs) do
 				listLeft[id] = {title = output.title, fillLevel = output.fillLevel, capacity = output.capacity}
-
-				if id >= GC_ProductionFactory.LIMIT then
-					break
-				end
 			end
 		end
 	end
