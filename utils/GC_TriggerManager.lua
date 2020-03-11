@@ -196,3 +196,11 @@ function GC_TriggerManager:writeStream(streamId, connection)
 		end
     end
 end
+
+function GC_TriggerManager:finalizePlacement()
+	for _,trigger in pairs(self.registeredTriggers) do
+		if trigger.finalizePlacement ~= nil then
+			trigger:finalizePlacement()
+		end
+	end
+end

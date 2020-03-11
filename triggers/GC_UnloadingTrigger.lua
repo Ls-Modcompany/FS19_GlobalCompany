@@ -3,13 +3,15 @@
 --
 -- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany
--- @Date: 09.02.2019
--- @Version: 1.1.0.0
+-- @Date: 11.03.2020
+-- @Version: 1.2.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
 --
+-- 	v1.2.0.0 (11.03.2020):
+-- 		- add manurehosesystem
 --	v1.1.0.0 (09.02.2019):
 -- 		- added new function 'setCustomDischargeNotAllowedWarning'
 --		- add 'GC_DebugUtils' support.
@@ -34,6 +36,12 @@
 
 
 GC_UnloadingTrigger = {}
+
+local loadPath = g_company.dir .. "../FS19_manureSystem/src/events/ManureSystemConnectorIsConnectedEvent.lua"
+if fileExists(loadPath) then source(loadPath) end
+
+loadPath = g_company.dir .. "../FS19_manureSystem/src/events/ManureSystemConnectorManureFlowEvent.lua"
+if fileExists(loadPath) then source(loadPath) end
 
 local GC_UnloadingTrigger_mt = Class(GC_UnloadingTrigger, UnloadTrigger)
 InitObjectClass(GC_UnloadingTrigger, "GC_UnloadingTrigger")
@@ -178,6 +186,54 @@ function GC_UnloadingTrigger:load(nodeId, target, xmlFile, xmlKey, forcedFillTyp
 		return false
 	end
 
+	--load for manure system
+	if g_manureSystem ~= nil then
+		self.connectorStrategies = {}
+		self.manureSystemConnectors = {}
+		self.manureSystemConnectorsByType = {}
+
+		if hasXMLProperty(xmlFile, xmlKey .. ".manureSystemConnectors") then
+			local componentNode = getXMLString(xmlFile, xmlKey .. ".manureSystemConnectors#node")	
+			self.components = { { node = I3DUtil.indexToObject(nodeId, componentNode, target.i3dMappings) } }
+			
+			self.manureSystemFillType = g_fillTypeManager:getFillTypeIndexByName(getXMLString(xmlFile, xmlKey .. ".manureSystemConnectors#fillType"))
+
+			local i = 0
+			while true do
+				local baseKey = xmlKey .. (".manureSystemConnectors.connector(%d)"):format(i)
+				if not hasXMLProperty(xmlFile, baseKey) then
+					break
+				end
+
+				local typeString = Utils.getNoNil(getXMLString(xmlFile, baseKey .. "#type"), g_manureSystem.connectorManager.CONNECTOR_TYPE_HOSE_COUPLING)
+				local type = g_manureSystem.connectorManager:getConnectorType(typeString)
+
+				if type == nil then
+					g_logManager:xmlWarning(self.configFileName, "Invalid connector type %s", typeString)
+					type = g_manureSystem.connectorManager:getConnectorType(g_manureSystem.connectorManager.CONNECTOR_TYPE_HOSE_COUPLING)
+				end
+
+				if self.manureSystemConnectorsByType[type] == nil then
+					self.manureSystemConnectorsByType[type] = {}
+				end
+
+				if self.connectorStrategies[type] == nil then
+					self.connectorStrategies[type] = g_manureSystem.connectorManager:getConnectorStrategy(type, self)
+				end
+				
+				local connector = { type = type }
+				if g_company.utils.loadManureSystemConnectorFromXML(self, connector, xmlFile, baseKey, i) then
+					if self.connectorStrategies[type]:load(connector, xmlFile, baseKey) then
+						table.insert(self.manureSystemConnectors, connector)
+						table.insert(self.manureSystemConnectorsByType[type], connector)
+					end
+				end
+
+				i = i + 1
+			end
+		end
+	end
+
 	return true
 end
 
@@ -198,7 +254,17 @@ function GC_UnloadingTrigger:delete()
     if self.palletTriggerNode ~= nil and self.palletTriggerNode ~= 0 then
         removeTrigger(self.palletTriggerNode)
         self.palletTriggerNode = 0
-    end
+	end
+	
+	if g_manureSystem ~= nil then
+		for type, connectors in pairs(self.manureSystemConnectorsByType) do
+			for _, connector in ipairs(connectors) do
+				self.connectorStrategies[type]:delete(connector)
+			end
+		end	
+
+		g_manureSystem:removeConnectorObject(self)
+	end
     
 	GC_UnloadingTrigger:superClass().delete(self)
 end
@@ -334,6 +400,11 @@ function GC_UnloadingTrigger:getFillUnitFreeCapacity(fillUnitIndex, fillTypeInde
 		return 0
 	end
 
+	--for manuresystem: we get no fillTypeIndex
+	if fillTypeIndex == nil then
+		return self.target:getFreeCapacity(self.manureSystemFillType, farmId, self.extraParamater)
+	end
+
 	return self.target:getFreeCapacity(fillTypeIndex, farmId, self.extraParamater)
 end
 
@@ -427,3 +498,135 @@ end
 function GC_UnloadingTrigger:getIsFillAllowedFromFarm(farmId)
 	return g_currentMission.accessHandler:canFarmAccess(farmId, self.target) or self.allowEverybodyAccess
 end
+
+function GC_UnloadingTrigger:finalizePlacement()
+	if g_manureSystem ~= nil then
+		if #self.manureSystemConnectors ~= 0 then
+			g_manureSystem:addConnectorObject(self)
+		end
+	end
+end
+
+function GC_UnloadingTrigger:readStream(streamId, connection)
+    GC_UnloadingTrigger:superClass().readStream(self, streamId, connection)
+	if g_manureSystem ~= nil then
+        for type, connectors in pairs(self.manureSystemConnectorsByType) do
+            for _, connector in ipairs(connectors) do
+                local class = self.connectorStrategies[type]
+                if class.onReadStream ~= nil then
+                    class:onReadStream(connector, streamId, connection)
+                end
+            end
+        end
+	end
+end
+
+function GC_UnloadingTrigger:writeStream(streamId, connection)
+    GC_UnloadingTrigger:superClass().writeStream(self, streamId, connection)
+	if g_manureSystem ~= nil then      
+        for type, connectors in pairs(self.manureSystemConnectorsByType) do
+            for _, connector in ipairs(connectors) do
+				local class = self.connectorStrategies[type]
+                if class.onWriteStream ~= nil then
+                    class:onWriteStream(connector, streamId, connection)
+                end
+            end
+        end
+    end
+end
+
+function GC_UnloadingTrigger:getConnectorsByType(type)
+    local types = self.manureSystemConnectorsByType[type]
+    if types ~= nil then
+        return types
+    end
+
+    return {}
+end
+
+function GC_UnloadingTrigger:getConnectorById(id)
+    return self.manureSystemConnectors[id]
+end
+
+function GC_UnloadingTrigger:setIsConnected(id, state, grabNodeId, hose, noEventSend)
+    local connector = self:getConnectorById(id)
+
+    if connector.isConnected ~= state then
+        ManureSystemConnectorIsConnectedEvent.sendEvent(self, id, state, grabNodeId, hose, noEventSend)
+
+        if connector.lockAnimationIndex ~= nil then
+            local dir = state and 1 or -1
+            self.target.placeableClass:playAnimation(connector.lockAnimationIndex, dir)
+        end
+
+        if connector.manureFlowAnimationIndex == nil then
+            self:setIsManureFlowOpen(id, state, false, noEventSend)
+        end
+
+        if not state and connector.hasOpenManureFlow then
+            self:setIsManureFlowOpen(id, state, true, noEventSend)
+        end
+
+        connector.isConnected = state
+        connector.connectedObject = hose
+        connector.connectedNodeId = grabNodeId
+    end
+end
+
+function GC_UnloadingTrigger:setIsManureFlowOpen(id, state, force, noEventSend)
+    local connector = self:getConnectorById(id)
+
+    if not connector.isParkPlace and connector.hasOpenManureFlow ~= state or force then
+        ManureSystemConnectorManureFlowEvent.sendEvent(self, id, state, force, noEventSend)
+
+        connector.hasOpenManureFlow = state
+
+        if connector.manureFlowAnimationIndex ~= nil then
+            local canPlayAnimation = force or not self.target.placeableClass:getIsAnimationPlaying(connector.manureFlowAnimationIndex)
+
+            if canPlayAnimation then
+                local dir = state and 1 or -1
+                self.target.placeableClass:playAnimation(connector.manureFlowAnimationIndex, dir)
+            end
+        end
+    end
+end
+
+function GC_UnloadingTrigger:getAnimationTime(...)
+	return self.target.placeableClass:getAnimationTime(...)
+end
+
+function GC_UnloadingTrigger:getIsAnimationPlaying(...)
+	return self.target.placeableClass:getIsAnimationPlaying(...)
+end
+
+function GC_UnloadingTrigger:getFillUnitFillLevelPercentage(fillUnitIndex)
+	return self.target:ms_getFillUnitFillLevelPercentage(self.manureSystemFillType, self.extraParamater, true)
+end
+
+function GC_UnloadingTrigger:getFillUnitFillLevel(fillUnitIndex)
+	return self.target:ms_getFillUnitFillLevel(self.manureSystemFillType, self.extraParamater, true)
+end
+
+function GC_UnloadingTrigger:getFillUnitCapacity(fillUnitIndex)
+	return self.target:ms_getFillUnitCapacity(self.manureSystemFillType, self.extraParamater, true)
+end
+
+function GC_UnloadingTrigger:getFillUnitAllowsFillType(fillUnitIndex, fillTypeIndex)
+	return self.manureSystemFillType == fillTypeIndex
+end
+
+function GC_UnloadingTrigger:getFillUnitFillType(fillUnitIndex)
+	return self.manureSystemFillType
+end
+
+
+
+
+
+
+
+
+
+
+

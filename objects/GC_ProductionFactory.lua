@@ -148,12 +148,13 @@ function GC_ProductionFactory:new(isServer, isClient, customMt, xmlFilename, bas
 	return self
 end
 
-function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
+function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable, placeableClass)
 	local canLoad, addMinuteChange, addHourChange = true, false, false
 
 	self.rootNode = nodeId
 	self.indexName = indexName
 	self.isPlaceable = isPlaceable
+	self.placeableClass = placeableClass
 
 	self.triggerManager = GC_TriggerManager:new(self)
 	self.i3dMappings = GC_i3dLoader:loadI3dMapping(xmlFile, xmlKey .. ".i3dMappings")
@@ -1241,6 +1242,8 @@ function GC_ProductionFactory:loadOperatingParts(xmlFile, key, parent, isProduct
 end
 
 function GC_ProductionFactory:finalizePlacement()	
+	self.triggerManager:finalizePlacement()
+		
 	for _,outputProduct in pairs(self.outputProducts) do
 		if outputProduct.animalTrough ~= nil then
 			outputProduct.animalTrough:finalizePlacement()
@@ -1325,7 +1328,9 @@ function GC_ProductionFactory:delete()
 		end
 	end
 
-	self.programmFlow:delete()
+	if self.programmFlow ~= nil then
+		self.programmFlow:delete()
+	end
 
 	GC_ProductionFactory:superClass().delete(self)
 end
@@ -2834,3 +2839,115 @@ function GC_ProductionFactory:getOutputPerHour(productLine)
 	end	
 	return productLine.outputPerHour
 end
+
+-----------------------------------------ProgrammFlow functions--------------------------------------------------
+
+function GC_ProductionFactory:registerProgrammFlow()
+	g_company.programmFlowGlobalFunction:registerToProgrammFlow(self, self.programmFlow)
+
+	self.programmFlow:registerFunction(self, self.programmFlow_getCapacity, "getCapacity")
+	self.programmFlow:registerFunction(self, self.programmFlow_getLevel, "getLevel")
+	self.programmFlow:registerFunction(self, self.programmFlow_setAnimationNode, "setAnimationNode")
+	self.programmFlow:registerFunction(self, self.programmFlow_setParticleEffect, "setParticleEffect")
+end
+
+--[[   getCapacity
+* 1 * -> Productname (string) 
+]]--
+function GC_ProductionFactory:programmFlow_getCapacity(parameters)
+    local parsedParameters = g_company.dataTypeConverter:parseParameters(parameters, " ")
+	
+	local productName = parsedParameters[1]
+
+	if self.inputProductNameToId[productName] ~= nil then
+		return self.inputProducts[self.inputProductNameToId[productName]].capacity
+	end
+
+	if self.outputProductNameToId[productName] ~= nil then
+		return self.outputProducts[self.outputProductNameToId[productName]].capacity
+	end
+
+	return 0
+end
+
+--[[   getLevel
+* 1 * -> Productname (string) 
+]]--
+function GC_ProductionFactory:programmFlow_getLevel(parameters)
+    local parsedParameters = g_company.dataTypeConverter:parseParameters(parameters, " ")
+	
+	local productName = parsedParameters[1]
+
+	if self.inputProductNameToId[productName] ~= nil then
+		return self.inputProducts[self.inputProductNameToId[productName]].fillLevel
+	end
+
+	if self.outputProductNameToId[productName] ~= nil then
+		return self.outputProducts[self.outputProductNameToId[productName]].fillLevel
+	end
+
+	return 0	
+end
+
+--[[   setAnimationNode
+* 1 * -> Name of node (string) 
+* 2 * -> State (string) 
+]]--
+function GC_ProductionFactory:programmFlow_setAnimationNode(parameters)
+    local parsedParameters = g_company.dataTypeConverter:parseParameters(parameters, " ")
+	
+	local index = parsedParameters[1]
+	local state = parsedParameters[2]
+	self.programmFlowOperatingParts.operateAnimationNodes:setAnimationNodesStateByNode(index, state)
+end
+
+--[[   setParticleEffect
+* 1 * -> Name of node (string) 
+* 2 * -> State (string) 
+]]--
+function GC_ProductionFactory:programmFlow_setParticleEffect(parameters)
+    local parsedParameters = g_company.dataTypeConverter:parseParameters(parameters, " ")
+	
+	local index = parsedParameters[1]
+	local state = parsedParameters[2]
+	self.programmFlowOperatingParts.operateParticleEffects:setEffectsState(state, true)
+end
+
+-----------------------------------------ManureSystem--------------------------------------------------
+function GC_ProductionFactory:ms_getFillUnitFillLevelPercentage(fillUnitIndex, triggerId, isInput)
+	local product = self:getProductFromTriggerId(triggerId, fillUnitIndex, isInput)
+	if product ~= nil then		
+		return product.fillLevel / product.capacity
+	end
+
+	return 0
+end
+function GC_ProductionFactory:ms_getFillUnitCapacity(fillUnitIndex, triggerId, isInput)
+	local product = self:getProductFromTriggerId(triggerId, fillUnitIndex, isInput)
+	if product ~= nil then		
+		return product.capacity
+	end
+
+	return 0
+end
+function GC_ProductionFactory:ms_getFillUnitFillLevel(fillUnitIndex, triggerId, isInput)
+	local product = self:getProductFromTriggerId(triggerId, fillUnitIndex, isInput)
+	if product ~= nil then		
+		return product.fillLevel
+	end
+
+	return 0
+end
+function GC_ProductionFactory:ms_getFillUnitFreeCapacity(fillUnitIndex, triggerId, isInput)
+	local product = self:getProductFromTriggerId(triggerId, fillUnitIndex, isInput)
+	if product ~= nil then		
+		return product.capacity - product.fillLevel
+	end
+
+	return 0
+end
+
+
+
+
+

@@ -93,7 +93,7 @@ function GC_ProductionFactoryPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRa
 				if indexName ~= nil and usedIndexNames[indexName] == nil then
 					usedIndexNames[indexName] = key
 					local factory = GC_ProductionFactory:new(self.isServer, g_dedicatedServerInfo == nil, nil, filenameToUse, self.baseDirectory, self.customEnvironment)
-					if factory:load(self.nodeId, xmlFile, key, indexName, true) then
+					if factory:load(self.nodeId, xmlFile, key, indexName, true, self) then
 						factory.owningPlaceable = self
 						factory:setOwnerFarmId(self:getOwnerFarmId(), false)
 						table.insert(self.productionFactories, factory)

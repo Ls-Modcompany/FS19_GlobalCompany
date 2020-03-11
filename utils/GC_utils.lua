@@ -23,6 +23,9 @@
 GlobalCompanyUtils = {}
 g_company.utils = GlobalCompanyUtils
 
+local loadPath = g_company.dir .. "../FS19_manureSystem/src/utils/ManureSystemXMLUtil.lua"
+if fileExists(loadPath) then source(loadPath) end
+
 function GlobalCompanyUtils.createModPath(modFileName, filename)
 	return g_modsDirectory .. modFileName .. "/" .. filename
 end
@@ -499,4 +502,49 @@ function GlobalCompanyUtils.calcMoney(money)
 		return money * 1.08
 	end
 	return money
+end
+
+function GlobalCompanyUtils.getNextAnimalHusbandry(nodeId, modulName)
+	local distance = 9999999999
+	local foundTrough
+	local foundHusbandry
+	for _,husbandry in pairs(g_currentMission.husbandries) do
+		for name,mod in pairs(husbandry.modulesByName) do  
+			if name == modulName then
+				local newDistance = g_company.utils.calcDistance(nodeId, mod.owner.nodeId)
+				if newDistance < distance then
+					distance = newDistance
+					foundTrough = mod
+					foundHusbandry = husbandry
+				end
+			end
+		end    
+	end
+	return foundTrough, foundHusbandry
+end
+
+function GlobalCompanyUtils.calcDistance(nodeId, targetNode)
+    local x_t,_,z_t = getWorldTranslation(nodeId)
+    local x,_,z = getWorldTranslation(targetNode)
+    return MathUtil.vector3LengthSq(x - x_t, 0, z - z_t)
+end
+
+-- Code from ManureSysteStorage.lua
+-- Changes:
+-- add target as parameter
+function GlobalCompanyUtils.loadManureSystemConnectorFromXML(target, connector, xmlFile, baseKey, id)
+    local node = ManureSystemXMLUtil.getOrCreateNode(target, xmlFile, baseKey, id)
+
+    if node ~= nil then
+        connector.id = id + 1
+        connector.node = node
+        connector.isConnected = false
+        connector.connectedObject = nil
+        connector.inRangeDistance = Utils.getNoNil(getXMLFloat(xmlFile, baseKey .. "#inRangeDistance"), 1.3)
+        connector.isParkPlace = Utils.getNoNil(getXMLBool(xmlFile, baseKey .. "#isParkPlace"), false)
+
+        return true
+    end
+
+    return false
 end
