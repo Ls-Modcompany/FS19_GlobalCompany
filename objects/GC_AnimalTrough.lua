@@ -14,7 +14,7 @@
 --
 -- Notes:
 --
--- names: food water foodSpillage straw
+-- names: foodSpillage straw milk manure animals liquidManure water food
 --
 -- ToDo:
 --
