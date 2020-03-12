@@ -51,7 +51,7 @@ function GC_BaleTrigger:load(nodeId, target, xmlFile, xmlKey, reference, mode)
 	self.rootNode = nodeId;
 	self.target = target;
     self.reference = reference;
-    self.mode = mode;
+	self.mode = mode;
 	
 	self.baleInsideCounter = 0;
 
@@ -87,6 +87,9 @@ function GC_BaleTrigger:baleTriggerCallback(triggerId, otherId, onEnter, onLeave
 	local object = g_currentMission:getNodeObject(otherId)
 	if object ~= nil and object:isa(Bale) then
 		if onEnter then	
+			if self.programmFlow ~= nil then
+				self.programmFlow:onCallEvent(self, "onEnter")
+			end
 			if self.mode == GC_BaleTrigger.MODE_COUNTER then
 				self.baleInsideCounter = self.baleInsideCounter + 1;
 				if self.target.onEnterBaleTrigger ~= nil then
@@ -94,6 +97,9 @@ function GC_BaleTrigger:baleTriggerCallback(triggerId, otherId, onEnter, onLeave
 				end;
 			end;
 		elseif onLeave then
+			if self.programmFlow ~= nil then
+				self.programmFlow:onCallEvent(self, "onLeave")
+			end
 			if self.mode == GC_BaleTrigger.MODE_COUNTER then
 				self.baleInsideCounter = math.max(self.baleInsideCounter - 1, 0);
 				if self.target.onLeaveBaleTrigger ~= nil then
