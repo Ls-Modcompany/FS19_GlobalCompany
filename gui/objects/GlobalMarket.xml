@@ -21,9 +21,9 @@
             <GuiElement type="empty" id="gui_tab_storage">               
                 <GuiElement type="flowLayout" template="gcGlobalMarketRightLayout">         
                     <GuiElement type="flowLayout" template="gcGlobalMarketFilterLayout">
-                        <GuiElement type="tableSort" template="gcGlobalMarketTableHeader" tableSortSize="300px 35px" id="gui_tableSort" text="$l10n_GC_globalMarket_tbl_header_filltype" onClick="onClickChangeSortDirectionFillType" />
-                        <GuiElement type="tableSort" template="gcGlobalMarketTableHeader" tableSortSize="300px 35px" id="gui_tableSort" text="$l10n_GC_globalMarket_tbl_header_level" onClick="onClickChangeSortDirectionLevel" />
-                        <GuiElement type="tableSort" template="gcGlobalMarketTableHeader" tableSortSize="300px 35px" id="gui_tableSort" text="$l10n_GC_globalMarket_tbl_header_price" onClick="onClickChangeSortDirectionPrice" />
+                        <GuiElement type="tableSort" template="gcGlobalMarketTableHeader" tableSortSize="300px 35px" id="gui_tableSort" text="$l10n_GC_globalMarket_tbl_header_filltype" />
+                        <GuiElement type="tableSort" template="gcGlobalMarketTableHeader" tableSortSize="300px 35px" id="gui_tableSort" text="$l10n_GC_globalMarket_tbl_header_level" />
+                        <GuiElement type="tableSort" template="gcGlobalMarketTableHeader" tableSortSize="300px 35px" id="gui_tableSort" text="$l10n_GC_globalMarket_tbl_header_price" />
                     </GuiElement>
                     <GuiElement type="table" template="gcGlobalMarketTableLayout" id="gui_table_storage">
                         <GuiElement type="button" template="gcGlobalMarketLayoutButton" onClick="onClickStorageItem" isTableTemplate="true">		
@@ -39,9 +39,9 @@
             <GuiElement type="empty" id="gui_tab_buy">
                 <GuiElement type="flowLayout" template="gcGlobalMarketRightLayout">         
                     <GuiElement type="flowLayout" template="gcGlobalMarketFilterLayout">
-                        <GuiElement type="tableSort" template="gcGlobalMarketTableHeader" tableSortSize="300px 35px" id="gui_tableSort" text="$l10n_GC_globalMarket_tbl_header_filltype" onClick="onClickChangeSortDirectionFillType" />
-                        <GuiElement type="tableSort" template="gcGlobalMarketTableHeader" tableSortSize="300px 35px" id="gui_tableSort" text="$l10n_GC_globalMarket_tbl_header_level" onClick="onClickChangeSortDirectionLevel" />
-                        <GuiElement type="tableSort" template="gcGlobalMarketTableHeader" tableSortSize="300px 35px" id="gui_tableSort" text="$l10n_GC_globalMarket_tbl_header_price2" onClick="onClickChangeSortDirectionPrice" />
+                        <GuiElement type="tableSort" template="gcGlobalMarketTableHeader" tableSortSize="300px 35px" id="gui_tableSort" text="$l10n_GC_globalMarket_tbl_header_filltype" />
+                        <GuiElement type="tableSort" template="gcGlobalMarketTableHeader" tableSortSize="300px 35px" id="gui_tableSort" text="$l10n_GC_globalMarket_tbl_header_level" />
+                        <GuiElement type="tableSort" template="gcGlobalMarketTableHeader" tableSortSize="300px 35px" id="gui_tableSort" text="$l10n_GC_globalMarket_tbl_header_price2" />
                     </GuiElement>
                     <GuiElement type="table" template="gcGlobalMarketTableLayout" id="gui_table_buy">
                         <GuiElement type="button" template="gcGlobalMarketLayoutButton" onClick="onClickStorageItem" isTableTemplate="true">		
