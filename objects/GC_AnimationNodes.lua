@@ -71,6 +71,9 @@ function GC_AnimationNodes:load(nodeId, target, xmlFile, xmlKey, groupKey)
 			group.animationNodes = g_animationManager:loadAnimations(xmlFile, key, nodeId, self, target.i3dMappings)
 			if group.animationNodes ~= nil then
 
+				group.index = getXMLString(xmlFile, key .. "#index")
+				group.state = false
+
 				-- Operating sequence must be multiplies of two. These numbers will then loop.  6 8 4 4 = on(6 sec) off(8 sec) on(4 sec) off(4 sec)
 				local intervals = g_company.xmlUtils.getEvenTableFromXMLString(xmlFile, key .. "#operatingSequence", 2, true, false, 1000, self.debugData)
 				if intervals ~= nil then
@@ -209,6 +212,23 @@ function GC_AnimationNodes:setAnimationNodesState(state, forceState)
 
 			if self.intervalAnimations ~= nil then
 				self:raiseUpdate()
+			end
+		end
+	end
+end
+
+function GC_AnimationNodes:setAnimationNodesStateByNode(index, state)
+	if self.isClient then
+		if self.standardAnimations ~= nil then
+			for i = 1, #self.standardAnimations do
+				local group = self.standardAnimations[i]
+				if group.animationNodes ~= nil and group.index == index then
+					if state then
+						g_animationManager:startAnimations(group.animationNodes)
+					else
+						g_animationManager:stopAnimations(group.animationNodes)
+					end
+				end
 			end
 		end
 	end
