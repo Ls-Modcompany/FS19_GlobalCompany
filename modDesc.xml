@@ -2,7 +2,7 @@
 <modDesc descVersion="47">
 	<author>LS-Modcompany / kevink98, aPuehri, Eribus</author>
 	
-    <version>1.3.0.1</version>
+    <version>1.4.0.0</version>
     
 	<title>
         <en>GlobalCompany</en>
@@ -12,6 +12,10 @@
         <en><![CDATA[Global Company - A large script extension for Farming Simulator!
 
 GlobalCompany is the base for many scripts. No matter if production, warehouse or whatever - with this it is easy to implement.
+
+Changelog 1.4.0.0:
+- NEW: Support of ManureHoseSystem for factory
+- NEW: Programmflow for factory
 
 Changelog 1.3.0.0:
 - NEW: Design
@@ -62,6 +66,10 @@ Changelog 1.1.0.0:
 
 GlobalCompany ist die Grundlage für viele Scripte. Egal ob Produktionen, Lager oder was auch immer - hiermit lässt es sich einfach umsetzen.
 
+Changelog 1.4.0.0:
+- NEW: Unterstützung vom ManureHoseSystem bei Fabriken (Einbau nötig, siehe Beispielmod!)
+- NEW: Programmablaufplan für Fabriken
+
 Changelog 1.3.0.0:
 - NEU: Design
 - NEU: GlobalMarket
@@ -111,6 +119,10 @@ Changelog 1.1.0.0:
 
 GlobalCompany основа для многих скриптов. Будь то производства, хранилища или что то еще - с ним возможно многое.
 
+Блог изменений 1.4.0.0:
+- НОВИНКА: Поддержка системы навозаHoseSystem для фабрики
+- НОВОЕ: Поток программ для завода
+
 Блог изменений 1.3.0.0:
 - НОВИНКА: Дизайн
 - НОВИНКА: GlobalMarket
@@ -159,6 +171,10 @@ GlobalCompany основа для многих скриптов. Будь то �
         <fr><![CDATA[Global Company - Une grande extension de script pour Farming Simulator !
 
 GlobalCompany est la base de nombreux scripts. Que ce soit pour la production, l'entreposage ou autre - avec ce mod, il est facile de tout implémenter.
+
+Changelog 1.4.0.0 :
+- NOUVEAU : Support du système de tuyaux d'évacuation du fumier pour les usines
+- NOUVEAU : Programmflow pour l'usine
 
 Changelog 1.3.0.0 :
 - NOUVEAU : Design

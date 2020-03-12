@@ -4,14 +4,20 @@
 -- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
 -- @Date: 18.02.2020
--- @Version: 1.3.0.0
+-- @Version: 1.4.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+-- 	v1.4.0.0 (12.03.2020):
+--		- Add support of manurehosesystem to factory
+--		- Add programmflow to factory
+-- 		- Some further improvements
+--
 -- 	v1.3.0.0 (18.02.2020):
 --		- Fix synchro error
 -- 		- Add GlobalMarket
+-- 		- Add AnimalTrough
 --		- Change Design
 --
 -- 	v1.2.1.0 (27.01.2020):
@@ -91,9 +97,9 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.3.0.1";
-GlobalCompany.versionDate = "22.02.2020";
-GlobalCompany.currentVersionId = 1301; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.version = "1.4.0.0";
+GlobalCompany.versionDate = "12.03.2020";
+GlobalCompany.currentVersionId = 1400; -- Mod Manager ID. (Version number without periods.)
 GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
 GlobalCompany.isGreenWeekVersion = false;
 
@@ -110,6 +116,7 @@ function GlobalCompany.initialLoad()
 		getfenv(0)["g_company"] = GlobalCompany;
 
 		source(GlobalCompany.dir .. "utils/GC_utils.lua");
+		source(GlobalCompany.dir .. "utils/GC_DataTypeConverter.lua");
 		source(GlobalCompany.dir .. "class/GC_Class.lua");
 		source(GlobalCompany.dir .. "class/GC_StaticClass.lua");
 
@@ -286,8 +293,8 @@ function GlobalCompany.removeDynamicStorage(dynamicStorage, index)
 		if index ~= nil and GlobalCompany.loadedDynamicStorages[index] == dynamicStorage then
 			table.remove(GlobalCompany.loadedDynamicStorages, index);
 		else
-			for i, globalFactory in pairs (GlobalCompany.loadedDynamicStorages) do
-				if globalFactory == dynamicStorage then
+			for i, globalStorage in pairs (GlobalCompany.loadedDynamicStorages) do
+				if globalStorage == dynamicStorage then
 					table.remove(GlobalCompany.loadedDynamicStorages, i);
 					break;
 				end;
@@ -403,6 +410,8 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_GlobalMarket.lua");
 	source(GlobalCompany.dir .. "objects/GC_GlobalMarketObject.lua");
 	source(GlobalCompany.dir .. "objects/GC_AnimalTrough.lua");
+	source(GlobalCompany.dir .. "objects/GC_ProgrammFlow.lua");
+	source(GlobalCompany.dir .. "objects/GC_ProgrammFlow_Globalfunctions.lua");
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
