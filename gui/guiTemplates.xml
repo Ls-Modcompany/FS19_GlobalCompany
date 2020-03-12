@@ -76,6 +76,7 @@
         <uv name="icon_arrowBottom" value="678px 390px 35px 35px"/>
         <uv name="icon_circle" value="530px 388px 55px 55px"/>
         <uv name="icon_triangle" value="675px 388px 32px 32px"/>
+        <uv name="icon_tick" value="150px 344px 32px 32px"/>
 
         <uv name="icon_priceArrow" value="51px 339px 42px 42px"/>
 	</uvs>
@@ -1369,8 +1370,10 @@
 			<value name="size" value="20px 20px" />
 			<value name="position" value="10px -9px" />
 			<value name="imageUVs" value="icon_arrowBottom" />
-			<value name="imageColor" value="white" />
-			<value name="imageColor_selected" value="white" />
+			<!--value name="imageColor" value="white" />
+			<value name="imageColor_selected" value="white" /-->
+			<value name="imageColor" value="transparent" />
+			<value name="imageColor_selected" value="transparent" />
 			<value name="imageColor_disabled" value="transparent" />
 		</template>
 		<template name="gcGlobalMarketTableLayout" anchor="leftTop" extends="gcBase">
@@ -1700,6 +1703,141 @@
 			<value name="textMargin" value="10px 3px 0px 0px" />
 			<value name="textColor_selected" value="white" />	
 		</template>
-		
+
+		<!--###################################################################################################################################-->
+		<!--###############################################   -AnimalFeeder-   ################################################################-->
+		<!--###################################################################################################################################-->
+		<template name="gcAnimalFeeder" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="1920px 1080px" />
+			<value name="imageColor" value="glass0_1" />
+		</template>
+		<template name="gcAnimalFeederBackground" anchor="middleCenter" extends="gcBase gcBorder">
+			<value name="size" value="1600px 900px" />
+			<value name="position" value="0px 0px" />
+			<value name="hasBorders" value="true" />
+			<value name="borderBottomSize" value="6px" />
+			<value name="borderBottomColor" value="gcBlue" />
+			<Value name="imageUVs" value="colorBg"/>
+			<value name="imageColor" value="0.018 0.016 0.015 0.6" />
+		</template>
+		<template name="gcAnimalFeederButtonsLayout" anchor="middleBottom" extends="gcBase">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="left" />
+			<value name="position" value="0px 30px" />
+			<value name="size" value="1600px 50px" />
+		</template>
+		<template name="gcAnimalFeederTextHeader" anchor="middleTop" extends="gcBase_text">
+			<value name="textSize" value="26px" />
+			<value name="textBold" value="true" />
+			<value name="textAlignment" value="center" />
+			<value name="margin" value="0px 20px 0px 0px" />
+		</template>
+		<template name="gcAnimalFeederTextInfo" anchor="middleTop" extends="gcBase_text">
+			<value name="textSize" value="20px" />
+			<value name="textAlignment" value="center" />
+			<value name="margin" value="0px 80px 0px 0px" />
+			<value name="textColor_selected" value="white" />
+		</template>
+		<template name="gcAnimalFeederContentLayout1" anchor="middleCenter" extends="gcBase">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="middle" />
+			<value name="position" value="0px 20px" />
+			<value name="size" value="1500px 650px" />
+		</template>
+		<template name="gcAnimalFeederContentLayout2" anchor="middleCenter" extends="gcBase">
+			<value name="orientation" value="y" />
+			<value name="alignment" value="top" />
+			<value name="position" value="0px 0px" />
+			<value name="size" value="750px 650px" />
+		</template>
+		<template name="gcAnimalFeederBunkerOverview" anchor="middleCenter" extends="gcBase">
+			<value name="margin" value="20px 20px 20px 20px" />
+			<value name="size" value="500px 230px" />
+			<value name="imageColor" value="glass1" />
+		</template>
+		<template name="gcAnimalFeederBunkerOverviewText1" anchor="leftTop" extends="gcBase_text">
+			<value name="textSize" value="22px" />
+			<value name="textAlignment" value="left" />
+			<value name="margin" value="10px 20px 0px 0px" />
+			<value name="textColor_selected" value="white" />
+			<value name="textBold" value="true" />
+		</template>
+		<template name="gcAnimalFeederBunkerOverviewText2" anchor="leftTop" extends="gcBase_text">
+			<value name="textSize" value="17px" />
+			<value name="textAlignment" value="left" />
+			<value name="textColor_selected" value="white" />
+			<value name="textColor_disabled" value="gray1" />
+		</template>
+		<template name="gcAnimalFeederBunkerOverviewText3" anchor="leftTop" extends="gcBase_text">
+			<value name="textSize" value="18px" />
+			<value name="textAlignment" value="left" />
+			<value name="margin" value="10px 20px 0px 0px" />
+			<value name="textColor" value="red" />
+			<value name="textBold" value="true" />
+		</template>
+		<template name="gcAnimalFeederStatisticOverview" anchor="middleCenter" extends="gcBase">
+			<value name="margin" value="20px 20px 20px 20px" />
+			<value name="size" value="500px 260px" />
+			<value name="imageColor" value="glass1" />
+		</template>
+		<template name="gcAnimalFeederFeedingTimeOverview" anchor="middleCenter" extends="gcBase">
+			<value name="margin" value="20px 20px 20px 20px" />
+			<value name="size" value="500px 400px" />
+			<value name="imageColor" value="glass1" />
+		</template>
+		<template name="gcAnimalFeederFeedingTimeOverviewBtnTick" anchor="leftTop" extends="gcBase">
+			<value name="size" value="30px 30px" />
+			<value name="position" value="0px 0px" />
+			<value name="hasOverlay" value="true" />				
+			<value name="isActivable" value="true" />				
+		</template>
+		<template name="gcAnimalFeederFeedingTimeOverviewBtnTick_overlay" anchor="leftTop" extends="gcAnimalFeederFeedingTimeOverviewBtnTick">
+			<value name="imageColor" value="white" />		
+			<value name="imageColor_selected" value="blue" />		
+			<value name="imageUVs" value="icon_tick" />		
+			<value name="imageUVs_selected" value="icon_tick" />		
+		</template>
+		<template name="gcAnimalFeederFeedingTimeOverviewBtn" anchor="leftTop" extends="gcBase">
+			<value name="size" value="30px 30px" />
+			<value name="position" value="0px 0px" />
+			<value name="hasText" value="true" />					
+		</template>
+		<template name="gcAnimalFeederFeedingTimeOverviewBtn_text" anchor="leftTop" extends="gcAnimalFeederFeedingTimeOverviewBtn">
+			<value name="textColor" value="white" />		
+			<value name="textColor_selected" value="blue" />			
+		</template>
+		<template name="gcAnimalFeederMixingRatioOverview" anchor="middleCenter" extends="gcBase">
+			<value name="margin" value="20px 20px 20px 20px" />
+			<value name="size" value="500px 300px" />
+			<value name="imageColor" value="glass1" />
+		</template>		
+
+		<!--###################################################################################################################################-->
+		<!--##############################################   -AnimalFeederWarning-   ##########################################################-->
+		<!--###################################################################################################################################-->
+		<template name="gcAnimalFeederWarning" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="1920px 1080px" />
+			<value name="imageColor" value="transparent" />
+		</template>
+		<template name="gcAnimalFeederWarningBackground" anchor="topright" extends="gcBase gcBorder">
+			<value name="size" value="300px 180px" />
+			<value name="position" value="-20px -150px" />
+			<value name="hasBorders" value="true" />
+			<value name="borderBottomSize" value="6px" />
+			<value name="borderBottomColor" value="gcBlue" />
+			<Value name="imageUVs" value="colorBg"/>
+			<value name="imageColor" value="0.018 0.016 0.015 0.97" />
+		</template>
+		<template name="gcAnimalFeederWarningTextHeader" anchor="lefttop" extends="gcBase_text">
+			<value name="textSize" value="14px" />
+			<value name="textBold" value="true" />
+			<value name="textAlignment" value="center" />
+			<value name="margin" value="10px 10px 0px 0px" />
+		</template>
+		<template name="gcAnimalFeederWarningText" anchor="lefttop" extends="gcBase_text">
+			<value name="textSize" value="12px" />
+			<value name="textAlignment" value="left" />
+			<value name="margin" value="10px 10px 0px 0px" />
+		</template>
 	</templates>
 </guiTemplates>
