@@ -116,18 +116,20 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 					for k, v in pairs(GC_ObjectInfo.supportedTypes) do
 						if (object.typeName == v) then
 							if (object.getFillUnits ~= nil) then
-								local fUnit = object:getFillUnits();								
-								if object:getFillUnitExists(fUnit[1].fillUnitIndex) then							
-									local lev = Utils.getNoNil(g_company.mathUtils.round(fUnit[1].fillLevel,0.01),0);
-									local perc = Utils.getNoNil(g_company.mathUtils.round((object:getFillUnitFillLevelPercentage(fUnit[1].fillUnitIndex) * 100),0.01),0);
-									local fill = Utils.getNoNil(g_fillTypeManager.fillTypes[fUnit[1].fillType].title,"unknown");
-									if (string.lower(fill) ~= "unknown") then
-										self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(fill);
-										self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level2'):format(lev, perc);
-										self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object, self, false));
-										self.showInfo = true;
+								local fUnit = object:getFillUnits();	
+								if fUnit[1] ~= nil then							
+									if object:getFillUnitExists(fUnit[1].fillUnitIndex) then							
+										local lev = Utils.getNoNil(g_company.mathUtils.round(fUnit[1].fillLevel,0.01),0);
+										local perc = Utils.getNoNil(g_company.mathUtils.round((object:getFillUnitFillLevelPercentage(fUnit[1].fillUnitIndex) * 100),0.01),0);
+										local fill = Utils.getNoNil(g_fillTypeManager.fillTypes[fUnit[1].fillType].title,"unknown");
+										if (string.lower(fill) ~= "unknown") then
+											self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(fill);
+											self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level2'):format(lev, perc);
+											self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object, self, false));
+											self.showInfo = true;
+										end;
 									end;
-								end;
+								end
 							end;
 						end;
 					end;

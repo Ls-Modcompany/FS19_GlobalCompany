@@ -79,6 +79,8 @@ source(g_currentModDirectory .. "gui/objects/PlaceableDigitalDisplay.lua");
 source(g_currentModDirectory .. "gui/objects/GlobalMarket.lua");
 source(g_currentModDirectory .. "gui/objects/GlobalMarketLevelDialog.lua");
 source(g_currentModDirectory .. "gui/objects/GlobalMarketLoading.lua");
+source(g_currentModDirectory .. "gui/objects/AnimalFeeder.lua");
+source(g_currentModDirectory .. "gui/objects/AnimalFeederWarning.lua");
 
 function GlobalCompanyGui:init()	
 	for _,inAc in pairs(self.toInit_actionEvents) do
@@ -137,6 +139,8 @@ function GlobalCompanyGui:load()
 	g_company.gui:registerGui("gc_globalMarket", nil, Gc_Gui_GlobalMarket, true, true, false);
 	g_company.gui:registerGui("gc_globalMarketLevelDialog", nil, Gc_Gui_GlobalMarketLevelDialog, true, true, false);	
 	g_company.gui:registerGui("gc_globalMarketLoading", nil, Gc_Gui_GlobalMarketLoading, true, true, true);	
+	g_company.gui:registerGui("gc_animalFeeder", nil, Gc_Gui_AnimalFeeder, true, true, true);	
+	g_company.gui:registerGui("gc_animalFeederWarning", nil, Gc_Gui_AnimalFeederWarning, false, false, true);	
 	self.activeGuiDialogs = {};
 	self.registeredActonEvents = false;
 end;

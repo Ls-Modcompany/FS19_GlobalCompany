@@ -28,12 +28,6 @@
 
 GC_LoadingTrigger = {}
 
-local loadPath = g_company.dir .. "../FS19_manureSystem/src/events/ManureSystemConnectorIsConnectedEvent.lua"
-if fileExists(loadPath) then source(loadPath) end
-
-loadPath = g_company.dir .. "../FS19_manureSystem/src/events/ManureSystemConnectorManureFlowEvent.lua"
-if fileExists(loadPath) then source(loadPath) end
-
 local GC_LoadingTrigger_mt = Class(GC_LoadingTrigger, LoadTrigger)
 InitObjectClass(GC_LoadingTrigger, "GC_LoadingTrigger")
 
@@ -262,7 +256,7 @@ function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes
 			self.manureSystemConnectorsByType = {}
 
 			if hasXMLProperty(xmlFile, xmlKey .. ".manureSystemConnectors") then
-				local componentNode = getXMLString(xmlFile, xmlKey .. ".manureSystemConnectors#node")	
+				local componentNode = getXMLString(xmlFile, xmlKey .. ".manureSystemConnectors#rootNode")	
 				self.components = { { node = I3DUtil.indexToObject(nodeId, componentNode, source.i3dMappings) } }
 
 				self.manureSystemFillType = g_fillTypeManager:getFillTypeIndexByName(getXMLString(xmlFile, xmlKey .. ".manureSystemConnectors#fillType"))
@@ -423,11 +417,11 @@ end
 
 --for manuresystem
 function GC_LoadingTrigger:addFillUnitFillLevel(farmId, fillUnitIndex, fillLevelDelta, fillTypeIndex, toolType, fillPositionData)
-	local newFillLevel
+	local newFillLevel = 0
 	local oldFillLevel = self.source:getProvidedFillLevel(fillTypeIndex, farmId, self.extraParamater)
-	if oldFillLevel > 0 then
+	--if oldFillLevel > 0 then
 		newFillLevel = self.source:removeFillLevel(farmId, fillLevelDelta * -1, fillTypeIndex, self.extraParamater)
-	end
+	--end
 	return (oldFillLevel - newFillLevel) * -1
 end
 
@@ -824,7 +818,7 @@ function GC_LoadingTrigger:getFillUnitCapacity(fillUnitIndex)
 end
 
 function GC_LoadingTrigger:getFillUnitAllowsFillType(fillUnitIndex, fillTypeIndex)
-	return self.manureSystemFillType == fillTypeIndex
+	return g_manureSystem ~= nil and #self.manureSystemConnectors ~= 0 and self.manureSystemFillType == fillTypeIndex
 end
 
 function GC_LoadingTrigger:getFillUnitFillType(fillUnitIndex)

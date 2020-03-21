@@ -148,6 +148,13 @@ function GC_FillVolume:setFillType(fillTypeIndex, volume)
 		else
 			for _, volume in pairs(self.fillVolumes) do
 				volume.fillTypeIndex = fillTypeIndex;
+
+				local material = g_materialManager:getMaterial(fillTypeIndex, "fillplane", 1);
+				if material ~= nil then
+					setMaterial(volume.volume, material, 0);
+				end;
+
+				volume.lastFillTypeIndex = fillTypeIndex;
 			end;
 		end;
 	else

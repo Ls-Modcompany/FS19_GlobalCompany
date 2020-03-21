@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI>  
+  <GuiElement type="image" template="gcAnimalFeeder">
+    <GuiElement type="image" template="gcAnimalFeederBackground">
+        <GuiElement type="text" template="gcAnimalFeederTextHeader" id="gui_header" />    
+        <GuiElement type="text" template="gcAnimalFeederTextInfo" text="$l10n_GC_animalFeeder_gui_info" />    
+    </GuiElement>
+
+
+
+    <GuiElement type="flowLayout" template="gcAnimalFeederContentLayout1">
+
+        <GuiElement type="flowLayout" template="gcAnimalFeederContentLayout2">
+
+            
+            <GuiElement type="image" template="gcAnimalFeederFeedingTimeOverview">
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText1" text="Fütterungszeiten" />  
+
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtnTick" position="10px -54px 0px 0px" onClick="onClickToggleFeedingTimeActive" parameter="1" id="gui_feedingTime1_0" />
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="70px -60px 0px 0px" id="gui_feedingTime1_1" /> 
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="130px -60px 0px 0px" id="gui_feedingTime1_2" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="220px -54px 0px 0px" text="-" onClick="onClickSetFeedingTimeDown" parameter="1" id="gui_feedingTime1_3" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="260px -54px 0px 0px" text="+"  onClick="onClickSetFeedingTimeUp" parameter="1" id="gui_feedingTime1_4" /> 
+
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtnTick" position="10px -114px 0px 0px" onClick="onClickToggleFeedingTimeActive" parameter="2" id="gui_feedingTime2_0" />
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="70px -120px 0px 0px" id="gui_feedingTime2_1" /> 
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="130px -120px 0px 0px" id="gui_feedingTime2_2" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="220px -114px 0px 0px" text="-" onClick="onClickSetFeedingTimeDown" parameter="2" id="gui_feedingTime2_3" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="260px -114px 0px 0px" text="+"  onClick="onClickSetFeedingTimeUp" parameter="2" id="gui_feedingTime2_4" /> 
+                
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtnTick" position="10px -174px 0px 0px" onClick="onClickToggleFeedingTimeActive" parameter="3" id="gui_feedingTime3_0" />
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="70px -180px 0px 0px" id="gui_feedingTime3_1" /> 
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="130px -180px 0px 0px" id="gui_feedingTime3_2" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="220px -174px 0px 0px" text="-" onClick="onClickSetFeedingTimeDown" parameter="3" id="gui_feedingTime3_3" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="260px -174px 0px 0px" text="+"  onClick="onClickSetFeedingTimeUp" parameter="3" id="gui_feedingTime3_4" /> 
+                
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtnTick" position="10px -234px 0px 0px" onClick="onClickToggleFeedingTimeActive" parameter="4" id="gui_feedingTime4_0" />
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="70px -240px 0px 0px" id="gui_feedingTime4_1" /> 
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="130px -240px 0px 0px" id="gui_feedingTime4_2" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="220px -234px 0px 0px" text="-" onClick="onClickSetFeedingTimeDown" parameter="4" id="gui_feedingTime4_3" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="260px -234px 0px 0px" text="+"  onClick="onClickSetFeedingTimeUp" parameter="4" id="gui_feedingTime4_4" /> 
+                
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="10px -310px 0px 0px" text="$l10n_GC_animalFeeder_gui_demandPercent" /> 
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="220px -310px 0px 0px" id="gui_feedingDemandPercent" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="350px -304px 0px 0px" text="-" onClick="onClickSetFeedingDemandDown" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="390px -304px 0px 0px" text="+"  onClick="onClickSetFeedingDemandUp" /> 
+                
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="10px -350px 0px 0px" text="$l10n_GC_animalFeeder_gui_literPerDrive" /> 
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="220px -350px 0px 0px" id="gui_feedingLiterPerDrive" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="350px -344px 0px 0px" text="-" onClick="onClickSetFeedingLiterPerDriveDown" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="390px -344px 0px 0px" text="+"  onClick="onClickSetFeedingLiterPerDriveUp" /> 
+            </GuiElement>
+
+            <GuiElement type="image" template="gcAnimalFeederMixingRatioOverview">
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText1" text="$l10n_GC_animalFeeder_gui_mixingRatio_title" />  
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText1" text="Mischverhältnis" />  
+
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="10px -60px 0px 0px" id="gui_mixingRatio1_title" /> 
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="130px -60px 0px 0px" id="gui_mixingRatio1_value" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="190px -54px 0px 0px" text="-" onClick="onClickSetMixingRatioDown" parameter="1" id="gui_mixingRatio1_btn1" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="230px -54px 0px 0px" text="+"  onClick="onClickSetMixingRatioUp" parameter="1" id="gui_mixingRatio1_btn2" /> 
+
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="10px -120px 0px 0px" id="gui_mixingRatio2_title" /> 
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="130px -120px 0px 0px" id="gui_mixingRatio2_value" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="190px -114px 0px 0px" text="-" onClick="onClickSetMixingRatioDown" parameter="2" id="gui_mixingRatio2_btn1" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="230px -114px 0px 0px" text="+"  onClick="onClickSetMixingRatioUp" parameter="2" id="gui_mixingRatio2_btn2" /> 
+
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="10px -180px 0px 0px" id="gui_mixingRatio3_title" /> 
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="130px -180px 0px 0px" id="gui_mixingRatio3_value" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="190px -174px 0px 0px" text="-" onClick="onClickSetMixingRatioDown" parameter="3" id="gui_mixingRatio3_btn1" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="230px -174px 0px 0px" text="+"  onClick="onClickSetMixingRatioUp" parameter="3" id="gui_mixingRatio3_btn2" /> 
+
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="10px -240px 0px 0px" id="gui_mixingRatio4_title" /> 
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" position="130px -240px 0px 0px" id="gui_mixingRatio4_value" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="190px -234px 0px 0px" text="-" onClick="onClickSetMixingRatioDown" parameter="4" id="gui_mixingRatio4_btn1" /> 
+                <GuiElement type="button" template="gcAnimalFeederFeedingTimeOverviewBtn" position="230px -234px 0px 0px" text="+"  onClick="onClickSetMixingRatioUp" parameter="4" id="gui_mixingRatio4_btn2" /> 
+
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText3" position="0px -255px 0px 0px" text="$l10n_GC_animalFeeder_gui_mixingRatio_warnung" id="gui_mixingRatioWarning" />  
+            </GuiElement>
+
+        </GuiElement>
+        <GuiElement type="flowLayout" template="gcAnimalFeederContentLayout2">
+            
+            <GuiElement type="image" template="gcAnimalFeederBunkerOverview">
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText1" text="$l10n_GC_animalFeeder_gui_bunker_title" />  
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="10px 60px 0px 0px" id="gui_bunker_name1" />  
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="10px 100px 0px 0px" id="gui_bunker_name2" />  
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="10px 140px 0px 0px" id="gui_bunker_name3" />  
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="10px 180px 0px 0px" id="gui_bunker_name4" />  
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="350px 60px 0px 0px" id="gui_bunker_level1" />  
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="350px 100px 0px 0px" id="gui_bunker_level2" />  
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="350px 140px 0px 0px" id="gui_bunker_level3" /> 
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="350px 180px 0px 0px" id="gui_bunker_level4" /> 
+            </GuiElement>
+
+            <GuiElement type="image" template="gcAnimalFeederStatisticOverview">
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText1" text="$l10n_GC_animalFeeder_gui_hist_header" />  
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="10px 60px 0px 0px" text="$l10n_GC_animalFeeder_gui_hist_text1" />  
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="10px 100px 0px 0px" id="gui_history_1_text" />  
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="10px 140px 0px 0px" id="gui_history_2_text" />  
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="10px 180px 0px 0px" id="gui_history_3_text" />  
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="10px 220px 0px 0px" id="gui_history_4_text" /> 
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="350px 60px 0px 0px" id="gui_history_full" />  
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="350px 100px 0px 0px" id="gui_history_1" />  
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="350px 140px 0px 0px" id="gui_history_2" /> 
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="350px 180px 0px 0px" id="gui_history_3" /> 
+                <GuiElement type="text" template="gcAnimalFeederBunkerOverviewText2" margin="350px 220px 0px 0px" id="gui_history_4" /> 
+            </GuiElement>
+
+        </GuiElement>
+
+    </GuiElement>
+    
+    
+    <GuiElement type="flowLayout" template="gcAnimalFeederButtonsLayout">
+        <GuiElement type="button" template="gcBaseGuiButton" inputAction="MENU_BACK" onClick="onClickClose" />
+        <GuiElement type="text" template="gcBaseGuiButtonText" text="$l10n_GC_gui_buttons_back" />     
+        <GuiElement type="button" position="50px 0px" template="gcBaseGuiButtonNext" inputAction="JUMP" onClick="onClickStartManual" id="gui_btn_startManual" />
+        <GuiElement type="text" template="gcBaseGuiButtonText" id="gui_btn_startManualText" text="$l10n_GC_animalFeeder_gui_startManual" />     
+    
+    </GuiElement>
+  </GuiElement>  
+</GUI>

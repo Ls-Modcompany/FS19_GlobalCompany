@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI>  
+  <GuiElement type="image" template="gcAnimalFeederWarning">
+    <GuiElement type="image" template="gcAnimalFeederWarningBackground">
+        <GuiElement type="text" template="gcAnimalFeederWarningTextHeader" id="gui_header" />    
+        <GuiElement type="text" template="gcAnimalFeederWarningText" position="10px -30px" id="gui_header1" /> 
+        <GuiElement type="text" template="gcAnimalFeederWarningText" position="10px -50px" id="gui_text1" /> 
+        <GuiElement type="text" template="gcAnimalFeederWarningText" position="10px -70px" id="gui_header2" /> 
+        <GuiElement type="text" template="gcAnimalFeederWarningText" position="10px -90px" id="gui_text2" /> 
+        <GuiElement type="text" template="gcAnimalFeederWarningText" position="10px -110px" id="gui_header3" /> 
+        <GuiElement type="text" template="gcAnimalFeederWarningText" position="10px -130px" id="gui_text3" /> 
+    </GuiElement>
+  </GuiElement>  
+</GUI>

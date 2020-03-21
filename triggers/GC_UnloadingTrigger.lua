@@ -37,12 +37,6 @@
 
 GC_UnloadingTrigger = {}
 
-local loadPath = g_company.dir .. "../FS19_manureSystem/src/events/ManureSystemConnectorIsConnectedEvent.lua"
-if fileExists(loadPath) then source(loadPath) end
-
-loadPath = g_company.dir .. "../FS19_manureSystem/src/events/ManureSystemConnectorManureFlowEvent.lua"
-if fileExists(loadPath) then source(loadPath) end
-
 local GC_UnloadingTrigger_mt = Class(GC_UnloadingTrigger, UnloadTrigger)
 InitObjectClass(GC_UnloadingTrigger, "GC_UnloadingTrigger")
 
@@ -193,7 +187,7 @@ function GC_UnloadingTrigger:load(nodeId, target, xmlFile, xmlKey, forcedFillTyp
 		self.manureSystemConnectorsByType = {}
 
 		if hasXMLProperty(xmlFile, xmlKey .. ".manureSystemConnectors") then
-			local componentNode = getXMLString(xmlFile, xmlKey .. ".manureSystemConnectors#node")	
+			local componentNode = getXMLString(xmlFile, xmlKey .. ".manureSystemConnectors#rootNode")	
 			self.components = { { node = I3DUtil.indexToObject(nodeId, componentNode, target.i3dMappings) } }
 			
 			self.manureSystemFillType = g_fillTypeManager:getFillTypeIndexByName(getXMLString(xmlFile, xmlKey .. ".manureSystemConnectors#fillType"))
@@ -483,7 +477,6 @@ function GC_UnloadingTrigger:setAcceptedFillTypeState(fillTypeInt, state)
 	if self.fillTypes == nil then
 		self.fillTypes = {}
 	end
-
 	self.fillTypes[fillTypeInt] = state
 end
 
@@ -613,20 +606,10 @@ function GC_UnloadingTrigger:getFillUnitCapacity(fillUnitIndex)
 end
 
 function GC_UnloadingTrigger:getFillUnitAllowsFillType(fillUnitIndex, fillTypeIndex)
-	return self.manureSystemFillType == fillTypeIndex
+	local glob = GC_UnloadingTrigger:superClass().getFillUnitAllowsFillType(self, fillUnitIndex, fillTypeIndex)    	
+	return (g_manureSystem ~= nil and #self.manureSystemConnectors ~= 0 and self.manureSystemFillType == fillTypeIndex) or glob
 end
 
 function GC_UnloadingTrigger:getFillUnitFillType(fillUnitIndex)
 	return self.manureSystemFillType
 end
-
-
-
-
-
-
-
-
-
-
-

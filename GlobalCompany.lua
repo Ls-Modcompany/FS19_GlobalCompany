@@ -150,6 +150,7 @@ function GlobalCompany.initialLoad()
 		
 		GlobalCompany.loadedFactories = {}
 		GlobalCompany.loadedDynamicStorages = {}
+		GlobalCompany.loadedAnimalFeeders = {}
 
 		Mission00.load = Utils.prependedFunction(Mission00.load, GlobalCompany.onMissionLoad);
 		Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, GlobalCompany.init);
@@ -303,6 +304,28 @@ function GlobalCompany.removeDynamicStorage(dynamicStorage, index)
 	end;
 end;
 
+function GlobalCompany.addAnimalFeeder(animalFeeder)
+	if animalFeeder ~= nil then
+		table.insert(GlobalCompany.loadedAnimalFeeders, animalFeeder);
+		return #GlobalCompany.loadedAnimalFeeders;
+	end;
+end;
+
+function GlobalCompany.removeAnimalFeeder(animalFeeder, index)
+	if animalFeeder ~= nil then
+		if index ~= nil and GlobalCompany.loadedAnimalFeeders[index] == animalFeeder then
+			table.remove(GlobalCompany.loadedAnimalFeeders, index);
+		else
+			for i, globalFeeder in pairs (GlobalCompany.loadedAnimalFeeders) do
+				if globalFeeder == animalFeeder then
+					table.remove(GlobalCompany.loadedAnimalFeeders, i);
+					break;
+				end;
+			end;
+		end;
+	end;
+end;
+
 --|| Init ||--
 function GlobalCompany.addInit(target, init)
 	table.insert(GlobalCompany.inits, {init=init, target=target});
@@ -412,6 +435,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_AnimalTrough.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProgrammFlow.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProgrammFlow_Globalfunctions.lua");
+	source(GlobalCompany.dir .. "objects/GC_AnimalFeeder.lua");
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
@@ -429,6 +453,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "placeables/GC_DynamicStoragePlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_PlaceableDigitalDisplayPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_GlobalMarketPlaceable.lua");
+	source(GlobalCompany.dir .. "placeables/GC_AnimalFeederPlaceable.lua");
 
 	--|| Additionals ||--
 	source(GlobalCompany.dir .. "additionals/GC_BaleAddon.lua");
@@ -469,6 +494,7 @@ function GlobalCompany.loadPlaceables()
 	GlobalCompany:addPlaceableType("GC_ProductionFactoryPlaceable", "GC_ProductionFactoryPlaceable", placeablesDir .. "GC_ProductionFactoryPlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_PlaceableDigitalDisplayPlaceable", "GC_PlaceableDigitalDisplayPlaceable", placeablesDir .. "GC_PlaceableDigitalDisplayPlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_GlobalMarketPlaceable", "GC_GlobalMarketPlaceable", placeablesDir .. "GC_GlobalMarketPlaceable.lua");
+	GlobalCompany:addPlaceableType("GC_AnimalFeederPlaceable", "GC_AnimalFeederPlaceable", placeablesDir .. "GC_AnimalFeederPlaceable.lua");
 end;
 
 function GlobalCompany:registerObject(object)
