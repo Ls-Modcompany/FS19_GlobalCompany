@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI>  
+  <GuiElement type="image" template="gcFarmStart">
+    <GuiElement type="image" template="gcFarmStartBackground">
+        <GuiElement type="text" template="gcDynStorageTextHeader" id="gui_header" text="Wähle deinen Starthof aus!" />    
+    </GuiElement>
+
+    <GuiElement type="table" template="gcFarmStartMap" id="gui_table">   
+        <GuiElement type="button" template="gcFarmStartMapBackgroud" isTableTemplate="true" onDoubleClick="onDoubleClickSetBox">
+            <GuiElement type="image" template="gcFarmStartMapBackgroudBackground" onCreate="onCreatePreview" />
+            <GuiElement type="image" template="gcFarmStartMapBackgroudBackground2" />
+            <GuiElement type="text" template="gcFarmStartMapBackgroudHeader" onCreate="onCreateHeader" />    
+            <GuiElement type="text" template="gcFarmStartMapBackgroudDescription" onCreate="onCreateDescription" />    
+        </GuiElement>    
+    </GuiElement>
+  </GuiElement>  
+</GUI>

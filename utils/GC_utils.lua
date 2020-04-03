@@ -494,6 +494,18 @@ function GlobalCompanyUtils.appendedFunction(oldFunc, newFunc, t)
     end;
 end
 
+function GlobalCompanyUtils.interruptFunction(oldFunc, newFunc)
+    if oldFunc ~= nil then
+        return function (s, ...)
+			if newFunc(s, ...) then
+				oldFunc(s, ...)
+			end
+        end
+    else
+        return newFunc
+    end
+end
+
 function GlobalCompanyUtils.calcMoney(money)
 	local moneyUnit = g_gameSettings:getValue("moneyUnit")
 	if moneyUnit == GS_MONEY_POUND then
