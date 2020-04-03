@@ -14,6 +14,12 @@
                     <GuiElement type="button" template="gcGlobalMarketButtonsLeft" id="gui_btn_tab_buy" onClick="onClickTabBuy" >
                         <GuiElement type="image" template="gcGlobalMarketButtonsLeftImg2" />
                     </GuiElement>
+                    <!--GuiElement type="button" template="gcGlobalMarketButtonsLeft" id="gui_btn_tab_vehicleSell" onClick="onClickTabVehicleSell">
+                        <GuiElement type="image" template="gcGlobalMarketButtonsLeftImg1" />
+                    </GuiElement>
+                    <GuiElement type="button" template="gcGlobalMarketButtonsLeft" id="gui_btn_tab_vehicleBuy" onClick="onClickTabVehicleBuy" >
+                        <GuiElement type="image" template="gcGlobalMarketButtonsLeftImg2" />
+                    </GuiElement-->
                 </GuiElement>
             </GuiElement>
 
@@ -54,12 +60,37 @@
                 </GuiElement>
             </GuiElement>
 
+            <!--GuiElement type="empty" id="gui_tab_vehicleSell">  
+                <GuiElement type="flowLayout" template="gcGlobalMarketRightLayout">         
+                    <GuiElement type="flowLayout" template="gcGlobalMarketFilterLayout">
+                        <GuiElement type="tableSort" template="gcGlobalMarketTableHeader" tableSortSize="100px 35px" id="gui_tableSort" text="$l10n_GC_globalMarket_tbl_header_preview" />
+                        <GuiElement type="tableSort" template="gcGlobalMarketTableHeader" tableSortSize="300px 35px" id="gui_tableSort" text="$l10n_GC_globalMarket_tbl_header_name" />
+                        <GuiElement type="tableSort" template="gcGlobalMarketTableHeader" tableSortSize="300px 35px" id="gui_tableSort" text="$l10n_GC_globalMarket_tbl_header_age" />
+                        <GuiElement type="tableSort" template="gcGlobalMarketTableHeader" tableSortSize="300px 35px" id="gui_tableSort" text="$l10n_GC_globalMarket_tbl_header_operationTime" />
+                        <GuiElement type="tableSort" template="gcGlobalMarketTableHeader" tableSortSize="300px 35px" id="gui_tableSort" text="$l10n_GC_globalMarket_tbl_header_price3" />
+                    </GuiElement>
+                    <GuiElement type="table" template="gcGlobalMarketTableLayout2" id="gui_table_vehicleSell">
+                        <GuiElement type="button" template="gcGlobalMarketLayoutButton2" onClick="onClickStorageItem" isTableTemplate="true">		
+                            <GuiElement type="image" template="gcGlobalMarketButtonsPreview" position="10px 0px" onCreate="onCreateCol20" />				
+                            <GuiElement type="text" template="gcGlobalMarketTableLayoutText" position="120px 0px" onCreate="onCreateCol21" />	
+                            <GuiElement type="text" template="gcGlobalMarketTableLayoutText" position="430px 0px" onCreate="onCreateCol22" />	
+                            <GuiElement type="text" template="gcGlobalMarketTableLayoutText" position="740px 0px" onCreate="onCreateCol23" />	
+                            <GuiElement type="text" template="gcGlobalMarketTableLayoutText" position="1040px 0px" onCreate="onCreateCol24" />	
+                        </GuiElement>                        
+                    </GuiElement>
+                </GuiElement>
+            </GuiElement>
+
+            <GuiElement type="empty" id="gui_tab_vehicleBuy">  
+            </GuiElement-->
+
                     
         </GuiElement>
         
         <GuiElement type="flowLayout" template="gcGlobalMarketButtonsLayout1">
             <GuiElement type="button" template="gcBaseGuiButton" inputAction="MENU_BACK" onClick="onClickClose" />
             <GuiElement type="text" template="gcBaseGuiButtonText" text="$l10n_GC_gui_buttons_back" /> 
+
             <GuiElement type="button" position="50px 0px" template="gcBaseGuiButtonNext" inputAction="MENU_EXTRA_1" onClick="onClickStorageScreen" />
             <GuiElement type="text" template="gcBaseGuiButtonText" text="$l10n_GC_globalMarket_btn_storageScreen" />   
             <GuiElement type="button" position="50px 0px" template="gcBaseGuiButtonNext" inputAction="MENU_EXTRA_2" onClick="onClickBuyScreen" />

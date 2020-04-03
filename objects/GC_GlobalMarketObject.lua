@@ -146,7 +146,12 @@ function GC_GlobalMarketObject:load(nodeId, xmlFile, xmlKey, indexName, isPlacea
 		loadingTriggerLiquid.allowEverybodyAccess = true
 		self.loadingTriggerLiquid = loadingTriggerLiquid
 	end
-
+	
+    --local vehicleTriggerKey = string.format("%s.vehicleTrigger", xmlKey)
+    --local vehicleTrigger = self.triggerManager:addTrigger(GC_VehicleTrigger, self.rootNode, self, xmlFile, vehicleTriggerKey);
+    --if vehicleTrigger ~= nil then        
+	--	self.vehicleTrigger = vehicleTrigger
+	--end
 	
 	local palletOutput = self.triggerManager:addTrigger(GC_ObjectSpawner, self.rootNode, self, xmlFile, xmlKey)
 	if palletOutput ~= nil then   

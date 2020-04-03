@@ -40,8 +40,8 @@ GC_GlobalMarket.priceTrends.DOWN = 1
 GC_GlobalMarket.priceTrends.OK = 2
 GC_GlobalMarket.priceTrends.UP = 3
 
-GC_GlobalMarket.ownFillTypes = {}
-GC_GlobalMarket.ownFillTypes.WOOD = -10
+--GC_GlobalMarket.ownFillTypes = {}
+--GC_GlobalMarket.ownFillTypes.WOOD = -10
 
 GC_GlobalMarket.baleToFilename = {}
 GC_GlobalMarket.baleToFilename["GRASS_WINDROW"] = {g_company.dir .. "shop/buyableBales_grassRound.xml", g_company.dir .. "shop/buyableBales_grass.xml" }
@@ -81,7 +81,8 @@ function GC_GlobalMarket:new()
     self.paths = {}
     self.paths.mainFolder = getUserProfileAppPath() .. "GlobalCompany_GlobalMarket"
     self.paths.isOnlineFile = self.paths.mainFolder .. "/globalMarketOnline.xml"
-    self.paths.fillTypesData = self.paths.mainFolder .. "/fillTypesData.xml"
+    self.paths.fillTypes = self.paths.mainFolder .. "/fillTypes.xml"
+    self.paths.fillTypesLevel = self.paths.mainFolder .. "/serverLevels.xml"
     self.paths.folderGetFromServer = self.paths.mainFolder .. "/getFromServer"
     self.paths.folderSendToServer = self.paths.mainFolder .. "/sendToServer"
     self.paths.fileForManualSynch = self.paths.mainFolder .. "/doManualSynch.xml"
@@ -207,6 +208,30 @@ function GC_GlobalMarket:loadFillTypes()
         return
     end
 
+    local serverLevels = {}
+    if not fileExists(self.paths.fillTypesLevel) then
+        return
+    end
+    
+    local xmlFile = loadXMLFile("gc_globalMarket_serverLevels", self.paths.fillTypesLevel)
+    
+    local i = 0
+    while true do
+        local key = string.format("gc_globalMarket_serverLevels.levels.level(%d)", i)
+        if not hasXMLProperty(xmlFile, key) then
+            break
+        end
+
+        local fillTypeId = getXMLInt(xmlFile, key .. "#fillTypeId")       
+        
+        local level = getXMLInt(xmlFile, key .. "#level")
+        local actualPrice = g_company.utils.calcMoney(getXMLInt(xmlFile, key .. "#actualPrice") / 1000 * EconomyManager.getPriceMultiplier())
+        local priceTrend = getXMLInt(xmlFile, key .. "#priceTrend")
+         
+        serverLevels[fillTypeId] = {level=level, actualPrice=actualPrice, priceTrend=priceTrend}
+        i = i + 1
+    end
+
     self.fillTypes = {}
     local changeFillTypes = {}
     self.fillTypeToType = {}
@@ -215,33 +240,40 @@ function GC_GlobalMarket:loadFillTypes()
         changeFillTypes[i] = {}
     end
 
-    if not fileExists(self.paths.fillTypesData) then
+    if not fileExists(self.paths.fillTypes) then
         return
     end
     
-    local xmlFile = loadXMLFile("gc_globalMarket_fillTypesData", self.paths.fillTypesData)
+    local xmlFile = loadXMLFile("gc_globalMarket_fillTypes", self.paths.fillTypes)
     
     local i = 0
     while true do
-        local key = string.format("gc_globalMarket_fillTypesData.fillTypes.fillType(%d)", i)
+        local key = string.format("gc_globalMarket_fillTypes.fillTypes.fillType(%d)", i)
         if not hasXMLProperty(xmlFile, key) then
             break
         end
 
         local fillType = {}
+        fillType.id = getXMLInt(xmlFile, key .. "#id")
         fillType.name = getXMLString(xmlFile, key .. "#name")
-        fillType.fillLevel = getXMLInt(xmlFile, key .. "#fillLevel")
-        fillType.minPrice = g_company.utils.calcMoney(getXMLInt(xmlFile, key .. "#minPrice") / 1000)
-        fillType.maxPrice = g_company.utils.calcMoney(getXMLInt(xmlFile, key .. "#maxPrice") / 1000)
-        fillType.actualPrice = g_company.utils.calcMoney(getXMLInt(xmlFile, key .. "#actualPrice") / 1000 * EconomyManager.getPriceMultiplier())
         fillType.type = getXMLInt(xmlFile, key .. "#type")
-        fillType.priceTrend = getXMLInt(xmlFile, key .. "#priceTrend")
-        
-        if fillType.type == GC_GlobalMarket.fillTypeTypes.WOOD then
-            fillType.index = GC_GlobalMarket.ownFillTypes.WOOD
+        fillType.minPrice = g_company.utils.calcMoney(getXMLInt(xmlFile, key .. "#minPrice") / 1000 * EconomyManager.getPriceMultiplier())
+
+        if serverLevels[fillType.id] ~= nil then
+            fillType.fillLevel = serverLevels[fillType.id].level
+            fillType.actualPrice = serverLevels[fillType.id].actualPrice
+            fillType.priceTrend = serverLevels[fillType.id].priceTrend
         else
-            fillType.index = g_fillTypeManager:getFillTypeIndexByName(fillType.name)
+            fillType.fillLevel = 0
+            fillType.actualPrice = fillType.minPrice
+            fillType.priceTrend = self.priceTrends.OK
         end
+        
+        --if fillType.type == GC_GlobalMarket.fillTypeTypes.WOOD then
+        ---    fillType.index = GC_GlobalMarket.ownFillTypes.WOOD
+       -- else
+            fillType.index = g_fillTypeManager:getFillTypeIndexByName(fillType.name)
+        --end
         if fillType.index ~= nil then
             self.fillTypeToType[fillType.index] = fillType.type
             self.fillTypes[fillType.type][fillType.index] = fillType
@@ -253,7 +285,9 @@ function GC_GlobalMarket:loadFillTypes()
     
 	for _, changeFillTypesE in pairs(self.onChangeFillTypes) do
 		changeFillTypesE.func(changeFillTypesE.target, changeFillTypes)
-	end
+    end
+    
+    
 end
 
 function GC_GlobalMarket:setFillTypesForServer(fillTypes)
@@ -339,11 +373,11 @@ function GC_GlobalMarket:sellBuyOnMarket(fillTypeIndex, fillLevelDelta, sell, ma
     local xmlFile = createXMLFile("gc_globalMarket_sendToServer", freeFile,"gc_globalMarket_sendToServer");
     local key = "gc_globalMarket_sendToServer"
     
-    if fillTypeIndex == GC_GlobalMarket.ownFillTypes.WOOD then
-        setXMLString(xmlFile, string.format("%s.sendToServer.fillType", key), "wood")
-    else
+    --if fillTypeIndex == GC_GlobalMarket.ownFillTypes.WOOD then
+    --    setXMLString(xmlFile, string.format("%s.sendToServer.fillType", key), "wood")
+    --else
         setXMLString(xmlFile, string.format("%s.sendToServer.fillType", key), g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex))
-    end
+    --end
     setXMLInt(xmlFile, string.format("%s.sendToServer.fillLevel", key), fillLevelDelta)
     setXMLInt(xmlFile, string.format("%s.sendToServer.marketId", key), marketId)
     if sell then

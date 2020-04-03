@@ -28,6 +28,8 @@ local Gc_Gui_GlobalMarket_mt = Class(Gc_Gui_GlobalMarket)
 Gc_Gui_GlobalMarket.tabs = {}
 Gc_Gui_GlobalMarket.tabs.STORAGE = 1
 Gc_Gui_GlobalMarket.tabs.BUY = 2
+--Gc_Gui_GlobalMarket.tabs.VEHICLESELL = 3
+--Gc_Gui_GlobalMarket.tabs.VEHICLEBUY = 4
 
 function Gc_Gui_GlobalMarket:new(target, custom_mt)
     if custom_mt == nil then
@@ -41,10 +43,13 @@ end
 function Gc_Gui_GlobalMarket:onOpen()
     g_depthOfFieldManager:setBlurState(true)
     local haveStorageItems = self:loadTableSell()
+    --local haveVehicleSellItems = self:loadTableVehicleSell()
     self:loadTableBuy()
 
     if haveStorageItems then
         self:openTab(Gc_Gui_GlobalMarket.tabs.STORAGE) 
+    --elseif haveVehicleSellItems then
+    --    self:openTab(Gc_Gui_GlobalMarket.tabs.VEHICLESELL) 
     else
         self:openTab(Gc_Gui_GlobalMarket.tabs.BUY) 
     end
@@ -143,27 +148,67 @@ function Gc_Gui_GlobalMarket:onClickTabBuy(element)
     self:openTab(Gc_Gui_GlobalMarket.tabs.BUY) 
 end
 
+--function Gc_Gui_GlobalMarket:onClickTabVehicleSell(element) 
+--    self:openTab(Gc_Gui_GlobalMarket.tabs.VEHICLESELL) 
+--end
+
+--function Gc_Gui_GlobalMarket:onClickTabVehicleBuy(element) 
+--    self:openTab(Gc_Gui_GlobalMarket.tabs.VEHICLEBUY) 
+--end
+
 function Gc_Gui_GlobalMarket:openTab(tab) 
-   if tab ==  Gc_Gui_GlobalMarket.tabs.STORAGE then
+    if tab ==  Gc_Gui_GlobalMarket.tabs.STORAGE then
         self.activeTab = Gc_Gui_GlobalMarket.tabs.STORAGE
         self.gui_tab_storage:setVisible(true)
         self.gui_tab_buy:setVisible(false)
+        --self.gui_tab_vehicleSell:setVisible(false)
+        --self.gui_tab_vehicleBuy:setVisible(false)
         self.gui_btn_tab_storage:setActive(true)
         self.gui_btn_tab_buy:setActive(false)
+        --self.gui_btn_tab_vehicleSell:setActive(false)
+        --self.gui_btn_tab_vehicleBuy:setActive(false)
         self.gui_btn_outsource:setActive(false)
         self.gui_btn_sellBuyText:setText(g_company.languageManager:getText("GC_globalMarket_btn_sell"), true)
-   else
+    elseif tab ==  Gc_Gui_GlobalMarket.tabs.BUY then
         self.activeTab = Gc_Gui_GlobalMarket.tabs.BUY
         self.gui_tab_storage:setVisible(false)
         self.gui_tab_buy:setVisible(true)
+        --self.gui_tab_vehicleSell:setVisible(false)
+        --self.gui_tab_vehicleBuy:setVisible(false)
         self.gui_btn_tab_storage:setActive(false)
         self.gui_btn_tab_buy:setActive(true)
+        --self.gui_btn_tab_vehicleSell:setActive(false)
+       -- self.gui_btn_tab_vehicleBuy:setActive(false)
         self.gui_btn_outsource:setActive(false)
         self.gui_btn_sellBuyText:setText(g_company.languageManager:getText("GC_globalMarket_btn_buy"), true)
+    --[[elseif tab ==  Gc_Gui_GlobalMarket.tabs.VEHICLESELL then
+        self.activeTab = Gc_Gui_GlobalMarket.tabs.VEHICLESELL
+        self.gui_tab_storage:setVisible(false)
+        self.gui_tab_buy:setVisible(false)
+        self.gui_tab_vehicleSell:setVisible(true)
+        self.gui_tab_vehicleBuy:setVisible(false)
+        self.gui_btn_tab_storage:setActive(false)
+        self.gui_btn_tab_buy:setActive(false)
+        self.gui_btn_tab_vehicleSell:setActive(true)
+        self.gui_btn_tab_vehicleBuy:setActive(false)
+        self.gui_btn_outsource:setActive(false)
+        self.gui_btn_sellBuyText:setText(g_company.languageManager:getText("GC_globalMarket_btn_sell"), true)
+    elseif tab ==  Gc_Gui_GlobalMarket.tabs.VEHICLEBUY then
+        self.activeTab = Gc_Gui_GlobalMarket.tabs.VEHICLEBUY
+        self.gui_tab_storage:setVisible(false)
+        self.gui_tab_buy:setVisible(false)
+        self.gui_tab_vehicleSell:setVisible(false)
+        self.gui_tab_vehicleBuy:setVisible(true)
+        self.gui_btn_tab_storage:setActive(false)
+        self.gui_btn_tab_buy:setActive(false)
+        self.gui_btn_tab_vehicleSell:setActive(false)
+        self.gui_btn_tab_vehicleBuy:setActive(true)
+        self.gui_btn_outsource:setActive(false)
+        self.gui_btn_sellBuyText:setText(g_company.languageManager:getText("GC_globalMarket_btn_buy"), true) ]]--
    end
    if not self.manualSychRun then        
-        self.gui_btn_manualSych:setVisible(tab ==  Gc_Gui_GlobalMarket.tabs.BUY)
-        self.gui_btn_manualSychText:setVisible(tab ==  Gc_Gui_GlobalMarket.tabs.BUY)
+        self.gui_btn_manualSych:setVisible(tab ==  Gc_Gui_GlobalMarket.tabs.BUY or tab ==  Gc_Gui_GlobalMarket.tabs.VEHICLEBUY)
+        self.gui_btn_manualSychText:setVisible(tab ==  Gc_Gui_GlobalMarket.tabs.BUY or tab ==  Gc_Gui_GlobalMarket.tabs.VEHICLEBUY)
    end
    self.gui_btn_sellBuy:setVisible(false)
    self.gui_btn_sellBuyText:setVisible(false)  
@@ -192,7 +237,7 @@ function Gc_Gui_GlobalMarket:loadTableBuy()
 	self.gui_table_buy:removeElements()
     for type,fillTypes in pairs(g_company.globalMarket.fillTypes) do
         for _,fillType in pairs(fillTypes) do
-            if fillType.fillLevel > 0 then
+            if fillType.fillLevel ~= nil and fillType.fillLevel > 0 then
                 self.currentFillType = fillType
                 local item = self.gui_table_buy:createItem()
                 item.fillType = fillType
@@ -202,17 +247,46 @@ function Gc_Gui_GlobalMarket:loadTableBuy()
     end
 end
 
+function Gc_Gui_GlobalMarket:loadTableVehicleSell() 
+    local vehicles = self.market.vehicleTrigger:getVehicles()
+    
+	self.gui_table_vehicleSell:removeElements()    
+    for vehicle,_ in pairs(vehicles) do
+        local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
+        if storeItem.showInStore and storeItem.canBeSold then
+            self.currentVehicle = vehicle
+            self.currentVehicleStoreItem = storeItem
+            local item = self.gui_table_vehicleSell:createItem()
+            item.vehicle = vehicle
+        end        
+    end
+
+    self.currentVehicle = nil
+    self.currentVehicleStoreItem = nil
+
+    return g_company.utils.getTableLength(vehicles) > 0
+end
+
 function Gc_Gui_GlobalMarket:onClickSellBuy()    
     if self.currentSelectedItem == nil then return end
-    g_company.gui:setCanExit("gc_globalMarketLevelDialog", false)
     if self.activeTab == Gc_Gui_GlobalMarket.tabs.STORAGE then
+        g_company.gui:setCanExit("gc_globalMarketLevelDialog", false)
         g_company.gui:closeActiveGui("gc_globalMarketLevelDialog", false, self.market, self.currentSelectedItem.fillTypeLevel, self.currentSelectedItem.fillTypeIndex, true, false)
-    else
+        self:loadTableBuy()
+        self:loadTableSell()
+    elseif self.activeTab == Gc_Gui_GlobalMarket.tabs.BUY then
         local maxDelta = math.min(self.market:getFreeCapacity(self.currentSelectedItem.fillType.index, g_currentMission:getFarmId()), self.currentSelectedItem.fillType.fillLevel)
+        g_company.gui:setCanExit("gc_globalMarketLevelDialog", false)
         g_company.gui:closeActiveGui("gc_globalMarketLevelDialog", false, self.market, maxDelta, self.currentSelectedItem.fillType.index, false, false)
+        self:loadTableBuy()
+        self:loadTableSell()
+    --elseif self.activeTab == Gc_Gui_GlobalMarket.tabs.VEHICLESELL then
+    --    g_company.gui:setCanExit("gc_globalMarketVehicleDialog", false)
+    --    g_company.gui:closeActiveGui("gc_globalMarketVehicleDialog", false, self.market, self.currentSelectedItem.vehicle, false)        
+    --elseif self.activeTab == Gc_Gui_GlobalMarket.tabs.VEHICLEBUY then
+    --    g_company.gui:setCanExit("gc_globalMarketVehicleDialog", false)
+    --    g_company.gui:closeActiveGui("gc_globalMarketVehicleDialog", false, self.market, self.currentSelectedItem.vehicle, true)
     end
-    self:loadTableBuy()
-    self:loadTableSell()
 end
 
 function Gc_Gui_GlobalMarket:onClickOutsource()    
@@ -260,12 +334,12 @@ end
 
 function Gc_Gui_GlobalMarket:onCreateCol1(element)
     if self.currentFillTypeIndex ~= nil and self.currentFillLevel ~= nil then
-        if self.currentFillTypeIndex == g_company.globalMarket.ownFillTypes.WOOD then
-            element:setText(g_i18n:getText("configuration_valueWoodTrailer"))
-        else
+        --if self.currentFillTypeIndex == g_company.globalMarket.ownFillTypes.WOOD then
+        --    element:setText(g_i18n:getText("configuration_valueWoodTrailer"))
+        --else
             local fillType = g_fillTypeManager:getFillTypeByIndex(self.currentFillTypeIndex)
             element:setText(fillType.title)
-        end
+        --end
     end
 end
 
@@ -284,12 +358,12 @@ end
 
 function Gc_Gui_GlobalMarket:onCreateCol10(element)
     if self.currentFillType ~= nil then
-        if self.currentFillType.index == g_company.globalMarket.ownFillTypes.WOOD then
-            element:setText(g_i18n:getText("configuration_valueWoodTrailer"))
-        else
+        --if self.currentFillType.index == g_company.globalMarket.ownFillTypes.WOOD then
+        --    element:setText(g_i18n:getText("configuration_valueWoodTrailer"))
+        --else
             local fillType = g_fillTypeManager:getFillTypeByIndex(self.currentFillType.index)
             element:setText(fillType.title)
-        end
+        --end
     end
 end
 
@@ -341,4 +415,40 @@ end
 
 function Gc_Gui_GlobalMarket:onClickBuyScreen()
     self:openTab(Gc_Gui_GlobalMarket.tabs.BUY) 
+end
+
+
+function Gc_Gui_GlobalMarket:onCreateCol20(element)
+    if self.currentVehicleStoreItem ~= nil then 
+        element:setImageFilename(self.currentVehicleStoreItem.imageFilename)
+    end
+end
+
+function Gc_Gui_GlobalMarket:onCreateCol21(element)
+    if self.currentVehicleStoreItem ~= nil then 
+        element:setText(self.currentVehicleStoreItem.name)
+    end    
+end
+
+function Gc_Gui_GlobalMarket:onCreateCol22(element)
+    if self.currentVehicle ~= nil then 
+        element:setText(string.format(g_company.languageManager:getText("GC_globalMarket_txt_days"), self.currentVehicle.age))
+        for k,v in pairs(self.currentVehicleStoreItem.configurationSets ) do
+            --for k,v in pairs(v2) do
+                print(string.format("%s %s", k, v))
+            --end
+        end
+    end    
+end
+
+function Gc_Gui_GlobalMarket:onCreateCol23(element)
+    if self.currentVehicle ~= nil then 
+        element:setText(string.format(g_company.languageManager:getText("GC_globalMarket_txt_hours"), g_i18n:formatNumber(self.currentVehicle.operatingTime/3600000, 1)))
+    end    
+end
+
+function Gc_Gui_GlobalMarket:onCreateCol24(element)
+    if self.currentVehicleStoreItem ~= nil then  
+        element:setText(g_i18n:formatMoney(g_currentMission.economyManager:getSellPrice(self.currentVehicleStoreItem), 0, true, false))
+    end    
 end
