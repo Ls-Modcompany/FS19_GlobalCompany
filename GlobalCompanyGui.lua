@@ -78,9 +78,11 @@ source(g_currentModDirectory .. "gui/objects/DynamicStorage.lua");
 source(g_currentModDirectory .. "gui/objects/PlaceableDigitalDisplay.lua");
 source(g_currentModDirectory .. "gui/objects/GlobalMarket.lua");
 source(g_currentModDirectory .. "gui/objects/GlobalMarketLevelDialog.lua");
+source(g_currentModDirectory .. "gui/objects/GlobalMarketVehicleDialog.lua");
 source(g_currentModDirectory .. "gui/objects/GlobalMarketLoading.lua");
 source(g_currentModDirectory .. "gui/objects/AnimalFeeder.lua");
 source(g_currentModDirectory .. "gui/objects/AnimalFeederWarning.lua");
+source(g_currentModDirectory .. "gui/objects/FarmStarter.lua");
 
 function GlobalCompanyGui:init()	
 	for _,inAc in pairs(self.toInit_actionEvents) do
@@ -122,14 +124,20 @@ function GlobalCompanyGui:loadMap()
 	end;
 end;
 
-function GlobalCompanyGui:load()	
+function GlobalCompanyGui:preLoad()	
 	-- self.fakeGui = GC_Gui_FakeGui:new();
 	self.fakeGui = g_company.gui.fakeGui:new();
 	g_gui:loadGui(g_company.dir .. self.fakeGui.guiInformations.guiXml, "gc_fakeGui", self.fakeGui);
 	
 	g_company.gui:registerUiElements("g_factoryDefault", g_company.dir .. "images/factoryDefault.dds");
 	g_company.gui:registerUiElements("g_gcUi2", g_company.dir .. "images/ui_elements_2.dds");
-	
+
+	g_company.gui:registerGui("gc_farmStarter", nil, Gc_Gui_FarmStarter, false, false, true);	
+	self.activeGuiDialogs = {};
+	self.registeredActonEvents = false;
+end
+
+function GlobalCompanyGui:load()	
 	self.mainGui = g_company.gui:registerGui("gc_main", InputAction.GC_MAIN, Gc_Gui_MainGui, true, true, true).classGui;
 	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
 	g_company.gui:registerGui("gc_placeableBaler", nil, Gc_Gui_Baler, true, true, false);
@@ -137,53 +145,52 @@ function GlobalCompanyGui:load()
 	g_company.gui:registerGui("gc_dynamicStorage", nil, Gc_Gui_DynamicStorage, true, true, true);
 	g_company.gui:registerGui("gc_placeableDigitalDisplay", nil, Gc_Gui_PlaceableDigitalDisplay, true, true, false);
 	g_company.gui:registerGui("gc_globalMarket", nil, Gc_Gui_GlobalMarket, true, true, false);
-	g_company.gui:registerGui("gc_globalMarketLevelDialog", nil, Gc_Gui_GlobalMarketLevelDialog, true, true, false);	
+	g_company.gui:registerGui("gc_globalMarketLevelDialog", nil, Gc_Gui_GlobalMarketLevelDialog, true, true, false);
+	g_company.gui:registerGui("gc_globalMarketVehicleDialog", nil, Gc_Gui_GlobalMarketVehicleDialog, true, true, false);	
 	g_company.gui:registerGui("gc_globalMarketLoading", nil, Gc_Gui_GlobalMarketLoading, true, true, true);	
 	g_company.gui:registerGui("gc_animalFeeder", nil, Gc_Gui_AnimalFeeder, true, true, true);	
 	g_company.gui:registerGui("gc_animalFeederWarning", nil, Gc_Gui_AnimalFeederWarning, false, false, true);	
-	self.activeGuiDialogs = {};
-	self.registeredActonEvents = false;
 end;
 
 function GlobalCompanyGui:update(dt)
 	if GlobalCompanyGui:getIsDev() then
-		if self.DevelopementVersionTimer == nil or self.DevelopementVersionTimer <= 0 then
+		if g_company.gui.DevelopementVersionTimer == nil or g_company.gui.DevelopementVersionTimer <= 0 then
 			for _, fileName in pairs(GlobalCompanyGui.DevelopementVersionTemplatesFilename) do				
-				self:loadGuiTemplates(fileName);
+				g_company.gui:loadGuiTemplates(fileName);
 			end;
-			for name,gui in pairs(self.guis) do		
+			for name,gui in pairs(g_company.gui.guis) do		
 				gui.gui:deleteElements();
 				gui.gui:loadFromXML();
 			end;
-			if self.activeGui ~= nil then
-				self.guis[self.activeGui].gui:openGui();
+			if g_company.gui.activeGui ~= nil then
+				g_company.gui.guis[g_company.gui.activeGui].gui:openGui();
 			else
-				for name, open in pairs(self.smallGuis) do
+				for name, open in pairs(g_company.gui.smallGuis) do
 					if open then
-						self.guis[name].gui:openGui();
+						g_company.gui.guis[name].gui:openGui();
 					end;
 				end; 
 			end;
-			if self.activeGuiDialog ~= nil then
-				self.guis[self.activeGuiDialog].gui:openGui();
+			if g_company.gui.activeGuiDialog ~= nil then
+				g_company.gui.guis[g_company.gui.activeGuiDialog].gui:openGui();
 			end;
-			self.DevelopementVersionTimer = 70;
+			g_company.gui.DevelopementVersionTimer = 70;
 		else
-			self.DevelopementVersionTimer = self.DevelopementVersionTimer - 1;
+			g_company.gui.DevelopementVersionTimer = g_company.gui.DevelopementVersionTimer - 1;
 		end;		
 	end;
 	
-	if self.activeGui == nil then
-		for name, open in pairs(self.smallGuis) do
+	if g_company.gui.activeGui == nil then
+		for name, open in pairs(g_company.gui.smallGuis) do
 			if open then
-				self.guis[name].gui:update(dt);
+				g_company.gui.guis[name].gui:update(dt);
 			end;
 		end;
 	else
 		if g_gui:getIsDialogVisible() then
-			self:closeGui(self.activeGui);
+			g_company.gui:closeGui(g_company.gui.activeGui);
 		else
-			self.guis[self.activeGui].gui:update(dt);
+			g_company.gui.guis[g_company.gui.activeGui].gui:update(dt);
 		end;
 	end;
 	for _, name in pairs(GlobalCompanyGui.activeGuiDialogs) do
@@ -192,30 +199,30 @@ function GlobalCompanyGui:update(dt)
 end;
 
 function GlobalCompanyGui:mouseEvent(posX, posY, isDown, isUp, button) 
-	if self.activeGuiDialog ~= nil then
-		GlobalCompanyGui.guis[self.activeGuiDialog].gui:mouseEvent(posX, posY, isDown, isUp, button);
-	elseif self.activeGui == nil then
-		--for name, open in pairs(self.smallGuis) do
-		--	if open then
-		--		self.guis[name].gui:mouseEvent(posX, posY, isDown, isUp, button);
-		--	end;
-		--end;
+	if g_company.gui.activeGuiDialog ~= nil then
+		GlobalCompanyGui.guis[g_company.gui.activeGuiDialog].gui:mouseEvent(posX, posY, isDown, isUp, button);
+	elseif g_company.gui.activeGui == nil then
+		for name, open in pairs(g_company.gui.smallGuis) do
+			if name == "gc_farmStarter" and open then
+				g_company.gui.guis[name].gui:mouseEvent(posX, posY, isDown, isUp, button);
+			end;
+		end;
 	else
-		self.guis[self.activeGui].gui:mouseEvent(posX, posY, isDown, isUp, button);
+		g_company.gui.guis[g_company.gui.activeGui].gui:mouseEvent(posX, posY, isDown, isUp, button);
 	end;
 end;
 
 function GlobalCompanyGui:keyEvent(unicode, sym, modifier, isDown) 
-	if self.activeGuiDialog ~= nil then
-		GlobalCompanyGui.guis[self.activeGuiDialog].gui:keyEvent(unicode, sym, modifier, isDown);
-	elseif self.activeGui == nil then
-		for name, open in pairs(self.smallGuis) do
+	if g_company.gui.activeGuiDialog ~= nil then
+		GlobalCompanyGui.guis[g_company.gui.activeGuiDialog].gui:keyEvent(unicode, sym, modifier, isDown);
+	elseif g_company.gui.activeGui == nil then
+		for name, open in pairs(g_company.gui.smallGuis) do
 			if open then
-				self.guis[name].gui:keyEvent(unicode, sym, modifier, isDown);
+				g_company.gui.guis[name].gui:keyEvent(unicode, sym, modifier, isDown);
 			end;
 		end;
 	else
-		self.guis[self.activeGui].gui:keyEvent(unicode, sym, modifier, isDown);
+		g_company.gui.guis[g_company.gui.activeGui].gui:keyEvent(unicode, sym, modifier, isDown);
 	end;
 end;
 
@@ -223,13 +230,31 @@ function GlobalCompanyGui:draw() end;
 function GlobalCompanyGui:drawB()
 	if GlobalCompanyGui.activeGui == nil then
 		-- if g_gui.currentGui == nil then
-		if not g_gui:getIsGuiVisible() then
+		if not g_gui:getIsGuiVisible() or g_currentMission == nil then
 			for name, open in pairs(GlobalCompanyGui.smallGuis) do
 				if open then
 					GlobalCompanyGui.guis[name].gui:draw();
 				end;
 			end;
 		end;
+	else
+		GlobalCompanyGui.guis[GlobalCompanyGui.activeGui].gui:draw();
+	end;
+	for _, name in pairs(GlobalCompanyGui.activeGuiDialogs) do
+		GlobalCompanyGui.guis[name].gui:draw();
+	end;
+end;
+
+function GlobalCompanyGui:drawM()
+	if GlobalCompanyGui.activeGui == nil then
+		-- if g_gui.currentGui == nil then
+		--if not g_gui:getIsGuiVisible() or g_currentMission == nil then
+			for name, open in pairs(GlobalCompanyGui.smallGuis) do
+				if open then
+					GlobalCompanyGui.guis[name].gui:draw();
+				end;
+			end;
+		--end;
 	else
 		GlobalCompanyGui.guis[GlobalCompanyGui.activeGui].gui:draw();
 	end;
@@ -1017,3 +1042,8 @@ end
 g_company.gui:loadGuiTemplates(g_company.dir .. "gui/guiTemplates.xml");
 g_company.addInit(GlobalCompanyGui, GlobalCompanyGui.init);
 BaseMission.draw = Utils.appendedFunction(BaseMission.draw, GlobalCompanyGui.drawB);
+Gui.draw = Utils.appendedFunction(Gui.draw, GlobalCompanyGui.drawM);
+
+Gui.update = Utils.appendedFunction(Gui.update, GlobalCompanyGui.update);
+Gui.mouseEvent  = Utils.appendedFunction(Gui.mouseEvent, GlobalCompanyGui.mouseEvent );
+Gui.keyEvent  = Utils.appendedFunction(Gui.keyEvent, GlobalCompanyGui.keyEvent );

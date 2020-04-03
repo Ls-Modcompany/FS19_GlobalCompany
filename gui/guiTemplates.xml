@@ -22,6 +22,7 @@
 
         <color name="buttonMain" value="0.118 0.116 0.115 0.6"/>
 
+        <color name="orangeLight" value="1 0.4 0.0 0.65"/>
 
         <color name="glass0_1" value="0.018 0.016 0.015 0.65"/>
         <color name="glass0_2" value="0.718 0.716 0.715 0.04"/>
@@ -1330,6 +1331,13 @@
 			<value name="imageColor_selected" value="red" />			
 			<value name="rotation" value="3.1" />		
 		</template>
+		<template name="gcGlobalMarketButtonsPreview" anchor="leftCenter" extends="gcBase">
+			<value name="size" value="80px 80px" />
+			<value name="position" value="0px 10px" />		
+			<value name="imageUVs" value="0px 0px 1024px 1024px" />	
+			<value name="imageUVs_selected" value="0px 0px 1024px 1024px" />	
+			<value name="margin" value="0px 0px 20px 0px" />	
+		</template>
 		<template name="gcGlobalMarketButtonsLeftImg1" anchor="middleCenter" extends="gcBase">
 			<value name="size" value="140px 140px" />
 			<value name="position" value="0px 0px" />		
@@ -1363,7 +1371,7 @@
 			<value name="textUpperCase" value="false" />
 			<value name="textAlignment" value="left" />
 			<value name="textSize" value="20px" />
-			<value name="textMargin" value="40px 5px 0px 0px" />
+			<value name="textMargin" value="10px 5px 0px 0px" />
 			<value name="textColor_selected" value="white" />	
 		</template>
 		<template name="gcGlobalMarketTableHeader_overlay" anchor="leftTop" extends="gcGlobalMarketTableHeader">
@@ -1395,6 +1403,25 @@
 			<value name="imageColor" value="buttonMain" />
 			<value name="imageColor_selected" value="gcBlue" />
 		</template>
+		<template name="gcGlobalMarketTableLayout2" anchor="leftTop" extends="gcBase">
+			<value name="orientation" value="y" />
+			<value name="alignment" value="top" />
+			<value name="size" value="1380px 640px" />
+			<value name="position" value="10px -10px" />
+			<value name="maxItemsX" value="1" />
+			<value name="maxItemsY" value="8" />
+			<value name="hasSlider" value="true" />
+		</template>
+		<template name="gcGlobalMarketTableLayout2_slider" anchor="rightTop" extends="gcBase">
+			<value name="size" value="20px 640px" />
+			<value name="position" value="0px 0px" />
+			<value name="hasOverlay" value="true" />
+		</template>
+		<template name="gcGlobalMarketTableLayout2_slider_overlay" anchor="rightTop" extends="gcMenuFactoriesTableLayout_slider">
+			<value name="position" value="0px 0px" />
+			<value name="imageColor" value="buttonMain" />
+			<value name="imageColor_selected" value="gcBlue" />
+		</template>
 		<template name="gcGlobalMarketLayoutButton" extends="gcBase">
 			<value name="size" value="1340px 35px" />
 			<value name="hasOverlay" value="true" />
@@ -1403,6 +1430,19 @@
 			<value name="margin" value="0px 0px 0px 5px" />
 		</template>
 		<template name="gcGlobalMarketLayoutButton_overlay" extends="gcGlobalMarketLayoutButton">			
+			<value name="imageColor" value="buttonMain" />
+			<value name="imageColor_selected" value="buttonMain" />
+			<value name="imageColor_disabled" value="transparent" />
+			<value name="imageColor_disabledSelected" value="transparent" />
+		</template>
+		<template name="gcGlobalMarketLayoutButton2" extends="gcBase">
+			<value name="size" value="1340px 80px" />
+			<value name="hasOverlay" value="true" />
+			<value name="isActivable" value="true" />
+			<value name="canDeactivable" value="false" />
+			<value name="margin" value="0px 0px 0px 5px" />
+		</template>
+		<template name="gcGlobalMarketLayoutButton2_overlay" extends="gcGlobalMarketLayoutButton2">			
 			<value name="imageColor" value="buttonMain" />
 			<value name="imageColor_selected" value="buttonMain" />
 			<value name="imageColor_disabled" value="transparent" />
@@ -1531,6 +1571,32 @@
 		</template>
 		<template name="gcGlobalMarketLdContent2Text" anchor="middleTop" extends="gcBase_text">
 			<value name="textSize" value="24px" />
+			<value name="textBold" value="false" />
+			<value name="textAlignment" value="left" />
+			<value name="margin" value="0px 0px 0px 0px" />
+		</template>
+		<template name="gcGlobalMarketLdContent3" anchor="leftCenter" extends="gcBase">
+			<value name="orientation" value="y" />
+			<value name="alignment" value="top" />
+			<value name="position" value="0px 0px" />
+			<value name="size" value="1100px 400px" />		
+			<value name="debugEnabled" value="true" />		
+		</template>
+		<template name="gcGlobalMarketLdContent4" anchor="leftCenter" extends="gcBase">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="left" />
+			<value name="position" value="0px 0px" />
+			<value name="size" value="1100px 30px" />		
+			<value name="debugEnabled" value="true" />		
+		</template>
+		<template name="gcGlobalMarketLdContent3TextHeader" anchor="middleTop" extends="gcBase_text">
+			<value name="textSize" value="20px" />
+			<value name="textBold" value="true" />
+			<value name="textAlignment" value="left" />
+			<value name="margin" value="0px 0px 0px 0px" />
+		</template>
+		<template name="gcGlobalMarketLdContent3Text" anchor="middleTop" extends="gcBase_text">
+			<value name="textSize" value="20px" />
 			<value name="textBold" value="false" />
 			<value name="textAlignment" value="left" />
 			<value name="margin" value="0px 0px 0px 0px" />
@@ -1838,6 +1904,75 @@
 			<value name="textSize" value="12px" />
 			<value name="textAlignment" value="left" />
 			<value name="margin" value="10px 10px 0px 0px" />
+		</template>
+
+		<!--###################################################################################################################################-->
+		<!--#############################################   -FarmStart-   ################################################################-->
+		<!--###################################################################################################################################-->
+		<template name="gcFarmStart" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="1400px 679px" />
+			<value name="position" value="0px 2px" />
+		</template>
+		<template name="gcFarmStartBackground" anchor="middleCenter" extends="gcBase gcBorder">
+			<value name="size" value="1400px 679px" />
+			<value name="position" value="0px 0px" />
+			<Value name="imageUVs" value="colorBg"/>
+			<value name="imageColor" value="0.05 0.05 0.05 1" />
+		</template>
+		<template name="gcFarmStartMap" anchor="middleCenter" extends="gcBase">
+			<value name="orientation" value="x" />
+			<value name="maxItemsX" value="4" />
+			<value name="maxItemsY" value="1" />
+			<value name="position" value="0px -25px" />
+			<value name="size" value="1300px 600px" />
+		</template>
+		<template name="gcFarmStartMapBackgroud" anchor="middleCenter" extends="gcBase">
+			<value name="size" value="325px 600px" />
+			<value name="position" value="0px 0px" />			
+			<value name="margin" value="5px 0px 5px 0px" />
+			<value name="hasOverlay" value="true" />
+		</template>
+		<template name="gcFarmStartMapBackgroud_overlay" anchor="middleCenter" extends="gcFarmStartMapBackgroud gcBorder">	
+			<Value name="imageUVs" value="colorBg"/>
+			<value name="imageColor" value="0.018 0.016 0.015 0.8" />
+			<value name="imageColor_selected" value="gcBlue" />
+			<value name="margin" value="0px 0px 0px 0px" />
+		</template>
+		<template name="gcFarmStartMapBackgroudBackground" anchor="middleTop" extends="gcFarmStartMapBackgroud">	
+			<value name="size" value="325px 400px" />
+			<value name="margin" value="0px 0px 0px 0px" />	
+			<Value name="imageUVs" value="0px 0px 1024px 832px"/>	
+			<Value name="imageUVs_selected" value="0px 0px 1024px 832px"/>		
+		</template>
+		<template name="gcFarmStartMapBackgroudBackground2" anchor="leftBottom" extends="gcBase">
+			<value name="size" value="325px 200px" />
+			<value name="position" value="0px 0px" />
+			<value name="imageColor" value="0.04 0.04 0.04 1" />
+			<value name="imageColor_selected" value="orange" />
+		</template>
+		<template name="gcFarmStartMapBackgroudHeader" anchor="leftBottom" extends="gcBase_text">
+			<value name="textSize" value="25px" />
+			<value name="position" value="140px 170px" />
+			<value name="textMaxWidth" value="325px" />
+			<value name="textWrapWidth" value="325px" />
+			<value name="textAlignment" value="center" />
+			<value name="margin" value="0px 0px 0px 0px" />
+			<value name="textColor_selected" value="0.02 0.02 0.02 1" />
+		</template>
+		<template name="gcFarmStartMapBackgroudDescription" anchor="leftBottom" extends="gcBase_text">
+			<value name="textSize" value="20px" />
+			<value name="position" value="10px 130px" />
+			<value name="textWrapWidth" value="300px" />
+			<value name="textMaxNumLines" value="5" />
+			<value name="textAlignment" value="left" />
+			<value name="textLineHeightScale" value="1.4" />
+			<value name="textColor_selected" value="0.02 0.02 0.02 1" />
+		</template>
+		<template name="gcFarmStartButtonsLayout" anchor="middleBottom" extends="gcBase">
+			<value name="orientation" value="x" />
+			<value name="alignment" value="left" />
+			<value name="position" value="0px -70px" />
+			<value name="size" value="1400px 50px" />
 		</template>
 	</templates>
 </guiTemplates>

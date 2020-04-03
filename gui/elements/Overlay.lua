@@ -91,7 +91,7 @@ function GC_Gui_overlay:loadTemplate(templateName, xmlFile, key, overlayName)
 		self.imageFilename = g_currentMission.mapImageFilename;
 	elseif uiElement ~= nil then
         self.imageFilename = uiElement;
-    end;
+	end;
 	
 	self.imageOverlay = createImageOverlay(self.imageFilename);
 	self:loadOnCreate();
