@@ -3,13 +3,19 @@
 --
 -- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
--- @Date: 18.02.2020
--- @Version: 1.4.0.0
+-- @Date: 02.04.2020
+-- @Version: 1.4.2.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
--- 	v1.4.0.0 (12.03.2020):
+-- 	v1.4.2.0 (02.04.2020):
+--		- GlobalMarket: Add feature for create own server
+--
+-- 	v1.4.1.0 (30.03.2020):
+--		- Add FarmStart
+--
+-- 	v1.4.0.0 (22.03.2020):
 --		- Add support of manurehosesystem to factory
 --		- Add programmflow to factory
 -- 		- Some further improvements
@@ -97,9 +103,9 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.4.0.0";
-GlobalCompany.versionDate = "12.03.2020";
-GlobalCompany.currentVersionId = 1400; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.version = "1.4.2.0";
+GlobalCompany.versionDate = "02.04.2020";
+GlobalCompany.currentVersionId = 1420; -- Mod Manager ID. (Version number without periods.)
 GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
 GlobalCompany.isGreenWeekVersion = false;
 
@@ -176,6 +182,8 @@ function GlobalCompany.initialLoad()
 		
 		GlobalCompany.loadSourceFiles();
 		GlobalCompany.loadPlaceables();
+		
+		g_company.gui:preLoad()
 
 		g_company.farmlandOwnerListener = GC_FarmlandOwnerListener:new()
 		g_company.fillTypeManager = GC_FillTypeManager:new()
@@ -445,6 +453,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "triggers/GC_UnloadingTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_ShovelFillTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_AnimalLoadingTrigger.lua");
+	source(GlobalCompany.dir .. "triggers/GC_VehicleTrigger.lua");
 	--source(GlobalCompany.dir .. "triggers/GC_PalletExtendedTrigger.lua");
 
 	--|| Placeables ||--
@@ -461,6 +470,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "additionals/GC_ObjectInfo.lua");
 	source(GlobalCompany.dir .. "additionals/GC_HorseHelper.lua");
 	source(GlobalCompany.dir .. "additionals/GC_ExtendedPlaceable.lua");
+	source(GlobalCompany.dir .. "additionals/GC_FarmStarter.lua");
 
 	--|| Events ||--
 	source(GlobalCompany.dir .. "events/GC_SynchEvent.lua");
@@ -553,8 +563,8 @@ end;
 
 function GlobalCompany:loadMap()
 	g_company.debug:loadConsoleCommands();
-
-	g_company.gui:load();
+	
+	g_company.gui:load()
 
 	local fillLevelsDisplay = GC_FillLevelsDisplay.new(g_baseHUDFilename)
 	if fillLevelsDisplay ~= nil then
