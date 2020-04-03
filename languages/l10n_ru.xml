@@ -142,10 +142,50 @@
 		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Подтвердите зарядку коробки"/>
 
 		<!-- PlaceableDigitalDisplay -->
-		<e k="GC_placeableDigDisplay_openGui" v="Adjust digital display"/>
-		<e k="GC_placeableDigDisplay_header" v="Digitales display"/>
-		<e k="GC_placeableDigDisplay_headerInfo" v="Here you can specify any text you want to appear on the display."/>
-		<e k="GC_placeableDigDisplay_btnSave" v="Save"/>
+		<e k="GC_placeableDigDisplay_openGui" v="Отрегулируйте цифровой дисплей"/>
+		<e k="GC_placeableDigDisplay_header" v="Цифровой дисплей"/>
+		<e k="GC_placeableDigDisplay_headerInfo" v="Здесь вы можете указать любой текст, который хотите отображать на дисплее."/>
+		<e k="GC_placeableDigDisplay_btnSave" v="Сохранить"/>
 
+		<!-- GlobalMarket -->
+		<e k="GC_globalMarket_openGui" v="Open GlobalMarket"/>
+		<e k="GC_globalMarket_header" v="Global Market 2020"/>
+		<e k="GC_globalMarket_headerInfo" v="Здесь вы можете продать доставленный товар или купить товар."/>
+		<e k="GC_globalMarket_btn_buyScreen" v="Просмотр для покупки"/>
+		<e k="GC_globalMarket_btn_storageScreen" v="Просмотр для продажи"/>
+		<e k="GC_globalMarket_btn_synch" v="Синхронизировать"/>
+		
+		<e k="GC_globalMarket_header2" v="Global Markt 2020 - Выбор количества"/>
+		<e k="GC_globalMarket_headerInfo2" v="Выберите желаемое количество здесь!"/>
+		<e k="GC_globalMarket_btn_ok" v="Подтвердить"/>
+		<e k="GC_globalMarket_btn_startLoad" v="Начать погрузку"/>
+		
+		<e k="GC_globalMarket_header3" v="Global Markt 2020 - Аутсорсинг"/>
+		<e k="GC_globalMarket_headerInfo3" v="Выберите, что загрузить"/>
+		<e k="GC_globalMarket_btn_min" v="Минимум"/>
+		<e k="GC_globalMarket_btn_max" v="Максимум"/>
+
+		<e k="GC_globalMarket_txt_amount" v="Количество"/>
+		<e k="GC_globalMarket_txt_money" v="Стоимость"/>
+
+		<e k="GC_globalMarket_tbl_header_filltype" v="Тип продукта"/>
+		<e k="GC_globalMarket_tbl_header_level" v="Литры"/>
+		<e k="GC_globalMarket_tbl_header_pallets" v="Паллеты"/>
+		<e k="GC_globalMarket_tbl_header_bales" v="Тюки"/>
+		<e k="GC_globalMarket_tbl_header_price" v="Актуальная цена"/>
+		<e k="GC_globalMarket_tbl_header_price2" v="Актуальная цена / 1000 л"/>
+		<e k="GC_globalMarket_btn_outsource" v="Аутсорсинг"/>
+		<e k="GC_globalMarket_btn_outsourceBale1" v="Круглый тюк"/>
+		<e k="GC_globalMarket_btn_outsourceBale2" v="Квадратный тюк"/>
+		<e k="GC_globalMarket_btn_sell" v="Продать"/>
+		<e k="GC_globalMarket_btn_buy" v="Купить"/>
+
+		<e k="GC_globalMarket_externIsOffline" v="Запустите необходимое внешнее программное обеспечение, чтобы вы могли покупать товары или продавать доставленные товары."/>
+		<e k="GC_globalMarket_externIsFalseVersion" v="У вас нет последней версии внешнего программного обеспечения."/>
+		
+		
+		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Квадратный тюк травы"/>
+		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Круглый тюк травы"/>
+		<e k="GC_globalMarket_storeItem_cotton" v="Хлопок"/>
 	</elements>
 </l10n>

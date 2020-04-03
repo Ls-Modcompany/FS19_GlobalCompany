@@ -21,6 +21,7 @@
 		<e k="GC_gui_modHubLink" v="ModHub Download Link"/>
 		<e k="GC_gui_buttons_nextWarning" v="Nächste Warnung"/>
 		<e k="GC_gui_buttons_nextConflict" v="Nächster Konflikt"/>
+		<e k="GC_gui_buttons_accept" v="Bestätigen"/>
 		
 		<!-- General -->
 		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
@@ -151,7 +152,7 @@ Kosten:  %s"/>
 		<!-- GlobalMarket -->
 		<e k="GC_globalMarket_openGui" v="GlobalerMarkt öffnen"/>
 		<e k="GC_globalMarket_header" v="Globaler Markt 2020"/>
-		<e k="GC_globalMarket_headerInfo" v="Hier kannst du abgelieferte Ware verkaufen oder Ware ankaufen."/>
+		<e k="GC_globalMarket_headerInfo" v="Hier kannst du abgelieferte Ware verkaufen oder Ware ankaufen. Auch kannst du Fahrzeuge verkaufen und kaufen."/>
 		<e k="GC_globalMarket_btn_buyScreen" v="Kaufübersicht"/>
 		<e k="GC_globalMarket_btn_storageScreen" v="Lagerübersicht"/>
 		<e k="GC_globalMarket_btn_synch" v="Synchronisieren"/>
@@ -165,6 +166,9 @@ Kosten:  %s"/>
 		<e k="GC_globalMarket_headerInfo3" v="Wähle aus, was geladen werden soll"/>
 		<e k="GC_globalMarket_btn_min" v="Minimal"/>
 		<e k="GC_globalMarket_btn_max" v="Maximal"/>
+
+		<e k="GC_globalMarket_header4" v="Globaler Markt 2020 - Fahrzeugtransfer"/>
+		<e k="GC_globalMarket_headerInfo4" v="Informationen zum Fahrzeugkauf"/>
 
 		<e k="GC_globalMarket_txt_amount" v="Menge"/>
 		<e k="GC_globalMarket_txt_money" v="Wert"/>
@@ -181,6 +185,14 @@ Kosten:  %s"/>
 		<e k="GC_globalMarket_btn_sell" v="Verkaufen"/>
 		<e k="GC_globalMarket_btn_buy" v="Kaufen   "/>
 
+		<e k="GC_globalMarket_tbl_header_preview" v="Vorschau"/>
+		<e k="GC_globalMarket_tbl_header_name" v="Name"/>
+		<e k="GC_globalMarket_tbl_header_age" v="Alter"/>
+		<e k="GC_globalMarket_tbl_header_operationTime" v="Betriebszeit"/>
+		<e k="GC_globalMarket_tbl_header_price3" v="Preis"/>
+		<e k="GC_globalMarket_txt_hours" v="%s Stunden"/>
+		<e k="GC_globalMarket_txt_days" v="%s Tage"/>
+
 		<e k="GC_globalMarket_externIsOffline" v="Starte die benötigte externe Software, damit du Ware ankaufen kannst oder deine abgegebene Ware verkaufen kannst."/>
 		<e k="GC_globalMarket_externIsFalseVersion" v="Du hast nicht die aktuellste Version der externen Software."/>
 		
@@ -188,6 +200,7 @@ Kosten:  %s"/>
 		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Quaderballen Gras"/>
 		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Rundballen Gras"/>
 		<e k="GC_globalMarket_storeItem_cotton" v="Baumwolle"/>
+
 		
 		<!-- AnimalFeeder -->
 		<e k="GC_animalFeeder_backupTitie" v="Fütterungsanlage"/>

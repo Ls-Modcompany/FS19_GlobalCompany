@@ -20,6 +20,7 @@
 		<e k="GC_gui_modHubLink" v="ModHub Download Link"/>
 		<e k="GC_gui_buttons_nextWarning" v="Next Warning"/>
 		<e k="GC_gui_buttons_nextConflict" v="Next Conflict"/>
+		<e k="GC_gui_buttons_accept" v="Confirm"/>
 
 		<!-- General -->
 		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
@@ -170,6 +171,11 @@
 		<e k="GC_globalMarket_btn_outsourceBale2" v="Square bale"/>
 		<e k="GC_globalMarket_btn_sell" v="Sell"/>
 		<e k="GC_globalMarket_btn_buy" v="Buy"/>
+
+		<e k="GC_globalMarket_tbl_header_preview" v="Preview"/>
+		<e k="GC_globalMarket_tbl_header_name" v="Name"/>
+		<e k="GC_globalMarket_tbl_header_age" v="Age"/>
+		<e k="GC_globalMarket_tbl_header_price3" v="Price"/>
 
 		<e k="GC_globalMarket_externIsOffline" v="Start the necessary external software so that you can buy goods or sell your delivered goods."/>
 		<e k="GC_globalMarket_externIsFalseVersion" v="You do not have the latest version of the external software."/>
