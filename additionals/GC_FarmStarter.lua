@@ -137,3 +137,19 @@ end
 
 FSBaseMission.loadMap = Utils.appendedFunction(FSBaseMission.loadMap, GC_FarmStarter.loadMap)
 Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, GC_FarmStarter.onStartMission)
+
+function GC_FarmStarter:loadFromXMLFile(xmlFile, key, resetVehicles)    
+    local oldValue = self.boughtWithFarmland
+    self.boughtWithFarmland = Utils.getNoNil(getXMLBool(xmlFile, key .. "#boughtWithFarmland"), self.boughtWithFarmland)
+
+    if self.boughtWithFarmland ~= oldValue then
+        if self.boughtWithFarmland then
+            if self.isServer then
+                self:updateOwnership(true)
+            end
+            g_farmlandManager:addStateChangeListener(self)
+        end
+    end
+end
+
+Placeable.loadFromXMLFile = g_company.utils.appendedFunction2(Placeable.loadFromXMLFile, GC_FarmStarter.loadFromXMLFile)
