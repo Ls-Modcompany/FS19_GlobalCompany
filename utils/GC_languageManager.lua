@@ -76,7 +76,6 @@ function GC_languageManager:loadModLanguageFiles(modLanguageFiles)
 end;
 
 function GC_languageManager:loadEntries(modName, fullPath, baseKey, globalTexts)
-	print(string.format("loadEntries %s %s",fullPath, globalTexts ~= nil))
 	if globalTexts == nil then
 		globalTexts = getfenv(0).g_i18n.texts
 	end
@@ -199,7 +198,6 @@ function GC_languageManager:getText(textName, endText, backup)
 			return text;
 		end;
 
-		print(textName)
 		if g_company.languageManager.fallbackText[textName] ~= nil then
 			return g_company.languageManager.fallbackText[textName]
 		end
