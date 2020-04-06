@@ -494,6 +494,18 @@ function GlobalCompanyUtils.appendedFunction(oldFunc, newFunc, t)
     end;
 end
 
+function GlobalCompanyUtils.appendedFunction2(oldFunc, newFunc, t)
+    if oldFunc ~= nil then
+        return function (s, ...)
+            local val = oldFunc(s, ...)
+			newFunc(s, ...)
+			return val
+        end;
+    else
+        return newFunc
+    end;
+end
+
 function GlobalCompanyUtils.interruptFunction(oldFunc, newFunc)
     if oldFunc ~= nil then
         return function (s, ...)

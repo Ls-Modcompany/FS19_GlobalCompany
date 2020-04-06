@@ -3,12 +3,15 @@
 --
 -- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
--- @Date: 02.04.2020
--- @Version: 1.4.2.0
+-- @Date: 06.04.2020
+-- @Version: 1.4.3.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+-- 	v1.4.3.0 (02.04.2020):
+--		- FarmStart: Add 'boughtWithFarmland' attribute for items
+--
 -- 	v1.4.2.0 (02.04.2020):
 --		- GlobalMarket: Add feature for create own server
 --
@@ -103,9 +106,9 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.4.2.0";
-GlobalCompany.versionDate = "02.04.2020";
-GlobalCompany.currentVersionId = 1420; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.version = "1.4.3.0";
+GlobalCompany.versionDate = "06.04.2020";
+GlobalCompany.currentVersionId = 1430; -- Mod Manager ID. (Version number without periods.)
 GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
 GlobalCompany.isGreenWeekVersion = false;
 
