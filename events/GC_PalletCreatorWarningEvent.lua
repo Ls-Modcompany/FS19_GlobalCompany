@@ -39,7 +39,9 @@ end
 
 function GC_PalletCreatorWarningEvent:readStream(streamId, connection)
 	local palletCreator = NetworkUtil.readNodeObject(streamId)
-	palletCreator:showWarningMessage()
+	if palletCreator ~= nil then
+		palletCreator:showWarningMessage()
+	end
 end
 
 function GC_PalletCreatorWarningEvent:writeStream(streamId, connection)

@@ -114,7 +114,7 @@ function GC_PlaceableDigitalDisplay:writeStream(streamId, connection)
 			self.triggerManager:writeStream(streamId, connection)
 		end
 
-		streamWriteInt8(streamId, table.getn(self.screenTexts))
+		streamWriteInt8(streamId, g_company.utils.getTableLength(self.screenTexts))
 		for i, text in pairs(self.screenTexts) do
 			streamWriteInt8(streamId, i)
 			streamWriteString(streamId, text)

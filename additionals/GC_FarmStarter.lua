@@ -52,41 +52,46 @@ function GC_FarmStarter.loadMapFinished(s, node, arguments, callAsyncCallback)
             
             if not continueLoading then
                 local xmlFile = loadXMLFile("globalCompany", xmlPath)
-                
-                local i = 0
-                while true do
-                    local key = string.format("globalCompany.farmStarter.farm(%d)", i)
-                    if not hasXMLProperty(xmlFile, key) then
-                        break
-                    end
 
-                    local farm = {
-                        header = Utils.getNoNil(getXMLString(xmlFile, key .. "#header"), string.format("Header %s", i+1)),
-                        description = Utils.getNoNil(getXMLString(xmlFile, key .. "#description"), string.format("Description %s", i+1)),
-                        preview = s.baseDirectory .. getXMLString(xmlFile, key .. "#preview"),
-                        preview2 = s.baseDirectory .. getXMLString(xmlFile, key .. "#preview2"),
-                        xmlItems = s.baseDirectory .. getXMLString(xmlFile, key .. ".items"),
-                        xmlVehicles = s.baseDirectory .. getXMLString(xmlFile, key .. ".vehicles"),
-                        money1 = getXMLInt(xmlFile, key .. ".money1"),
-                        money2 = getXMLInt(xmlFile, key .. ".money2"),
-                    }
 
-                    farm.farmlands = {}
-                    local j = 0
+                if hasXMLProperty(xmlFile, "globalCompany.farmStarter") then                
+                    local i = 0
                     while true do
-                        local key2 = string.format("%s.farmlands.farmland(%d)", key, j)    
-                        if not hasXMLProperty(xmlFile, key2) then
+                        local key = string.format("globalCompany.farmStarter.farm(%d)", i)
+                        if not hasXMLProperty(xmlFile, key) then
                             break
-                        end    
-                        table.insert(farm.farmlands, getXMLInt(xmlFile, key2))
-                        j = j + 1
-                    end           
+                        end
 
-                    table.insert(g_company.farmStarter.farms, farm)                
-                    i = i + 1
-                end           
-                g_company.gui:openGuiWithData("gc_farmStarter", false, g_company.farmStarter.farms, s.missionInfo.difficulty)
-                g_company.farmStarter.used = true
+                        local farm = {
+                            header = Utils.getNoNil(getXMLString(xmlFile, key .. "#header"), string.format("Header %s", i+1)),
+                            description = Utils.getNoNil(getXMLString(xmlFile, key .. "#description"), string.format("Description %s", i+1)),
+                            preview = s.baseDirectory .. getXMLString(xmlFile, key .. "#preview"),
+                            preview2 = s.baseDirectory .. getXMLString(xmlFile, key .. "#preview2"),
+                            xmlItems = s.baseDirectory .. getXMLString(xmlFile, key .. ".items"),
+                            xmlVehicles = s.baseDirectory .. getXMLString(xmlFile, key .. ".vehicles"),
+                            money1 = getXMLInt(xmlFile, key .. ".money1"),
+                            money2 = getXMLInt(xmlFile, key .. ".money2"),
+                        }
+
+                        farm.farmlands = {}
+                        local j = 0
+                        while true do
+                            local key2 = string.format("%s.farmlands.farmland(%d)", key, j)    
+                            if not hasXMLProperty(xmlFile, key2) then
+                                break
+                            end    
+                            table.insert(farm.farmlands, getXMLInt(xmlFile, key2))
+                            j = j + 1
+                        end           
+
+                        table.insert(g_company.farmStarter.farms, farm)                
+                        i = i + 1
+                    end   
+                    g_company.gui:openGuiWithData("gc_farmStarter", false, g_company.farmStarter.farms, s.missionInfo.difficulty)
+                    g_company.farmStarter.used = true
+                else
+                    continueLoading = true
+                end        
             end
         else
             continueLoading = true

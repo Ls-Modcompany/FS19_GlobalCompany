@@ -81,7 +81,7 @@ end
 
 function GC_Class:writeUpdateStream(streamId, connection, dirtyMask)
     if GC_Class:superClass().writeUpdateStream ~= nil then
-        GC_Class:superClass().writeUpdateStream(self, streamId, timestamp, connection)
+        GC_Class:superClass().writeUpdateStream(self, streamId, connection, dirtyMask)
     end    
 end
 
