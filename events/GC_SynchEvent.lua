@@ -55,7 +55,7 @@ function GC_SynchEvent:readStream(streamId, connection)
     end
 
     if self.gcObject == nil then
-        print(string.format("Synch-Event: Gc-Object is nil with id %s classtype %s eventId %s", self.gcId, self.targetClassType, self.targetEventId))
+        print(string.format("Synch-Event-readStream: Gc-Object is nil with id %s classtype %s eventId %s", self.gcId, self.targetClassType, self.targetEventId))
     end
 
     local event = self.gcObject.events[self.targetEventId]
@@ -93,6 +93,10 @@ function GC_SynchEvent:writeStream(streamId, connection)
         self.gcObject = g_company:getStaticObject(self.gcId)
     else
         print(string.format("Invalid classType %s", self.targetClassType))
+    end
+
+    if self.gcObject == nil then
+        print(string.format("Synch-Event-writeStream: Gc-Object is nil with id %s classtype %s eventId %s", self.gcId, self.targetClassType, self.targetEventId))
     end
 
     local useOwnIndex = self.gcObject.events[self.targetEventId].useOwnIndex
