@@ -223,6 +223,9 @@ Kosten:  %s"/>
 		<e k="GC_animalFeeder_gui_warningText_noConnectedAnimalTrough" v="Kein Trog gefunden!"/>
 		<e k="GC_animalFeeder_gui_warningText_toHighDeltaForTroug" v="Füllmenge zu groß!"/>
 	
+		<!-- FarmStarter -->
+		<e k="GC_farmstarter_header" v="Wähle deinen Starthof aus!"/>
+
 
 		<!-- Market -->
 		<!--e k="GC_market_showDetails" v="Details"/>

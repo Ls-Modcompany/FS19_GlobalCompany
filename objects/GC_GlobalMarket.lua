@@ -261,7 +261,13 @@ function GC_GlobalMarket:loadFillTypes()
 
         if serverLevels[fillType.id] ~= nil then
             fillType.fillLevel = serverLevels[fillType.id].level
-            fillType.actualPrice = serverLevels[fillType.id].actualPrice
+
+            local price = serverLevels[fillType.id].actualPrice
+            if price == 0 then
+                price = fillType.minPrice
+            end
+
+            fillType.actualPrice = price
             fillType.priceTrend = serverLevels[fillType.id].priceTrend
         else
             fillType.fillLevel = 0

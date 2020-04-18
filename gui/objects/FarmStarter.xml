@@ -2,7 +2,7 @@
 <GUI>  
   <GuiElement type="image" template="gcFarmStart">
     <GuiElement type="image" template="gcFarmStartBackground">
-        <GuiElement type="text" template="gcDynStorageTextHeader" id="gui_header" text="Wähle deinen Starthof aus!" />    
+        <GuiElement type="text" template="gcDynStorageTextHeader" id="gui_header" text="$l10n_GC_farmstarter_header" />    
     </GuiElement>
 
     <GuiElement type="table" template="gcFarmStartMap" id="gui_table">   

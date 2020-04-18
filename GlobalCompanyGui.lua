@@ -199,6 +199,9 @@ function GlobalCompanyGui:update(dt)
 end;
 
 function GlobalCompanyGui:mouseEvent(posX, posY, isDown, isUp, button) 
+	if g_company == nil then
+		return
+	end
 	if g_company.gui.activeGuiDialog ~= nil then
 		GlobalCompanyGui.guis[g_company.gui.activeGuiDialog].gui:mouseEvent(posX, posY, isDown, isUp, button);
 	elseif g_company.gui.activeGui == nil then
@@ -213,6 +216,9 @@ function GlobalCompanyGui:mouseEvent(posX, posY, isDown, isUp, button)
 end;
 
 function GlobalCompanyGui:keyEvent(unicode, sym, modifier, isDown) 
+	if g_company == nil then
+		return
+	end
 	if g_company.gui.activeGuiDialog ~= nil then
 		GlobalCompanyGui.guis[g_company.gui.activeGuiDialog].gui:keyEvent(unicode, sym, modifier, isDown);
 	elseif g_company.gui.activeGui == nil then
@@ -302,13 +308,16 @@ function GlobalCompanyGui:delete()
 	end;
 end;
 
-function GlobalCompanyGui:loadGui(class, name)
+function GlobalCompanyGui:loadGui(class, name, isFullGui, canExit)
 	if self.guis[name] ~= nil then
 		g_company.debug.write(debugIndex, Debug.ERROR, "Gui %s already exist.", name);
 		return;
 	else 
 		self.guis[name] = {};
 	end;
+
+	self.guis[name].isFullGui = Utils.getNoNil(isFullGui, true)
+	self.guis[name].canExit = Utils.getNoNil(canExit, true)
 
 	local classGui = class:new();
 	local newGui = GC_Gui:new(name);

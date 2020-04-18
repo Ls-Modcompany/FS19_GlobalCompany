@@ -435,7 +435,7 @@ function Gc_Gui_GlobalMarket:onCreateCol22(element)
         element:setText(string.format(g_company.languageManager:getText("GC_globalMarket_txt_days"), self.currentVehicle.age))
         for k,v in pairs(self.currentVehicleStoreItem.configurationSets ) do
             --for k,v in pairs(v2) do
-                print(string.format("%s %s", k, v))
+                --print(string.format("%s %s", k, v))
             --end
         end
     end    

@@ -184,5 +184,8 @@
 		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Square bale grass"/>
 		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Round bale grass"/>
 		<e k="GC_globalMarket_storeItem_cotton" v="Cotton"/>
+	
+		<!-- FarmStarter -->
+		<e k="GC_farmstarter_header" v="Choose your startfarm!"/>
 	</elements>
 </l10n>

@@ -181,6 +181,7 @@ function Gc_Gui_MainGui:onClickMenuNext()
 end;
 
 function Gc_Gui_MainGui:setData(site)
+    site = Utils.getNoNil(site, self.activePage);
     self:onClickMainMenu(self.gui_menu.elements[site]);
     self.gui_menu.elements[site]:setActive(true);  
 end
