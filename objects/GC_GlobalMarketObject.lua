@@ -569,6 +569,10 @@ function GC_GlobalMarketObject:spawnPalletsEvent(data, noEventSend)
 		local asRoundBale = data[6]
 
 		local palletFilename = g_company.globalMarket:getPalletFilenameFromFillTypeIndex(fillTypeIndex) 
+		if palletFilename ~= nil then
+			palletFilename = Utils.getFilename(palletFilename , self.baseDirectory) 
+		end
+
 		local isPallet = true
 		if palletFilename == nil then
 			palletFilename = g_company.globalMarket.baleToFilename[string.upper(g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex))]
