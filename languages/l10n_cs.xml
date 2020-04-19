@@ -3,24 +3,25 @@
 	<elements>
 
 		<!-- Warnings / Errors -->
-		<e k="GC_mapVersionWarning" v="地图 '%s' 出自 %s 需要Global Company - 版本 %s 或更高才能正常使用.请访问modhub下载链接获取最新官方版本或访问 '%s' 获取支持."/>
-		<e k="GC_modVersionWarning" v="Mod '%s' 出自 %s 需要Global Company - 版本 %s 或更高才能正常使用.请访问modhub下载链接获取最新官方版本或访问 '%s' 获取支持."/>
-		<e k="GC_loadingError" v="加载Global Company时出错! 请访问modhub下载链接获取最新官方版本或访问 '%s' 获取支持."/>
+		<e k="GC_mapVersionWarning" v="地图 '%s' 出自 %s 需要Global Company - 版本 %s 或更高才能正常使用.请访问modhub下载获取最新官方版本或访问 '%s' 获取支持."/>
+		<e k="GC_modVersionWarning" v="Mod '%s' 出自 %s 需要Global Company - 版本 %s 或更高才能正常使用.请访问modhub下载获取最新官方版本或访问 '%s' 获取支持."/>
+		<e k="GC_loadingError" v="加载Global Company时出错! 请访问modhub下载获取最新官方版本或访问 '%s' 获取支持."/>
 		<e k="GC_duplicateError" v="尝试加载两次Global Company! 请从mod文件夹中删除 '%s' , 然后重新加载游戏."/>
-		<e k="GC_combinedError" v="正在尝试将Global Company加载为mod 地图 '%s' 的一部分! 这是不可能的,会导致严重的错误.请访问modhub下载链接获取最新官方版本或访问 '%s' 获取支持."/>
+		<e k="GC_combinedError" v="正在尝试将Global Company加载为mod 地图 '%s' 的一部分! 这是不可能的,会导致严重的错误.请访问modhub下载获取最新官方版本或访问 '%s' 获取支持."/>
 		<e k="GC_invalidModWarning" v="Mod %s 出自 %s 不被支持! 为了避免错误,应该删除这个mod!"/>
 		<e k="GC_quitToMainMenu" v="确定要退出主菜单吗?"/>
-		<e k="GC_betaVersionWarning" v="已加载开发版本. 请在 %s 报告警告或错误. 访问modhub下载链接获取最新官方版本或访问 '%s' 获取支持."/>
-		<e k="GC_namingError" v="为开发版本找到的'file / zip'名称 '%s' 无效! 使用'FS19_GlobalCompany'作为文件/zip名称. 访问modhub下载链接获取最新官方版本或访问 '%s' 获取支持."/>
+		<e k="GC_betaVersionWarning" v="已加载开发版本. 请在 %s 报告警告或错误. 访问modhub下载获取最新官方版本或访问 '%s' 获取支持."/>
+		<e k="GC_namingError" v="为开发版本找到的'file / zip'名称 '%s' 无效! 使用'FS19_GlobalCompany'作为文件/zip名称. 访问modhub下载获取最新官方版本或访问 '%s' 获取支持."/>
 
 		<!-- GUI -->
 		<e k="GC_gui_buttons_ok" v="好的"/>
 		<e k="GC_gui_buttons_yes" v="确定"/>
 		<e k="GC_gui_buttons_no" v="不"/>
 		<e k="GC_gui_buttons_back" v="返回"/>
-		<e k="GC_gui_modHubLink" v="ModHub 下载链接"/>
+		<e k="GC_gui_modHubLink" v="ModHub 下载"/>
 		<e k="GC_gui_buttons_nextWarning" v="下一条警告"/>
 		<e k="GC_gui_buttons_nextConflict" v="下一个冲突"/>
+		<e k="GC_gui_buttons_accept" v="确认"/>
 
 		<!-- General -->
 		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
@@ -122,7 +123,7 @@
 		<e k="GC_baler_info_fillLevelBunker" v="仓库填充量"/>
 		<e k="GC_baler_info_counter" v="捆计数器"/>
 		<e k="GC_baler_info_automatic" v="自动开启"/>
-		<e k="GC_baler_actualTyp" v="实际填充类型:"/>
+		<e k="GC_baler_actualTyp" v="当前填充类型:"/>
 		<e k="GC_baler_canStack" v="要堆叠的捆数:"/>
 
 		<!-- ObjectInfo -->
@@ -166,6 +167,9 @@
 		<e k="GC_globalMarket_btn_min" v="最小"/>
 		<e k="GC_globalMarket_btn_max" v="最大"/>
 
+		<e k="GC_globalMarket_header4" v="Globaler Markt 2020 - 车辆转让"/>
+		<e k="GC_globalMarket_headerInfo4" v="购车信息"/>
+
 		<e k="GC_globalMarket_txt_amount" v="数量"/>
 		<e k="GC_globalMarket_txt_money" v="价值"/>
 
@@ -181,6 +185,14 @@
 		<e k="GC_globalMarket_btn_sell" v="出售"/>
 		<e k="GC_globalMarket_btn_buy" v="购买"/>
 
+		<e k="GC_globalMarket_tbl_header_preview" v="预览"/>
+		<e k="GC_globalMarket_tbl_header_name" v="名称"/>
+		<e k="GC_globalMarket_tbl_header_age" v="年龄"/>
+		<e k="GC_globalMarket_tbl_header_operationTime" v="工作时间"/>
+		<e k="GC_globalMarket_tbl_header_price3" v="价格"/>
+		<e k="GC_globalMarket_txt_hours" v="%s 小时"/>
+		<e k="GC_globalMarket_txt_days" v="%s 天"/>
+
 		<e k="GC_globalMarket_externIsOffline" v="启动必要的外部软件,以便您可以购买商品或出售已交付的商品."/>
 		<e k="GC_globalMarket_externIsFalseVersion" v="您没有最新版本的外部软件."/>
 		
@@ -188,6 +200,30 @@
 		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="方草捆"/>
 		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="圆草捆"/>
 		<e k="GC_globalMarket_storeItem_cotton" v="棉花"/>
+
+		<!-- AnimalFeeder -->
+		<e k="GC_animalFeeder_backupTitie" v="饲喂系统"/>
+		<e k="GC_animalFeeder_openGui" v="打开系统面板"/>
+		<e k="GC_animalFeeder_gui_info" v="在这里管理饲喂系统!"/>
+		<e k="GC_animalFeeder_gui_startManual" v="手动启动系统"/>
+		<e k="GC_animalFeeder_gui_hist_header" v="统计"/>
+		<e k="GC_animalFeeder_gui_hist_text1" v="昨日消耗总量:"/>
+		<e k="GC_animalFeeder_gui_hist_text2" v="昨日消耗料仓 %s:"/>
+		<e k="GC_animalFeeder_gui_hist_val" v="%s 升"/>
+		<e k="GC_animalFeeder_gui_hist_time" v="%s:00 时"/>
+		<e k="GC_animalFeeder_gui_demandPercent" v="更多需求/喂养:"/>
+		<e k="GC_animalFeeder_gui_bunker_title" v="料仓概述"/>
+		<e k="GC_animalFeeder_gui_bunker_name" v="料仓 %s"/>
+		<e k="GC_animalFeeder_gui_mixingRatio_title" v="混合比例"/>
+		<e k="GC_animalFeeder_gui_mixingRatio_warnung" v="混合比例必须为100%!"/>
+		<e k="GC_animalFeeder_gui_literPerDrive" v="数量/行程:"/>
+		<e k="GC_animalFeeder_gui_warningHeader" v="饲喂系统 - 警告 (%s)"/>
+		<e k="GC_animalFeeder_gui_warningText_bunkerEmpty" v="%s: %s 空!"/>
+		<e k="GC_animalFeeder_gui_warningText_noConnectedAnimalTrough" v="未发现料槽!"/>
+		<e k="GC_animalFeeder_gui_warningText_toHighDeltaForTroug" v="填充量过大!"/>
+	
+		<!-- FarmStarter -->
+		<e k="GC_farmstarter_header" v="选择你的起始农场!"/>
 
 
 		<!-- Market -->
@@ -198,5 +234,6 @@
 		<e k="GC_market_liter" v="Liter"/>
 		<e k="GC_market_money" v="Preis"/>
 		<e k="GC_market_designation" v="Bezeichnung"/-->
+
 	</elements>
 </l10n>
