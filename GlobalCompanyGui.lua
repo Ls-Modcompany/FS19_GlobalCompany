@@ -153,6 +153,9 @@ function GlobalCompanyGui:load()
 end;
 
 function GlobalCompanyGui:update(dt)
+	if g_company == nil then
+		return
+	end
 	if GlobalCompanyGui:getIsDev() then
 		if g_company.gui.DevelopementVersionTimer == nil or g_company.gui.DevelopementVersionTimer <= 0 then
 			for _, fileName in pairs(GlobalCompanyGui.DevelopementVersionTemplatesFilename) do				
