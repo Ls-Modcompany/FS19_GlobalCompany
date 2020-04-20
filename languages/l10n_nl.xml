@@ -148,7 +148,7 @@ Kosten: %s"/>
 		<e k="GC_placeableDigDisplay_headerInfo" v="Hier kunt u elke tekst definiëren die op het scherm moet verschijnen."/>
 		<e k="GC_placeableDigDisplay_btnSave" v="Bewaar"/>
 		
-		<!-- Market -->
+		<!-- GlobalMarket -->
 		<e k="GC_globalMarket_openGui" v="Open GlobalMarket"/>
 		<e k="GC_globalMarket_header" v="Global Markt 2020"/>
 		<e k="GC_globalMarket_headerInfo" v="Hier kunt u geleverde goederen verkopen of goederen kopen."/>
