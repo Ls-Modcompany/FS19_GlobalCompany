@@ -300,13 +300,19 @@ function GC_GlobalMarketObject:loadFromXMLFile(xmlFile, key)
 		end
 
         local fillTypeIndex = getXMLInt(xmlFile, levelKey .. "#fillTypeIndex")
-        local farmId = getXMLInt(xmlFile, levelKey .. "#farmId")
-        local level = getXMLInt(xmlFile, levelKey .. "#level")
-
-		if self.fillLevels[fillTypeIndex] == nil then
-			self.fillLevels[fillTypeIndex] = {}
+		local fillType = getXMLString(xmlFile, levelKey .. "#fillType")
+		if fillType ~= nil then
+			fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillType)
 		end
-		self.fillLevels[fillTypeIndex][farmId] = level		
+		if fillTypeIndex ~= nil then
+			local farmId = getXMLInt(xmlFile, levelKey .. "#farmId")
+			local level = getXMLInt(xmlFile, levelKey .. "#level")
+
+			if self.fillLevels[fillTypeIndex] == nil then
+				self.fillLevels[fillTypeIndex] = {}
+			end
+			self.fillLevels[fillTypeIndex][farmId] = level
+		end		
 		
         index = index + 1
 	end  
@@ -325,7 +331,7 @@ function GC_GlobalMarketObject:saveToXMLFile(xmlFile, key, usedModNames)
 	for fillTypeIndex, tab in pairs(self.fillLevels) do
 		for farmId, level in pairs(tab) do
 			local levelKey = string.format("%s.levels.level(%d)", key, index);
-			setXMLInt(xmlFile, levelKey .. "#fillTypeIndex", fillTypeIndex);
+			setXMLString(xmlFile, levelKey .. "#fillType", g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex))
 			setXMLInt(xmlFile, levelKey .. "#farmId", farmId);
 			setXMLInt(xmlFile, levelKey .. "#level", level);
 			index = index + 1;
