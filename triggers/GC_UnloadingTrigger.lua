@@ -429,35 +429,38 @@ end
 function GC_UnloadingTrigger:palletTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay, otherShapeId)
 	if self.isEnabled and otherShapeId ~= nil then
 		local object = g_currentMission:getNodeObject(otherShapeId)
-		if object ~= nil and object:isa(Vehicle) and object.typeName == "pallet" and object.spec_dischargeable ~= nil then				
-			local dischargeNode = object.spec_dischargeable.currentDischargeNode
-			if dischargeNode == nil then
-				if onEnter then
-					if self.nonDischargeNodePallets[object] == nil then
-						local fillUnitIndex = 1
-						local fillTypeIndex
-						
-						local fillUnits = object:getFillUnits()
-						for index, fillUnit in ipairs (fillUnits) do
-							if self:getIsFillTypeAllowed(fillUnit.fillType) then
-								fillUnitIndex = index
-								fillTypeIndex = fillUnit.fillType	
-								break
+		if object ~= nil then
+			local storeItem = g_storeManager:getItemByXMLFilename(object.configFileName:lower())
+			if object:isa(Vehicle) and object.typeName:lower():find("pallet") or storeItem.categoryName == "pallets" and object.spec_dischargeable ~= nil then				
+				local dischargeNode = object.spec_dischargeable.currentDischargeNode
+				if dischargeNode == nil then
+					if onEnter then
+						if self.nonDischargeNodePallets[object] == nil then
+							local fillUnitIndex = 1
+							local fillTypeIndex
+							
+							local fillUnits = object:getFillUnits()
+							for index, fillUnit in ipairs (fillUnits) do
+								if self:getIsFillTypeAllowed(fillUnit.fillType) then
+									fillUnitIndex = index
+									fillTypeIndex = fillUnit.fillType	
+									break
+								end
+							end
+					
+							if fillTypeIndex ~= nil then
+								if self.target:getFreeCapacity(fillTypeIndex, object:getOwnerFarmId(), self.extraParamater) > 0 then
+									self.palletsInTrigger = self.palletsInTrigger + 1
+									self.nonDischargeNodePallets[otherShapeId] = {fillUnitIndex = fillUnitIndex, fillTypeIndex = fillTypeIndex}								
+									self:raiseActive()
+								end
 							end
 						end
-				
-						if fillTypeIndex ~= nil then
-							if self.target:getFreeCapacity(fillTypeIndex, object:getOwnerFarmId(), self.extraParamater) > 0 then
-								self.palletsInTrigger = self.palletsInTrigger + 1
-								self.nonDischargeNodePallets[otherShapeId] = {fillUnitIndex = fillUnitIndex, fillTypeIndex = fillTypeIndex}								
-								self:raiseActive()
-							end
+					elseif onLeave then
+						if self.nonDischargeNodePallets[otherShapeId] ~= nil then
+							self.palletsInTrigger = math.max(self.palletsInTrigger - 1, 0)
+							self.nonDischargeNodePallets[otherShapeId] = nil
 						end
-					end
-				elseif onLeave then
-					if self.nonDischargeNodePallets[otherShapeId] ~= nil then
-						self.palletsInTrigger = math.max(self.palletsInTrigger - 1, 0)
-						self.nonDischargeNodePallets[otherShapeId] = nil
 					end
 				end
 			end
