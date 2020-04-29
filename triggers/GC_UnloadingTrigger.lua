@@ -431,7 +431,7 @@ function GC_UnloadingTrigger:palletTriggerCallback(triggerId, otherId, onEnter, 
 		local object = g_currentMission:getNodeObject(otherShapeId)
 		if object ~= nil then
 			local storeItem = g_storeManager:getItemByXMLFilename(object.configFileName:lower())
-			if object:isa(Vehicle) and object.typeName:lower():find("pallet") or storeItem.categoryName == "pallets" and object.spec_dischargeable ~= nil then				
+			if object:isa(Vehicle) and (object.typeName:lower():find("pallet") or storeItem.categoryName == "pallets") and object.spec_dischargeable ~= nil then				
 				local dischargeNode = object.spec_dischargeable.currentDischargeNode
 				if dischargeNode == nil then
 					if onEnter then
