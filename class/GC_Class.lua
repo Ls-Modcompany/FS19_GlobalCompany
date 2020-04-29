@@ -15,6 +15,7 @@
 
 GC_Class = {}
 GC_Class._mt = Class(GC_Class, Object)
+InitObjectClass(GC_Class, "GC_Class")
 g_company.gc_class = GC_Class
 
 function GC_Class:new(mt, isServer, isClient, scriptDebugInfo, xmlFilename, baseDirectory, customEnvironment, scriptName)
@@ -63,14 +64,14 @@ function GC_Class:readStream(streamId, connection)
         GC_Class:superClass().readStream(self, streamId, connection)
     end
 
-    self.gcId = streamReadUInt8(streamId)
+    self.gcId = streamReadUInt16(streamId)
 end
 
 function GC_Class:writeStream(streamId, connection)
     if GC_Class:superClass().writeStream ~= nil then
         GC_Class:superClass().writeStream(self, streamId, connection)
     end
-    streamWriteUInt8(streamId, self.gcId)
+    streamWriteUInt16(streamId, self.gcId)
 end
 
 function GC_Class:readUpdateStream(streamId, timestamp, connection)
