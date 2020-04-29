@@ -147,6 +147,7 @@ function GC_Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 	self.fillLevelBunker = 0
     self.capacity = Utils.getNoNil(getXMLInt(xmlFile, mainPartKey .. "#capacity"), 50000)
 	self.pressPerSecond = Utils.getNoNil(getXMLInt(xmlFile, mainPartKey .. "#pressPerSecond"), 400)
+	self.pressPerSecond = 200
 	self.baleCounter = 0
 	    
     local capacities = {}
@@ -178,6 +179,8 @@ function GC_Baler:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 		end
 		i = i + 1
 	end
+
+	self.spawnPosition = I3DUtil.indexToObject(self.nodeId, getXMLString(xmlFile, mainPartKey .. ".baleAnimation#spawn"), self.i3dMappings)
 
 	if self.isClient then
 		self.unloadTrigger = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.nodeId, self, xmlFile, string.format("%s.unloadTrigger", mainPartKey), {[1] = self.fillTypes[self.activeFillTypeIndex].index}, {[1] = "DISCHARGEABLE"})
@@ -311,6 +314,7 @@ function GC_Baler:finalizePlacement()
 	self.eventId_removeBaleObjectFromAnimationEvent = self:registerEvent(self, self.removeBaleObjectFromAnimationEvent, false, false)
 	self.eventId_resetBaleTrigger = self:registerEvent(self, self.resetBaleTriggerEvent, false, false)
 	self.eventId_inkBaleCounter = self:registerEvent(self, self.inkBaleCounterEvent, false, false)
+	self.eventId_cleanHeap = self:registerEvent(self, self.cleanHeapEvent, false, false)
 end
 
 function GC_Baler:delete()
@@ -393,7 +397,7 @@ function GC_Baler:readStream(streamId, connection)
 				end
 			end
 
-			self.animationManager:setAnimationTime("stackAnimation", streamReadFloat32(streamId))
+			self.animationManager:setAnimationTime("stackAnimation", streamReadFloat32(streamId), false)
 			local time = self.animationManager:getAnimationTime("stackAnimation")
 			if self.animationState == GC_Baler.ANIMATION_ISSTACKING or self.animationState == GC_Baler.ANIMATION_ISSTACKINGEND then		
 				self.animationManager:setAnimationByState("stackAnimation", true, true)
@@ -544,11 +548,12 @@ function GC_Baler:update(dt)
 		if self.state_baler == GC_Baler.STATE_ON then
 			if self.fillLevelBunker >= 4000 then
 				if self:canUnloadBale() then					
-					self:setBaleObjectToAnimation()
+					--self.animationManager:setAnimationTime("baleAnimation", 0)
 					self.animationManager:setAnimationByState("baleAnimation", true)
+					self:setBaleObjectToAnimation()
 					self:inkBaleCounter()
 					self:setFillLevelBunker(self.fillLevelBunker * -1, true)
-					if self.shouldTurnOff or self.fillLevel + self.fillLevelBunker < 4000 then
+					if self.shouldTurnOff or (self.fillLevel + self.fillLevelBunker) < 4000 then
 						self:onTurnOffBaler()
 						self.shouldTurnOff = false
 					end
@@ -571,7 +576,7 @@ function GC_Baler:update(dt)
 			else --if self.animationManager:getAnimationTime("baleAnimation") == 0 then
 				self:onTurnOffBaler()
 			end
-		elseif self.fillLevelBunker >= 4000 and not self.hasStack then
+		elseif self.fillLevelBunker >= 4000 and self.hasStack then -- remove not self.hasStack
 			if self:canUnloadBale() then
 				self:onTurnOnBaler()	
 				self:onTurnOnStacker()
@@ -605,17 +610,12 @@ function GC_Baler:update(dt)
 			end
 		end
 		if self.animationManager:getAnimationTime("baleAnimation") == 1 then
-			if self.animationManager:getAnimationTime("moveCollisionAnimation") == 1 then
-				self.animationManager:setAnimationTime("moveCollisionAnimation", 0)
-				setCollisionMask(self.moveCollisionAnimationNode, 0)
-			end
-			self:createBale(self.animationManager:getPartsOfAnimation("baleAnimation")[1].node)
-			self:removeBaleObjectFromAnimation()
+			
 		end
 		
 		if self.hasStack and self.state_stacker == GC_Baler.STATE_ON then
 			if self.animationState == GC_Baler.ANIMATION_CANSTACK then
-				if self.stackerBaleTrigger:getTriggerNotEmpty() and self.fillLevelBunker > 0 and not self.needMove then	
+				if self.stackerBaleTrigger:getTriggerNotEmpty() and self.fillLevel + self.fillLevelBunker >= 4000 and not self.needMove then	-- set > 0 to >= 4000
 					if self.stackerBaleTrigger:getNum() < self.stackBalesTarget and self.state_balerMove == GC_Baler.STATE_OFF then
 						self.animationState = GC_Baler.ANIMATION_ISSTACKING
 						self.raisedAnimationKeys = {}
@@ -639,6 +639,10 @@ function GC_Baler:update(dt)
 					self.animationManager:stopAnimation("stackAnimation")
 					self:resetBaleTrigger()
 					self.raisedAnimationKeys["2"] = true
+
+					if self.fillLevelBunker >= 4000 then
+						self:onTurnOnBaler()
+					end
 				elseif self.animationManager:getRealAnimationTimeSeconds("stackAnimation") >= 1 and self.raisedAnimationKeys["1"] == nil then
 					self:setBaleObjectToFork()
 					for _,bale in pairs(self.stackBales) do
@@ -652,13 +656,32 @@ function GC_Baler:update(dt)
 					self.animationState = GC_Baler.ANIMATION_ISSTACKINGEND
 					self.animationManager:playAnimation("stackAnimation", 1, 2000 / self.animationManager:getAnimationDuration("stackAnimation"))
 				end				
-				if self.state_baler == GC_Baler.STATE_OFF and self.fillLevelBunker >= 4000 then
-					self:onTurnOnBaler()
-				end
+				-- self.state_baler == GC_Baler.STATE_OFF and self.fillLevelBunker >= 4000 then
+				--	self:onTurnOnBaler()
+				--end
 			elseif self.animationState == GC_Baler.ANIMATION_ISSTACKINGEND then
 				if self.animationManager:getRealAnimationTimeSeconds("stackAnimation") >= 4.59999 then
 					self.animationState = GC_Baler.ANIMATION_CANSTACK
-					self.animationManager:setAnimationTime("stackAnimation", 0)	
+					self.animationManager:setAnimationTime("stackAnimation", 0)
+
+					if self.stackerBaleTrigger:getTriggerNotEmpty() and self.fillLevel + self.fillLevelBunker >= 4000 and not self.needMove then	-- set > 0 to >= 4000
+						if self.stackerBaleTrigger:getNum() < self.stackBalesTarget and self.state_balerMove == GC_Baler.STATE_OFF then
+							self.animationState = GC_Baler.ANIMATION_ISSTACKING
+							self.raisedAnimationKeys = {}
+							self.animationManager:setAnimationByState("stackAnimation", true)
+						else
+							if self.state_balerMove == GC_Baler.STATE_OFF and self.moverBaleTrigger:getTriggerEmpty() then
+								self:onTurnOnBaleMover()
+								self.stackBales = {}
+								setCollisionMask(self.moveCollisionAnimationNode, self.moveCollisionAnimationColliMask)
+								self.animationManager:setAnimationByState("moveCollisionAnimation", true)
+							end
+							if self.animationManager:getAnimationTime("moveCollisionAnimation") == 1 then
+								self.animationManager:setAnimationTime("moveCollisionAnimation", 0)
+								setCollisionMask(self.moveCollisionAnimationNode, 0)
+							end	
+						end
+					end
 				elseif self.animationManager:getRealAnimationTimeSeconds("stackAnimation") >= 2.6 and self.raisedAnimationKeys["2.6"] == nil then
 					self:removeBaleObjectFromFork()
 					self.raisedAnimationKeys["2.6"] = true
@@ -691,6 +714,22 @@ function GC_Baler:update(dt)
 	self:raiseActive()
 end
 
+function GC_Baler:animationFinishedPlaying(animname, fromLoop)
+	print("animationFinishedPlaying")
+	if self.isServer and self.animationManager ~= nil and animname == "baleAnimation" and fromLoop then
+		if self.animationManager:getAnimationTime("moveCollisionAnimation") == 1 then
+			self.animationManager:setAnimationTime("moveCollisionAnimation", 0)
+			setCollisionMask(self.moveCollisionAnimationNode, 0)
+		end
+		--self:createBale(self.animationManager:getPartsOfAnimation("baleAnimation")[1].node)
+		self:createBale(self.spawnPosition)
+		self:removeBaleObjectFromAnimation()
+		if self.hasStack then				
+			self:onTurnOnStacker()
+		end
+	end
+end
+
 function GC_Baler:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, toolType, fillPositionData, triggerId)
 	self:setFillLevel(self.fillLevel + fillLevelDelta)
 	
@@ -717,18 +756,24 @@ function GC_Baler:playerTriggerActivated(ref)
     if ref == GC_Baler.PLAYERTRIGGER_MAIN then
 		g_company.gui:openGuiWithData("gc_placeableBaler", false, self)
     elseif ref == GC_Baler.PLAYERTRIGGER_CLEAN then
-        if self.cleanHeap:getIsHeapEmpty() then
-            if self.fillLevel < 4000 then
-                self.cleanHeap.fillTypeIndex = self.activeFillTypeIndex                    
-                self.cleanHeap:updateDynamicHeap(self.fillLevel, false)
-                self:setFillLevel(0)
+		self:cleanHeapEvent({})        
+    end
+end
+
+function GC_Baler:cleanHeapEvent(data, noEventSend) 
+	self:raiseEvent(self.eventId_cleanHeap, data, noEventSend)
+	if self.isServer then
+		if self.cleanHeap:getIsHeapEmpty() then
+            if self.fillLevel < 4000 then    
+				self.cleanHeap.fillTypeIndex = self.activeFillTypeIndex
+				self.cleanHeap:updateDynamicHeap(self.fillLevel, false)
+				self:setFillLevel(0)           
             end
         else
             -- heap is not empty
         end
-    end
+	end
 end
-
 
 function GC_Baler:setFillLevelBunker(delta, onlyBunker, noEventSend)  
 	self:setFillLevelBunkerEvent({delta, onlyBunker}, noEventSend)
@@ -822,7 +867,8 @@ end
 
 function GC_Baler:removeBaleObjectFromAnimationEvent(data, noEventSend)
 	self:raiseEvent(self.eventId_removeBaleObjectFromAnimationEvent, data, noEventSend)	
-	self.animationManager:setAnimationTime("baleAnimation", 0)
+	--self.animationManager:setAnimationTime("baleAnimation", 0)
+	--self.animationManager:setAnimationByState("baleAnimation", false)
 	if getNumOfChildren(self.animationManager:getPartsOfAnimation("baleAnimation")[1].node) > 0 then
 		delete(getChildAt(self.animationManager:getPartsOfAnimation("baleAnimation")[1].node, 0))
 	end
@@ -848,7 +894,8 @@ function GC_Baler:setBaleObjectToForkEvent(data, noEventSend)
 end
 
 function GC_Baler:canUnloadBale()
-	local canUnloadBale = self.animationManager:getAnimationTime("baleAnimation") == 0
+	--local canUnloadBale = self.animationManager:getAnimationTime("baleAnimation") == 0
+	local canUnloadBale = true
 	if canUnloadBale and self.hasStack then
 		canUnloadBale = self.stackerBaleTrigger:getTriggerEmpty() and self.animationState ~= GC_Baler.ANIMATION_ISSTACKING and self.animationState ~= GC_Baler.ANIMATION_ISSTACKINGEND
 	elseif canUnloadBale and not self.hasStack then
@@ -866,8 +913,10 @@ function GC_Baler:createBale(ref)
 	local baleType = g_baleTypeManager:getBale(self.activeFillTypeIndex, false, t.width, t.height, t.length, t.diameter)	
 	local filename = Utils.getFilename(baleType.filename, "")
 	local baleObject = Bale:new(self.isServer, g_client ~= nil)
+
 	local x,y,z = getWorldTranslation(ref)
-	local rx,ry,rz = getWorldRotation(ref)
+	local rx,ry,rz  = getWorldRotation(ref)
+
 	baleObject:load(filename, x,y,z,rx,ry,rz, 4000)
 	baleObject:setOwnerFarmId(self:getOwnerFarmId(), true)
 	baleObject:register()
