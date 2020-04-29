@@ -66,7 +66,7 @@ end;
 
 function GC_Gui_input:keyEvent(unicode, sym, modifier, isDown, eventUsed)
     if self.buttonElement:getActive() and isDown then
-        local currentText = self.textElement.text;
+		local currentText = self.textElement.text;
         if sym == Input.KEY_backspace then
 			currentText = currentText:sub(0, currentText:len() - 1);
         else

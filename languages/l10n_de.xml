@@ -152,7 +152,7 @@ Kosten:  %s"/>
 		<!-- GlobalMarket -->
 		<e k="GC_globalMarket_openGui" v="GlobalerMarkt öffnen"/>
 		<e k="GC_globalMarket_header" v="Globaler Markt 2020"/>
-		<e k="GC_globalMarket_headerInfo" v="Hier kannst du abgelieferte Ware verkaufen oder Ware ankaufen. Auch kannst du Fahrzeuge verkaufen und kaufen."/>
+		<e k="GC_globalMarket_headerInfo" v="Hier kannst du abgelieferte Ware verkaufen oder Ware ankaufen."/>
 		<e k="GC_globalMarket_btn_buyScreen" v="Kaufübersicht"/>
 		<e k="GC_globalMarket_btn_storageScreen" v="Lagerübersicht"/>
 		<e k="GC_globalMarket_btn_synch" v="Synchronisieren"/>
