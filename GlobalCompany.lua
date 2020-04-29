@@ -3,8 +3,8 @@
 --
 -- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
--- @Date: 06.04.2020
--- @Version: 1.4.4.2
+-- @Date: 29.04.2020
+-- @Version: 1.4.5.1
 --
 -- @Support: LS-Modcompany
 --
@@ -109,9 +109,9 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.4.5.0";
+GlobalCompany.version = "1.4.5.1";
 GlobalCompany.versionDate = "29.04.2020";
-GlobalCompany.currentVersionId = 1450; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.currentVersionId = 1451; -- Mod Manager ID. (Version number without periods.)
 GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
 GlobalCompany.isGreenWeekVersion = false;
 
