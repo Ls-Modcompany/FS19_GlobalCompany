@@ -129,7 +129,7 @@ function Gc_Gui_DynamicStorage:onCreateContent(element)
 end;
 
 function Gc_Gui_DynamicStorage:onCreateFillLevel(element) 
-    if self.tmp_place ~= nil and self.tmp_place.activeFillTypeIndex > -1 and self.tmp_place.fillLevel > 0 then
+    if self.tmp_place ~= nil then
         element:setText(string.format(g_company.languageManager:getText("GC_dynamicStorage_gui_fillLevel"), g_i18n:formatNumber(self.tmp_place.fillLevel, 0), g_i18n:formatNumber(self.tmp_place.capacity, 0)));
     end;   
 end;
