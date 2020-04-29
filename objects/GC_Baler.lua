@@ -576,10 +576,12 @@ function GC_Baler:update(dt)
 			else --if self.animationManager:getAnimationTime("baleAnimation") == 0 then
 				self:onTurnOffBaler()
 			end
-		elseif self.fillLevelBunker >= 4000 and self.hasStack then -- remove not self.hasStack
+		elseif self.fillLevelBunker >= 4000 then -- remove not self.hasStack
 			if self:canUnloadBale() then
 				self:onTurnOnBaler()	
-				self:onTurnOnStacker()
+				if self.hasStack then
+					self:onTurnOnStacker()
+				end
 			elseif self.moverBaleTrigger:getTriggerEmpty() then
 				self.needMove = true
 			end
@@ -715,7 +717,6 @@ function GC_Baler:update(dt)
 end
 
 function GC_Baler:animationFinishedPlaying(animname, fromLoop)
-	print("animationFinishedPlaying")
 	if self.isServer and self.animationManager ~= nil and animname == "baleAnimation" and fromLoop then
 		if self.animationManager:getAnimationTime("moveCollisionAnimation") == 1 then
 			self.animationManager:setAnimationTime("moveCollisionAnimation", 0)
