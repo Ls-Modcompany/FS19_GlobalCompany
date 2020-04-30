@@ -148,14 +148,51 @@ Koszt: %s"/>
 		<e k="GC_placeableDigDisplay_headerInfo" v="Tutaj możesz określić dowolny tekst, który ma się pojawiać na wyświetlaczu."/>
 		<e k="GC_placeableDigDisplay_btnSave" v="Zapisz"/>
 		
-		<!-- Market -->
-		<!--e k="GC_market_showDetails" v="Szczegóły"/>
-		<e k="GC_market_date" v="Data"/>
-		<e k="GC_market_name" v="Nazwa"/>
-		<e k="GC_market_type" v="Artykół"/>
-		<e k="GC_market_liter" v="Litry"/>
-		<e k="GC_market_money" v="Cena"/>
-		<e k="GC_market_designation" v="Opis"/-->
+		<!-- GlobalMarket -->
+		<e k="GC_globalMarket_openGui" v="Open GlobalMarket"/>
+		<e k="GC_globalMarket_header" v="Global Market 2020"/>
+		<e k="GC_globalMarket_headerInfo" v="Tutaj możesz sprzedać lub kupić produkty."/>
+		<e k="GC_globalMarket_btn_buyScreen" v="Ceny kupna"/>
+		<e k="GC_globalMarket_btn_storageScreen" v="Stan magazynu"/>
+		<e k="GC_globalMarket_btn_synch" v="Synchronizuj"/>
+		
+		<e k="GC_globalMarket_header2" v="Global Market 2020 - Ilość"/>
+		<e k="GC_globalMarket_headerInfo2" v="Ustaw ilość!"/>
+		<e k="GC_globalMarket_btn_ok" v="Potwierdz"/>
+		<e k="GC_globalMarket_btn_startLoad" v="Zacznij załadunek"/>
+		
+		<e k="GC_globalMarket_header3" v="Global Market 2020 - Pakowanie"/>
+		<e k="GC_globalMarket_headerInfo3" v="Wybierz co załadować"/>
+		<e k="GC_globalMarket_btn_min" v="Minimum"/>
+		<e k="GC_globalMarket_btn_max" v="Maximum"/>
+
+		<e k="GC_globalMarket_txt_amount" v="Ilość"/>
+		<e k="GC_globalMarket_txt_money" v="Wartość"/>
+
+		<e k="GC_globalMarket_tbl_header_filltype" v="Produkt"/>
+		<e k="GC_globalMarket_tbl_header_level" v="Litry"/>
+		<e k="GC_globalMarket_tbl_header_pallets" v="Palety"/>
+		<e k="GC_globalMarket_tbl_header_bales" v="Bale"/>
+		<e k="GC_globalMarket_tbl_header_price" v="Aktualna Cena"/>
+		<e k="GC_globalMarket_tbl_header_price2" v="Aktualna Cena / 1000 Litrów"/>
+		<e k="GC_globalMarket_btn_outsource" v="Spakuj"/>
+		<e k="GC_globalMarket_btn_outsourceBale1" v="Bale"/>
+		<e k="GC_globalMarket_btn_outsourceBale2" v="Snopki"/>
+		<e k="GC_globalMarket_btn_sell" v="Sprzedaj"/>
+		<e k="GC_globalMarket_btn_buy" v="Kup"/>
+
+		<e k="GC_globalMarket_tbl_header_preview" v="Preview"/>
+		<e k="GC_globalMarket_tbl_header_name" v="Nazwa"/>
+		<e k="GC_globalMarket_tbl_header_age" v="Wiek"/>
+		<e k="GC_globalMarket_tbl_header_price3" v="Cena"/>
+
+		<e k="GC_globalMarket_externIsOffline" v="Włącz program, by móc kupować i sprzedawać produkty na rynku"/>
+		<e k="GC_globalMarket_externIsFalseVersion" v="Nie posiadasz aktualnej wersji programu."/>
+		
+		
+		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Snopki Trawy"/>
+		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Bale Trawy"/>
+		<e k="GC_globalMarket_storeItem_cotton" v="Bawełna"/>
 		
 	</elements>
 </l10n>
