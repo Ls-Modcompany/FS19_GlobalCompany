@@ -88,10 +88,10 @@ function GC_FillTypeManager:load()
             local hudOverlayFilenameSmall = getXMLString(xmlFile, xmlKey .. ".image#hudSmall");
             local palletFilename = getXMLString(xmlFile, xmlKey .. ".pallet#filename");
         
-            local s,_ = palletFilename:find("$data");
-            if s == nil then
+            --local s,_ = palletFilename:find("$data");
+            --if s == nil then
                 --palletFilename = g_company.utils.createModPath(data.modName, palletFilename);
-            end;
+            --end;
             
             title = g_company.languageManager:getText(string.format("%s_%s", string.gsub(data.modName, "FS19_", ""), string.gsub(title, "$l10n_", "")));
 
