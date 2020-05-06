@@ -48,8 +48,8 @@
 		<e k="GC_gui_deactivate" v="Ausschalten"/>
 		<e k="GC_gui_state" v="Status:"/>
 		<e k="GC_gui_automatic" v="Automatik:"/>
-		<e k="GC_gui_state_on" v="läuft"/>
-		<e k="GC_gui_state_off" v="gestoppt"/>
+		<e k="GC_gui_state_on" v="Läuft"/>
+		<e k="GC_gui_state_off" v="Gestoppt"/>
 		<e k="GC_gui_pallet1" v="%s Palette"/>
 		<e k="GC_gui_pallet2" v="%s Paletten"/>
 		<e k="GC_gui_spawnText1" v="%s Palette erzeugen"/>
@@ -79,11 +79,11 @@
 
 		<e k="GC_gui_factories" v="Produktionen"/>
 		<e k="GC_gui_activeProductLines" v="aktive Produktlinien:"/>
-		<e k="GC_gui_emptyInputs" v="leere Rohstoffe:"/>
-		<e k="GC_gui_fullOutputs" v="volle Produkte:"/>
+		<e k="GC_gui_emptyInputs" v="Leere Rohstoffe:"/>
+		<e k="GC_gui_fullOutputs" v="Volle Produkte:"/>
 
 		<e k="GC_gui_dynamicStorages" v="Dynamische Lager"/>
-		<e k="GC_gui_freeSlots" v="freie Boxen:"/>
+		<e k="GC_gui_freeSlots" v="Freie Boxen:"/>
 		
 		<e k="GC_gui_placeableObject" v="Platzierbare Objekt"/>
 		<e k="GC_gui_farmlandObject" v="Farmland Objekt"/>
@@ -177,8 +177,8 @@ Kosten:  %s"/>
 		<e k="GC_globalMarket_tbl_header_level" v="Liter"/>
 		<e k="GC_globalMarket_tbl_header_pallets" v="Paletten"/>
 		<e k="GC_globalMarket_tbl_header_bales" v="Ballen"/>
-		<e k="GC_globalMarket_tbl_header_price" v="aktueller Preis"/>
-		<e k="GC_globalMarket_tbl_header_price2" v="aktueller Preis / 1000 Liter"/>
+		<e k="GC_globalMarket_tbl_header_price" v="Aktueller Preis"/>
+		<e k="GC_globalMarket_tbl_header_price2" v="Aktueller Preis / 1000 Liter"/>
 		<e k="GC_globalMarket_btn_outsource" v="Auslagern"/>
 		<e k="GC_globalMarket_btn_outsourceBale1" v="Rundballen"/>
 		<e k="GC_globalMarket_btn_outsourceBale2" v="Quaderballen"/>

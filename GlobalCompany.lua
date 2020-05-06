@@ -4,14 +4,17 @@
 -- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
 -- @Date: 29.04.2020
--- @Version: 1.4.5.1
+-- @Version: 1.5.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+-- 	v1.5.0.0 (29.04.2020):
+--		- Fix Baler
+--
 -- 	v1.4.4.0 (18.04.2020):
 --		- Some Bugfixes
-
+--
 -- 	v1.4.3.0 (02.04.2020):
 --		- FarmStart: Add 'boughtWithFarmland' attribute for items
 --
@@ -109,10 +112,10 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.4.5.1";
+GlobalCompany.version = "1.5.0.0";
 GlobalCompany.versionDate = "29.04.2020";
-GlobalCompany.currentVersionId = 1451; -- Mod Manager ID. (Version number without periods.)
-GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
+GlobalCompany.currentVersionId = 1500; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.isDevelopmentVersion = false; -- This is for versions loaded from GIT.
 GlobalCompany.isGreenWeekVersion = false;
 
 function GlobalCompany.initialLoad()

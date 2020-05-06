@@ -138,7 +138,7 @@ Koszt: %s"/>
 		<e k="GC_dynamicStorage_gui_info_unloading" v="Wybierz, którą skrzynkę należy rozładować. Pamiętaj, że każdą skrzynkę można rozładować tylko jednym ładunkiem."/>
 		<e k="GC_dynamicStorage_gui_info_loading" v="Wybierz, którą skrzynkę chcesz załadować."/>
 		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s l"/>
-		<e k="GC_dynamicStorage_gui_empty" v="pusty"/>
+		<e k="GC_dynamicStorage_gui_empty" v="Pusty"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Potwierdź pozycję rozładunku"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Potwierdź skrzynkę do załadunku"/>
 		

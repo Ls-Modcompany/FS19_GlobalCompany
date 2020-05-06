@@ -129,7 +129,7 @@
 		<e k="GC_dynamicStorage_gui_info_unloading" v="Choose in which box should be unloaded. Note that in each box only one fruit can be unloaded."/>
 		<e k="GC_dynamicStorage_gui_info_loading" v="Choose from which box to load."/>
 		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s Litre"/>
-		<e k="GC_dynamicStorage_gui_empty" v="empty"/>
+		<e k="GC_dynamicStorage_gui_empty" v="Empty"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Confirm unloading position"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Confirm charging box"/>
 
@@ -164,8 +164,8 @@
 		<e k="GC_globalMarket_tbl_header_level" v="Litres"/>
 		<e k="GC_globalMarket_tbl_header_pallets" v="Pallets"/>
 		<e k="GC_globalMarket_tbl_header_bales" v="Bales"/>
-		<e k="GC_globalMarket_tbl_header_price" v="actual Price"/>
-		<e k="GC_globalMarket_tbl_header_price2" v="actual Price / 1000 Liter"/>
+		<e k="GC_globalMarket_tbl_header_price" v="Actual Price"/>
+		<e k="GC_globalMarket_tbl_header_price2" v="Actual Price / 1000 Liter"/>
 		<e k="GC_globalMarket_btn_outsource" v="Outsource"/>
 		<e k="GC_globalMarket_btn_outsourceBale1" v="Round bale"/>
 		<e k="GC_globalMarket_btn_outsourceBale2" v="Square bale"/>
