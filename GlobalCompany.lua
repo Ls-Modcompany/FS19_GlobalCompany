@@ -3,8 +3,8 @@
 --
 -- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
--- @Date: 29.04.2020
--- @Version: 1.5.0.0
+-- @Date: 08.05.2020
+-- @Version: 1.5.0.1
 --
 -- @Support: LS-Modcompany
 --
@@ -112,10 +112,10 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.5.0.0";
-GlobalCompany.versionDate = "29.04.2020";
-GlobalCompany.currentVersionId = 1500; -- Mod Manager ID. (Version number without periods.)
-GlobalCompany.isDevelopmentVersion = false; -- This is for versions loaded from GIT.
+GlobalCompany.version = "1.5.0.1";
+GlobalCompany.versionDate = "08.05.2020";
+GlobalCompany.currentVersionId = 1501; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
 GlobalCompany.isGreenWeekVersion = false;
 
 function GlobalCompany.initialLoad()
