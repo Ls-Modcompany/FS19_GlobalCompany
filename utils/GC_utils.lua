@@ -494,11 +494,24 @@ function GlobalCompanyUtils.appendedFunction(oldFunc, newFunc, t)
     end;
 end
 
-function GlobalCompanyUtils.appendedFunction2(oldFunc, newFunc, t)
+function GlobalCompanyUtils.appendedFunction2(oldFunc, newFunc)
     if oldFunc ~= nil then
         return function (s, ...)
             local val = oldFunc(s, ...)
 			newFunc(s, ...)
+			return val
+        end;
+    else
+        return newFunc
+    end;
+end
+
+function GlobalCompanyUtils.appendedFunction3(oldFunc, preFunc, postFunc)
+    if oldFunc ~= nil then
+        return function (s, ...)
+			preFunc(s, ...)
+            local val = oldFunc(s, ...)
+			postFunc(s, ...)
 			return val
         end;
     else
@@ -571,4 +584,19 @@ function GlobalCompanyUtils.loadManureSystemConnectorFromXML(target, connector, 
     end
 
     return false
+end
+
+--http://lua-users.org/wiki/CopyTable
+function GlobalCompanyUtils.shallowcopy(orig)
+	local orig_type = type(orig)
+	local copy
+	if orig_type == 'table' then
+		copy = {}
+		for orig_key, orig_value in pairs(orig) do
+			copy[orig_key] = orig_value
+		end
+	else -- number, string, boolean, etc
+		copy = orig
+	end
+	return copy
 end

@@ -44,7 +44,7 @@
 		<e k="GC_gui_liter" v="%s Litri"/>
 		<e k="GC_gui_buyText" v="Acquisto (%s)"/>
 		<e k="GC_gui_activate" v="Attivato"/>
-		<e k="GC_gui_deactivate" v="disattivato"/>
+		<e k="GC_gui_deactivate" v="Disattivato"/>
 		<e k="GC_gui_state" v="Stato:"/>
 		<e k="GC_gui_automatic" v="Automatico:"/>
 		<e k="GC_gui_state_on" v="Avviato"/>
