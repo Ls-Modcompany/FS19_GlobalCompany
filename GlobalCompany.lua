@@ -134,6 +134,7 @@ function GlobalCompany.initialLoad()
 		source(GlobalCompany.dir .. "utils/GC_DataTypeConverter.lua");
 		source(GlobalCompany.dir .. "class/GC_Class.lua");
 		source(GlobalCompany.dir .. "class/GC_StaticClass.lua");
+		source(GlobalCompany.dir .. "utils/GC_NetworkManager.lua");
 
 		source(GlobalCompany.dir .. "utils/GC_DebugUtils.lua");
 		source(GlobalCompany.dir .. "utils/GC_DebugManager.lua");
@@ -184,6 +185,7 @@ function GlobalCompany.initialLoad()
 		GlobalCompany.objects = {}
 		GlobalCompany.objectId = 1
 		GlobalCompany.staticObjects = {}
+		g_company.networkManager = GC_NetworkManager:new();
 
 		g_company.modManager:initDevelopmentWarning(GlobalCompany.isDevelopmentVersion);
 
@@ -493,6 +495,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryProductPurchaseEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionDynamicStorageCustomTitleEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_GmSendMoneyEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_NetworkManagerInitEvent.lua");
 	
 
 	--|| Specializations ||--
@@ -572,6 +575,7 @@ end;
 
 function GlobalCompany:loadMap()
 	g_company.debug:loadConsoleCommands();
+	--g_company.networkManager:register(true)
 	
 	g_company.gui:load()
 
