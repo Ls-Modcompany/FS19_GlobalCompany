@@ -17,10 +17,10 @@
 		<e k="GC_gui_buttons_ok" v="OK"/>
 		<e k="GC_gui_buttons_yes" v="Tak"/>
 		<e k="GC_gui_buttons_no" v="Nie"/>
-		<e k="GC_gui_buttons_back" v="Wstecz"/>
 		<e k="GC_gui_modHubLink" v="Link pobrania z ModHub"/>
 		<e k="GC_gui_buttons_nextWarning" v="Następne ostrzeżenie"/>
 		<e k="GC_gui_buttons_nextConflict" v="Następny konflikt"/>
+		<e k="GC_gui_buttons_accept" v="Potwierdź"/>
 
 		<!-- General -->
 		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
@@ -34,6 +34,7 @@
 		<e k="GC_settings5_title" v="Aktywuj rozcinanie bel"/>
 		
 		<!-- Factory -->
+		<e k="GC_gui_buttons_back" v="Wstecz"/>
 		<e k="GC_gui_overview" v="Podgląd"/>
 		<e k="GC_gui_productLines" v="Linie produktów"/>
 		<e k="GC_gui_description" v="Opis"/>
@@ -53,20 +54,16 @@
 		<e k="GC_gui_pallet2" v="%s palet/y"/>
 		<e k="GC_gui_spawnText1" v="Wydaj %s palet/ę"/>
 		<e k="GC_gui_spawnText2" v="Wydaj %s palet/y"/>
-		<e k="GC_gui_autoStart" v="Automatyczny start:"/>		
-		
+		<e k="GC_gui_autoStart" v="Automatyczny start:"/>
 		<e k="GC_Productline_Title_Backup" v="Linia produkcji %d"/>
 		<e k="GC_Input_Title_Backup" v="Zapotrzebowanie %d"/>
 		<e k="GC_Output_Title_Backup" v="Produkt %d"/>
 		<e k="GC_Input_Header_Backup" v="Zapotrzebowanie"/>
-		<e k="GC_Output_Header_Backup" v="Produkty"/>
-		
+		<e k="GC_Output_Header_Backup" v="Produkty"/>		
 		<e k="GC_Open_Product_Menu" v="Otwórz menu obiektu"/>
-		<e k="GC_Open_Overview_Menu" v="Otwórz menu podglądu"/>
-		
+		<e k="GC_Open_Overview_Menu" v="Otwórz menu podglądu"/>		
 		<e k="GC_Factory_Animal_Dialogue1" v="Wybierz liczbę zwierząt przekazanych do obiektu."/>
-		<e k="GC_Factory_Animal_Dialogue2" v="Select the number of animals to unload to vehicle."/>
-
+		<e k="GC_Factory_Animal_Dialogue2" v="Wybierz liczbę zwierząt przekazanych do pojazdu."/>
 		<e k="GC_gui_disabled" v="Wyłączone"/>
 		<e k="GC_gui_add" v="Dodaj"/>
 		<e k="GC_gui_remove" v="Usuń"/>
@@ -74,16 +71,13 @@
 		<e k="GC_gui_max" v="Maksimum"/>
 		<e k="GC_gui_percent" v="Procent"/>
 		<e k="GC_gui_lifeTimeIncome" v="Dożywotni dochód"/>
-		<e k="GC_gui_changeFactoryTitle" v="Wprowadź poniżej nową nazwę referencyjną obiektu."/>
-		
+		<e k="GC_gui_changeFactoryTitle" v="Wprowadź poniżej nową nazwę referencyjną obiektu."/>		
 		<e k="GC_gui_factories" v="Obiekty produkcyjne"/>
 		<e k="GC_gui_activeProductLines" v="Aktywne obiekty prod.:"/>
 		<e k="GC_gui_emptyInputs" v="Brakujące surowce:"/>
-		<e k="GC_gui_fullOutputs" v="Gotowe produkty:"/>
-		
+		<e k="GC_gui_fullOutputs" v="Gotowe produkty:"/>		
 		<e k="GC_gui_dynamicStorages" v="Dynamiczne magazyny"/>
 		<e k="GC_gui_freeSlots" v="Wolne miejsce:"/>
-
 		<e k="GC_gui_placeableObject" v="Obiekt kupowany"/>
 		<e k="GC_gui_farmlandObject" v="Obiekt użytkowy"/>
 		<e k="GC_gui_changeDynamicStorageTitle" v="Wpisz poniżej nową nazwę magazynu."/>
@@ -91,15 +85,12 @@
 		
 		<!-- Formatting required -->
 		<e k="GC_Factory_Sell_Warning" v="Ten obiekt wciąż zawiera produkty. Będą one sprzedawane luzem w następującej ilości:
-
 Cena hurtowa: %s"/>		
-		
 		<e k="GC_Factory_Purchase_Warning" v="Potwierdź zakup następującego produktu.
-
 Produkt: %s
 Ilość: %s
 Koszt: %s"/>
-
+		
 		<!-- BaleShreader -->
 		<e k="GC_baleShreader_openSteer" v="Otwórz klapę"/>
 		<e k="GC_baleShreader_closeSteer" v="Zamknij klapę"/>
@@ -149,50 +140,52 @@ Koszt: %s"/>
 		<e k="GC_placeableDigDisplay_btnSave" v="Zapisz"/>
 		
 		<!-- GlobalMarket -->
-		<e k="GC_globalMarket_openGui" v="Open GlobalMarket"/>
-		<e k="GC_globalMarket_header" v="Global Market 2020"/>
-		<e k="GC_globalMarket_headerInfo" v="Tutaj możesz sprzedać lub kupić produkty."/>
-		<e k="GC_globalMarket_btn_buyScreen" v="Ceny kupna"/>
-		<e k="GC_globalMarket_btn_storageScreen" v="Stan magazynu"/>
+		<e k="GC_globalMarket_openGui" v="Otwórz GlobalMarket"/>
+		<e k="GC_globalMarket_header" v="Rynek globalny 2020"/>
+		<e k="GC_globalMarket_headerInfo" v="Tutaj możesz sprzedać lub kupić towary."/>
+		<e k="GC_globalMarket_btn_buyScreen" v="Towary na sprzedaż"/>
+		<e k="GC_globalMarket_btn_storageScreen" v="Twoje towary"/>
 		<e k="GC_globalMarket_btn_synch" v="Synchronizuj"/>
 		
-		<e k="GC_globalMarket_header2" v="Global Market 2020 - Ilość"/>
-		<e k="GC_globalMarket_headerInfo2" v="Ustaw ilość!"/>
-		<e k="GC_globalMarket_btn_ok" v="Potwierdz"/>
-		<e k="GC_globalMarket_btn_startLoad" v="Zacznij załadunek"/>
+		<e k="GC_globalMarket_header2" v="Rynek globalny 2020 - Ilość"/>
+		<e k="GC_globalMarket_headerInfo2" v="Wybierz ilość ładunku"/>
+		<e k="GC_globalMarket_btn_ok" v="Potwierdź"/>
+		<e k="GC_globalMarket_btn_startLoad" v="Rozpocznij załadunek"/>
 		
-		<e k="GC_globalMarket_header3" v="Global Market 2020 - Pakowanie"/>
-		<e k="GC_globalMarket_headerInfo3" v="Wybierz co załadować"/>
+		<e k="GC_globalMarket_header3" v="Global Markt 2020 - Przeładunek"/>
+		<e k="GC_globalMarket_headerInfo3" v="Wybierz jaki towar załadować"/>
 		<e k="GC_globalMarket_btn_min" v="Minimum"/>
-		<e k="GC_globalMarket_btn_max" v="Maximum"/>
+		<e k="GC_globalMarket_btn_max" v="Maksimum"/>
 
 		<e k="GC_globalMarket_txt_amount" v="Ilość"/>
 		<e k="GC_globalMarket_txt_money" v="Wartość"/>
 
-		<e k="GC_globalMarket_tbl_header_filltype" v="Produkt"/>
-		<e k="GC_globalMarket_tbl_header_level" v="Litry"/>
+		<e k="GC_globalMarket_tbl_header_filltype" v="Typ ładunku"/>
+		<e k="GC_globalMarket_tbl_header_level" v="Litry/ów"/>
 		<e k="GC_globalMarket_tbl_header_pallets" v="Palety"/>
-		<e k="GC_globalMarket_tbl_header_bales" v="Bale"/>
-		<e k="GC_globalMarket_tbl_header_price" v="Aktualna Cena"/>
-		<e k="GC_globalMarket_tbl_header_price2" v="Aktualna Cena / 1000 Litrów"/>
-		<e k="GC_globalMarket_btn_outsource" v="Spakuj"/>
-		<e k="GC_globalMarket_btn_outsourceBale1" v="Bale"/>
-		<e k="GC_globalMarket_btn_outsourceBale2" v="Snopki"/>
+		<e k="GC_globalMarket_tbl_header_bales" v="Bele"/>
+		<e k="GC_globalMarket_tbl_header_price" v="Aktualna cena"/>
+		<e k="GC_globalMarket_tbl_header_price2" v="Aktualna cena / 1000 l"/>
+		<e k="GC_globalMarket_btn_outsource" v="Przeładunek"/>
+		<e k="GC_globalMarket_btn_outsourceBale1" v="Bele okrągłe"/>
+		<e k="GC_globalMarket_btn_outsourceBale2" v="Bele kwadratowe"/>
 		<e k="GC_globalMarket_btn_sell" v="Sprzedaj"/>
 		<e k="GC_globalMarket_btn_buy" v="Kup"/>
 
-		<e k="GC_globalMarket_tbl_header_preview" v="Preview"/>
+		<e k="GC_globalMarket_tbl_header_preview" v="Podgląd"/>
 		<e k="GC_globalMarket_tbl_header_name" v="Nazwa"/>
 		<e k="GC_globalMarket_tbl_header_age" v="Wiek"/>
 		<e k="GC_globalMarket_tbl_header_price3" v="Cena"/>
 
-		<e k="GC_globalMarket_externIsOffline" v="Włącz program, by móc kupować i sprzedawać produkty na rynku"/>
-		<e k="GC_globalMarket_externIsFalseVersion" v="Nie posiadasz aktualnej wersji programu."/>
+		<e k="GC_globalMarket_externIsOffline" v="Uruchom dodatkowy program, aby móc kupować lub sprzedawać towary."/>
+		<e k="GC_globalMarket_externIsFalseVersion" v="Nie masz najnowszej wersji programu."/>
 		
 		
-		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Snopki Trawy"/>
-		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Bale Trawy"/>
+		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Kwadratowe bele trawy"/>
+		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Okrągłe bele trawy"/>
 		<e k="GC_globalMarket_storeItem_cotton" v="Bawełna"/>
-		
+	
+		<!-- FarmStarter -->
+		<e k="GC_farmstarter_header" v="Wybierz swoją farmę startową!"/>
 	</elements>
 </l10n>
