@@ -1,16 +1,93 @@
 --
 -- GlobalCompany
 --
--- @Interface: 1.4.0.0 b5007
+-- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
--- @Date: 24.08.2018
--- @Version: 1.1.0.0
+-- @Date: 08.05.2020
+-- @Version: 1.5.0.1
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+-- 	v1.5.0.0 (29.04.2020):
+--		- Fix Baler
 --
--- 	v1.1.0.0 (24.08.2018):
+-- 	v1.4.4.0 (18.04.2020):
+--		- Some Bugfixes
+--
+-- 	v1.4.3.0 (02.04.2020):
+--		- FarmStart: Add 'boughtWithFarmland' attribute for items
+--
+-- 	v1.4.2.0 (02.04.2020):
+--		- GlobalMarket: Add feature for create own server
+--
+-- 	v1.4.1.0 (30.03.2020):
+--		- Add FarmStart
+--
+-- 	v1.4.0.0 (22.03.2020):
+--		- Add support of manurehosesystem to factory
+--		- Add programmflow to factory
+-- 		- Some further improvements
+--
+-- 	v1.3.0.0 (18.02.2020):
+--		- Fix synchro error
+-- 		- Add GlobalMarket
+-- 		- Add AnimalTrough
+--		- Change Design
+--
+-- 	v1.2.1.0 (27.01.2020):
+--		- Add new Mp-Synch and GC-Object System
+-- 		- Fix PlaceableDisplay
+--
+-- 	v1.2.0.0 (12.01.2020):
+--		- Release v1.2.0.0 on Modhub
+--
+-- 	v1.1.5.1 (05.01.2020):
+--		- Update cs language
+--		- Factory: Add old animalinput
+--
+-- 	v1.1.5.0 (02.01.2020):
+--		- DynamicStorage: Fix effects on dediserver
+--		- DynamicStorage: Add unloadtriggers at places
+--		- Ingamemap: Add support for 4x maps
+--
+-- 	v1.1.4.2 (24.12.2019):
+--		- DynamicStorage: Change key t to lctrl+t
+--
+-- 	v1.1.4.1 (23.12.2019):
+--		- Factory: Add animaloutput
+--
+-- 	v1.1.4.0 (22.12.2019):
+--		- Factory: Add Seasons support
+--		- GC-Menu: Improve dynamic ingamemap
+--		- Add languanges: pt, it, pl
+-- 		- Update for green week berlin 2020
+-- 		- Further improvements
+--
+-- 	v1.1.3.0 (03.11.2019):
+--		- FIX: 'Error: Server:registerObjectInStream is only allowed in writeStream calls' Error on MP again
+--
+--
+-- 	v1.1.2.0 (31.10.2019):
+--		- FIX: 'Error: Server:registerObjectInStream is only allowed in writeStream calls' Error on MP
+--		- FIX: language texts
+--		- FIX: Objektinfo: Change position, now we can see the hand
+--
+--
+-- 	v1.1.1.0 (30.10.2019):
+--		- GC-Menu
+--			- NEW: Overview for DynamicStorage
+--			- NEW: Better overview for Factorys
+--			- NEW: AddOns can now create Tabs
+--		- Factory
+--			- NEW: add 'refPoint' - Attribute
+--			- FIX: Incomeprice can now be negative
+--		- Add new Gui-elements
+--		- VisibilityNodes: Collisions will check now also on Server
+--		- Adaption to Courseplay
+--		- many more things
+--
+-- 	v1.1.0.0 (24.08.2019):
 --		- add language russian
 --		- fix Shopmanager for actual patch
 --		- Objectinfo: Add support for pallets of VertexDesign
@@ -22,7 +99,7 @@
 --		- adaption to autoDrive
 --		- add dynamicStorage
 --
--- 	v1.0.0.0 (11.05.2018):
+-- 	v1.0.0.0 (11.05.2019):
 --		- first Release
 --
 -- Notes:
@@ -35,10 +112,11 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.1.0.0";
-GlobalCompany.versionDate = "24.08.2019";
-GlobalCompany.currentVersionId = 1100; -- Mod Manager ID. (Version number without periods.)
-GlobalCompany.isDevelopmentVersion = false; -- This is for versions loaded from GIT.
+GlobalCompany.version = "1.5.0.1";
+GlobalCompany.versionDate = "08.05.2020";
+GlobalCompany.currentVersionId = 1501; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
+GlobalCompany.isGreenWeekVersion = false;
 
 function GlobalCompany.initialLoad()
 	if GlobalCompany.initialLoadComplete ~= nil then
@@ -53,9 +131,15 @@ function GlobalCompany.initialLoad()
 		getfenv(0)["g_company"] = GlobalCompany;
 
 		source(GlobalCompany.dir .. "utils/GC_utils.lua");
+		source(GlobalCompany.dir .. "utils/GC_DataTypeConverter.lua");
+		source(GlobalCompany.dir .. "class/GC_Class.lua");
+		source(GlobalCompany.dir .. "class/GC_StaticClass.lua");
+		source(GlobalCompany.dir .. "utils/GC_NetworkManager.lua");
 
 		source(GlobalCompany.dir .. "utils/GC_DebugUtils.lua");
+		source(GlobalCompany.dir .. "utils/GC_DebugManager.lua");
 		g_company.debug = GC_DebugUtils:new();
+		g_company.debugManager = GC_DebugManager:new();
 		GlobalCompany.debugIndex = g_company.debug:registerScriptName("GlobalCompany");
 
 		source(GlobalCompany.dir .. "utils/GC_languageManager.lua");
@@ -72,13 +156,21 @@ function GlobalCompany.initialLoad()
 
 	local modNameCurrent = g_currentModName;
 	if g_company.modManager:doLoadCheck(modNameCurrent, duplicateLoad, GlobalCompany.isDevelopmentVersion) then
-		g_company.debug:singleLogWrite(GC_DebugUtils.BLANK, "Loading Version: %s (%s)", GlobalCompany.version, GlobalCompany.versionDate);
+		local text = "Loading Version: %s (%s)"
+		if GlobalCompany.isDevelopmentVersion then
+			text = "Loading Developer-Version: %s (%s)"
+		end
+		g_company.debug:singleLogWrite(GC_DebugUtils.BLANK, text, GlobalCompany.version, GlobalCompany.versionDate);
+
 		addModEventListener(GlobalCompany);
 		
 		GlobalCompany.loadedFactories = {}
+		GlobalCompany.loadedDynamicStorages = {}
+		GlobalCompany.loadedAnimalFeeders = {}
 
-		Mission00.load = Utils.prependedFunction(Mission00.load, GlobalCompany.initModClasses);
+		Mission00.load = Utils.prependedFunction(Mission00.load, GlobalCompany.onMissionLoad);
 		Mission00.onStartMission = Utils.appendedFunction(Mission00.onStartMission, GlobalCompany.init);
+		FSCareerMissionInfo.saveToXMLFile = Utils.appendedFunction(FSCareerMissionInfo.saveToXMLFile, GlobalCompany.saveToXMLFile)
 
 		GlobalCompany.inits = {};
 		GlobalCompany.loadables = {};
@@ -88,6 +180,12 @@ function GlobalCompany.initialLoad()
 		GlobalCompany.xmlLoads = {};
 		GlobalCompany.modClassNames = {};
 		GlobalCompany.modLanguageFiles = {};
+		GlobalCompany.saveables = {};
+
+		GlobalCompany.objects = {}
+		GlobalCompany.objectId = 1
+		GlobalCompany.staticObjects = {}
+		g_company.networkManager = GC_NetworkManager:new();
 
 		g_company.modManager:initDevelopmentWarning(GlobalCompany.isDevelopmentVersion);
 
@@ -95,15 +193,22 @@ function GlobalCompany.initialLoad()
 		
 		GlobalCompany.loadSourceFiles();
 		GlobalCompany.loadPlaceables();
+		
+		g_company.gui:preLoad()
 
-		g_company.farmlandOwnerListener = GC_FarmlandOwnerListener:new();
-		g_company.fillTypeManager = GC_FillTypeManager:new();
-		g_company.densityMapHeightManager = GC_densityMapHeightManager:new();
-		g_company.treeTypeManager = GC_TreeTypeManager:new();
-		g_company.physicManager = GC_PhysicManager:new();
+		g_company.farmlandOwnerListener = GC_FarmlandOwnerListener:new()
+		g_company.fillTypeManager = GC_FillTypeManager:new()
+		g_company.densityMapHeightManager = GC_densityMapHeightManager:new()
+		g_company.treeTypeManager = GC_TreeTypeManager:new()
+		g_company.physicManager = GC_PhysicManager:new()
+		g_company.bitmapManager = GC_BitmapManager:new()
+		g_company.jobManager = GC_JobManager:new()
+		g_company.globalMarket = GC_GlobalMarket:new()
 
 		GlobalCompany.loadEnviroment(modNameCurrent, GlobalCompany.dir .. "xml/globalCompany.xml", false);
-		g_company.modManager:initSelectedMods();
+		
+		g_company.modManager:initSelectedMods()	
+		
 		g_company.languageManager:loadModLanguageFiles(GlobalCompany.modLanguageFiles);
 
 		local xmlFileCurrentMod = nil;
@@ -128,6 +233,11 @@ function GlobalCompany.initialLoad()
 	GlobalCompany.initialLoadComplete = true;
 end;
 
+function GlobalCompany:leaveToMenuCallback()
+	local inGameMenuTarget = g_gui.guis["InGameMenu"].target;
+	InGameMenu.onYesNoEnd(inGameMenuTarget, true);
+end;
+
 function GlobalCompany.loadEnviroment(modName, path, isMod)
 	local xmlFile = loadXMLFile("globalCompany", path);
 	GlobalCompany.environments[modName] = xmlFile;
@@ -142,7 +252,11 @@ end;
 -- Script still needs to be loaded from modDesc using 'extraSourceFiles'.
 -- <globalCompany minimumVersion="1.0.0.0"> <customClasses> <customClass name="MyAddonScript"/> </customClasses> </globalCompany>
 -- function MyAddonScript:initGlobalCompany(customEnvironment, baseDirectory, xmlFile) end;
-function GlobalCompany:initModClasses()
+function GlobalCompany.onMissionLoad(mission)
+
+	g_company.bitmapManager.mission = mission;
+
+	-- init mod classes
 	if g_company.modClassNames ~= nil then
 		for modName, modClasses in pairs (g_company.modClassNames) do
 			local modEnv = getfenv(0)["_G"][modName];
@@ -150,7 +264,7 @@ function GlobalCompany:initModClasses()
 				local baseDirectory = g_modNameToDirectory[modName];
 				for _, className in ipairs(modClasses) do
 					if className ~= nil and modEnv[className] ~= nil and modEnv[className].initGlobalCompany ~= nil then
-						modEnv[className].initGlobalCompany(modEnv[className], modName, baseDirectory, GlobalCompany.environments[modName]);
+						modEnv[className].initGlobalCompany(modEnv[className], modName, baseDirectory, GlobalCompany.environments[modName], mission);
 					end;
 				end;
 			end;
@@ -187,6 +301,50 @@ function GlobalCompany.removeFactory(factory, index)
 	end;
 end;
 
+function GlobalCompany.addDynamicStorage(dynamicStorage)
+	if dynamicStorage ~= nil then
+		table.insert(GlobalCompany.loadedDynamicStorages, dynamicStorage);
+		return #GlobalCompany.loadedDynamicStorages;
+	end;
+end;
+
+function GlobalCompany.removeDynamicStorage(dynamicStorage, index)
+	if dynamicStorage ~= nil then
+		if index ~= nil and GlobalCompany.loadedDynamicStorages[index] == dynamicStorage then
+			table.remove(GlobalCompany.loadedDynamicStorages, index);
+		else
+			for i, globalStorage in pairs (GlobalCompany.loadedDynamicStorages) do
+				if globalStorage == dynamicStorage then
+					table.remove(GlobalCompany.loadedDynamicStorages, i);
+					break;
+				end;
+			end;
+		end;
+	end;
+end;
+
+function GlobalCompany.addAnimalFeeder(animalFeeder)
+	if animalFeeder ~= nil then
+		table.insert(GlobalCompany.loadedAnimalFeeders, animalFeeder);
+		return #GlobalCompany.loadedAnimalFeeders;
+	end;
+end;
+
+function GlobalCompany.removeAnimalFeeder(animalFeeder, index)
+	if animalFeeder ~= nil then
+		if index ~= nil and GlobalCompany.loadedAnimalFeeders[index] == animalFeeder then
+			table.remove(GlobalCompany.loadedAnimalFeeders, index);
+		else
+			for i, globalFeeder in pairs (GlobalCompany.loadedAnimalFeeders) do
+				if globalFeeder == animalFeeder then
+					table.remove(GlobalCompany.loadedAnimalFeeders, i);
+					break;
+				end;
+			end;
+		end;
+	end;
+end;
+
 --|| Init ||--
 function GlobalCompany.addInit(target, init)
 	table.insert(GlobalCompany.inits, {init=init, target=target});
@@ -195,6 +353,11 @@ end;
 --|| Load ||--
 function GlobalCompany.addLoadable(target, loadF)
 	table.insert(GlobalCompany.loadables, {loadF=loadF, target=target});
+end;
+
+--|| Saveables ||--
+function GlobalCompany.addSaveable(target, saveF)
+	table.insert(GlobalCompany.saveables, {saveF=saveF, target=target});
 end;
 
 --|| Raised Updateables ||--
@@ -256,12 +419,14 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "utils/GC_FillTypeManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_TreeTypeManager.lua");
 	source(GlobalCompany.dir .. "utils/GC_PhysicManager.lua");
+	source(GlobalCompany.dir .. "utils/GC_BitmapManager.lua");
+	source(GlobalCompany.dir .. "utils/GC_JobManager.lua");
 
 	--|| Gui ||--
 	source(GlobalCompany.dir .. "GlobalCompanyGui.lua");
 
 	--|| Objects ||--
-	-- source(GlobalCompany.dir .. "objects/GC_Baler.lua");
+	source(GlobalCompany.dir .. "objects/GC_Baler.lua");
 	source(GlobalCompany.dir .. "objects/GC_Sounds.lua");
 	source(GlobalCompany.dir .. "objects/GC_Movers.lua");
 	source(GlobalCompany.dir .. "objects/GC_Shaders.lua");
@@ -282,8 +447,14 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_VisibilityNodes.lua");
 	source(GlobalCompany.dir .. "objects/GC_AnimationManager.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactory.lua");
-	source(GlobalCompany.dir .. "objects/GC_AnimalShop.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicStorage.lua");
+	source(GlobalCompany.dir .. "objects/GC_PlaceableDigitalDisplay.lua");
+	source(GlobalCompany.dir .. "objects/GC_GlobalMarket.lua");
+	source(GlobalCompany.dir .. "objects/GC_GlobalMarketObject.lua");
+	source(GlobalCompany.dir .. "objects/GC_AnimalTrough.lua");
+	source(GlobalCompany.dir .. "objects/GC_ProgrammFlow.lua");
+	source(GlobalCompany.dir .. "objects/GC_ProgrammFlow_Globalfunctions.lua");
+	source(GlobalCompany.dir .. "objects/GC_AnimalFeeder.lua");
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
@@ -293,13 +464,16 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "triggers/GC_UnloadingTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_ShovelFillTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_AnimalLoadingTrigger.lua");
+	source(GlobalCompany.dir .. "triggers/GC_VehicleTrigger.lua");
 	--source(GlobalCompany.dir .. "triggers/GC_PalletExtendedTrigger.lua");
 
 	--|| Placeables ||--
-	-- source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
+	source(GlobalCompany.dir .. "placeables/GC_BalerPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_ProductionFactoryPlaceable.lua");
-	source(GlobalCompany.dir .. "placeables/GC_AnimalShopPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_DynamicStoragePlaceable.lua");
+	source(GlobalCompany.dir .. "placeables/GC_PlaceableDigitalDisplayPlaceable.lua");
+	source(GlobalCompany.dir .. "placeables/GC_GlobalMarketPlaceable.lua");
+	source(GlobalCompany.dir .. "placeables/GC_AnimalFeederPlaceable.lua");
 
 	--|| Additionals ||--
 	source(GlobalCompany.dir .. "additionals/GC_BaleAddon.lua");
@@ -307,8 +481,10 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "additionals/GC_ObjectInfo.lua");
 	source(GlobalCompany.dir .. "additionals/GC_HorseHelper.lua");
 	source(GlobalCompany.dir .. "additionals/GC_ExtendedPlaceable.lua");
+	source(GlobalCompany.dir .. "additionals/GC_FarmStarter.lua");
 
 	--|| Events ||--
+	source(GlobalCompany.dir .. "events/GC_SynchEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_PalletCreatorWarningEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_AnimationManagerStopEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_AnimalLoadingTriggerEvent.lua");
@@ -317,6 +493,9 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryCustomTitleEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactorySpawnPalletEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryProductPurchaseEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_ProductionDynamicStorageCustomTitleEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_GmSendMoneyEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_NetworkManagerInitEvent.lua");
 	
 
 	--|| Specializations ||--
@@ -332,11 +511,60 @@ function GlobalCompany.loadPlaceables()
 
 	local placeablesDir = GlobalCompany.dir .. "placeables/";
 
-	-- GlobalCompany:addPlaceableType("GC_BalerPlaceable", "GC_BalerPlaceable", placeablesDir .. "GC_BalerPlaceable.lua");
+	GlobalCompany:addPlaceableType("GC_BalerPlaceable", "GC_BalerPlaceable", placeablesDir .. "GC_BalerPlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_DynamicStoragePlaceable", "GC_DynamicStoragePlaceable", placeablesDir .. "GC_DynamicStoragePlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_ProductionFactoryPlaceable", "GC_ProductionFactoryPlaceable", placeablesDir .. "GC_ProductionFactoryPlaceable.lua");
-	GlobalCompany:addPlaceableType("GC_AnimalShopPlaceable", "GC_AnimalShopPlaceable", placeablesDir .. "GC_AnimalShopPlaceable.lua");
+	GlobalCompany:addPlaceableType("GC_PlaceableDigitalDisplayPlaceable", "GC_PlaceableDigitalDisplayPlaceable", placeablesDir .. "GC_PlaceableDigitalDisplayPlaceable.lua");
+	GlobalCompany:addPlaceableType("GC_GlobalMarketPlaceable", "GC_GlobalMarketPlaceable", placeablesDir .. "GC_GlobalMarketPlaceable.lua");
+	GlobalCompany:addPlaceableType("GC_AnimalFeederPlaceable", "GC_AnimalFeederPlaceable", placeablesDir .. "GC_AnimalFeederPlaceable.lua");
 end;
+
+function GlobalCompany:registerObject(object)
+	--if GlobalCompany:getIsServer() then		
+		object.gcId = GlobalCompany.objectId
+		table.insert(GlobalCompany.objects, object)
+		GlobalCompany.objectId = GlobalCompany.objectId + 1
+	--end
+end
+
+function GlobalCompany:unregisterObject(objectToDelete)
+	for id,object in pairs(GlobalCompany.objects) do
+		if object == objectToDelete then
+			table.remove(GlobalCompany.objects, id)
+			break
+		end
+	end
+end
+
+function GlobalCompany:getObject(id)
+	for _,object in pairs(GlobalCompany.objects) do
+		if object.gcId == id then
+			return object
+		end
+	end
+end
+
+function GlobalCompany:registerStaticObject(object, staticId)
+	object.gcId = staticId
+	table.insert(GlobalCompany.staticObjects, object)
+end
+
+function GlobalCompany:unregisterStaticObject(objectToDelete)
+	for id,object in pairs(GlobalCompany.staticObjects) do
+		if object == objectToDelete then
+			table.remove(GlobalCompany.staticObjects, id)
+			break
+		end
+	end
+end
+
+function GlobalCompany:getStaticObject(id)
+	for _,object in pairs(GlobalCompany.staticObjects) do
+		if object.gcId == id then
+			return object
+		end
+	end
+end
 
 --| Main |--
 function GlobalCompany:init()
@@ -347,8 +575,9 @@ end;
 
 function GlobalCompany:loadMap()
 	g_company.debug:loadConsoleCommands();
-
-	g_company.gui:load();
+	--g_company.networkManager:register(true)
+	
+	g_company.gui:load()
 
 	local fillLevelsDisplay = GC_FillLevelsDisplay.new(g_baseHUDFilename)
 	if fillLevelsDisplay ~= nil then
@@ -378,6 +607,12 @@ function GlobalCompany:loadMap()
 
 	for _,loadable in pairs(GlobalCompany.loadables) do
 		loadable.loadF(loadable.target);
+	end;
+end;
+
+function GlobalCompany:saveToXMLFile()
+	for _, save in pairs(GlobalCompany.saveables) do
+		save.saveF(save.target);
 	end;
 end;
 

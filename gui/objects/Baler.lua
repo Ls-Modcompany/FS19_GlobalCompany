@@ -1,7 +1,25 @@
-
-
-
-
+--
+-- GlobalCompany - Gui - Baler
+--
+-- @Interface: --
+-- @Author: LS-Modcompany / kevink98
+-- @Date: 22.02.2020
+-- @Version: 1.0.0.0
+--
+-- @Support: LS-Modcompany
+--
+-- Changelog:
+--
+-- 	v1.0.0.0 (22.02.2020):
+-- 		- initial fs19 (kevink98)
+--
+--
+-- Notes:
+--
+-- ToDo:
+--
+--
+--
 
 
 Gc_Gui_Baler = {};

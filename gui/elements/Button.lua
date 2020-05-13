@@ -56,18 +56,24 @@ function GC_Gui_button:loadTemplate(templateName, xmlFile, key)
 	self.checkParent = g_company.gui:getTemplateValueBool(templateName, "checkParent", self.checkParent);		
 	self.clickZone = GuiUtils.getNormalizedValues(g_company.gui:getTemplateValue(templateName, "clickZone"), self.outputSize, nil);
 		
-	self.callback_onClick = g_company.gui:getTemplateValueXML(xmlFile, "onClick", key, nil);
-	self.callback_onDoubleClick = g_company.gui:getTemplateValueXML(xmlFile, "onDoubleClick", key, nil);
-	self.callback_onEnter = g_company.gui:getTemplateValueXML(xmlFile, "onEnter", key, nil);
-	self.callback_onLeave = g_company.gui:getTemplateValueXML(xmlFile, "onLeave", key, nil);
-	
 	self.isTableTemplate = g_company.gui:getTemplateValueBool(templateName, "isTableTemplate", self.isTableTemplate);
-	self.isTableTemplate = g_company.gui:getTemplateValueBoolXML(xmlFile, "isTableTemplate", key, self.isTableTemplate);
 	self.hasOverlay = g_company.gui:getTemplateValueBool(templateName, "hasOverlay", false);
 	self.hasText = g_company.gui:getTemplateValueBool(templateName, "hasText", false);
-
 	local inputAction = g_company.gui:getTemplateValue(templateName, "inputAction");
-	inputAction = g_company.gui:getTemplateValueXML(xmlFile, "inputAction", key, inputAction);
+
+	if xmlFile ~= nil then
+		self.callback_onClick = g_company.gui:getTemplateValueXML(xmlFile, "onClick", key, nil);
+		self.callback_onDoubleClick = g_company.gui:getTemplateValueXML(xmlFile, "onDoubleClick", key, nil);
+		self.callback_onEnter = g_company.gui:getTemplateValueXML(xmlFile, "onEnter", key, nil);
+		self.callback_onLeave = g_company.gui:getTemplateValueXML(xmlFile, "onLeave", key, nil);
+
+		self.openPage = g_company.gui:getTemplateValueXML(xmlFile, "openPage", key, nil);
+		
+		self.isTableTemplate = g_company.gui:getTemplateValueBoolXML(xmlFile, "isTableTemplate", key, self.isTableTemplate);
+
+		inputAction = g_company.gui:getTemplateValueXML(xmlFile, "inputAction", key, inputAction);
+	end
+
 	if inputAction ~= nil and InputAction[inputAction] ~= nil then
 		self.inputAction = InputAction[inputAction];
 		self.hasText = true;
@@ -75,7 +81,7 @@ function GC_Gui_button:loadTemplate(templateName, xmlFile, key)
 	
 	if self.hasOverlay then
 		self.overlayElement = GC_Gui_overlay:new(self.gui);
-		self.overlayElement:loadTemplate(templateName, xmlFile, key);
+		self.overlayElement:loadTemplate(string.format("%s_overlay", templateName), xmlFile, key);
 		self.overlayElement.position = { 0,0 };
 		self:addElement(self.overlayElement);
 		--if id ~= nil and id ~= "" then
@@ -85,7 +91,7 @@ function GC_Gui_button:loadTemplate(templateName, xmlFile, key)
 
 	if self.hasText then
 		self.textElement = GC_Gui_text:new(self.gui);
-		self.textElement:loadTemplate(templateName, xmlFile, key);
+		self.textElement:loadTemplate(string.format("%s_text", templateName), xmlFile, key);
 		self.textElement.position = { 0,0 };
 		self:addElement(self.textElement);
 		--if id ~= nil and id ~= "" then
@@ -117,6 +123,7 @@ function GC_Gui_button:copy(src)
 	self.callback_onDoubleClick = src.callback_onDoubleClick;
 	self.callback_onEnter = src.callback_onEnter;
 	self.callback_onLeave = src.callback_onLeave;
+	self.openPage = src.openPage;
 	
 	--self.isTableTemplate = src.isTableTemplate;
 	self:copyOnCreate();
@@ -133,14 +140,23 @@ function GC_Gui_button:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
 			
 		local clickZone = {};		
 		if self.clickZone == nil then
-			clickZone[1] = self.drawPosition[1] + self.margin[1];
+			--[[clickZone[1] = self.drawPosition[1] + self.margin[1];
 			clickZone[2] = self.drawPosition[2] + self.size[2] + self.margin[4];
 			clickZone[3] = self.drawPosition[1] + self.size[1] + self.margin[1];
 			clickZone[4] = self.drawPosition[2] + self.size[2] + self.margin[4];
 			clickZone[5] = self.drawPosition[1] + self.size[1]+ self.margin[1];
 			clickZone[6] = self.drawPosition[2] + self.margin[4];
 			clickZone[7] = self.drawPosition[1] + self.margin[1];
-			clickZone[8] = self.drawPosition[2] + self.margin[4];
+			clickZone[8] = self.drawPosition[2] + self.margin[4];]]--
+			
+			clickZone[1] = self.drawPosition[1]
+			clickZone[2] = self.drawPosition[2] + self.size[2]
+			clickZone[3] = self.drawPosition[1] + self.size[1]
+			clickZone[4] = self.drawPosition[2] + self.size[2]
+			clickZone[5] = self.drawPosition[1] + self.size[1]
+			clickZone[6] = self.drawPosition[2]
+			clickZone[7] = self.drawPosition[1]
+			clickZone[8] = self.drawPosition[2]
 		else
 			if self.isRoundButton then
 				clickZone[1] = self.drawPosition[1] + self.clickZone[1] + self.margin[1];
@@ -192,6 +208,10 @@ function GC_Gui_button:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
 					if self.callback_onClick ~= nil then
 						self.gui[self.callback_onClick](self.gui, self, self.parameter);
 					end;
+					
+					if self.openPage ~= nil and self.parent ~= nil and self.parent.parent ~= nil and self.parent.parent.name == "pageSelector" then
+						self.parent.parent:openPage(self.openPage);
+					end
 				end;
 			else
 				if self.mouseEntered then
@@ -236,32 +256,37 @@ end;
 
 function GC_Gui_button:draw(index)
 	self.drawPosition[1], self.drawPosition[2] = g_company.gui:calcDrawPos(self, index);	
-	
-	self.drawPosition[1] = self.drawPosition[1] + self.sliderPosition[1];
-	self.drawPosition[2] = self.drawPosition[2] - self.sliderPosition[2];
-	
+		
 	
 	if self.debugEnabled then
 		local xPixel = 1 / g_screenWidth;
 		local yPixel = 1 / g_screenHeight;
 		setOverlayColor(GuiElement.debugOverlay, 1, 0,0,1)
 				
-		if self.isRoundButton then
-		
+		if self.isRoundButton then		
 			local y = self.clickZone[3] * (g_screenWidth / g_screenHeight);
 			renderOverlay(GuiElement.debugOverlay, self.drawPosition[1] + self.clickZone[1] + self.margin[1], self.drawPosition[2] + self.clickZone[2] + self.margin[4], self.clickZone[3],yPixel);
 			renderOverlay(GuiElement.debugOverlay, self.drawPosition[1] + self.clickZone[1] + self.margin[1], self.drawPosition[2] + self.clickZone[2] + self.margin[4], xPixel,y);
 		else
 			local clickZone = {};		
 			if self.clickZone == nil then
-				clickZone[1] = self.drawPosition[1] + self.margin[1];
+				--[[clickZone[1] = self.drawPosition[1] + self.margin[1];
 				clickZone[2] = self.drawPosition[2] + self.size[2] + self.margin[4];
 				clickZone[3] = self.drawPosition[1] + self.size[1] + self.margin[1];
 				clickZone[4] = self.drawPosition[2] + self.size[2] + self.margin[4];
 				clickZone[5] = self.drawPosition[1] + self.size[1]+ self.margin[1];
 				clickZone[6] = self.drawPosition[2] + self.margin[4];
 				clickZone[7] = self.drawPosition[1] + self.margin[1];
-				clickZone[8] = self.drawPosition[2] + self.margin[4];
+				clickZone[8] = self.drawPosition[2] + self.margin[4];]]--
+				
+				clickZone[1] = self.drawPosition[1]
+				clickZone[2] = self.drawPosition[2] + self.size[2]
+				clickZone[3] = self.drawPosition[1] + self.size[1]
+				clickZone[4] = self.drawPosition[2] + self.size[2]
+				clickZone[5] = self.drawPosition[1] + self.size[1]
+				clickZone[6] = self.drawPosition[2]
+				clickZone[7] = self.drawPosition[1]
+				clickZone[8] = self.drawPosition[2]
 			else
 				for i=1, table.getn(self.clickZone), 2 do
 					clickZone[i] = self.drawPosition[1] + self.clickZone[i] + self.margin[1];
@@ -274,6 +299,9 @@ function GC_Gui_button:draw(index)
 			end;
 		end;
 	end
+
+	self.drawPosition[1] = self.drawPosition[1] + self.sliderPosition[1];
+	self.drawPosition[2] = self.drawPosition[2] - self.sliderPosition[2];
 	
 	GC_Gui_button:superClass().draw(self);
 end;

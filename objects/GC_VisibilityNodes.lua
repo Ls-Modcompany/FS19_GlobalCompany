@@ -60,7 +60,7 @@ function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, baseDirectory,
 	self.baseDirectory = GlobalCompanyUtils.getParentBaseDirectory(target, baseDirectory)
 
 	local returnValue = false
-	if self.isClient then
+	--if self.isClient then
 		self.disableFillType = Utils.getNoNil(disableFillType, false)
 
 		local i = 0
@@ -174,7 +174,7 @@ function GC_VisibilityNodes:load(nodeId, target, xmlFile, xmlKey, baseDirectory,
 
 			i = i + 1
 		end
-	end
+	--end
 
 	return returnValue
 end
@@ -231,7 +231,8 @@ function GC_VisibilityNodes:loadVisibilityNode(node, loadedNodes, hasChildCollis
 end
 
 function GC_VisibilityNodes:delete()
-	if self.isClient and self.visNodes ~= nil then
+	--self.isClient and
+	if self.visNodes ~= nil then
 		for _, visNodes in pairs(self.visNodes) do
 			for i = 1, #visNodes.nodes do
 				if visNodes.nodes[i].filename ~= nil then
@@ -243,7 +244,7 @@ function GC_VisibilityNodes:delete()
 end
 
 function GC_VisibilityNodes:updateNodes(fillLevel, fillTypeIndex)
-	if self.isClient then
+	--if self.isClient then
 		if self.visNodes ~= nil then
 			if self.disableFillType then
 				for _, visNodes in pairs(self.visNodes) do
@@ -257,7 +258,7 @@ function GC_VisibilityNodes:updateNodes(fillLevel, fillTypeIndex)
 				end
 			end
 		end
-	end
+	--end
 end
 
 -- IMPORTANT: Do not call this function outside this script. Use 'updateNodes' instead.
@@ -302,7 +303,7 @@ end
 -- Use this to update 'endLevel' if the capacity can change on target.
 -- value will be added or subtracted from the 'originalEndLevel' as set in the XML or default.
 function GC_VisibilityNodes:updateVisNodesEndLevel(value, fillTypeIndex)
-	if self.isClient then
+	--if self.isClient then
 		if value == nil then
 			value = 0
 		end
@@ -320,7 +321,7 @@ function GC_VisibilityNodes:updateVisNodesEndLevel(value, fillTypeIndex)
 				end
 			end
 		end
-	end
+	--end
 end
 
 function GC_VisibilityNodes:getTypeData(currentRBT, nodeType)

@@ -26,13 +26,15 @@
 
 GC_languageManager = {};
 GC_languageManager.debugIndex = g_company.debug:registerScriptName("GC_languageManager");
+GC_languageManager.fallbackText = {}
 
 g_company.languageManager = GC_languageManager;
 
 local baseModNameToPrefix = {
 	["GlobalCompany"] = "GC",
-	["GlobalCompanyTablet"] = "GCT",
-	["GlobalCompanySRS"] = "SRS"
+	--["GlobalCompanyTablet"] = "GCT",
+	--["GlobalCompanySRS"] = "SRS",
+	--["GlobalCompanyAddOn_OrganicSoilManagement"] = "OSM"
 };
 
 function GC_languageManager:load(loadingDirectory)
@@ -43,6 +45,9 @@ function GC_languageManager:load(loadingDirectory)
 	if loadingDirectory ~= nil then
 		local baseLanguageFullPath = g_company.languageManager:getLanguagesFullPath(loadingDirectory);
 		GC_languageManager:loadEntries(g_currentModName, baseLanguageFullPath, "l10n.elements.e(%d)");
+
+		local fallbackPath = string.gsub(baseLanguageFullPath, "l10n" .. g_languageSuffix, "l10n_en")
+		GC_languageManager:loadEntries(g_currentModName, fallbackPath, "l10n.elements.e(%d)", g_company.languageManager.fallbackText);
 
 		g_company.debug:writeDev(GC_languageManager.debugData, "Standard language XML file has been loaded successfully.");
 	end;
@@ -58,6 +63,9 @@ function GC_languageManager:loadModLanguageFiles(modLanguageFiles)
 	if modLanguageFiles ~= nil then
 		for modName, fullPath in pairs(modLanguageFiles) do
 			GC_languageManager:loadEntries(modName, fullPath, "l10n.elements.e(%d)");
+
+			local fallbackPath = string.gsub(fullPath, "l10n" .. g_languageSuffix, "l10n_en")
+			GC_languageManager:loadEntries(modName, fallbackPath, "l10n.elements.e(%d)", g_company.languageManager.fallbackText);
 			fullPathCount = fullPathCount + 1;
 		end;
 	end;
@@ -67,8 +75,10 @@ function GC_languageManager:loadModLanguageFiles(modLanguageFiles)
 	end;
 end;
 
-function GC_languageManager:loadEntries(modName, fullPath, baseKey)
-	local globalTexts = getfenv(0).g_i18n.texts;
+function GC_languageManager:loadEntries(modName, fullPath, baseKey, globalTexts)
+	if globalTexts == nil then
+		globalTexts = getfenv(0).g_i18n.texts
+	end
 	
 	local duplicateTable = {};
 	local prefixErrorTable = {};
@@ -187,6 +197,10 @@ function GC_languageManager:getText(textName, endText, backup)
 
 			return text;
 		end;
+
+		if g_company.languageManager.fallbackText[textName] ~= nil then
+			return g_company.languageManager.fallbackText[textName]
+		end
 
 		-- If all fail's and there is no 'backup' we need to provide the default warning so texts are entered correctly by modders. 
 		return g_i18n:getText(textName);

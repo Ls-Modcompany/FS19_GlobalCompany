@@ -21,7 +21,7 @@
 -- 
 -- ToDo:
 -- 		xmlIinformations at fakegui (kevin)
--- 
+-- 		declare better when input only work on walk or in vehicle or booth
 
 GlobalCompanyGui = {};
 g_company.gui = GlobalCompanyGui;
@@ -32,7 +32,7 @@ GlobalCompanyGui.debugData = g_company.debug:getDebugData(GlobalCompanyGui.debug
 GlobalCompanyGui.DevelopementVersionTemplatesFilename = {};
 addModEventListener(GlobalCompanyGui);
 
-GlobalCompanyGui.devVersion = false;
+GlobalCompanyGui.devVersion = false
 
 GlobalCompanyGui.guis = {};
 GlobalCompanyGui.smallGuis = {};
@@ -43,6 +43,8 @@ GlobalCompanyGui.template.colors = {};
 GlobalCompanyGui.template.uvs = {};
 GlobalCompanyGui.template.templates = {};
 GlobalCompanyGui.template.uiElements = {};
+
+GlobalCompanyGui.gcMenuModSites = {}
 
 GlobalCompanyGui.MULTIDIALOG_MODE_OK = 0;
 GlobalCompanyGui.MULTIDIALOG_MODE_YES_NO = 1;
@@ -61,7 +63,11 @@ source(g_currentModDirectory .. "gui/elements/Borders.lua");
 source(g_currentModDirectory .. "gui/elements/Table.lua");
 source(g_currentModDirectory .. "gui/elements/Slider.lua");
 source(g_currentModDirectory .. "gui/elements/Input.lua");
+source(g_currentModDirectory .. "gui/elements/Page.lua");
+source(g_currentModDirectory .. "gui/elements/PageSelector.lua");
 source(g_currentModDirectory .. "gui/elements/GuiScreen.lua");
+source(g_currentModDirectory .. "gui/elements/IngameMap.lua");
+source(g_currentModDirectory .. "gui/elements/TableSort.lua");
 
 source(g_currentModDirectory .. "gui/FakeGui.lua");
 source(g_currentModDirectory .. "gui/MultiDialog.lua");
@@ -69,19 +75,40 @@ source(g_currentModDirectory .. "gui/objects/Baler.lua");
 source(g_currentModDirectory .. "gui/objects/ObjectInfo.lua");
 source(g_currentModDirectory .. "gui/objects/GcMain.lua");
 source(g_currentModDirectory .. "gui/objects/DynamicStorage.lua");
-source(g_currentModDirectory .. "gui/objects/AnimalShop.lua");
+source(g_currentModDirectory .. "gui/objects/PlaceableDigitalDisplay.lua");
+source(g_currentModDirectory .. "gui/objects/GlobalMarket.lua");
+source(g_currentModDirectory .. "gui/objects/GlobalMarketLevelDialog.lua");
+source(g_currentModDirectory .. "gui/objects/GlobalMarketVehicleDialog.lua");
+source(g_currentModDirectory .. "gui/objects/GlobalMarketLoading.lua");
+source(g_currentModDirectory .. "gui/objects/AnimalFeeder.lua");
+source(g_currentModDirectory .. "gui/objects/AnimalFeederWarning.lua");
+source(g_currentModDirectory .. "gui/objects/FarmStarter.lua");
 
 function GlobalCompanyGui:init()	
 	for _,inAc in pairs(self.toInit_actionEvents) do
 		g_gui.inputManager:registerActionEvent(inAc.inputAction, GlobalCompanyGui, inAc.func, false, true, false, true);
 	end;
-	Player.registerActionEvents = Utils.appendedFunction(Player.registerActionEvents, GlobalCompanyGui.registerActionEvents);
+	FSBaseMission.registerActionEvents = Utils.appendedFunction(FSBaseMission.registerActionEvents, GlobalCompanyGui.registerActionEventsVehicle);
 end;
 
-function GlobalCompanyGui:registerActionEvents()
+function GlobalCompanyGui:registerActionEventsPlayer()
 	if g_company.gui.toInit_actionEvents ~= nil then
 		for _,inAc in pairs(g_company.gui.toInit_actionEvents) do
 			g_gui.inputManager:registerActionEvent(inAc.inputAction, GlobalCompanyGui, inAc.func, false, true, false, true);
+		end;
+	end;
+end;
+
+function GlobalCompanyGui:registerActionEventsVehicle()
+	if g_company.gui.toInit_actionEvents ~= nil then
+		for _,inAc in pairs(g_company.gui.toInit_actionEvents) do
+			if g_currentMission.controlledVehicle ~= nil then
+				if inAc.inVehicle then
+					g_gui.inputManager:registerActionEvent(inAc.inputAction, GlobalCompanyGui, inAc.func, false, true, false, true);
+				end
+			else
+				g_gui.inputManager:registerActionEvent(inAc.inputAction, GlobalCompanyGui, inAc.func, false, true, false, true);
+			end
 		end;
 	end;
 end;
@@ -90,71 +117,86 @@ function GlobalCompanyGui:getIsDev()
 	return g_company.debug:getIsDev() and GlobalCompanyGui.devVersion;
 end;
 
-function GlobalCompanyGui:loadMap()
+function GlobalCompanyGui:loadMap()	
+	Gui.mouseEvent = GlobalCompanyGui_stored_gui_mouseEvent
+	Gui.keyEvent = GlobalCompanyGui_stored_gui_keyEvent
+
 	if g_company.debug:getIsDev() then
 		addConsoleCommand("gcGuiReload", "Reload all templates.", "consoleCommandReloadTemplates", g_company.gui);
 		addConsoleCommand("gcGuiDevMode", "Set the state GUI Development Mode. [state]", "consoleCommandEnableDevVersion", g_company.gui);
 	end;
 end;
 
-function GlobalCompanyGui:load()	
+function GlobalCompanyGui:preLoad()	
 	-- self.fakeGui = GC_Gui_FakeGui:new();
 	self.fakeGui = g_company.gui.fakeGui:new();
 	g_gui:loadGui(g_company.dir .. self.fakeGui.guiInformations.guiXml, "gc_fakeGui", self.fakeGui);
 	
 	g_company.gui:registerUiElements("g_factoryDefault", g_company.dir .. "images/factoryDefault.dds");
 	g_company.gui:registerUiElements("g_gcUi2", g_company.dir .. "images/ui_elements_2.dds");
-	
-	self.mainGui = g_company.gui:registerGui("gc_main", InputAction.GC_MAIN, Gc_Gui_MainGui, true, true, true).classGui;
-	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
-	g_company.gui:registerGui("gcPlaceable_baler", nil, Gc_Gui_Baler, true, true);
-	g_company.gui:registerGui("gcObjectInfo", nil, Gc_Gui_ObjectInfo, false, false);
-	g_company.gui:registerGui("gc_dynamicStorage", nil, Gc_Gui_DynamicStorage, true, true);
-	g_company.gui:registerGui("gc_animalShop", nil, Gc_Gui_AnimalShop, true, true);
-	
+
+	g_company.gui:registerGui("gc_farmStarter", nil, Gc_Gui_FarmStarter, false, false, true);	
 	self.activeGuiDialogs = {};
 	self.registeredActonEvents = false;
+end
+
+function GlobalCompanyGui:load()	
+	self.mainGui = g_company.gui:registerGui("gc_main", InputAction.GC_MAIN, Gc_Gui_MainGui, true, true, true).classGui;
+	g_company.gui:registerGui("gc_multiDialog", nil, GC_Gui_MultiDialog, true, true);
+	g_company.gui:registerGui("gc_placeableBaler", nil, Gc_Gui_Baler, true, true, false);
+	g_company.gui:registerGui("gcObjectInfo", nil, Gc_Gui_ObjectInfo, false, false, false);
+	g_company.gui:registerGui("gc_dynamicStorage", nil, Gc_Gui_DynamicStorage, true, true, true);
+	g_company.gui:registerGui("gc_placeableDigitalDisplay", nil, Gc_Gui_PlaceableDigitalDisplay, true, true, false);
+	g_company.gui:registerGui("gc_globalMarket", nil, Gc_Gui_GlobalMarket, true, true, false);
+	g_company.gui:registerGui("gc_globalMarketLevelDialog", nil, Gc_Gui_GlobalMarketLevelDialog, true, true, false);
+	g_company.gui:registerGui("gc_globalMarketVehicleDialog", nil, Gc_Gui_GlobalMarketVehicleDialog, true, true, false);	
+	g_company.gui:registerGui("gc_globalMarketLoading", nil, Gc_Gui_GlobalMarketLoading, true, true, true);	
+	g_company.gui:registerGui("gc_animalFeeder", nil, Gc_Gui_AnimalFeeder, true, true, true);	
+	g_company.gui:registerGui("gc_animalFeederWarning", nil, Gc_Gui_AnimalFeederWarning, false, false, true);	
 end;
 
 function GlobalCompanyGui:update(dt)
+	if g_company == nil then
+		return
+	end
 	if GlobalCompanyGui:getIsDev() then
-		if self.DevelopementVersionTimer == nil or self.DevelopementVersionTimer <= 0 then
+		if g_company.gui.DevelopementVersionTimer == nil or g_company.gui.DevelopementVersionTimer <= 0 then
 			for _, fileName in pairs(GlobalCompanyGui.DevelopementVersionTemplatesFilename) do				
-				self:loadGuiTemplates(fileName);
+				g_company.gui:loadGuiTemplates(fileName);
 			end;
-			for name,gui in pairs(self.guis) do		
+			for name,gui in pairs(g_company.gui.guis) do		
 				gui.gui:deleteElements();
 				gui.gui:loadFromXML();
 			end;
-			if self.activeGui ~= nil then
-				self.guis[self.activeGui].gui:openGui();
+			if g_company.gui.activeGui ~= nil then
+				g_company.gui.guis[g_company.gui.activeGui].gui:openGui();
 			else
-				for name, open in pairs(self.smallGuis) do
+				for name, open in pairs(g_company.gui.smallGuis) do
 					if open then
-						self.guis[name].gui:openGui();
+						g_company.gui.guis[name].gui:openGui();
 					end;
 				end; 
 			end;
-			if self.activeGuiDialog ~= nil then
-				self.guis[self.activeGuiDialog].gui:openGui();
+			if g_company.gui.activeGuiDialog ~= nil then
+				g_company.gui.guis[g_company.gui.activeGuiDialog].gui:openGui();
 			end;
-			self.DevelopementVersionTimer = 70;
+			g_company.gui.DevelopementVersionTimer = 70;
 		else
-			self.DevelopementVersionTimer = self.DevelopementVersionTimer - 1;
+			g_company.gui.DevelopementVersionTimer = g_company.gui.DevelopementVersionTimer - 1;
 		end;		
 	end;
 	
-	if self.activeGui == nil then
-		for name, open in pairs(self.smallGuis) do
+	if g_company.gui.activeGui == nil then
+		for name, open in pairs(g_company.gui.smallGuis) do
 			if open then
-				self.guis[name].gui:update(dt);
+				g_company.gui.guis[name].gui:update(dt);
 			end;
 		end;
 	else
 		if g_gui:getIsDialogVisible() then
-			self:closeGui(self.activeGui);
+			g_company.gui:closeGui(g_company.gui.activeGui);
 		else
-			self.guis[self.activeGui].gui:update(dt);
+			g_company.gui.guis[g_company.gui.activeGui].gui:update(dt);
 		end;
 	end;
 	for _, name in pairs(GlobalCompanyGui.activeGuiDialogs) do
@@ -163,30 +205,36 @@ function GlobalCompanyGui:update(dt)
 end;
 
 function GlobalCompanyGui:mouseEvent(posX, posY, isDown, isUp, button) 
-	if self.activeGuiDialog ~= nil then
-		GlobalCompanyGui.guis[self.activeGuiDialog].gui:mouseEvent(posX, posY, isDown, isUp, button);
-	elseif self.activeGui == nil then
-		--for name, open in pairs(self.smallGuis) do
-		--	if open then
-		--		self.guis[name].gui:mouseEvent(posX, posY, isDown, isUp, button);
-		--	end;
-		--end;
+	if g_company == nil then
+		return
+	end
+	if g_company.gui.activeGuiDialog ~= nil then
+		GlobalCompanyGui.guis[g_company.gui.activeGuiDialog].gui:mouseEvent(posX, posY, isDown, isUp, button);
+	elseif g_company.gui.activeGui == nil then
+		for name, open in pairs(g_company.gui.smallGuis) do
+			if name == "gc_farmStarter" and open then
+				g_company.gui.guis[name].gui:mouseEvent(posX, posY, isDown, isUp, button);
+			end;
+		end;
 	else
-		self.guis[self.activeGui].gui:mouseEvent(posX, posY, isDown, isUp, button);
+		g_company.gui.guis[g_company.gui.activeGui].gui:mouseEvent(posX, posY, isDown, isUp, button);
 	end;
 end;
 
 function GlobalCompanyGui:keyEvent(unicode, sym, modifier, isDown) 
-	if self.activeGuiDialog ~= nil then
-		GlobalCompanyGui.guis[self.activeGuiDialog].gui:keyEvent(unicode, sym, modifier, isDown);
-	elseif self.activeGui == nil then
-		for name, open in pairs(self.smallGuis) do
+	if g_company == nil then
+		return
+	end
+	if g_company.gui.activeGuiDialog ~= nil then
+		GlobalCompanyGui.guis[g_company.gui.activeGuiDialog].gui:keyEvent(unicode, sym, modifier, isDown);
+	elseif g_company.gui.activeGui == nil then
+		for name, open in pairs(g_company.gui.smallGuis) do
 			if open then
-				self.guis[name].gui:keyEvent(unicode, sym, modifier, isDown);
+				g_company.gui.guis[name].gui:keyEvent(unicode, sym, modifier, isDown);
 			end;
 		end;
 	else
-		self.guis[self.activeGui].gui:keyEvent(unicode, sym, modifier, isDown);
+		g_company.gui.guis[g_company.gui.activeGui].gui:keyEvent(unicode, sym, modifier, isDown);
 	end;
 end;
 
@@ -194,13 +242,31 @@ function GlobalCompanyGui:draw() end;
 function GlobalCompanyGui:drawB()
 	if GlobalCompanyGui.activeGui == nil then
 		-- if g_gui.currentGui == nil then
-		if not g_gui:getIsGuiVisible() then
+		if not g_gui:getIsGuiVisible() or g_currentMission == nil then
 			for name, open in pairs(GlobalCompanyGui.smallGuis) do
 				if open then
 					GlobalCompanyGui.guis[name].gui:draw();
 				end;
 			end;
 		end;
+	else
+		GlobalCompanyGui.guis[GlobalCompanyGui.activeGui].gui:draw();
+	end;
+	for _, name in pairs(GlobalCompanyGui.activeGuiDialogs) do
+		GlobalCompanyGui.guis[name].gui:draw();
+	end;
+end;
+
+function GlobalCompanyGui:drawM()
+	if GlobalCompanyGui.activeGui == nil then
+		-- if g_gui.currentGui == nil then
+		--if not g_gui:getIsGuiVisible() or g_currentMission == nil then
+			for name, open in pairs(GlobalCompanyGui.smallGuis) do
+				if open then
+					GlobalCompanyGui.guis[name].gui:draw();
+				end;
+			end;
+		--end;
 	else
 		GlobalCompanyGui.guis[GlobalCompanyGui.activeGui].gui:draw();
 	end;
@@ -248,13 +314,16 @@ function GlobalCompanyGui:delete()
 	end;
 end;
 
-function GlobalCompanyGui:loadGui(class, name)
+function GlobalCompanyGui:loadGui(class, name, isFullGui, canExit)
 	if self.guis[name] ~= nil then
 		g_company.debug.write(debugIndex, Debug.ERROR, "Gui %s already exist.", name);
 		return;
 	else 
 		self.guis[name] = {};
 	end;
+
+	self.guis[name].isFullGui = Utils.getNoNil(isFullGui, true)
+	self.guis[name].canExit = Utils.getNoNil(canExit, true)
 
 	local classGui = class:new();
 	local newGui = GC_Gui:new(name);
@@ -264,7 +333,7 @@ function GlobalCompanyGui:loadGui(class, name)
 	return newGui;
 end;
 
-function GlobalCompanyGui:registerGui(name, inputAction, class, isFullGui, canExit, onWalkActive)
+function GlobalCompanyGui:registerGui(name, inputAction, class, isFullGui, canExit, inVehicle)
 	if self.guis[name] ~= nil then
 		g_company.debug:writeError(g_company.gui.debugData, "Gui %s already exist.", name); --gui
 		return;
@@ -278,7 +347,7 @@ function GlobalCompanyGui:registerGui(name, inputAction, class, isFullGui, canEx
 	self.guis[name].gui = newGui;
 	self.guis[name].isFullGui = Utils.getNoNil(isFullGui, true);
 	self.guis[name].canExit = canExit;
-	self.guis[name].onWalkActive = onWalkActive;
+	--self.guis[name].onWalkActive = onWalkActive;
 		
 	if not self.guis[name].isFullGui then
 		self.smallGuis[name] = false;		
@@ -286,13 +355,19 @@ function GlobalCompanyGui:registerGui(name, inputAction, class, isFullGui, canEx
 	
 	if inputAction ~= nil then
 		local func = function() GlobalCompanyGui:openGui(name) end;	
-		table.insert(self.toInit_actionEvents, {inputAction=inputAction, func=func});
+		table.insert(self.toInit_actionEvents, {inputAction=inputAction, func=func, inVehicle=inVehicle});
 	end;
 	
 	newGui:loadFromXML();
 	
 	return newGui;
 end;
+
+function GlobalCompanyGui:setCanExit(name, canExit)
+	if self.guis[name] ~= nil then
+		self.guis[name].canExit = canExit
+	end
+end
 
 function GlobalCompanyGui:unregisterGui()
 	if self.guis[name] ~= nil then
@@ -392,10 +467,13 @@ function GlobalCompanyGui:closeGui(name)
 	end;	
 end;
 
-function GlobalCompanyGui:closeActiveGui()
+function GlobalCompanyGui:closeActiveGui(guiName, ...)
 	if self.activeGui ~= nil then
 		self:closeGui(self.activeGui);
 	end;
+	if guiName ~= nil then
+		self:openGuiWithData(guiName, ...)
+	end
 end;
 
 function GlobalCompanyGui:getGuiIsOpen(guiName)
@@ -692,10 +770,12 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 			if element.parent.alignment == GC_Gui_flowLayout.ALIGNMENT_LEFT then
 				x = 0;
 				for i, elementF in pairs(element.parent.elements) do
-					if i == index then
-						break;
-					else
-						x = x + elementF.size[1] + elementF.margin[1] + elementF.margin[3] + elementF.position[1];
+					if elementF:getVisible() then
+						if i == index then
+							break;
+						else
+							x = x + elementF.size[1] + elementF.margin[1] + elementF.margin[3] + elementF.position[1];
+						end;
 					end;
 				end;
 				
@@ -703,17 +783,21 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 			elseif element.parent.alignment == GC_Gui_flowLayout.ALIGNMENT_MIDDLE then			
 				local fullSize = 0;
 				for i, elementF in pairs(element.parent.elements) do
-					fullSize = fullSize + elementF.size[1] + elementF.margin[1] + elementF.margin[3] + elementF.position[1];
+					if elementF:getVisible() then
+						fullSize = fullSize + elementF.size[1] + elementF.margin[1] + elementF.margin[3] + elementF.position[1];
+					end
 				end;	
 				local leftToStart = (element.parent.size[1] - fullSize) / 2;
 				
 				x = 0;
 				for i, elementF in pairs(element.parent.elements) do
-					if i == index then
-						break;
-					else
-						x = x + elementF.size[1] + elementF.margin[1] + elementF.margin[3];
-					end;
+					if elementF:getVisible() then
+						if i == index then
+							break;
+						else
+							x = x + elementF.size[1] + elementF.margin[1] + elementF.margin[3];
+						end;
+					end
 				end;
 
 				x = x + leftToStart + element.parent.drawPosition[1] + element.margin[1] + element.position[1];			
@@ -721,12 +805,14 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 				x = 0;
 				local search = true;
 				for i, elementF in pairs(element.parent.elements) do
-					if search then
-						if i == index then
-							search = false;
+					if elementF:getVisible() then
+						if search then
+							if i == index then
+								search = false;
+							end;
+						else
+							x = x + elementF.size[1] + elementF.margin[1] + elementF.margin[3] + elementF.position[1];
 						end;
-					else
-						x = x + elementF.size[1] + elementF.margin[1] + elementF.margin[3] + elementF.position[1];
 					end;
 				end;
 				
@@ -744,13 +830,15 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 			if element.parent.alignment == GC_Gui_flowLayout.ALIGNMENT_TOP then
 				y = 0;
 				for i, elementF in pairs(element.parent.elements) do
-					if i == index then
-						break;
-					else
-						if elementF.name == "text" then							
-							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+					if elementF:getVisible() then
+						if i == index then
+							break;
 						else
-							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							if elementF.name == "text" then							
+								y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							else
+								y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							end;
 						end;
 					end;
 				end;
@@ -759,19 +847,23 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 			elseif element.parent.alignment == GC_Gui_flowLayout.ALIGNMENT_CENTER then
 				local fullSize = 0;
 				for i, elementF in pairs(element.parent.elements) do
-					fullSize = fullSize + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
+					if elementF:getVisible() then
+						fullSize = fullSize + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
+					end
 				end;	
 				local topToStart = (element.parent.size[2] - fullSize) / 2;
 				
 				y = 0;
 				for i, elementF in pairs(element.parent.elements) do
-					if i == index then
-						break;
-					else
-						if elementF.name == "text" then							
-							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+					if elementF:getVisible() then
+						if i == index then
+							break;
 						else
-							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							if elementF.name == "text" then							
+								y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							else
+								y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							end;
 						end;
 					end;
 				end;
@@ -780,19 +872,23 @@ function GlobalCompanyGui:calcDrawPos(element, index)
 			elseif element.parent.alignment == GC_Gui_flowLayout.ALIGNMENT_BOTTOM then
 				local fullSize = 0;
 				for i, elementF in pairs(element.parent.elements) do
-					fullSize = fullSize + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
+					if elementF:getVisible() then
+						fullSize = fullSize + elementF.size[2] + elementF.margin[2] + elementF.margin[4];
+					end
 				end;	
 				local topToStart = element.parent.size[2] - fullSize;
 				
 				y = 0;
 				for i, elementF in pairs(element.parent.elements) do
-					if i == index then
-						break;
-					else
-						if elementF.name == "text" then							
-							y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+					if elementF:getVisible() then
+						if i == index then
+							break;
 						else
-							y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							if elementF.name == "text" then							
+								y = y + elementF:getTextHeight() + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							else
+								y = y + elementF.size[2] + elementF.margin[2] + elementF.margin[4] + elementF.position[1];
+							end;
 						end;
 					end;
 				end;
@@ -954,6 +1050,19 @@ function GlobalCompanyGui:checkClickZoneNormal(x,y, drawX, drawY, sX, sY)
 	return x > drawX and y > drawY and x < drawX + sX and y < drawY + sY;
 end;
 
+function GlobalCompanyGui:registerSiteForGcMenu(imageFilename, imageUVs, gui)
+	table.insert(GlobalCompanyGui.gcMenuModSites, {imageFilename=imageFilename, imageUVs=imageUVs, gui=gui, added=false})
+end
+
 g_company.gui:loadGuiTemplates(g_company.dir .. "gui/guiTemplates.xml");
 g_company.addInit(GlobalCompanyGui, GlobalCompanyGui.init);
 BaseMission.draw = Utils.appendedFunction(BaseMission.draw, GlobalCompanyGui.drawB);
+Gui.draw = Utils.appendedFunction(Gui.draw, GlobalCompanyGui.drawM);
+
+Gui.update = Utils.appendedFunction(Gui.update, GlobalCompanyGui.update);
+
+GlobalCompanyGui_stored_gui_mouseEvent = Gui.mouseEvent
+GlobalCompanyGui_stored_gui_keyEvent = Gui.keyEvent
+Gui.mouseEvent  = Utils.appendedFunction(Gui.mouseEvent, GlobalCompanyGui.mouseEvent);
+Gui.keyEvent  = Utils.appendedFunction(Gui.keyEvent, GlobalCompanyGui.keyEvent);
+

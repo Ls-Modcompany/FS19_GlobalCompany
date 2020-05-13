@@ -309,7 +309,7 @@ function GC_ProductionFactoryGui:onCreateProductLineProduction(element)
 		self.productLineElementMapping[self.currentProductLineId].outputPerHour = element
 
 		if self.currentProductLine.active then
-			element:setText(string.format(self.l10n:getText("shop_incomeValue"), self:formatVolume(self.currentProductLine.outputPerHour, true, self.currentProductLine.unitLang)))
+			element:setText(string.format(self.l10n:getText("shop_incomeValue"), self:formatVolume(self.currentProductLine.getOutputPerHour(), true, self.currentProductLine.unitLang)))
 		else
 			element:setText(string.format(self.l10n:getText("shop_incomeValue"), self:formatVolume(0, true, self.currentProductLine.unitLang)))
 		end
@@ -597,7 +597,7 @@ function GC_ProductionFactoryGui:updateProductLineListItem(productLine, productL
 			if elementMapping.outputPerHour ~= nil then
 				local outputPerHour = 0
 				if productLine.active then
-					outputPerHour = productLine.outputPerHour
+					outputPerHour = productLine.getOutputPerHour()
 				end
 				elementMapping.outputPerHour:setText(string.format(self.l10n:getText("shop_incomeValue"), self:formatVolume(outputPerHour, true, productLine.unitLang)))
 			end

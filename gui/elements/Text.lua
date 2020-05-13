@@ -86,7 +86,10 @@ function GC_Gui_text:loadTemplate(templateName, xmlFile, key)
 		end;
 	end;
 	
-	local text = getXMLString(xmlFile, string.format("%s#text", key));	
+	local text = ""
+	if xmlFile ~= nil then
+	 	text = getXMLString(xmlFile, string.format("%s#text", key));	
+	end
 	if text ~= nil then 
 		if text:sub(-1) == ":" then
 			text = text:sub(1, text:len() - 1);
@@ -240,6 +243,10 @@ end;
 
 function GC_Gui_text:setTextColor(r,g,b,a)
     self.textColor = {r,g,b,a};
+end;
+
+function GC_Gui_text:setTextColorSelected(r,g,b,a)
+    self.textColor_selected = {r,g,b,a};
 end;
 
 function GC_Gui_text:getTextWidth(text)

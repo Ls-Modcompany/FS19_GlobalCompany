@@ -3,13 +3,15 @@
 --
 -- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany 
--- @Date: 06.03.2018
--- @Version: 1.0.0.0
+-- @Date: 22.02.2020
+-- @Version: 1.1.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
 --
+-- 	v1.1.0.0 (22.02.2020):
+--		- add more spawn options
 --
 -- 	v1.0.0.0 (06.03.2018):
 -- 		- initial fs19 ()
@@ -103,11 +105,16 @@ function GC_ObjectSpawner:getSpaceByObjectInfo(object, maxWanted, ignoreShapesHi
 	return totalFreeAreas
 end
 
-function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesHit)
+function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesHit, object2, numberToSpawn2, ownFillLevel)
 	local numSpawned = 0
 	local owner = self:getOwnerFarmId()
+	if object.farmId ~= nil then
+		owner = object.farmId
+	end
 
-	numberToSpawn = g_company.utils.getLess(1, numberToSpawn, 255)
+	local numberToSpawn1 = numberToSpawn
+	numberToSpawn2 = Utils.getNoNil(numberToSpawn2, 0)
+	numberToSpawn = g_company.utils.getLess(1, numberToSpawn + numberToSpawn2, 255)
 	local wantedCount = numberToSpawn
 	
 	if object.filename ~= nil and object.width ~= nil and object.length ~= nil then		
@@ -115,7 +122,7 @@ function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesH
 		local placesToSpawn = {}
 		for _, spawnArea in ipairs (self.spawnAreas) do
 			if #placesToSpawn < wantedCount then
-				spawned = self:getSpawnAreaDataBySize(spawnArea, object.width, object.length, object.offset, numberToSpawn, placesToSpawn)
+				spawned = self:getSpawnAreaDataBySize(spawnArea, object.width, object.length, object.offset, numberToSpawn, placesToSpawn, ignoreShapesHit)
 				numberToSpawn = numberToSpawn - spawned
 			else
 				break
@@ -129,13 +136,25 @@ function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesH
 				local x, y, z = spawnPlace[1], spawnPlace[2], spawnPlace[3]
 				local rx, ry, rz = spawnPlace[4], spawnPlace[5], spawnPlace[6]
 
+				--Thanks to grouminait! https://ls-modcompany.com/forum/thread/5655-gc-palletcreator-optionen/?postID=67874#post67874
+				if g_company.utils.floatEqual(math.abs(math.deg(rx)), 180, 1) and g_company.utils.floatEqual(math.abs(math.deg(rz)), 180, 1) then
+					rx = math.rad(0)
+					ry = math.rad(-math.deg(ry))
+					rz = math.rad(0)
+				end
+
 				if object.filename ~= nil then
 					if object.fillLevel ~= nil then						
 						local configs = object.configurations
 						local pallet = g_currentMission:loadVehicle(object.filename, x, y, z, 0, ry, true, 0, Vehicle.PROPERTY_STATE_OWNED, owner, configs, nil)
 						if pallet ~= nil then
 							if object.fillUnitIndex ~= nil and object.fillTypeIndex ~= nil then
-								pallet:addFillUnitFillLevel(owner, object.fillUnitIndex, object.fillLevel, object.fillTypeIndex, ToolType.UNDEFINED)
+								local currentFillLevel = pallet:getFillUnitFillLevel(object.fillUnitIndex)
+								local deltaFillLevel = object.fillLevel
+								if currentFillLevel ~= nil then
+									deltaFillLevel = (currentFillLevel * -1) + object.fillLevel
+								end
+								pallet:addFillUnitFillLevel(owner, object.fillUnitIndex, deltaFillLevel, object.fillTypeIndex, ToolType.UNDEFINED)
 							end
 
 							numSpawned = numSpawned + 1
@@ -145,13 +164,26 @@ function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesH
 						local price = Utils.getNoNil(object.price, 0)
 						local propertyState = Utils.getNoNil(object.propertyState, Vehicle.PROPERTY_STATE_OWNED)
 
-						local vehicle = g_currentMission:loadVehicle(objectData.filename, x, y, z, 0, ry, save, price, propertyState, owner, object.configurations, nil)
+						local vehicle = g_currentMission:loadVehicle(object.filename, x, y, z, 0, ry, save, price, propertyState, owner, object.configurations, nil)
 						if vehicle ~= nil then
-							if numberToSpawn > 1 then
+							--if numberToSpawn > 1 then
 								numSpawned = numSpawned + 1
-							else
-								return vehicle
-							end
+								if numSpawned == numberToSpawn1 then
+									if object2 ~= nil then
+										object = object2
+									else
+										return vehicle
+									end
+								end
+
+								if ownFillLevel ~= nil and vehicle.spec_buyableBale ~= nil then
+									for _,bale in pairs(vehicle.spec_buyableBale.loadedBales) do
+										bale:setFillLevel(ownFillLevel);
+									end
+								end
+							--else
+							--	return vehicle
+							--end
 						end
 					end
 				end

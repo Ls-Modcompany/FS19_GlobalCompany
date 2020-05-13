@@ -91,7 +91,7 @@ function GC_densityMapHeightManager:loadDensitys()
                 g_company.debug:print("Error loading density map height type. '"..tostring(key).."' is missing texture(s)!");
                 return
             end
-            print("load fillTypeName")
+            
             g_densityMapHeightManager:addDensityMapHeightType(fillTypeName, maxSurfaceAngle, collisionScale, collisionBaseOffset, minCollisionOffset, maxCollisionOffset, fillToGroundScale, allowsSmoothing, diffuseMapFilename, normalMapFilename, distanceFilename, isBaseType)
             i = i + 1
         end

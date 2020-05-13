@@ -3,12 +3,17 @@
 --
 -- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany
--- @Date: 22.03.2018
--- @Version: 1.0.0.0
+-- @Date: 09.03.2020
+-- @Version: 1.3.1.0
 --
 -- @Support: https://ls-modcompany.com
 --
 -- Changelog:
+--
+-- 	v1.3.1.0 (09.03.2020):
+--		- remove productionline limit
+-- 	v1.3.0.0 (22.12.2019):
+--		- add seasons support (outputPerHour)
 --
 -- 	v1.2.0.0 (04.08.2019):
 -- 		- Add option for multiple 'loadingTriggers' and 'unloadingTriggers' for each product.
@@ -35,10 +40,9 @@ local GC_ProductionFactory_mt = Class(GC_ProductionFactory, Object)
 InitObjectClass(GC_ProductionFactory, "GC_ProductionFactory")
 
 -- This is for performance and GUI support! Even this is High.
-GC_ProductionFactory.LIMIT = 10
 GC_ProductionFactory.MAX_INT = 2147483647
 
-GC_ProductionFactory.BACKUP_TITLE = "- - - - - -"
+GC_ProductionFactory.BACKUP_TITLE = ""
 
 GC_ProductionFactory.BACKUP_ANIMAL_TO_LITRES = {
 	["COW"] = 1000,
@@ -115,6 +119,7 @@ function GC_ProductionFactory:new(isServer, isClient, customMt, xmlFilename, bas
 	self.drawProductLineUI = {}
 
 	self.animalTypeToInputProduct = {}
+	self.animalTypeToOutputProduct = {}
 
 	self.productLines = {}
 	self.inputProducts = {}
@@ -143,12 +148,13 @@ function GC_ProductionFactory:new(isServer, isClient, customMt, xmlFilename, bas
 	return self
 end
 
-function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
+function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable, placeableClass)
 	local canLoad, addMinuteChange, addHourChange = true, false, false
 
 	self.rootNode = nodeId
 	self.indexName = indexName
 	self.isPlaceable = isPlaceable
+	self.placeableClass = placeableClass
 
 	self.triggerManager = GC_TriggerManager:new(self)
 	self.i3dMappings = GC_i3dLoader:loadI3dMapping(xmlFile, xmlKey .. ".i3dMappings")
@@ -186,6 +192,13 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 		spawnTextTwo = Utils.getNoNil(getXMLString(xmlFile, xmlKey .. ".guiInformation#spawnTextTwo"), "GC_gui_spawnText2")
 	}
 
+	local refPoint = getXMLString(xmlFile, xmlKey .. "#refPoint")
+	if refPoint ~= nil and refPoint ~= "" then
+		self.refPoint = I3DUtil.indexToObject(self.rootNode, refPoint, self.i3dMappings)
+	else
+		self.refPoint = self.rootNode
+	end
+
 	self.disableAllOutputGUI = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. ".operation#disableAllOutputGUI"), false)
 	self.showInGlobalGUI = Utils.getNoNil(getXMLBool(xmlFile, xmlKey .. ".operation#showInGlobalGUI"), true)
 	self.updateDelay = math.max(Utils.getNoNil(getXMLInt(xmlFile, xmlKey .. ".operation#updateDelayMinutes"), 10), 1)
@@ -198,6 +211,20 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			self.animationManager = animationManager
 		else
 			animationManager:delete()
+		end
+	end
+
+	if hasXMLProperty(xmlFile, xmlKey .. ".programmFlow") then
+		local programmFlow = GC_ProgrammFlow:new(self.isServer, self.isClient)
+		if programmFlow:load(self.rootNode, self, xmlFile, xmlKey .. ".programmFlow") then
+			programmFlow:register(true)
+			self.programmFlow = programmFlow
+			self:registerProgrammFlow()
+			self.programmFlowOperatingParts = {}
+
+			self:loadOperatingParts(xmlFile, xmlKey .. ".programmFlow.operatingParts", self.programmFlowOperatingParts, false)
+		else
+			programmFlow:delete()
 		end
 	end
 
@@ -264,6 +291,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 					local fillType
 
 					if inputProduct.isAnimalTypes then
+						local allowSubType = getXMLString(xmlFile, fillTypesKey .. "#subFillType")
 						local animalType = g_animalManager:getAnimalsByType(fillTypeName)
 						if animalType ~= nil then
 							local animalTypeName = animalType.type
@@ -273,14 +301,21 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 								if inputProduct.animalTypeToLitres == nil then
 									inputProduct.animalTypeToLitres = {}
 								end
-
 								for id, subType in pairs (animalType.subTypes) do
-									usedFillTypeNames[subType.fillTypeDesc.name] = inputProductName
-
-									inputProduct.animalFillTypeIndexs[subType.fillType] = true
-
-									if id == 1 then
-										fillType = subType.fillTypeDesc
+									if allowSubType ~= nil then
+										if subType.fillTypeDesc.name == allowSubType:upper() then
+											usedFillTypeNames[subType.fillTypeDesc.name] = inputProductName
+											inputProduct.animalFillTypeIndexs[subType.fillType] = true
+											fillType = subType.fillTypeDesc
+											inputProduct.subFillType = subType
+											break
+										end
+									else
+										usedFillTypeNames[subType.fillTypeDesc.name] = inputProductName
+										inputProduct.animalFillTypeIndexs[subType.fillType] = true
+										if id == 1 then
+											fillType = subType.fillTypeDesc
+										end
 									end
 								end
 
@@ -442,13 +477,25 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 							end
 						end
 					end
-
+					
+					local animalTroughKey = inputProductKey .. ".inputMethods.animalTrough"
+					if hasXMLProperty(xmlFile, animalTroughKey) then										
+						local animalTrough = GC_AnimalTrough:new(self.isServer, self.isClient)
+						if animalTrough ~= nil and animalTrough:load(self.rootNode, self, xmlFile, animalTroughKey, inputProductId) then
+							animalTrough.direction = GC_AnimalTrough.DIRECTIONTOTARGET
+							inputProduct.animalTrough = animalTrough
+						end		
+					end
+					
 					if inputProduct.isAnimalTypes and inputProduct.animalTypeToLitres ~= nil then
 						local livestockTriggerKey = inputProductKey .. ".inputMethods.livestockTrigger"
 						if hasXMLProperty(xmlFile, livestockTriggerKey) then
 							local trigger = self.triggerManager:addTrigger(GC_AnimalLoadingTrigger, self.rootNode, self, xmlFile, livestockTriggerKey, inputProduct.animalTypeToLitres)
 							if trigger ~= nil then
 								trigger:setTitleName(factoryTitle)
+								if inputProduct.subFillType ~= nil then
+									trigger:setSubFillType(inputProduct.subFillType)
+								end
 
 								local triggerId = trigger.managerId
 								trigger.extraParamater = triggerId
@@ -534,9 +581,49 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				local outputProduct = {}
 				outputProduct.name = outputProductName
 
+				outputProduct.animalFillTypeIndexs = {}
+				outputProduct.isAnimalTypes = Utils.getNoNil(getXMLBool(xmlFile, outputProductKey .. "#isAnimalTypes"), false)
+
 				local fillTypeName = getXMLString(xmlFile, outputProductKey .. "#fillType")
+
 				if fillTypeName ~= nil then
-					local fillType = g_fillTypeManager:getFillTypeByName(fillTypeName)
+					local fillType, subFillType
+					if outputProduct.isAnimalTypes then
+						local subFillTypeName = getXMLString(xmlFile, outputProductKey .. "#subFillType")
+						local animalType = g_animalManager:getAnimalsByType(fillTypeName)
+						if animalType ~= nil then
+							local animalTypeName = animalType.type
+							if self.animalTypeToOutputProduct[animalTypeName] == nil then
+								self.animalTypeToOutputProduct[animalTypeName] = outputProduct
+
+								if outputProduct.animalTypeToLitres == nil then
+									outputProduct.animalTypeToLitres = {}
+								end
+
+								for id, subType in pairs (animalType.subTypes) do
+									if subType.fillTypeDesc.name == subFillTypeName:upper() then
+										outputProduct.animalFillTypeIndexs[subType.fillType] = true
+										fillType = subType.fillTypeDesc
+										subFillType = subType
+										break
+									end
+								end
+
+								local litresPerAnimal = getXMLInt(xmlFile, outputProductKey .. "#litresPerAnimal")
+								if litresPerAnimal == nil then
+									-- Use backup values if none given.
+									litresPerAnimal = Utils.getNoNil(GC_ProductionFactory.BACKUP_ANIMAL_TO_LITRES[animalTypeName], 500)
+								end
+								outputProduct.animalTypeToLitres[animalTypeName] = litresPerAnimal
+							else
+								g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Duplicate animalType ( %s ) used in factory at %s! Only use each 'animalType' once per factory.", indexName, animalTypeName, outputProductName)
+							end
+						else
+							g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Unknown animalType ( %s ) found in 'outputProduct' ( %s ) at %s, ignoring!", indexName, fillTypeName, outputProductName, fillTypesKey)
+						end
+					else
+						fillType = g_fillTypeManager:getFillTypeByName(fillTypeName)
+					end
 					if fillType ~= nil then
 						local fillTypeIndex = fillType.index
 
@@ -639,6 +726,15 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 								end
 							end
 
+							local animalTroughKey = outputMethodsKey .. ".animalTrough"
+							if hasXMLProperty(xmlFile, animalTroughKey) then										
+								local animalTrough = GC_AnimalTrough:new(self.isServer, self.isClient)
+								if animalTrough ~= nil and animalTrough:load(self.rootNode, self, xmlFile, animalTroughKey, outputProductId) then
+									outputProduct.animalTrough = animalTrough
+									table.insert(triggersLoaded, "animalTrough")
+								end		
+							end
+
 							local shovelFillTriggerKey = outputMethodsKey .. ".shovelFillTrigger"
 							if hasXMLProperty(xmlFile, shovelFillTriggerKey) then
 								local shovelTrigger = self.triggerManager:addTrigger(GC_ShovelFillTrigger, self.rootNode, self, xmlFile, shovelFillTriggerKey, fillTypeIndex, "getProvidedFillLevel")
@@ -696,6 +792,29 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 								end
 							end
 
+							if outputProduct.isAnimalTypes and outputProduct.animalTypeToLitres ~= nil then
+								local livestockTriggerKey = outputMethodsKey .. ".livestockTrigger"
+								if hasXMLProperty(xmlFile, livestockTriggerKey) then
+									local trigger = self.triggerManager:addTrigger(GC_AnimalLoadingTrigger, self.rootNode, self, xmlFile, livestockTriggerKey, outputProduct.animalTypeToLitres)
+									if trigger ~= nil then
+										trigger:setTitleName(factoryTitle)
+										trigger:setDirection(false)
+										trigger:setSubFillType(subFillType)
+		
+										local triggerId = trigger.managerId
+										trigger.extraParamater = triggerId
+		
+										--outputProduct.livestockTrigger = trigger
+
+										self.triggerIdToOutputProductId[triggerId] = {}
+										for index, _ in pairs (outputProduct.animalFillTypeIndexs) do
+											self.triggerIdToOutputProductId[triggerId][index] = outputProductId
+										end
+									end
+									table.insert(triggersLoaded, "livestockTrigger")
+								end
+							end
+
 							if #invalidTriggers > 0 then
 								triggersLoaded = table.concat(triggersLoaded, " or ")
 								invalidTriggers = table.concat(invalidTriggers, " and ")
@@ -746,7 +865,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 		i = 0
 		while true do
 			local productLineKey = string.format("%s.productLines.productLine(%d)", xmlKey, i)
-			if not hasXMLProperty(xmlFile, productLineKey) or i >= GC_ProductionFactory.LIMIT then
+			if not hasXMLProperty(xmlFile, productLineKey) then
 				break
 			end
 
@@ -757,6 +876,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			productLine.userStopped = false
 			productLine.autoStart = Utils.getNoNil(getXMLBool(xmlFile, productLineKey .. "#autoLineStart"), false)
 			productLine.outputPerHour = Utils.getNoNil(getXMLInt(xmlFile, productLineKey .. "#outputPerHour"), 1000)
+			productLine.getOutputPerHour = function() return self:getOutputPerHour(productLine) end
 
 			productLine.unitLang = g_company.languageManager:getText(getXMLString(xmlFile, productLineKey .. "#unitLang"))
 
@@ -778,7 +898,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			local inputProductNameToInputId = {}
 			while true do
 				local inputKey = string.format("%s.inputs.inputProduct(%d)", productLineKey, inputKeyId)
-				if not hasXMLProperty(xmlFile, inputKey) or inputKeyId >= GC_ProductionFactory.LIMIT then
+				if not hasXMLProperty(xmlFile, inputKey) then
 					break
 				end
 
@@ -800,7 +920,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 
 						-- Allow simple income as fillType is used. This is product line specific.
 						local pricePerLiter = getXMLFloat(xmlFile, inputKey .. ".income#pricePerLiter")
-						if pricePerLiter ~= nil and pricePerLiter > 0.0 then
+						if pricePerLiter ~= nil then -- 21.9.19 / KK: remove and pricePerLiter > 0.0
 							local usePriceMultiplier = Utils.getNoNil(getXMLBool(xmlFile, inputKey .. ".income#usePriceMultiplier"), true)
 							productLine.inputsIncome[inputId] = {pricePerLiter = pricePerLiter, usePriceMultiplier = usePriceMultiplier}
 							addHourChange = true
@@ -820,7 +940,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				local outputProductNameToOutputId = {}
 				while true do
 					local outputKey = string.format("%s.outputs.outputProduct(%d)", productLineKey, outputKeyId)
-					if not hasXMLProperty(xmlFile, outputKey) or outputKeyId >= GC_ProductionFactory.LIMIT then
+					if not hasXMLProperty(xmlFile, outputKey) then
 						break
 					end
 
@@ -907,6 +1027,22 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 					productLine.playerTrigger = playerTrigger
 					self.drawProductLineUI[nextId] = Utils.getNoNil(getXMLBool(xmlFile, linePlayerTriggerKey .. "#showPopupUI"), true)
 				end
+			end
+
+			--v1.3.0.0
+			local seasonsKey = productLineKey .. ".seasons"
+			if hasXMLProperty(xmlFile, seasonsKey) then
+				productLine.seasonsData = {}
+				productLine.seasonsData.spring = {}
+				productLine.seasonsData.summer = {}
+				productLine.seasonsData.autumn = {}
+				productLine.seasonsData.winter = {}
+
+				productLine.seasonsData.spring.outputPerHour = getXMLInt(xmlFile, seasonsKey .. ".spring" .. "#outputPerHour")
+				productLine.seasonsData.summer.outputPerHour = getXMLInt(xmlFile, seasonsKey .. ".summer" .. "#outputPerHour")
+				productLine.seasonsData.autumn.outputPerHour = getXMLInt(xmlFile, seasonsKey .. ".autumn" .. "#outputPerHour")
+				productLine.seasonsData.winter.outputPerHour = getXMLInt(xmlFile, seasonsKey .. ".winter" .. "#outputPerHour")
+				
 			end
 
 			table.insert(self.productLines, productLine)
@@ -1023,14 +1159,15 @@ function GC_ProductionFactory:setLoadingTrigger(outputProduct, xmlFile, loadingT
 end
 
 function GC_ProductionFactory:loadProductParts(xmlFile, key, product)
+	local capacity = product.capacity
+
+	local visibilityNodes = GC_VisibilityNodes:new(self.isServer, self.isClient)
+	if visibilityNodes:load(self.rootNode, self, xmlFile, key, self.baseDirectory, capacity, true) then
+		product.visibilityNodes = visibilityNodes
+	end
+
 	if self.isClient then
 		local fillTypeName = g_fillTypeManager.indexToName[product.lastFillTypeIndex]
-		local capacity = product.capacity
-
-		local visibilityNodes = GC_VisibilityNodes:new(self.isServer, self.isClient)
-		if visibilityNodes:load(self.rootNode, self, xmlFile, key, self.baseDirectory, capacity, true) then
-			product.visibilityNodes = visibilityNodes
-		end
 
 		local movers = GC_Movers:new(self.isServer, self.isClient)
 		if movers:load(self.rootNode, self, xmlFile, key, self.baseDirectory, capacity, true) then
@@ -1104,6 +1241,21 @@ function GC_ProductionFactory:loadOperatingParts(xmlFile, key, parent, isProduct
 	end
 end
 
+function GC_ProductionFactory:finalizePlacement()	
+	self.triggerManager:finalizePlacement()
+		
+	for _,outputProduct in pairs(self.outputProducts) do
+		if outputProduct.animalTrough ~= nil then
+			outputProduct.animalTrough:finalizePlacement()
+		end
+	end	
+	for _,inputProduct in pairs(self.inputProducts) do
+		if inputProduct.animalTrough ~= nil then
+			inputProduct.animalTrough:finalizePlacement()
+		end
+	end	
+end
+
 function GC_ProductionFactory:delete()
 	self.factoryDeleteStarted = true
 
@@ -1130,12 +1282,22 @@ function GC_ProductionFactory:delete()
 		self.animationManager:delete()
 	end
 
-	if self.isClient then
-		for _, product in ipairs (self.inputProducts) do
+	for _, product in ipairs (self.inputProducts) do
+		if product.visibilityNodes ~= nil then
+			product.visibilityNodes:delete()
+		end
+	end
+
+	if self.outputProducts ~= nil then
+		for _, product in ipairs (self.outputProducts) do
 			if product.visibilityNodes ~= nil then
 				product.visibilityNodes:delete()
 			end
+		end
+	end
 
+	if self.isClient then
+		for _, product in ipairs (self.inputProducts) do
 			if product.fillVolumes ~= nil then
 				product.fillVolumes:delete()
 			end
@@ -1145,10 +1307,6 @@ function GC_ProductionFactory:delete()
 
 		if self.outputProducts ~= nil then
 			for _, product in ipairs (self.outputProducts) do
-				if product.visibilityNodes ~= nil then
-					product.visibilityNodes:delete()
-				end
-
 				if product.fillVolumes ~= nil then
 					product.fillVolumes:delete()
 				end
@@ -1164,6 +1322,14 @@ function GC_ProductionFactory:delete()
 		if self.sharedOperatingParts ~= nil then
 			self:deleteOperatingParts(self.sharedOperatingParts)
 		end
+		
+		if self.programmFlowOperatingParts ~= nil then
+			self:deleteOperatingParts(self.programmFlowOperatingParts)
+		end
+	end
+
+	if self.programmFlow ~= nil then
+		self.programmFlow:delete()
 	end
 
 	GC_ProductionFactory:superClass().delete(self)
@@ -1607,7 +1773,7 @@ function GC_ProductionFactory:hourChanged()
 
 					if productLine.active then
 						local stopProductLine = false
-						local productPerHour = productLine.outputPerHour
+						local productPerHour = productLine.getOutputPerHour()
 						local hasProduct, producedFactor = self:getHasInputProducts(productLine, productPerHour)
 
 						if hasProduct then
@@ -1655,8 +1821,10 @@ function GC_ProductionFactory:hourChanged()
 
 		if self.hourlyIncomeTotal > 0 then
 			g_currentMission:addMoney(self.hourlyIncomeTotal, self:getOwnerFarmId(), MoneyType.PROPERTY_INCOME, true, false)
-			self.hourlyIncomeTotal = 0
+		else
+			g_currentMission:addMoney(self.hourlyIncomeTotal, self:getOwnerFarmId(), MoneyType.PROPERTY_MAINTENANCE, true, false)			 
 		end
+		self.hourlyIncomeTotal = 0
 	end
 end
 
@@ -1710,7 +1878,9 @@ function GC_ProductionFactory:minuteChanged()
 					if productLine.productSale == nil then
 						if productLine.active then
 							local stopProductLine = false
-							local productionFactor = (productLine.outputPerHour / 60) * self.updateDelay
+
+							local productPerHour = productLine.getOutputPerHour()
+							local productionFactor = (productPerHour / 60) * self.updateDelay
 							local hasSpace, factor = self:getHasOutputSpace(productLine, productionFactor)
 							local hasProduct, producedFactor = self:getHasInputProducts(productLine, factor)
 
@@ -1726,7 +1896,7 @@ function GC_ProductionFactory:minuteChanged()
 									end
 
 									local income = productLine.inputsIncome[i]
-									if income ~= nil and income.pricePerLiter > 0.0 then
+									if income ~= nil then --22.9.19 / KK:  and income.pricePerLiter > 0.0
 										local updateAmount = income.pricePerLiter * amount
 										if income.usePriceMultiplier then
 											updateAmount = updateAmount * EconomyManager.getPriceMultiplier()
@@ -1895,11 +2065,11 @@ function GC_ProductionFactory:updateFactoryLevels(fillLevel, product, fillTypeIn
 
 	product.fillLevel = fillLevel
 
-	if self.isClient then
-		if product.visibilityNodes ~= nil then
-			product.visibilityNodes:updateNodes(fillLevel)
-		end
+	if product.visibilityNodes ~= nil then
+		product.visibilityNodes:updateNodes(fillLevel)
+	end
 
+	if self.isClient then
 		if product.movers ~= nil then
 			product.movers:updateMovers(fillLevel, fillTypeIndex)
 		end
@@ -2060,6 +2230,44 @@ function GC_ProductionFactory:getProductFromTriggerId(triggerId, fillTypeIndex, 
 	return
 end
 
+function GC_ProductionFactory:getFillLevelFromOutputProduct(outputProductId)
+	return self.outputProducts[outputProductId].fillLevel
+end
+
+function GC_ProductionFactory:getFillTypeIndexFromOutputProduct(outputProductId)
+	return self.outputProducts[outputProductId].fillTypeIndex
+end
+
+function GC_ProductionFactory:getFillTypeIndexFromInputProduct(inputProductId)
+	for fillTypeIndex,_ in pairs(self.inputProducts[inputProductId].fillTypes) do
+		return fillTypeIndex;
+	end
+end
+
+function GC_ProductionFactory:addFillLevelFromAnimalTroughInput(fillLevelDelta, fillTypeIndex, inputProductId)
+	local product = self.inputProducts[inputProductId]
+
+	if product ~= nil then
+		product.lastFillTypeIndex = fillTypeIndex
+		fillLevelDelta = math.min(fillLevelDelta, product.capacity - product.fillLevel)
+		delta = self:updateFactoryLevels(product.fillLevel + fillLevelDelta, product, fillTypeIndex, true)
+
+		self:doAutoStart(fillTypeIndex, triggerId)
+	end
+	return fillLevelDelta
+end
+
+function GC_ProductionFactory:addFillLevelFromAnimalTroughOutput(fillLevelDelta, fillTypeIndex, outputProductId)
+	local product = self.outputProducts[outputProductId]
+
+	if product ~= nil then
+		product.lastFillTypeIndex = fillTypeIndex
+		self:updateFactoryLevels(product.fillLevel + fillLevelDelta, product, fillTypeIndex, true)
+
+		self:doAutoStart(fillTypeIndex, triggerId)
+	end
+end
+
 function GC_ProductionFactory:palletCreatorInteraction(level, blockedLevel, deltaWaiting, fillTypeIndex, triggerId)
 	if not self.isServer then
 		return
@@ -2140,6 +2348,16 @@ function GC_ProductionFactory:getFreeCapacity(fillTypeIndex, farmId, triggerId)
 	return 0
 end
 
+function GC_ProductionFactory:getAnimlsNum(fillTypeIndex, farmId, triggerId)
+	-- This is ONLY used for output triggers!
+	local product = self:getProductFromTriggerId(triggerId, fillTypeIndex, false)
+	if product ~= nil then
+		return product.fillLevel
+	end
+
+	return 0
+end
+
 function GC_ProductionFactory:addFillLevel(farmId, fillLevelDelta, fillTypeIndex, toolType, fillPositionData, triggerId)
 	local product = self:getProductFromTriggerId(triggerId, fillTypeIndex, true)
 
@@ -2160,8 +2378,6 @@ function GC_ProductionFactory:removeFillLevel(farmId, fillLevelDelta, fillTypeIn
 
 		return product.fillLevel
 	end
-
-	return
 end
 
 function GC_ProductionFactory:getProvidedFillTypes(triggerId)
@@ -2251,20 +2467,12 @@ function GC_ProductionFactory:getFillLevelInformation(listRight, listLeft)
 	if inputs ~= nil then
 		for id, input in pairs (inputs) do
 			listRight[id] = {title = input.title, fillLevel = input.fillLevel, capacity = input.capacity}
-
-			if id >= GC_ProductionFactory.LIMIT then
-				break
-			end
 		end
 
 		local outputs = self:getOutputs(self.guiLineId)
 		if outputs ~= nil then
 			for id, output in pairs (outputs) do
 				listLeft[id] = {title = output.title, fillLevel = output.fillLevel, capacity = output.capacity}
-
-				if id >= GC_ProductionFactory.LIMIT then
-					break
-				end
 			end
 		end
 	end
@@ -2613,3 +2821,133 @@ function GC_ProductionFactory:getIsValidFarmlandId(playerFarmId)
 
 	return false
 end
+
+function GC_ProductionFactory:getOutputPerHour(productLine)
+	if g_seasons ~= nil then
+		if productLine.seasonsData ~= nil then
+			if g_seasons.environment.season == g_seasons.environment.SPRING and productLine.seasonsData.spring ~= nil and productLine.seasonsData.spring.outputPerHour ~= nil then
+				return productLine.seasonsData.spring.outputPerHour * 6 / g_seasons.environment.daysPerSeason
+			elseif g_seasons.environment.season == g_seasons.environment.SUMMER and productLine.seasonsData.summer ~= nil and productLine.seasonsData.summer.outputPerHour ~= nil then
+				return productLine.seasonsData.summer.outputPerHour * 6 / g_seasons.environment.daysPerSeason
+			elseif g_seasons.environment.season == g_seasons.environment.AUTUMN and productLine.seasonsData.autumn ~= nil and productLine.seasonsData.autumn.outputPerHour ~= nil then
+				return productLine.seasonsData.autumn.outputPerHour * 6 / g_seasons.environment.daysPerSeason
+			elseif g_seasons.environment.season == g_seasons.environment.WINTER and productLine.seasonsData.winter ~= nil and productLine.seasonsData.winter.outputPerHour ~= nil then
+				return productLine.seasonsData.winter.outputPerHour * 6 / g_seasons.environment.daysPerSeason
+			end
+		end
+		return productLine.outputPerHour * 6 / g_seasons.environment.daysPerSeason
+	end	
+	return productLine.outputPerHour
+end
+
+-----------------------------------------ProgrammFlow functions--------------------------------------------------
+
+function GC_ProductionFactory:registerProgrammFlow()
+	g_company.programmFlowGlobalFunction:registerToProgrammFlow(self, self.programmFlow)
+
+	self.programmFlow:registerFunction(self, self.programmFlow_getCapacity, "getCapacity")
+	self.programmFlow:registerFunction(self, self.programmFlow_getLevel, "getLevel")
+	self.programmFlow:registerFunction(self, self.programmFlow_setAnimationNode, "setAnimationNode")
+	self.programmFlow:registerFunction(self, self.programmFlow_setParticleEffect, "setParticleEffect")
+end
+
+--[[   getCapacity
+* 1 * -> Productname (string) 
+]]--
+function GC_ProductionFactory:programmFlow_getCapacity(parameters)
+    local parsedParameters = g_company.dataTypeConverter:parseParameters(parameters, " ")
+	
+	local productName = parsedParameters[1]
+
+	if self.inputProductNameToId[productName] ~= nil then
+		return self.inputProducts[self.inputProductNameToId[productName]].capacity
+	end
+
+	if self.outputProductNameToId[productName] ~= nil then
+		return self.outputProducts[self.outputProductNameToId[productName]].capacity
+	end
+
+	return 0
+end
+
+--[[   getLevel
+* 1 * -> Productname (string) 
+]]--
+function GC_ProductionFactory:programmFlow_getLevel(parameters)
+    local parsedParameters = g_company.dataTypeConverter:parseParameters(parameters, " ")
+	
+	local productName = parsedParameters[1]
+
+	if self.inputProductNameToId[productName] ~= nil then
+		return self.inputProducts[self.inputProductNameToId[productName]].fillLevel
+	end
+
+	if self.outputProductNameToId[productName] ~= nil then
+		return self.outputProducts[self.outputProductNameToId[productName]].fillLevel
+	end
+
+	return 0	
+end
+
+--[[   setAnimationNode
+* 1 * -> Name of node (string) 
+* 2 * -> State (string) 
+]]--
+function GC_ProductionFactory:programmFlow_setAnimationNode(parameters)
+    local parsedParameters = g_company.dataTypeConverter:parseParameters(parameters, " ")
+	
+	local index = parsedParameters[1]
+	local state = parsedParameters[2]
+	self.programmFlowOperatingParts.operateAnimationNodes:setAnimationNodesStateByNode(index, state)
+end
+
+--[[   setParticleEffect
+* 1 * -> Name of node (string) 
+* 2 * -> State (string) 
+]]--
+function GC_ProductionFactory:programmFlow_setParticleEffect(parameters)
+    local parsedParameters = g_company.dataTypeConverter:parseParameters(parameters, " ")
+	
+	local index = parsedParameters[1]
+	local state = parsedParameters[2]
+	self.programmFlowOperatingParts.operateParticleEffects:setEffectsState(state, true)
+end
+
+-----------------------------------------ManureSystem--------------------------------------------------
+function GC_ProductionFactory:ms_getFillUnitFillLevelPercentage(fillUnitIndex, triggerId, isInput)
+	local product = self:getProductFromTriggerId(triggerId, fillUnitIndex, isInput)
+	if product ~= nil then		
+		return product.fillLevel / product.capacity
+	end
+
+	return 0
+end
+function GC_ProductionFactory:ms_getFillUnitCapacity(fillUnitIndex, triggerId, isInput)
+	local product = self:getProductFromTriggerId(triggerId, fillUnitIndex, isInput)
+	if product ~= nil then		
+		return product.capacity
+	end
+
+	return 0
+end
+function GC_ProductionFactory:ms_getFillUnitFillLevel(fillUnitIndex, triggerId, isInput)
+	local product = self:getProductFromTriggerId(triggerId, fillUnitIndex, isInput)
+	if product ~= nil then		
+		return product.fillLevel
+	end
+
+	return 0
+end
+function GC_ProductionFactory:ms_getFillUnitFreeCapacity(fillUnitIndex, triggerId, isInput)
+	local product = self:getProductFromTriggerId(triggerId, fillUnitIndex, isInput)
+	if product ~= nil then		
+		return product.capacity - product.fillLevel
+	end
+
+	return 0
+end
+
+
+
+
+

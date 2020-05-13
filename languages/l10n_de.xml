@@ -9,9 +9,9 @@
 		<e k="GC_duplicateError" v="Es wurde versucht, GlobalCompany doppelt zu laden! Entferne '%s' aus dem Modordner und lade das Spiel neu."/>
 		<e k="GC_combinedError" v="Es wurde versucht, GlobalCompany als Teil der Modmap '%s' zu laden! Das ist nicht erlaubt und bringt Fehler. Lade dir die aktuellste Version aus dem Modhub oder besuche '%s' für support."/>
 		<e k="GC_invalidModWarning" v="Mod %s von %s wird nicht unterstützt! Um Fehler zu vermeiden, muss dieser Mod entfernt werden!"/>
-		<e k="GC_quitToMainMenu" v="Are you sure you want to exit to the main menu?"/>
-		<e k="GC_betaVersionWarning" v="Development version has been loaded. Please report warnings or errors at %s. Visit modHub download link for the latest official release version or visit '%s' for support."/>
-		<e k="GC_namingError" v="Invalid 'file / zip' name '%s' found for development release! Use 'FS19_GlobalCompany' for file / zip name. Visit modHub download link for the latest official release version or visit '%s' for support."/>
+		<e k="GC_quitToMainMenu" v="Wirklich zum Haupmenü zurückkehren?"/>
+		<e k="GC_betaVersionWarning" v="Entwicklerversion wurde geladen. Bitte Warnungen und Fehler bei %s melden. Folge dem Modhub Downloadlink für die letzte offizielle Version oder Besuche '%s' für Support."/>
+		<e k="GC_namingError" v="Fehlerhafte 'Datei / Zip' Name '%s' gefunden für Entwicklerversion! Benütze 'FS19_GlobalCompany' als Dateinamen. Folge dem Modhub Downloadlink für die letzte offizielle Version oder Besuche '%s' für Support."/>
 
 		<!-- GUI -->
 		<e k="GC_gui_buttons_ok" v="OK"/>
@@ -21,6 +21,7 @@
 		<e k="GC_gui_modHubLink" v="ModHub Download Link"/>
 		<e k="GC_gui_buttons_nextWarning" v="Nächste Warnung"/>
 		<e k="GC_gui_buttons_nextConflict" v="Nächster Konflikt"/>
+		<e k="GC_gui_buttons_accept" v="Bestätigen"/>
 		
 		<!-- General -->
 		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
@@ -32,7 +33,6 @@
 		<e k="GC_settings3_title" v="Pferdehelfer anstellen (300€ / Pferd / Tag)"/>
 		<e k="GC_settings4_title" v="Mehr Bäume aktivieren"/>
 		<e k="GC_settings5_title" v="Ballen aufschneiden aktivieren"/>
-		<e k="GC_settings6_title" v="VehicleControl: Interaktionshilfe anzeigen"/>
 		
 		<!-- Factory -->
 		<e k="GC_gui_overview" v="Übersicht"/>
@@ -48,8 +48,8 @@
 		<e k="GC_gui_deactivate" v="Ausschalten"/>
 		<e k="GC_gui_state" v="Status:"/>
 		<e k="GC_gui_automatic" v="Automatik:"/>
-		<e k="GC_gui_state_on" v="läuft"/>
-		<e k="GC_gui_state_off" v="gestoppt"/>
+		<e k="GC_gui_state_on" v="Läuft"/>
+		<e k="GC_gui_state_off" v="Gestoppt"/>
 		<e k="GC_gui_pallet1" v="%s Palette"/>
 		<e k="GC_gui_pallet2" v="%s Paletten"/>
 		<e k="GC_gui_spawnText1" v="%s Palette erzeugen"/>
@@ -65,18 +65,30 @@
 		<e k="GC_Open_Product_Menu" v="Öffne Produktmenü"/>
 		<e k="GC_Open_Overview_Menu" v="Öffne Übersichtsmenü"/>
 		
-		<e k="GC_Factory_Animal_Dialogue" v="Wählen die Anzahl der Tiere, die in die Fabrik entladen werden sollen."/>
+		<e k="GC_Factory_Animal_Dialogue1" v="Wähle die Anzahl der Tiere, die in die Fabrik entladen werden sollen."/>
+		<e k="GC_Factory_Animal_Dialogue2" v="Wähle die Anzahl der Tiere, die in das Fahrzeug entladen werden sollen."/>
 		
 		<e k="GC_gui_disabled" v="Deaktiviert"/>
 		<e k="GC_gui_add" v="Hinzufügen"/>
 		<e k="GC_gui_remove" v="Entfernen"/>
+		<e k="GC_gui_rename" v="Umbenennen"/>
 		<e k="GC_gui_max" v="Maximum"/>
 		<e k="GC_gui_percent" v="Prozent"/>
 		<e k="GC_gui_lifeTimeIncome" v="Bisheriger Verdienst"/>
 		<e k="GC_gui_changeFactoryTitle" v="Geben Sie unten einen neuen Fabriknamen ein."/>
+
+		<e k="GC_gui_factories" v="Produktionen"/>
+		<e k="GC_gui_activeProductLines" v="aktive Produktlinien:"/>
+		<e k="GC_gui_emptyInputs" v="Leere Rohstoffe:"/>
+		<e k="GC_gui_fullOutputs" v="Volle Produkte:"/>
+
+		<e k="GC_gui_dynamicStorages" v="Dynamische Lager"/>
+		<e k="GC_gui_freeSlots" v="Freie Boxen:"/>
 		
 		<e k="GC_gui_placeableObject" v="Platzierbare Objekt"/>
 		<e k="GC_gui_farmlandObject" v="Farmland Objekt"/>
+		<e k="GC_gui_changeDynamicStorageTitle" v="Geben Sie unten einen neuen Lagernamen ein."/>
+		<e k="GC_gui_dynamicStorage_titleBackup" v="Dynamisches Lager"/>
 		
 		<!-- Formatting required -->
 		<e k="GC_Factory_Sell_Warning" v="Es sind noch Produkte in der Fabrik. Diese werden als loses Schüttgut für den folgenden Betrag verkauft:
@@ -131,14 +143,98 @@ Kosten:  %s"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Abladeposition bestätigen"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Aufladebox bestätigen"/>
 
-		<!-- AnimalShop -->
-		<e k="GC_animalShop_openGui" v="Tiershop öffnen"/>
-		<e k="GC_animalShop_page_1" v="Shop"/>
-		<e k="GC_animalShop_page_2_1" v="Kühe"/>
-		<e k="GC_animalShop_page_2_2" v="Schafe"/>
-		<e k="GC_animalShop_page_2_3" v="Schweine"/>
-		<e k="GC_animalShop_page_2_4" v="Pferde"/>
+		<!-- PlaceableDigitalDisplay -->
+		<e k="GC_placeableDigDisplay_openGui" v="Digitales Display anpassen"/>
+		<e k="GC_placeableDigDisplay_header" v="Digitales Display"/>
+		<e k="GC_placeableDigDisplay_headerInfo" v="Hier kannst du einen beliebigen Text festlegen, der auf dem Display erscheinen soll."/>
+		<e k="GC_placeableDigDisplay_btnSave" v="Speichern"/>
+		
+		<!-- GlobalMarket -->
+		<e k="GC_globalMarket_openGui" v="GlobalerMarkt öffnen"/>
+		<e k="GC_globalMarket_header" v="Globaler Markt 2020"/>
+		<e k="GC_globalMarket_headerInfo" v="Hier kannst du abgelieferte Ware verkaufen oder Ware ankaufen."/>
+		<e k="GC_globalMarket_btn_buyScreen" v="Kaufübersicht"/>
+		<e k="GC_globalMarket_btn_storageScreen" v="Lagerübersicht"/>
+		<e k="GC_globalMarket_btn_synch" v="Synchronisieren"/>
+		
+		<e k="GC_globalMarket_header2" v="Globaler Markt 2020 - Mengenauswahl"/>
+		<e k="GC_globalMarket_headerInfo2" v="Wähle hier die gewünschte Menge!"/>
+		<e k="GC_globalMarket_btn_ok" v="Bestätigen"/>
+		<e k="GC_globalMarket_btn_startLoad" v="Beladen starten"/>
+		
+		<e k="GC_globalMarket_header3" v="Globaler Markt 2020 - Auslagern"/>
+		<e k="GC_globalMarket_headerInfo3" v="Wähle aus, was geladen werden soll"/>
+		<e k="GC_globalMarket_btn_min" v="Minimal"/>
+		<e k="GC_globalMarket_btn_max" v="Maximal"/>
 
+		<e k="GC_globalMarket_header4" v="Globaler Markt 2020 - Fahrzeugtransfer"/>
+		<e k="GC_globalMarket_headerInfo4" v="Informationen zum Fahrzeugkauf"/>
+
+		<e k="GC_globalMarket_txt_amount" v="Menge"/>
+		<e k="GC_globalMarket_txt_money" v="Wert"/>
+
+		<e k="GC_globalMarket_tbl_header_filltype" v="Fruchttyp"/>
+		<e k="GC_globalMarket_tbl_header_level" v="Liter"/>
+		<e k="GC_globalMarket_tbl_header_pallets" v="Paletten"/>
+		<e k="GC_globalMarket_tbl_header_bales" v="Ballen"/>
+		<e k="GC_globalMarket_tbl_header_price" v="Aktueller Preis"/>
+		<e k="GC_globalMarket_tbl_header_price2" v="Aktueller Preis / 1000 Liter"/>
+		<e k="GC_globalMarket_btn_outsource" v="Auslagern"/>
+		<e k="GC_globalMarket_btn_outsourceBale1" v="Rundballen"/>
+		<e k="GC_globalMarket_btn_outsourceBale2" v="Quaderballen"/>
+		<e k="GC_globalMarket_btn_sell" v="Verkaufen"/>
+		<e k="GC_globalMarket_btn_buy" v="Kaufen   "/>
+
+		<e k="GC_globalMarket_tbl_header_preview" v="Vorschau"/>
+		<e k="GC_globalMarket_tbl_header_name" v="Name"/>
+		<e k="GC_globalMarket_tbl_header_age" v="Alter"/>
+		<e k="GC_globalMarket_tbl_header_operationTime" v="Betriebszeit"/>
+		<e k="GC_globalMarket_tbl_header_price3" v="Preis"/>
+		<e k="GC_globalMarket_txt_hours" v="%s Stunden"/>
+		<e k="GC_globalMarket_txt_days" v="%s Tage"/>
+
+		<e k="GC_globalMarket_externIsOffline" v="Starte die benötigte externe Software, damit du Ware ankaufen kannst oder deine abgegebene Ware verkaufen kannst."/>
+		<e k="GC_globalMarket_externIsFalseVersion" v="Du hast nicht die aktuellste Version der externen Software."/>
+		
+		
+		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Quaderballen Gras"/>
+		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Rundballen Gras"/>
+		<e k="GC_globalMarket_storeItem_cotton" v="Baumwolle"/>
+
+		
+		<!-- AnimalFeeder -->
+		<e k="GC_animalFeeder_backupTitie" v="Fütterungsanlage"/>
+		<e k="GC_animalFeeder_openGui" v="Anlagenpanel öffnen"/>
+		<e k="GC_animalFeeder_gui_info" v="Verwalte hier die Fütterungsanlage!"/>
+		<e k="GC_animalFeeder_gui_startManual" v="Anlage manuell starten"/>
+		<e k="GC_animalFeeder_gui_hist_header" v="Statistik"/>
+		<e k="GC_animalFeeder_gui_hist_text1" v="Verbrauch gestern gesamt:"/>
+		<e k="GC_animalFeeder_gui_hist_text2" v="Verbrauch gestern Bunker %s:"/>
+		<e k="GC_animalFeeder_gui_hist_val" v="%s Liter"/>
+		<e k="GC_animalFeeder_gui_hist_time" v="%s:00 Uhr"/>
+		<e k="GC_animalFeeder_gui_demandPercent" v="Mehr Bedarf/Fütterung:"/>
+		<e k="GC_animalFeeder_gui_bunker_title" v="Bunkerübersicht"/>
+		<e k="GC_animalFeeder_gui_bunker_name" v="Bunker %s"/>
+		<e k="GC_animalFeeder_gui_mixingRatio_title" v="Mischverhältnis"/>
+		<e k="GC_animalFeeder_gui_mixingRatio_warnung" v="Mischverhältnis muss 100% ergeben!"/>
+		<e k="GC_animalFeeder_gui_literPerDrive" v="Menge/Fahrt:"/>
+		<e k="GC_animalFeeder_gui_warningHeader" v="Fütterungsanlagen - Warnungen (%s)"/>
+		<e k="GC_animalFeeder_gui_warningText_bunkerEmpty" v="%s: %s leer!"/>
+		<e k="GC_animalFeeder_gui_warningText_noConnectedAnimalTrough" v="Kein Trog gefunden!"/>
+		<e k="GC_animalFeeder_gui_warningText_toHighDeltaForTroug" v="Füllmenge zu groß!"/>
+	
+		<!-- FarmStarter -->
+		<e k="GC_farmstarter_header" v="Wähle deinen Starthof aus!"/>
+
+
+		<!-- Market -->
+		<!--e k="GC_market_showDetails" v="Details"/>
+		<e k="GC_market_date" v="Datum"/>
+		<e k="GC_market_name" v="Name"/>
+		<e k="GC_market_type" v="Art"/>
+		<e k="GC_market_liter" v="Liter"/>
+		<e k="GC_market_money" v="Preis"/>
+		<e k="GC_market_designation" v="Bezeichnung"/-->
 
 	</elements>
 </l10n>

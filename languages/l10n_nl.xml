@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<l10n>
+	<elements>
+
+		<!-- Warnings / Errors -->
+		<e k="GC_mapVersionWarning" v="Kaart `%s` van %s vereist GlobalCompany - versie %s of hoger is vereist. Krijg de laatste versie van de modhub of bezoek '%s' voor ondersteuning."/>	
+		<e k="GC_modVersionWarning" v="Mod '%s' van %s vereist GlobalCompany - versie %s of hoger is vereist. Krijg de laatste versie van de modhub of bezoek '%s' voor ondersteuning."/>	
+		<e k="GC_loadingError" v="Er is iets misgegaan tijdens het laden van GlobalCompany! Krijg de laatste versie van de modhub of bezoek '%s' voor ondersteuning"/>	
+		<e k="GC_duplicateError" v="Er is een poging gedaan om GlobalCompany te verdubbelen! Verwijder '%s' uit de Mod-map en laad het spel opnieuw."/>
+		<e k="GC_combinedError" v="Er is een poging gedaan om GlobalCompany te laden als onderdeel van de modmap '%s'! Dit is niet toegestaan en veroorzaakt fouten. Krijg de laatste versie van de modhub of bezoek '%s' voor ondersteuning."/>
+		<e k="GC_invalidModWarning" v="Mod %s van %s wordt niet ondersteund! Om fouten te voorkomen, moet deze mod worden verwijderd!"/>
+		<e k="GC_quitToMainMenu" v="Keer echt terug naar het hoofdmenu?"/>
+		<e k="GC_betaVersionWarning" v="De ontwikkelingsversie is geladen. Meld waarschuwingen en fouten tot %. Volg de Modhub download link voor de laatste officiële versie of bezoek '%s' voor ondersteuning."/>
+		<e k="GC_namingError" v="Onjuiste 'File / Zip' naam '%s' gevonden voor ontwikkelaarsversie! Gebruik 'FS19_GlobalCompany' als bestandsnaam. Volg de Modhub download link voor de laatste officiële versie of bezoek '%s' voor ondersteuning."/>
+
+		<!-- GUI -->
+		<e k="GC_gui_buttons_ok" v="OK"/>
+		<e k="GC_gui_buttons_yes" v="Ja"/>
+		<e k="GC_gui_buttons_no" v="Nee"/>
+		<e k="GC_gui_buttons_back" v="Terug"/>
+		<e k="GC_gui_modHubLink" v="ModHub Download Link"/>
+		<e k="GC_gui_buttons_nextWarning" v="Volgende Waarschuwing"/>
+		<e k="GC_gui_buttons_nextConflict" v="Volgende Conflict"/>
+		
+		<!-- General -->
+		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
+
+		<!-- Settings -->
+		<e k="GC_settings_header" v="GlobalCompany - Instellingen"/>
+		<e k="GC_settings1_title" v="Activeer Plaatsen Overal"/>
+		<e k="GC_settings2_title" v="Objectinformatie Weergeven"/>
+		<e k="GC_settings3_title" v="Huren van Paardenhelpers (300€ / Paard / Dag)"/>
+		<e k="GC_settings4_title" v="Meer Bomen Activeren"/>
+		<e k="GC_settings5_title" v="Balen Opengesneden Activeren"/>
+		
+		<!-- Factory -->
+		<e k="GC_gui_overview" v="Overzicht"/>
+		<e k="GC_gui_productLines" v="Productlijnen"/>
+		<e k="GC_gui_description" v="Beschrijving"/>
+		<e k="GC_gui_active" v="Actief"/>
+		<e k="GC_gui_productionPerHour" v="Productie: %s liter/uur"/>
+		<e k="GC_gui_capacity" v="Capaciteit:"/>
+		<e k="GC_gui_filllevel" v="Vulniveau:"/>
+		<e k="GC_gui_liter" v="%s Liter"/>
+		<e k="GC_gui_buyText" v="Kopen (%s)"/>
+		<e k="GC_gui_activate" v="Inschakelen"/>
+		<e k="GC_gui_deactivate" v="Uitschakelen"/>
+		<e k="GC_gui_state" v="Status:"/>
+		<e k="GC_gui_automatic" v="Automatisch:"/>
+		<e k="GC_gui_state_on" v="Lopend"/>
+		<e k="GC_gui_state_off" v="Gestopt"/>
+		<e k="GC_gui_pallet1" v="%s Pallet"/>
+		<e k="GC_gui_pallet2" v="%s Palletten"/>
+		<e k="GC_gui_spawnText1" v="%s Pallet Generen"/>
+		<e k="GC_gui_spawnText2" v="%s Palletten Generen"/>	
+		<e k="GC_gui_autoStart" v="Autostart:"/>		
+		
+		<e k="GC_Productline_Title_Backup" v="Productlijn %d"/>
+		<e k="GC_Input_Title_Backup" v="Grondstoffen %d"/>
+		<e k="GC_Output_Title_Backup" v="Product %d"/>
+		<e k="GC_Input_Header_Backup" v="Grondstoffen"/>
+		<e k="GC_Output_Header_Backup" v="Producten"/>
+		
+		<e k="GC_Open_Product_Menu" v="Open Productmenu"/>
+		<e k="GC_Open_Overview_Menu" v="Open Overzichtmenu"/>
+		
+		<e k="GC_Factory_Animal_Dialogue1" v="Selecteer het aantal dieren dat in de fabriek moet worden gelost."/>
+		<e k="GC_Factory_Animal_Dialogue2" v="Selecteer het aantal dieren dat in het voertuig moet worden gelost."/>
+		
+		<e k="GC_gui_disabled" v="Uitgeschakeld"/>
+		<e k="GC_gui_add" v="Toevoegen"/>
+		<e k="GC_gui_remove" v="Verwijderen"/>
+		<e k="GC_gui_rename" v="Hernoemen"/>
+		<e k="GC_gui_max" v="Maximaal"/>
+		<e k="GC_gui_percent" v="Percentage"/>
+		<e k="GC_gui_lifeTimeIncome" v="Eerdere Verdiensten"/>
+		<e k="GC_gui_changeFactoryTitle" v="Voer hieronder een nieuwe Fabrieksnaam in."/>
+
+		<e k="GC_gui_factories" v="Producties"/>
+		<e k="GC_gui_activeProductLines" v="Actieve Productlijnen:"/>
+		<e k="GC_gui_emptyInputs" v="Lege grondstoffen:"/>
+		<e k="GC_gui_fullOutputs" v="Volledige Producten:"/>
+
+		<e k="GC_gui_dynamicStorages" v="Dynamische Lagers"/>
+		<e k="GC_gui_freeSlots" v="Vrije Vakken:"/>
+		
+		<e k="GC_gui_placeableObject" v="Plaatsbaar Object"/>
+		<e k="GC_gui_farmlandObject" v="Landbouwgrond Object"/>
+		<e k="GC_gui_changeDynamicStorageTitle" v="Voer hieronder een nieuwe lagernaam in."/>
+		<e k="GC_gui_dynamicStorage_titleBackup" v="Dynamisch Magazijn"/>
+		
+		<!-- Formatting required -->
+		<e k="GC_Factory_Sell_Warning" v="Er zijn nog steeds Producten in de Fabriek. Deze worden als losse Bulkgoederen verkocht voor de volgende hoeveelheid:
+
+Hoeveelheidsprijs:  %s"/>
+
+		<e k="GC_Factory_Purchase_Warning" v="Bevestig de volgende productaankoop.
+
+Grondstof: %s
+Volume: %s
+Kosten: %s"/>
+
+		<!-- BaleShreader -->
+		<e k="GC_baleShreader_openSteer" v="Besturingssysteem open"/>
+		<e k="GC_baleShreader_closeSteer" v="Besturingssysteem sluiten"/>
+		<e k="GC_baleShreader_startWork" v="Balenversnipperaar starten"/>
+		<e k="GC_baleShreader_endWork" v="Balenversnipperaar stoppen"/>
+		<e k="GC_baleShreader_toggleOnWorkLight" v="Werklicht inschakelen"/>
+		<e k="GC_baleShreader_toggleOffWorkLight" v="Werklicht uitschakelen"/>
+
+		<!-- Baler -->
+		<e k="GC_baler_title" v="Balenpers"/>
+		<e k="GC_baler_title_witStack" v="Balenpers met Vorkheftruck"/>
+		<e k="GC_baler_cleaner" v="Stortgebied schoonmaken"/>
+		<e k="GC_baler_openGui" v="Besturingssysteem  open"/>
+		<e k="GC_baler_closeGui" v="Besturingssysteem  sluiten"/>
+		<e k="GC_baler_makeEmpty" v="Lossen"/>
+		<e k="GC_baler_turnOn" v="Inschakelen"/>
+		<e k="GC_baler_turnOff" v="Uitschakelen"/>
+		<e k="GC_baler_info_machineData" v="Plantgegevens"/>
+		<e k="GC_baler_info_fillLevel" v="Vulniveau"/>
+		<e k="GC_baler_info_fillLevelBunker" v="Bunkervullingsniveau"/>
+		<e k="GC_baler_info_counter" v="Geperste Balen"/>
+		<e k="GC_baler_info_automatic" v="Automatisch"/>
+		<e k="GC_baler_actualTyp" v="Huidig Baaltype:"/>
+		<e k="GC_baler_canStack" v="Stapelen van het aantal balen:"/>
+
+		<!-- ObjectInfo -->
+		<e k="GC_ObjectInfo_filltype" v="Vultype: %s"/>
+		<e k="GC_ObjectInfo_level" v="Vulniveau: %s Liter"/>
+		<e k="GC_ObjectInfo_level2" v="Füllstand: %s Liter (%s%%)"/>
+		<e k="GC_ObjectInfo_owner" v="Eigenaar: %s"/>
+
+		<!-- DynamicStorage -->
+		<e k="GC_dynamicStorage_unloadSettings" v="Instellingen lossenn"/>
+		<e k="GC_dynamicStorage_gui_header_unloading" v="Selecteer de lospositie"/>
+		<e k="GC_dynamicStorage_gui_header_loading" v="Selecteer herladingsvak"/>
+		<e k="GC_dynamicStorage_gui_info_unloading" v="Selecteer welk vak u wilt uitladen. Merk op dat er slechts één vrucht in elke vak kan worden gelost."/>
+		<e k="GC_dynamicStorage_gui_info_loading" v="Selecteer uit welk vak u wilt laden."/>
+		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s Liter"/>
+		<e k="GC_dynamicStorage_gui_empty" v="Leeg"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Bevestig de lospositie"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Bevestig de oplaadvak"/>
+
+		<!-- PlaceableDigitalDisplay -->
+		<e k="GC_placeableDigDisplay_openGui" v="Aanpassing van de digitale weergave"/>
+		<e k="GC_placeableDigDisplay_header" v="Digitaal Display"/>
+		<e k="GC_placeableDigDisplay_headerInfo" v="Hier kunt u elke tekst definiëren die op het scherm moet verschijnen."/>
+		<e k="GC_placeableDigDisplay_btnSave" v="Bewaar"/>Purchase overview		
+		
+		<!-- GlobalMarket -->
+		<e k="GC_globalMarket_openGui" v="Open GlobalMarket"/>
+		<e k="GC_globalMarket_header" v="Global Markt 2020"/>
+		<e k="GC_globalMarket_headerInfo" v="Hier kunt u geleverde goederen verkopen of goederen kopen."/>
+		<e k="GC_globalMarket_btn_buyScreen" v="Aankoopoverzicht"/>
+		<e k="GC_globalMarket_btn_storageScreen" v="Voorraadoverzicht"/>
+		<e k="GC_globalMarket_btn_synch" v="Synchroniseren"/>
+		
+		<e k="GC_globalMarket_header2" v="Global Markt 2020 - Hoeveelheidsselectie"/>
+		<e k="GC_globalMarket_headerInfo2" v="Selecteer hier de gewenste hoeveelheid!"/>
+		<e k="GC_globalMarket_btn_ok" v="Bevestigen"/>
+		<e k="GC_globalMarket_btn_startLoad" v="Begin met laden"/>
+		
+		<e k="GC_globalMarket_header3" v="Global Markt 2020 - Uitgaand"/>
+		<e k="GC_globalMarket_headerInfo3" v="Selecteer wat u wilt laden"/>
+		<e k="GC_globalMarket_btn_min" v="Minimaal"/>
+		<e k="GC_globalMarket_btn_max" v="Maximaal"/>
+
+		<e k="GC_globalMarket_txt_amount" v="Aantal stuks"/>
+		<e k="GC_globalMarket_txt_money" v="Waarde"/>
+
+		<e k="GC_globalMarket_tbl_header_filltype" v="Type fruit"/>
+		<e k="GC_globalMarket_tbl_header_level" v="Liter"/>
+		<e k="GC_globalMarket_tbl_header_pallets" v="Pallets"/>
+		<e k="GC_globalMarket_tbl_header_bales" v="Balen"/>
+		<e k="GC_globalMarket_tbl_header_price" v="Werkelijke prijs"/>
+		<e k="GC_globalMarket_tbl_header_price2" v="Werkelijke prijs / 1000 Liter"/>
+		<e k="GC_globalMarket_btn_outsource" v="Uitgaand"/>
+		<e k="GC_globalMarket_btn_outsourceBale1" v="Ronde baal"/>
+		<e k="GC_globalMarket_btn_outsourceBale2" v="Vierkante baal"/>
+		<e k="GC_globalMarket_btn_sell" v="Verkopen"/>
+		<e k="GC_globalMarket_btn_buy" v="Kopen"/>
+
+		<e k="GC_globalMarket_tbl_header_preview" v="Voorbeeld"/>
+		<e k="GC_globalMarket_tbl_header_name" v="Naam"/>
+		<e k="GC_globalMarket_tbl_header_age" v="Leeftijd"/>
+		<e k="GC_globalMarket_tbl_header_price3" v="Prijs"/>
+
+		<e k="GC_globalMarket_externIsOffline" v="Start de nodige externe software zodat u goederen kunt kopen of uw geleverde goederen kunt verkopen."/>
+		<e k="GC_globalMarket_externIsFalseVersion" v="U beschikt niet over de nieuwste versie van de externe software."/>
+		
+		
+		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Vierkante baal gras"/>
+		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Ronde baal gras"/>
+		<e k="GC_globalMarket_storeItem_cotton" v="Katoen"/>
+	
+		<!-- FarmStarter -->
+		<e k="GC_farmstarter_header" v="Kies je startboerderij!"/>		
+
+	</elements>
+</l10n>

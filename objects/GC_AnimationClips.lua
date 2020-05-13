@@ -285,3 +285,17 @@ end
 function GC_AnimationClips:getAnimationClipActive()
 	return self.animationClipsActive
 end
+
+function GC_AnimationClips:resetClipByIndex(index)
+	local entry = self.standardAnimationClips[index]
+	setAnimTrackTime(entry.animCharSet, 0, entry.startTime)
+	disableAnimTrack(entry.animCharSet, 0)
+end
+
+function GC_AnimationClips:setTimeByIndex(index, time)
+	local entry = self.standardAnimationClips[index]
+	entry.enabled = true
+	enableAnimTrack(entry.animCharSet, 0)
+	setAnimTrackTime(entry.animCharSet, 0, time)
+	self.animationClipsActive = true
+end

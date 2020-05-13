@@ -23,6 +23,9 @@
 GlobalCompanyUtils = {}
 g_company.utils = GlobalCompanyUtils
 
+local loadPath = g_company.dir .. "../FS19_manureSystem/src/utils/ManureSystemXMLUtil.lua"
+if fileExists(loadPath) then source(loadPath) end
+
 function GlobalCompanyUtils.createModPath(modFileName, filename)
 	return g_modsDirectory .. modFileName .. "/" .. filename
 end
@@ -331,6 +334,15 @@ function GlobalCompanyUtils.getCorrectNumberValue(value, newValue, minValue, max
 	return value
 end
 
+function GlobalCompanyUtils.getEdgeNumber(value, minValue, maxValue)
+	if value < minValue then
+		return minValue
+	elseif value > maxValue then
+		return maxValue
+	end
+	return value
+end
+
 -- Part code from http://lua-users.org/wiki/StringRecipes
 -- add insert to table option and first line indent matching.
 function GlobalCompanyUtils.stringWrap(str, limit, indent, returnTable)
@@ -373,4 +385,218 @@ function GlobalCompanyUtils.stringWrap(str, limit, indent, returnTable)
 	else
 		return newString
 	end
+end
+
+function GlobalCompanyUtils.convertNumberToBits(num,bits)
+	bits = bits or math.max(1, select(2, math.frexp(num)))
+	local t = {}    
+	local str = ""
+	for b = bits, 1, -1 do
+		t[b] = math.fmod(num, 2)
+		str = t[b] .. str
+		num = math.floor((num - t[b]) / 2)
+	end
+	return t, str
+end
+
+function GlobalCompanyUtils.getValueOfBits(bits, start, lenght)
+	return tonumber(bits:reverse():sub(start + 1, start + lenght):reverse(), 2)
+end
+
+function GlobalCompanyUtils.floatEqual(lhs, rhs, epsilon)
+	return math.abs(lhs - rhs) < epsilon
+end
+
+function GlobalCompanyUtils.deleteFile(path)
+	getfenv(0)["deleteFile"](path)
+end
+
+function GlobalCompanyUtils.deleteFileIfExists(path)
+	if fileExists(path) then
+		GlobalCompanyUtils.deleteFile(path)
+		return true
+	end
+	return false
+end
+
+function GlobalCompanyUtils.teleportVehicleWithRotation(posX, posZ, rotY)
+	local vehicleCombos = {}
+	local vehicles = {}
+	local function addVehiclePositions(vehicle)
+		local x,y,z = getWorldTranslation(vehicle.rootNode)
+		table.insert(vehicles, {vehicle=vehicle, offset={worldToLocal(g_currentMission.controlledVehicle.rootNode, x,y,z)}})
+
+		for _, impl in pairs(vehicle:getAttachedImplements()) do
+			addVehiclePositions(impl.object)
+			table.insert(vehicleCombos, {vehicle=vehicle, object=impl.object, jointDescIndex=impl.jointDescIndex, inputAttacherJointDescIndex=impl.object:getActiveInputAttacherJointDescIndex()})
+		end
+
+		for i=table.getn(vehicle:getAttachedImplements()), 1, -1 do
+			vehicle:detachImplement(1, true)
+		end
+		vehicle:removeFromPhysics()
+	end
+
+	addVehiclePositions(g_currentMission.controlledVehicle)
+
+	for k, data in pairs(vehicles) do
+		local x,z = posX, posZ
+		if k > 1 then
+			x,_,z = localToWorld(g_currentMission.controlledVehicle.rootNode, unpack(data.offset))
+		end
+		local _,ry,_ = getWorldRotation(data.vehicle.rootNode)
+		ry = Utils.getNoNil(rotY, ry)
+		data.vehicle:setRelativePosition(x, 0.5, z, ry, true)
+		data.vehicle:addToPhysics()
+	end
+
+	for _, combo in pairs(vehicleCombos) do
+		combo.vehicle:attachImplement(combo.object, combo.inputAttacherJointDescIndex, combo.jointDescIndex, true, nil, nil, false);
+	end
+end
+
+--Code from ls17 of giants
+function GlobalCompanyUtils.limitTextToWidth(text, textSize, width, trimFront, trimReplaceText)
+    local replaceTextWidth = getTextWidth(textSize, trimReplaceText)
+    local indexOfFirstCharacter = 1
+    local indexOfLastCharacter = utf8Strlen(text)
+    if width >= 0 then
+        local totalWidth = getTextWidth(textSize, text)
+        if totalWidth > width then
+            if trimFront then
+                indexOfFirstCharacter = getTextLineLength(textSize, text, totalWidth-width+replaceTextWidth)
+                text = trimReplaceText .. utf8Substr(text, indexOfFirstCharacter)
+			else
+                indexOfLastCharacter = getTextLineLength(textSize, text, width-replaceTextWidth)
+                text = utf8Substr(text, 0, indexOfLastCharacter) .. trimReplaceText
+            end
+        end
+    end
+    return text, indexOfFirstCharacter, indexOfLastCharacter
+end
+
+function GlobalCompanyUtils.fillStringLeft(text, num, fill)
+	while(string.len(text) < num) do
+		text = fill .. text
+	end
+	return text
+end
+
+function GlobalCompanyUtils.appendedFunction(oldFunc, newFunc, t)
+    if oldFunc ~= nil then
+        return function (s, ...)
+            local val = oldFunc(s, ...)
+			val = newFunc(t, s, val, ...)
+			return val
+        end;
+    else
+        return newFunc
+    end;
+end
+
+function GlobalCompanyUtils.appendedFunction2(oldFunc, newFunc)
+    if oldFunc ~= nil then
+        return function (s, ...)
+            local val = oldFunc(s, ...)
+			newFunc(s, ...)
+			return val
+        end;
+    else
+        return newFunc
+    end;
+end
+
+function GlobalCompanyUtils.appendedFunction3(oldFunc, preFunc, postFunc)
+    if oldFunc ~= nil then
+        return function (s, ...)
+			preFunc(s, ...)
+            local val = oldFunc(s, ...)
+			postFunc(s, ...)
+			return val
+        end;
+    else
+        return newFunc
+    end;
+end
+
+function GlobalCompanyUtils.interruptFunction(oldFunc, newFunc)
+    if oldFunc ~= nil then
+        return function (s, ...)
+			if newFunc(s, ...) then
+				oldFunc(s, ...)
+			end
+        end
+    else
+        return newFunc
+    end
+end
+
+function GlobalCompanyUtils.calcMoney(money)
+	local moneyUnit = g_gameSettings:getValue("moneyUnit")
+	if moneyUnit == GS_MONEY_POUND then
+		return money * 0.83
+	elseif moneyUnit == GS_MONEY_DOLLAR then
+		return money * 1.08
+	end
+	return money
+end
+
+function GlobalCompanyUtils.getNextAnimalHusbandry(nodeId, modulName)
+	local distance = 9999999999
+	local foundTrough
+	local foundHusbandry
+	for _,husbandry in pairs(g_currentMission.husbandries) do
+		for name,mod in pairs(husbandry.modulesByName) do  
+			if name == modulName then
+				local newDistance = g_company.utils.calcDistance(nodeId, mod.owner.nodeId)
+				if newDistance < distance then
+					distance = newDistance
+					foundTrough = mod
+					foundHusbandry = husbandry
+				end
+			end
+		end    
+	end
+	return foundTrough, foundHusbandry
+end
+
+function GlobalCompanyUtils.calcDistance(nodeId, targetNode)
+    local x_t,_,z_t = getWorldTranslation(nodeId)
+    local x,_,z = getWorldTranslation(targetNode)
+    return MathUtil.vector3LengthSq(x - x_t, 0, z - z_t)
+end
+
+-- Code from ManureSysteStorage.lua
+-- Changes:
+-- add target as parameter
+function GlobalCompanyUtils.loadManureSystemConnectorFromXML(target, connector, xmlFile, baseKey, id)
+    local node = ManureSystemXMLUtil.getOrCreateNode(target, xmlFile, baseKey, id)
+
+    if node ~= nil then
+        connector.id = id + 1
+        connector.node = node
+        connector.isConnected = false
+        connector.connectedObject = nil
+        connector.inRangeDistance = Utils.getNoNil(getXMLFloat(xmlFile, baseKey .. "#inRangeDistance"), 1.3)
+        connector.isParkPlace = Utils.getNoNil(getXMLBool(xmlFile, baseKey .. "#isParkPlace"), false)
+
+        return true
+    end
+
+    return false
+end
+
+--http://lua-users.org/wiki/CopyTable
+function GlobalCompanyUtils.shallowcopy(orig)
+	local orig_type = type(orig)
+	local copy
+	if orig_type == 'table' then
+		copy = {}
+		for orig_key, orig_value in pairs(orig) do
+			copy[orig_key] = orig_value
+		end
+	else -- number, string, boolean, etc
+		copy = orig
+	end
+	return copy
 end

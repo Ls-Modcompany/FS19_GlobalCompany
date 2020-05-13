@@ -3,14 +3,16 @@
 --
 -- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany
--- @Date: 11.03.2019
--- @Version: 1.1.0.0
+-- @Date: 11.03.2020
+-- @Version: 1.2.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
 --
--- 	v1.0.0.0 (11.03.2019):
+-- 	v1.2.0.0 (11.03.2020):
+-- 		- add manurehosesystem
+-- 	v1.1.0.0 (11.03.2019):
 -- 		- fix i3dMappings support for effects
 --
 -- 	v1.0.0.0 (12.02.2019):
@@ -60,9 +62,11 @@ function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes
 
 	self.debugData = g_company.debug:getDebugData(GC_LoadingTrigger.debugIndex, source)
 
-	self.baseDirectory = GlobalCompanyUtils.getParentBaseDirectory(target, baseDirectory)
+	self.baseDirectory = GlobalCompanyUtils.getParentBaseDirectory(source, baseDirectory)
 
 	local xmlUtils = g_company.xmlUtils
+
+	self.allowEverybodyAccess = false
 
 	local triggerNode = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, xmlKey .. "#triggerNode"), source.i3dMappings)
 	if triggerNode ~= nil and source.getProvidedFillTypes ~= nil and source.getAllProvidedFillLevels ~= nil and source.getProvidedFillLevel ~= nil and source.removeFillLevel ~= nil then
@@ -71,6 +75,7 @@ function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes
 		g_currentMission:addNodeObject(triggerNode, self)
 
 		self.fillLitersPerMS = xmlUtils.getXMLValue(getXMLInt, xmlFile, xmlKey .. "#fillLitersPerSecond", 1000) / 1000
+		self.fillLitersPerMSFuel = xmlUtils.getXMLValue(getXMLInt, xmlFile, xmlKey .. "#fillLitersPerSecondFuel", 20) / 1000
 		self.soundNode = createTransformGroup("loadTriggerSoundNode")
 
 		self.autoStart = xmlUtils.getXMLValue(getXMLBool, xmlFile, xmlKey .. "#autoStart", false)
@@ -240,9 +245,55 @@ function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes
 		-- When used the filling can only be started when not in vehicle.
 		local playerTriggerNode = I3DUtil.indexToObject(nodeId, getXMLString(xmlFile, xmlKey .. ".externalOperation#playerTriggerNode"), source.i3dMappings)
 		if playerTriggerNode ~= nil then
-			if playerTriggerNode ~= nil then
-				self.playerTriggerNode = playerTriggerNode
-				addTrigger(self.playerTriggerNode, "playerTriggerCallback", self)
+			self.playerTriggerNode = playerTriggerNode
+			addTrigger(self.playerTriggerNode, "playerTriggerCallback", self)
+		end
+
+		--load for manure system
+		if g_manureSystem ~= nil then
+			self.connectorStrategies = {}
+			self.manureSystemConnectors = {}
+			self.manureSystemConnectorsByType = {}
+
+			if hasXMLProperty(xmlFile, xmlKey .. ".manureSystemConnectors") then
+				local componentNode = getXMLString(xmlFile, xmlKey .. ".manureSystemConnectors#rootNode")	
+				self.components = { { node = I3DUtil.indexToObject(nodeId, componentNode, source.i3dMappings) } }
+
+				self.manureSystemFillType = g_fillTypeManager:getFillTypeIndexByName(getXMLString(xmlFile, xmlKey .. ".manureSystemConnectors#fillType"))
+
+				local i = 0
+				while true do
+					local baseKey = xmlKey .. (".manureSystemConnectors.connector(%d)"):format(i)
+					if not hasXMLProperty(xmlFile, baseKey) then
+						break
+					end
+
+					local typeString = Utils.getNoNil(getXMLString(xmlFile, baseKey .. "#type"), g_manureSystem.connectorManager.CONNECTOR_TYPE_HOSE_COUPLING)
+					local type = g_manureSystem.connectorManager:getConnectorType(typeString)
+
+					if type == nil then
+						g_logManager:xmlWarning(self.configFileName, "Invalid connector type %s", typeString)
+						type = g_manureSystem.connectorManager:getConnectorType(g_manureSystem.connectorManager.CONNECTOR_TYPE_HOSE_COUPLING)
+					end
+
+					if self.manureSystemConnectorsByType[type] == nil then
+						self.manureSystemConnectorsByType[type] = {}
+					end
+
+					if self.connectorStrategies[type] == nil then
+						self.connectorStrategies[type] = g_manureSystem.connectorManager:getConnectorStrategy(type, self)
+					end
+					
+					local connector = { type = type }
+					if g_company.utils.loadManureSystemConnectorFromXML(self, connector, xmlFile, baseKey, i) then
+						if self.connectorStrategies[type]:load(connector, xmlFile, baseKey) then
+							table.insert(self.manureSystemConnectors, connector)
+							table.insert(self.manureSystemConnectorsByType[type], connector)
+						end
+					end
+
+					i = i + 1
+				end
 			end
 		end
 
@@ -271,7 +322,7 @@ function GC_LoadingTrigger:load(nodeId, source, xmlFile, xmlKey, forcedFillTypes
 		if source.removeFillLevel == nil then
 			g_company.debug:print("    %s Target function 'removeFillLevel' could not be found!", prefix)
 		end
-	end
+	end	
 
 	return false
 end
@@ -285,6 +336,16 @@ function GC_LoadingTrigger:delete()
 	if self.triggerStatus ~= nil and self.triggerStatus.fallOffShader ~= nil then
 		local node = self.triggerStatus.fallOffShader.node
 		g_currentMission:removeTriggerMarker(node)
+	end
+
+	if g_manureSystem ~= nil then
+		for type, connectors in pairs(self.manureSystemConnectorsByType) do
+			for _, connector in ipairs(connectors) do
+				self.connectorStrategies[type]:delete(connector)
+			end
+		end	
+
+		g_manureSystem:removeConnectorObject(self)
 	end
 
 	GC_LoadingTrigger:superClass().delete(self)
@@ -308,7 +369,12 @@ function GC_LoadingTrigger:update(dt)
 	if self.isServer then
 		if self.isLoading then
 			if self.currentFillableObject ~= nil then
-				local fillDelta = self:addFillLevelToFillableObject(self.currentFillableObject, self.fillUnitIndex, self.selectedFillType, self.fillLitersPerMS * dt, self.dischargeInfo, ToolType.TRIGGER)
+				local fillLitersPerMS = self.fillLitersPerMS
+				if self.selectedFillType == FillType.DIESEL or self.selectedFillType == FillType.FUEL then
+					local fillLitersPerMS = self.fillLitersPerMSFuel
+				end
+				local fillDelta = self:addFillLevelToFillableObject(self.currentFillableObject, self.fillUnitIndex, self.selectedFillType, fillLitersPerMS * dt, self.dischargeInfo, ToolType.TRIGGER)
+				
 				if fillDelta == nil or fillDelta < 0.001 then
 					self:setIsLoading(false)
 				end
@@ -347,6 +413,16 @@ function GC_LoadingTrigger:updateTriggerStatus(name)
 			setVisibility(node, name == statusName)
 		end
 	end
+end
+
+--for manuresystem
+function GC_LoadingTrigger:addFillUnitFillLevel(farmId, fillUnitIndex, fillLevelDelta, fillTypeIndex, toolType, fillPositionData)
+	local newFillLevel = 0
+	local oldFillLevel = self.source:getProvidedFillLevel(fillTypeIndex, farmId, self.extraParamater)
+	--if oldFillLevel > 0 then
+		newFillLevel = self.source:removeFillLevel(farmId, fillLevelDelta * -1, fillTypeIndex, self.extraParamater)
+	--end
+	return (oldFillLevel - newFillLevel) * -1
 end
 
 function GC_LoadingTrigger:addFillLevelToFillableObject(fillableObject, fillUnitIndex, fillTypeIndex, fillDelta, fillInfo, toolType)
@@ -465,7 +541,7 @@ function GC_LoadingTrigger:getIsActivatable()
 
 					if canActivate then
 						if fillableObject.object:getFillUnitSupportsToolType(fillableObject.fillUnitIndex, ToolType.TRIGGER) then
-							if self:getIsFillAllowedToFarm(self:farmIdForFillableObject(fillableObject.object)) then
+							if self:getIsFillAllowedToFarm(self:farmIdForFillableObject(fillableObject.object)) or self.allowEverybodyAccess then
 								self.validFillableObject = fillableObject.object
 								self.validFillableFillUnitIndex = fillableObject.fillUnitIndex
 
@@ -479,23 +555,12 @@ function GC_LoadingTrigger:getIsActivatable()
 			end
 		end
 	end
-
 	return false
 end
 
 function GC_LoadingTrigger:vehicleHasActiveDriver(vehicle)
-	if (vehicle == g_currentMission.controlledVehicle) or self:vehicleHasAutoDriveActive(vehicle) then
-		return true;
-	end;
-	return false;
+	return (vehicle == g_currentMission.controlledVehicle) or (vehicle ~= nil and ((vehicle.cp ~= nil and vehicle.cp.isDriving) or (vehicle.ad ~= nil and vehicle.ad.isActive)))
 end;	
-
-function GC_LoadingTrigger:vehicleHasAutoDriveActive(vehicle)
-	if vehicle ~= nil and vehicle.ad ~= nil and vehicle.ad.isActive then
-		return true;
-	end;
-	return false;
-end;
 
 function GC_LoadingTrigger:shouldRemoveActivatable()
 	return self.playerTriggerNode == nil
@@ -520,7 +585,6 @@ end
 
 function GC_LoadingTrigger:setIsLoading(isLoading, targetObject, fillUnitIndex, fillType, noEventSend)
 	GC_LoadingTrigger:superClass().setIsLoading(self, isLoading, targetObject, fillUnitIndex, fillType, noEventSend)
-
 	if self.isClient then
 		if self.triggerStatus ~= nil then
 			if isLoading then
@@ -638,4 +702,125 @@ function GC_LoadingTrigger:playerTriggerCallback(triggerId, otherId, onEnter, on
 			self:raiseActive()
 		end
 	end
+end
+
+function GC_LoadingTrigger:finalizePlacement()
+	if g_manureSystem ~= nil then
+		if #self.manureSystemConnectors ~= 0 then
+			g_manureSystem:addConnectorObject(self)
+		end
+	end
+end
+
+function GC_LoadingTrigger:readStream(streamId, connection)
+    GC_LoadingTrigger:superClass().readStream(self, streamId, connection)
+	if g_manureSystem ~= nil then
+        for type, connectors in pairs(self.manureSystemConnectorsByType) do
+            for _, connector in ipairs(connectors) do
+                local class = self.connectorStrategies[type]
+                if class.onReadStream ~= nil then
+                    class:onReadStream(connector, streamId, connection)
+                end
+            end
+        end
+	end
+end
+
+function GC_LoadingTrigger:writeStream(streamId, connection)
+    GC_LoadingTrigger:superClass().writeStream(self, streamId, connection)
+	if g_manureSystem ~= nil then      
+        for type, connectors in pairs(self.manureSystemConnectorsByType) do
+            for _, connector in ipairs(connectors) do
+				local class = self.connectorStrategies[type]
+                if class.onWriteStream ~= nil then
+                    class:onWriteStream(connector, streamId, connection)
+                end
+            end
+        end
+    end
+end
+
+function GC_LoadingTrigger:getConnectorsByType(type)
+    local types = self.manureSystemConnectorsByType[type]
+    if types ~= nil then
+        return types
+    end
+
+    return {}
+end
+
+function GC_LoadingTrigger:getConnectorById(id)
+    return self.manureSystemConnectors[id]
+end
+
+function GC_LoadingTrigger:setIsConnected(id, state, grabNodeId, hose, noEventSend)
+    local connector = self:getConnectorById(id)
+
+    if connector.isConnected ~= state then
+        ManureSystemConnectorIsConnectedEvent.sendEvent(self, id, state, grabNodeId, hose, noEventSend)
+
+        if connector.lockAnimationIndex ~= nil then
+            local dir = state and 1 or -1
+            self.source.placeableClass:playAnimation(connector.lockAnimationIndex, dir)
+        end
+
+        if connector.manureFlowAnimationIndex == nil then
+            self:setIsManureFlowOpen(id, state, false, noEventSend)
+        end
+
+        if not state and connector.hasOpenManureFlow then
+            self:setIsManureFlowOpen(id, state, true, noEventSend)
+        end
+
+        connector.isConnected = state
+        connector.connectedObject = hose
+        connector.connectedNodeId = grabNodeId
+    end
+end
+
+function GC_LoadingTrigger:setIsManureFlowOpen(id, state, force, noEventSend)
+    local connector = self:getConnectorById(id)
+
+    if not connector.isParkPlace and connector.hasOpenManureFlow ~= state or force then
+        ManureSystemConnectorManureFlowEvent.sendEvent(self, id, state, force, noEventSend)
+
+        connector.hasOpenManureFlow = state
+
+        if connector.manureFlowAnimationIndex ~= nil then
+            local canPlayAnimation = force or not self.source.placeableClass:getIsAnimationPlaying(connector.manureFlowAnimationIndex)
+
+            if canPlayAnimation then
+                local dir = state and 1 or -1
+                self.source.placeableClass:playAnimation(connector.manureFlowAnimationIndex, dir)
+            end
+        end
+    end
+end
+
+function GC_LoadingTrigger:getAnimationTime(...)
+	return self.source.placeableClass:getAnimationTime(...)
+end
+
+function GC_LoadingTrigger:getIsAnimationPlaying(...)
+	return self.source.placeableClass:getIsAnimationPlaying(...)
+end
+
+function GC_LoadingTrigger:getFillUnitFillLevelPercentage(fillUnitIndex)
+	return self.source:ms_getFillUnitFillLevelPercentage(self.manureSystemFillType, self.extraParamater, false)
+end
+
+function GC_LoadingTrigger:getFillUnitFillLevel(fillUnitIndex)
+	return self.source:ms_getFillUnitFillLevel(self.manureSystemFillType, self.extraParamater, false)
+end
+
+function GC_LoadingTrigger:getFillUnitCapacity(fillUnitIndex)
+	return self.source:ms_getFillUnitCapacity(self.manureSystemFillType, self.extraParamater, false)
+end
+
+function GC_LoadingTrigger:getFillUnitAllowsFillType(fillUnitIndex, fillTypeIndex)
+	return g_manureSystem ~= nil and #self.manureSystemConnectors ~= 0 and self.manureSystemFillType == fillTypeIndex
+end
+
+function GC_LoadingTrigger:getFillUnitFillType(fillUnitIndex)
+	return self.manureSystemFillType
 end

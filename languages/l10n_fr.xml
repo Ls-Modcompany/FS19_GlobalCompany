@@ -17,6 +17,7 @@
 		<e k="GC_gui_buttons_ok" v="OK"/>
 		<e k="GC_gui_buttons_yes" v="Oui"/>
 		<e k="GC_gui_buttons_no" v="Non"/>
+		<e k="GC_gui_buttons_back" v="Retour"/>
 		<e k="GC_gui_modHubLink" v="Lien de téléchargement du ModHub"/>
 		<e k="GC_gui_buttons_nextWarning" v="Avertissement suivant"/>
 		<e k="GC_gui_buttons_nextConflict" v="Conflit suivant"/>
@@ -33,17 +34,15 @@
 		<e k="GC_settings5_title" v="Activer le découpage des balles"/>
 		
 		<!-- Factory -->
-		<e k="GC_gui_buttons_back" v="Précédent"/>
 		<e k="GC_gui_overview" v="Aperçu"/>
 		<e k="GC_gui_productLines" v="Lignes de production"/>
 		<e k="GC_gui_description" v="Description"/>
 		<e k="GC_gui_active" v="Actif"/>
 		<e k="GC_gui_productionPerHour" v="Production : %s litres/heure"/>
-		<e k="GC_gui_capacity" v="Capacité:"/>
-		<e k="GC_gui_filllevel" v="Quantité:"/>
+		<e k="GC_gui_capacity" v="Capacité :"/>
+		<e k="GC_gui_filllevel" v="Quantité :"/>
 		<e k="GC_gui_liter" v="%s litres"/>
 		<e k="GC_gui_buyText" v="Acheter (%s)"/>
-		
 		<e k="GC_gui_activate" v="Activer"/>
 		<e k="GC_gui_deactivate" v="Désactiver"/>
 		<e k="GC_gui_state" v="Statut:"/>
@@ -65,30 +64,41 @@
 		<e k="GC_Open_Product_Menu" v="Menu des produits"/>
 		<e k="GC_Open_Overview_Menu" v="Aperçu"/>
 		
-		<e k="GC_Factory_Animal_Dialogue" v="Sélectionnez le nombre d'animaux à décharger."/>
+		<e k="GC_Factory_Animal_Dialogue1" v="Sélectionnez le nombre d'animaux à décharger."/>
+		<e k="GC_Factory_Animal_Dialogue2" v="Select the number of animals to unload to vehicle."/>
 
 		<e k="GC_gui_disabled" v="Désactivé"/>
 		<e k="GC_gui_add" v="Ajouter"/>
 		<e k="GC_gui_remove" v="Retirer"/>
+		<e k="GC_gui_rename" v="Renommer"/>
 		<e k="GC_gui_max" v="Maximum"/>
 		<e k="GC_gui_percent" v="Pourcentage"/>
 		<e k="GC_gui_lifeTimeIncome" v="Revenu pour la durée de vie"/>
 		<e k="GC_gui_changeFactoryTitle" v="Entrez le nouveau nom de référence de l'usine."/>
 
+		<e k="GC_gui_factories" v="Productions"/>
+		<e k="GC_gui_activeProductLines" v="Production(s) en cours :"/>
+		<e k="GC_gui_emptyInputs" v="Ressource(s) vide(s) :"/>
+		<e k="GC_gui_fullOutputs" v="Sortie(s) pleine(s) :"/>
+
+		<e k="GC_gui_dynamicStorages" v="Stockages dynamiques"/>
+		<e k="GC_gui_freeSlots" v="emplacements libres :"/>
+		
 		<e k="GC_gui_placeableObject" v="Objet plaçable"/>
 		<e k="GC_gui_farmlandObject" v="Objet de la carte"/>
+		<e k="GC_gui_changeDynamicStorageTitle" v="Entrez un nouveau nom de stockage ci-dessous."/>
+		<e k="GC_gui_dynamicStorage_titleBackup" v="Stockage dynamique"/>
 		
 		<!-- Formatting required -->
 		<e k="GC_Factory_Sell_Warning" v="Cette usine contient encore des produits. Ils vont être vendus en gros pour le montant suivant :
 
 Prix de gros : %s"/>		
 		
-		<e k="GC_Factory_Purchase_Warning" v="Merci de confirmer l'achat des produits suivants.
+		<e k="GC_Factory_Purchase_Warning" v="Merci de confirmer l'achat du produit suivant.
 
-Produits en entrée : %s
+Produit : %s
 Volume : %s
 Coût : %s"/>
-
 
 		<!-- BaleShreader -->
 		<e k="GC_baleShreader_openSteer" v="Déployer la buse"/>
@@ -128,8 +138,14 @@ Coût : %s"/>
 		<e k="GC_dynamicStorage_gui_info_unloading" v="Sélectionner la boîte de déchargement. Notez que chaque boîte ne peut contenir qu'un seul type de produit."/>
 		<e k="GC_dynamicStorage_gui_info_loading" v="Sélectionnez la boîte à charger."/>
 		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s litre"/>
-		<e k="GC_dynamicStorage_gui_empty" v="vide"/>
+		<e k="GC_dynamicStorage_gui_empty" v="Vide"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Confirmer la position de déchargement"/>
-		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Confirmer la boîte à charger"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Confirmer le chargement"/>
+
+		<!-- PlaceableDigitalDisplay -->
+		<e k="GC_placeableDigDisplay_openGui" v="Réglage de l'affichage numérique"/>
+		<e k="GC_placeableDigDisplay_header" v="Affichage numérique"/>
+		<e k="GC_placeableDigDisplay_headerInfo" v="Vous pouvez spécifier ici n'importe quel texte qui apparaîtra à l'écran."/>
+		<e k="GC_placeableDigDisplay_btnSave" v="Sauver"/>
 	</elements>
 </l10n>

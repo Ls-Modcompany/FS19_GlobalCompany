@@ -33,7 +33,7 @@ GC_TemplatePlaceable.PLACEABLE_KEY = "placeable.templates";
 GC_TemplatePlaceable.GC_KEY = "globalCompany.templates";
 GC_TemplatePlaceable.ITEM_KEY = "template";
 
-local GC_AnimalShopPlaceable_mt = Class(GC_TemplatePlaceable, Placeable)
+local GC_TemplatePlaceable_mt = Class(GC_TemplatePlaceable, Placeable)
 InitObjectClass(GC_TemplatePlaceable, "GC_TemplatePlaceable")
 
 GC_TemplatePlaceable.debugIndex = g_company.debug:registerScriptName("TemplatePlaceable")
@@ -41,7 +41,7 @@ GC_TemplatePlaceable.debugIndex = g_company.debug:registerScriptName("TemplatePl
 getfenv(0)["GC_TemplatePlaceable"] = GC_TemplatePlaceable
 
 function GC_TemplatePlaceable:new(isServer, isClient, customMt)
-	local self = Placeable:new(isServer, isClient, customMt or GC_AnimalShopPlaceable_mt)
+	local self = Placeable:new(isServer, isClient, customMt or GC_TemplatePlaceable_mt)
 
 	self.debugData = nil
 	self.list = {}

@@ -1,18 +1,62 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="44">
+<modDesc descVersion="47">
 	<author>LS-Modcompany / kevink98, aPuehri, Eribus</author>
 	
-    <version>1.1.0.0</version>
+    <version>1.5.0.1</version>
     
 	<title>
         <en>GlobalCompany</en>
     </title>
     
 	<description>
-        <en>
-			<![CDATA[Global Company - A large script extension for Farming Simulator!
+        <en><![CDATA[Global Company - A large script extension for Farming Simulator!
 
 GlobalCompany is the base for many scripts. No matter if production, warehouse or whatever - with this it is easy to implement.
+
+Changelog 1.5.0.0:
+- NEW: GloblaMarket: Add Feature for create own private servers
+- NEW: FarmerStart
+- NEW: Some Improvements
+- FIX: Baler
+- FIX: Some Bugs
+
+Changelog 1.4.0.0:
+- NEW: Support of ManureHoseSystem for factory
+- NEW: Programmflow for factory
+
+Changelog 1.3.0.0:
+- NEW: Design
+- NEW: GlobalMarket
+- NEW: AnimalTrough
+- FIX: Error message at synchronisation
+
+Changelog 1.2.1.0:
+- FIX: PlaceableDisplay
+- NEW: Synchronisationsystem for MP
+- NEW: GC-Class / GC-Staticclass
+
+Changelog 1.2.0.0:
+- FIX: DynamicStorage: Fix effects on dediserver
+- FIX: DynamicStorage: Change key t to lctrl+t
+- FIX: 'Error: Server:registerObjectInStream is only allowed in writeStream calls' Error on MP
+- FIX: language texts
+- FIX: Objektinfo: Change position, now we can see the hand
+- FIX: Factory: Incomeprice can now be negative
+- FIX: VisibilityNodes: Collisions will check now also on Server
+- FIX: Adaption to Courseplay
+
+- NEW: DynamicStorage: Add unloadtriggers at places
+- NEW: Add dynamic ingamemap to gc menu
+- NEW: Factory: Add animaloutput
+- NEW: Factory: Add Seasons support
+- NEW: Add languanges: pt, it, pl
+- NEW: GC-Menu: Overview for DynamicStorage
+- NEW: GC-Menu: Better overview for Factorys
+- NEW: GC-Menu: AddOns can now create Tabs
+- NEW: Factory: add 'refPoint' - Attribute
+- NEW: Add new Gui-elements
+
+- And many more
 
 Changelog 1.1.0.0:
 - NEW: French and Russian languages added
@@ -25,10 +69,54 @@ Changelog 1.1.0.0:
 - NEW: more features for ProductionFactorys
 - FIX: Adaptation to AutoDrive
 - NEW: DynamicStorage]]></en>		
-		<de>
-			<![CDATA[Global Company - Die größte Scripterweiterung für den Landwirtschaft Simulator!
+		<de><![CDATA[Global Company - Die größte Scripterweiterung für den Landwirtschaft Simulator!
 
 GlobalCompany ist die Grundlage für viele Scripte. Egal ob Produktionen, Lager oder was auch immer - hiermit lässt es sich einfach umsetzen.
+
+Changelog 1.5.0.0:
+- NEU: GloblaMarket: Erstellung von privaten Servern hinzugefügt
+- NEU: FarmerStart
+- NEU: Viele Verbesserungen
+- FIX: Baler
+- FIX: Bugs behoben
+
+Changelog 1.4.0.0:
+- NEU: Unterstützung vom ManureHoseSystem bei Fabriken (Einbau nötig, siehe Beispielmod!)
+- NEU: Programmablaufplan für Fabriken
+
+Changelog 1.3.0.0:
+- NEU: Design
+- NEU: GlobalMarket
+- NEU: AnimalTrough
+- FIX: Fehlermeldung bei Synchronisation
+
+Changelog 1.2.1.0:
+- FIX: PlaceableDisplay
+- NEU: System für Synchronisierung im Multiplayer
+- NEU: GC-Class / GC-Staticclass
+
+Changelog 1.2.0.0:
+- FIX: DynamicStorage: Effektfehler auf Dediserver behoben
+- FIX: DynamicStorage: Tastenkombi auf LCtrl + T geändert
+- FIX: 'Error: Server:registerObjectInStream is only allowed in writeStream calls' Fehler auf Server
+- FIX: Sprachtexte
+- FIX: Objektinfo: Position geändert
+- FIX: Factory: Incomeprice kann nun negativ sein
+- FIX: VisibilityNodes: Kollisionsüberprüfung jetzt auch serverseitig
+- FIX: Anpassung an Courseplay
+
+- NEU: DynamicStorage: Abladetrigger für jede Box hinzugefügt
+- NEU: Dynamische Ingamemap ins GC-Menü hinzugefügt
+- NEU: Factory: Tieroutput hinzugefügt
+- NEU: Factory: Support für Seasons hinzugefügt
+- NEU: Sprachentexte hinzugefügt: pt, it, pl
+- NEU: GC-Menu: Übersicht für Dynamische Lager
+- NEU: GC-Menu: Übersicht für Fabriken überarbeitet
+- NEU: GC-Menu: AddOns können nun eigene Tabs erstellen
+- NEU: Factory: 'refPoint' - Attribute hinzugefügt
+- NEU: Gui-Elemente hinzugefügt
+
+- Und viele weitere Sachen
 
 Changelog 1.1.0.0:
 - NEU: Sprachen Französisch und Russisch hinzugefügt
@@ -41,10 +129,54 @@ Changelog 1.1.0.0:
 - NEU: weitere Features für ProductionFactorys
 - FIX: Anpassung an AutoDrive
 - NEW: DynamicStorage]]></de>
-		<ru>
-			<![CDATA[Global Company - самой большое собрание скриптов для Farming Simulator!
+		<ru><![CDATA[Global Company - самой большое собрание скриптов для Farming Simulator!
 
 GlobalCompany основа для многих скриптов. Будь то производства, хранилища или что то еще - с ним возможно многое.
+
+Блог изменений 1.5.0.0:
+- NEW: GloblaMarket: Добавить возможность создания собственных частных серверов
+- НОВИНКА: FarmerStart
+- НОВОЕ: некоторые улучшения
+- FIX: Пресс
+- FIX: Некоторые ошибки
+
+Блог изменений 1.4.0.0:
+- НОВИНКА: Поддержка системы навозаHoseSystem для фабрики
+- НОВОЕ: Поток программ для завода
+
+Блог изменений 1.3.0.0:
+- НОВИНКА: Дизайн
+- НОВИНКА: GlobalMarket
+- НОВИНКА: AnimalTrough
+- FIX: Сообщение об ошибке при синхронизации
+
+Блог изменений 1.2.1.0:
+- FIX: PlaceableDisplay
+- НОВОЕ: Система синхронизации для MP
+- НОВИНКА: GC-класс / GC-статик-класс
+
+Блог изменений 1.2.0.0:
+- FIX: DynamicStorage: Исправить эффекты на дедисервере
+- FIX: DynamicStorage: Изменить клавишу t на lctrl+t
+- Ошибка: Server:registerObjectInStream разрешен только при writeStream calls' Error on MP
+- FIX: языковые тексты
+- Объектинфо: Смена позиции, теперь мы видим руку
+- FIX: Фабрика: Недооценка теперь может быть отрицательной
+- FIX: Узлы видимости: Коллизии теперь будут проверяться и на сервере
+- FIX: адаптация к игре курса
+
+- NEW: DynamicStorage: Добавить разгрузочные триггеры в местах
+- НОВИНКА: Добавить динамическую карту ingamemap в меню gc
+- Фабрика: Добавить животный выход
+- Фабрика: Добавить поддержку сезонов
+- Новое: Добавьте языки: pt, it, pl
+- Новое: ГК-меню: Обзор для DynamicStorage
+- Новое: ГК-меню: Лучший обзор для Factorys
+- Новое: ГК-меню: Добавления теперь могут создавать Tabs
+- НОВОЕ: Завод: добавить 'refPoint' - Атрибут
+- НОВИНКА: Добавить новые Gui-элементы
+
+- И многое другое
 
 Блог изменений 1.1.0.0:
 - НОВИНКА: Добавлены французский и русский языки
@@ -57,10 +189,54 @@ GlobalCompany основа для многих скриптов. Будь то �
 - НОВИНКА: больше возможностей для ProductionFactorys
 - FIX: адаптация к AutoDrive
 - НОВИНКА: Динамическое хранение данных]]></ru>
-        <fr>
-			<![CDATA[Global Company - Une grande extension de script pour Farming Simulator !
+        <fr><![CDATA[Global Company - Une grande extension de script pour Farming Simulator !
 
 GlobalCompany est la base de nombreux scripts. Que ce soit pour la production, l'entreposage ou autre - avec ce mod, il est facile de tout implémenter.
+
+Changelog 1.5.0.0 :
+- NOUVEAU : GloblaMarket : Ajout d'une fonctionnalité permettant de créer ses propres serveurs privés
+- NOUVEAU : FarmerStart
+- NOUVEAU : Quelques améliorations
+- CORRECTION : Presse à balles
+- CORRECTION : Quelques bugs
+
+Changelog 1.4.0.0 :
+- NOUVEAU : Support du système de tuyaux d'évacuation du fumier pour les usines
+- NOUVEAU : Programmflow pour l'usine
+
+Changelog 1.3.0.0 :
+- NOUVEAU : Design
+- NOUVEAU : GlobalMarket
+- NOUVEAU : AnimalTrough
+- CORRECTION : Message d'erreur lors de la synchronisation
+
+Changelog 1.2.1.0 :
+- CORRECTIF : Affichage de la place disponible
+- NOUVEAU : Système de synchronisation pour les députés
+- NOUVEAU : Classe GC / Staticclasse GC
+
+Changelog 1.2.0.0 :
+- CORRECTIF : DynamicStorage : Correction des effets sur le dé-diseur
+- CORRECTIF : DynamicStorage : Changer la touche t en lctrl+t
+- CORRECTION : 'Erreur : Server:registerObjectInStream n'est autorisé que dans les appels writeStream' Erreur sur MP
+- CORRECTIF : textes en langue
+- FIX : Objektinfo : Changement de position, maintenant on peut voir la main
+- FIX : Usine : Le prix du revenu peut maintenant être négatif
+- CORRECTIF : VisibilityNodes : Les collisions seront maintenant vérifiées aussi sur le serveur
+- CORRECTIF : Adaptation au jeu de parcours
+
+- NOUVEAU : DynamicStorage : Ajout de triggers de déchargement à certains endroits
+- NOUVEAU : Ajout de l'ingamemap dynamique au menu gc
+- NOUVEAU : Usine : Ajout de la sortie animal
+- NOUVEAU : Usine : Ajout du support Seasons
+- NOUVEAU : Ajouter des langues : pt, it, pl
+- NOUVEAU : Menu GC : Vue d'ensemble pour DynamicStorage
+- NOUVEAU : Menu GC : Une meilleure vue d'ensemble pour Factorys
+- NOUVEAU : Menu GC : Les AddOns peuvent maintenant créer des onglets
+- NOUVEAU : Usine : ajout de 'refPoint' - Attribut
+- NOUVEAU : Ajouter de nouveaux Gui-éléments
+
+- Et beaucoup d'autres
 
 Changelog 1.1.0.0.0 :
 - NOUVEAU : ajout des langues française et russe
@@ -83,9 +259,9 @@ Changelog 1.1.0.0.0 :
 	</extraSourceFiles>
 
     <l10n>		
-		<text name="input_GC_MAIN"><en>GlobalCompany</en><de>GlobalCompany</de></text>
-		<text name="input_GC_BALEADDON_CUT"><en>Cut Bale</en><de>Ballen aufschneiden</de></text>
-		<text name="input_GC_DYNSTORAGE_VEHICLEINTERACTION"><en>dynStorageVehInterAct</en></text>
+	    <text name="input_GC_MAIN"><en>GlobalCompany</en><de>GlobalCompany</de><pl>Menu GlobalCompany</pl></text>
+	    <text name="input_GC_BALEADDON_CUT"><en>Cut Bale</en><de>Ballen aufschneiden</de><pl>Rozetnij belę</pl></text>
+		<text name="input_GC_DYNSTORAGE_VEHICLEINTERACTION"><en>DynStorageVehInterAct</en></text>
 	</l10n>		
 	
 	<actions>
@@ -102,7 +278,13 @@ Changelog 1.1.0.0.0 :
             <binding device="KB_MOUSE_DEFAULT" input="MOUSE_BUTTON_RIGHT" axisComponent="+" neutralInput="0" index="3"/>
         </actionBinding>
 		<actionBinding action="GC_DYNSTORAGE_VEHICLEINTERACTION">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_t" axisComponent="+" neutralInput="0" index="1"/>
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lctrl KEY_t" axisComponent="+" neutralInput="0" index="1"/>
         </actionBinding>	
     </inputBinding>
+
+    <storeItems>
+        <storeItem xmlFilename="shop/buyableBales_grassRound.xml" />
+        <storeItem xmlFilename="shop/buyableBales_grass.xml" />
+        <storeItem xmlFilename="shop/buyableBales_cotton.xml" />
+    </storeItems>
 </modDesc>

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<l10n>
+	<elements>
+
+		<!-- Warnings / Errors -->
+		<e k="GC_mapVersionWarning" v="La Mappa '%s' di %s richiede Global Company - Versione %s o superiore per funzionare correttamente. Visitare il link nel modHub per scaricarel'ultima versione ufficiale o visitare '%s' per il support."/>
+		<e k="GC_modVersionWarning" v="La Mod '%s' di %s richiede Global Company - Versione %s o superiore per funzionare correttamente. Visitare il link nel modHub per scaricarel'ultima versione ufficiale o visitare '%s' per il support."/>
+		<e k="GC_loadingError" v="Si è verificato un errore durante il caricamento di Global Company! Visitare il link nel modHub per scaricarel'ultima versione ufficiale o visitare'%s' per il support."/>
+		<e k="GC_duplicateError" v="Prova di caricare due volte la Global Company! Rimuovere '%s' dalle cartella delle mod e ricaricare il gioco."/>
+		<e k="GC_combinedError" v="Stai provando a caricare Global Company come parte di una mappa mod '%s'! Questo non è possibile e causerà gravi errori. Please visit modHub download link for the latest official version or visit '%s' for support."/>
+		<e k="GC_invalidModWarning" v="Mod %s di %s non supportata! Per evitare errori, questa mod dovrebbe essere rimossa!"/>
+		<e k="GC_quitToMainMenu" v="Sei sicuro di voler uscire dal menu principale?"/>
+		<e k="GC_betaVersionWarning" v="La versione di sviluppo è stata caricata. Si prega di segnalare avvisi o errori a %s. Visitare il link nel modHub per scaricarel'ultima versione ufficiale o visitare '%s' per il support."/>
+		<e k="GC_namingError" v="Trovato nome 'file / zip' '%s' invalido per la versione di sviluppo! Usare 'FS19_GlobalCompany' per il nome del file / zip. Visitare il link nel modHub per scaricarel'ultima versione ufficiale o visitare '%s' per il support."/>
+
+		<!-- GUI -->
+		<e k="GC_gui_buttons_ok" v="OK"/>
+		<e k="GC_gui_buttons_yes" v="Si"/>
+		<e k="GC_gui_buttons_no" v="No"/>
+		<e k="GC_gui_buttons_back" v="Indietro"/>
+		<e k="GC_gui_modHubLink" v="ModHub Download Link"/>
+		<e k="GC_gui_buttons_nextWarning" v="Prossimo avviso"/>
+		<e k="GC_gui_buttons_nextConflict" v="Prossimo conflitto"/>
+
+		<!-- General -->
+		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
+
+		<!-- Settings -->
+		<e k="GC_settings_header" v="GlobalCompany - Impostazioni"/>
+		<e k="GC_settings1_title" v="Attiva Posizionamento esteso"/>
+		<e k="GC_settings2_title" v="Visualizza Info Obbiettivo"/>
+		<e k="GC_settings3_title" v="Aiuto Cavalli ($300 / Cavallo / Giorno)"/>
+		<e k="GC_settings4_title" v="Attiva più alberi"/>
+		<e k="GC_settings5_title" v="Attiva taglio Balle"/>
+		
+		<!-- Factory -->
+		<e k="GC_gui_overview" v="Generale"/>
+		<e k="GC_gui_productLines" v="Linea Produzione"/>
+		<e k="GC_gui_description" v="Descrizione"/>
+		<e k="GC_gui_active" v="Attivo"/>
+		<e k="GC_gui_productionPerHour" v="Produzione: %s Litri/Ora"/>
+		<e k="GC_gui_capacity" v="Capacità:"/>
+		<e k="GC_gui_filllevel" v="Livello:"/>
+		<e k="GC_gui_liter" v="%s Litri"/>
+		<e k="GC_gui_buyText" v="Acquisto (%s)"/>
+		<e k="GC_gui_activate" v="Attivato"/>
+		<e k="GC_gui_deactivate" v="Disattivato"/>
+		<e k="GC_gui_state" v="Stato:"/>
+		<e k="GC_gui_automatic" v="Automatico:"/>
+		<e k="GC_gui_state_on" v="Avviato"/>
+		<e k="GC_gui_state_off" v="Fermo"/>
+		<e k="GC_gui_pallet1" v="%s Prodotto"/>
+		<e k="GC_gui_pallet2" v="%s Prodotti"/>
+		<e k="GC_gui_spawnText1" v=" %s Crea prodotto"/>
+		<e k="GC_gui_spawnText2" v=" %s Crea prodotti"/>
+		<e k="GC_gui_autoStart" v="Avvio Automatico:"/>
+		
+		<e k="GC_Productline_Title_Backup" v="Linea Produzione %d"/>
+		<e k="GC_Input_Title_Backup" v="Carico %d"/>
+		<e k="GC_Output_Title_Backup" v="Scarico %d"/>
+		<e k="GC_Input_Header_Backup" v="Carico"/>
+		<e k="GC_Output_Header_Backup" v="Scarico"/>
+		
+		<e k="GC_Open_Product_Menu" v="Apri Menu Prodotti"/>
+		<e k="GC_Open_Overview_Menu" v="Apri Menu Generale"/>
+		
+		<e k="GC_Factory_Animal_Dialogue1" v="Seleziona il numero di animali da scaricare in Fattoria."/>
+		<e k="GC_Factory_Animal_Dialogue2" v="Select the number of animals to unload to vehicle."/>
+
+		<e k="GC_gui_disabled" v="Disabilita"/>
+		<e k="GC_gui_add" v="Aggiungi"/>
+		<e k="GC_gui_remove" v="Rimuovi"/>
+		<e k="GC_gui_rename" v="Rinomina"/>
+		<e k="GC_gui_max" v="Massimo"/>
+		<e k="GC_gui_percent" v="Percentuale"/>
+		<e k="GC_gui_lifeTimeIncome" v="Rendita a vita"/>
+		<e k="GC_gui_changeFactoryTitle" v="Inserire sotto il nuovo nome."/>
+
+		<e k="GC_gui_factories" v="Produzione"/>
+		<e k="GC_gui_activeProductLines" v="Linea produzione attiva:"/>
+		<e k="GC_gui_emptyInputs" v="Materie prime vuote:"/>
+		<e k="GC_gui_fullOutputs" v="Prodotti finiti:"/>
+
+		<e k="GC_gui_dynamicStorages" v="Deposito dinamico"/>
+		<e k="GC_gui_freeSlots" v="Posti gratuiti:"/>
+		
+		<e k="GC_gui_placeableObject" v="Oggetto posizionabile"/>
+		<e k="GC_gui_farmlandObject" v="Oggetto Agricolo"/>
+		<e k="GC_gui_changeDynamicStorageTitle" v="Assegnare nuovo nome al deposito dinamico"/>
+		<e k="GC_gui_dynamicStorage_titleBackup" v="Deposito dinamico"/>
+		
+		<!-- Formatting required -->
+		<e k="GC_Factory_Sell_Warning" v="Questa edificio contiene ancora prodotti. Questi saranno venduti in blocco per il seguente importo:
+
+Prezzo blocco:  %s"/>		
+		
+		<e k="GC_Factory_Purchase_Warning" v="Conferma se vuoi vendere.
+
+Carico Prodotto:  %s
+Volume:  %s
+Prezzo:  %s"/>
+
+		<!-- BaleShreader -->
+		<e k="GC_baleShreader_openSteer" v="Apri scarico"/>
+		<e k="GC_baleShreader_closeSteer" v="Chiudi Scarico"/>
+		<e k="GC_baleShreader_startWork" v="Avvia imballatrice"/>
+		<e k="GC_baleShreader_endWork" v="Ferma imballatrice"/>
+		<e k="GC_baleShreader_toggleOnWorkLight" v="Accendi Luci"/>
+		<e k="GC_baleShreader_toggleOffWorkLight" v="Spegni Luci"/>
+
+		<!-- Baler -->
+		<e k="GC_baler_title" v="Imballatrice"/>
+		<e k="GC_baler_title_witStack" v="Balle in pila"/>
+		<e k="GC_baler_cleaner" v="Pulisci imballatrice"/>
+		<e k="GC_baler_openGui" v="Apri Hud"/>
+		<e k="GC_baler_closeGui" v="Chiudi Hud"/>
+		<e k="GC_baler_makeEmpty" v="Vuoto"/>
+		<e k="GC_baler_turnOn" v="Accendi"/>
+		<e k="GC_baler_turnOff" v="Spegni"/>
+		<e k="GC_baler_info_machineData" v="Dati impianto"/>
+		<e k="GC_baler_info_fillLevel" v="Livello"/>
+		<e k="GC_baler_info_fillLevelBunker" v="Livello Bunker"/>
+		<e k="GC_baler_info_counter" v="Cantatore Balle"/>
+		<e k="GC_baler_info_automatic" v="Avvio Automatico"/>
+		<e k="GC_baler_actualTyp" v="Livello attuale:"/>
+		<e k="GC_baler_canStack" v="Numero balle impilate:"/>
+
+		<!-- ObjectInfo -->
+		<e k="GC_ObjectInfo_filltype" v="Livello: %s"/>
+		<e k="GC_ObjectInfo_level" v="Livello: %s Litri"/>
+		<e k="GC_ObjectInfo_level2" v="Livello: %s Litri (%s%%)"/>
+		<e k="GC_ObjectInfo_owner" v="Proprietario: %s"/>
+
+		<!-- DynamicStorage -->
+		<e k="GC_dynamicStorage_unloadSettings" v="Scarica Impostazioni"/>
+		<e k="GC_dynamicStorage_gui_header_unloading" v="Sleziona posizione scarico"/>
+		<e k="GC_dynamicStorage_gui_header_loading" v="Seleziona scatola carico"/>
+		<e k="GC_dynamicStorage_gui_info_unloading" v="Scegli in quale scatola deve essere scaricato. Si noti che in ogni scatola può essere scaricato solo un frutto."/>
+		<e k="GC_dynamicStorage_gui_info_loading" v="Scegli da quale scatola caricare."/>
+		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s Litri"/>
+		<e k="GC_dynamicStorage_gui_empty" v="Vuoto"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Confemra posizione scarico"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Conferma scatola da caricare"/>
+		
+		<!-- PlaceableDigitalDisplay -->
+		<e k="GC_placeableDigDisplay_openGui" v="Regola il display digitale"/>
+		<e k="GC_placeableDigDisplay_header" v="Display digitale"/>
+		<e k="GC_placeableDigDisplay_headerInfo" v="Qui è possibile specificare qualsiasi testo che si desidera visualizzare sul display."/>
+		<e k="GC_placeableDigDisplay_btnSave" v="Salva"/>
+		
+		<!-- GlobalMarket -->
+		<e k="GC_globalMarket_openGui" v="Mercato globale aperto"/>
+		<e k="GC_globalMarket_header" v="Mercato globale 2020"/>
+		<e k="GC_globalMarket_headerInfo" v="Qui puoi vendere beni consegnati o acquistare beni."/>
+		<e k="GC_globalMarket_btn_buyScreen" v="Acquisto Sommario"/>
+		<e k="GC_globalMarket_btn_storageScreen" v="Panoramica di memorizzazione"/>
+		<e k="GC_globalMarket_btn_synch" v="Sincronizzare"/>
+		
+		<e k="GC_globalMarket_header2" v="Mercato globale 2020 - selezione della quantità"/>
+		<e k="GC_globalMarket_headerInfo2" v="Scegli qui la quantità desiderata!"/>
+		<e k="GC_globalMarket_btn_ok" v="Conferma"/>
+		<e k="GC_globalMarket_btn_startLoad" v="Inizia a caricare"/>
+		
+		<e k="GC_globalMarket_header3" v="Mercato globale 2020 - outsourcing"/>
+		<e k="GC_globalMarket_headerInfo3" v="Scegli cosa caricare"/>
+		<e k="GC_globalMarket_btn_min" v="Minimo"/>
+		<e k="GC_globalMarket_btn_max" v="Massimo"/>
+
+		<e k="GC_globalMarket_txt_amount" v="Lotto"/>
+		<e k="GC_globalMarket_txt_money" v="Valore"/>
+
+		<e k="GC_globalMarket_tbl_header_filltype" v="Tipo di frutta"/>
+		<e k="GC_globalMarket_tbl_header_level" v="Litri"/>
+		<e k="GC_globalMarket_tbl_header_pallets" v="Pallet"/>
+		<e k="GC_globalMarket_tbl_header_bales" v="Balla"/>
+		<e k="GC_globalMarket_tbl_header_price" v="Prezzo attuale"/>
+		<e k="GC_globalMarket_tbl_header_price2" v="Prezzo attuale / 1000 Litri"/>
+		<e k="GC_globalMarket_btn_outsource" v="Outsourcing"/>
+		<e k="GC_globalMarket_btn_outsourceBale1" v="Rotoballe"/>
+		<e k="GC_globalMarket_btn_outsourceBale2" v="Balle quadrate"/>
+		<e k="GC_globalMarket_btn_sell" v="Vendita"/>
+		<e k="GC_globalMarket_btn_buy" v="Acquista   "/>
+
+		<e k="GC_globalMarket_externIsOffline" v="Avvia il software esterno richiesto in modo da poter acquistare beni o vendere i tuoi beni."/>
+		<e k="GC_globalMarket_externIsFalseVersion" v="Non hai l'ultima versione del software esterno."/>
+		
+		
+		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Balle quadrate di erba"/>
+		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Balle rotonde di erba"/>
+		<e k="GC_globalMarket_storeItem_cotton" v="di cotone"/>
+		
+		<!-- Market -->
+		<!--e k="GC_market_showDetails" v="Dettaglio"/>
+		<e k="GC_market_date" v="Data"/>
+		<e k="GC_market_name" v="Nome"/>
+		<e k="GC_market_type" v="Art"/>
+		<e k="GC_market_liter" v="Litri"/>
+		<e k="GC_market_money" v="Prezzo"/>
+		<e k="GC_market_designation" v="Destinazione"/-->
+		
+	</elements>
+</l10n>

@@ -20,6 +20,7 @@
 		<e k="GC_gui_modHubLink" v="ModHub Download Link"/>
 		<e k="GC_gui_buttons_nextWarning" v="Next Warning"/>
 		<e k="GC_gui_buttons_nextConflict" v="Next Conflict"/>
+		<e k="GC_gui_buttons_accept" v="Confirm"/>
 
 		<!-- General -->
 		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
@@ -31,7 +32,6 @@
 		<e k="GC_settings3_title" v="Horse Helper ($300 / Horse / Day)"/>
 		<e k="GC_settings4_title" v="Activate More Trees"/>
 		<e k="GC_settings5_title" v="Activate Cut Bales"/>
-		<e k="GC_settings6_title" v="VehicleControl: Shop Interaktionshelp"/>
 		
 		<!-- Factory -->
 		<e k="GC_gui_buttons_back" v="Back"/>
@@ -44,7 +44,6 @@
 		<e k="GC_gui_filllevel" v="Fill Level:"/>
 		<e k="GC_gui_liter" v="%s Litres"/>
 		<e k="GC_gui_buyText" v="Purchase (%s)"/>
-		
 		<e k="GC_gui_activate" v="Activate"/>
 		<e k="GC_gui_deactivate" v="Deactivate"/>
 		<e k="GC_gui_state" v="Status:"/>
@@ -56,40 +55,41 @@
 		<e k="GC_gui_spawnText1" v="Spawn %s Pallet"/>
 		<e k="GC_gui_spawnText2" v="Spawn %s Pallets"/>
 		<e k="GC_gui_autoStart" v="Auto Start:"/>		
-		
 		<e k="GC_Productline_Title_Backup" v="Production Line %d"/>
 		<e k="GC_Input_Title_Backup" v="Input %d"/>
 		<e k="GC_Output_Title_Backup" v="Output %d"/>
 		<e k="GC_Input_Header_Backup" v="Inputs"/>
 		<e k="GC_Output_Header_Backup" v="Outputs"/>
-		
 		<e k="GC_Open_Product_Menu" v="Open product menu"/>
 		<e k="GC_Open_Overview_Menu" v="Open overview menu"/>
-		
-		<e k="GC_Factory_Animal_Dialogue" v="Select the number of animals to unload to factory."/>
-
+		<e k="GC_Factory_Animal_Dialogue1" v="Select the number of animals to unload to factory."/>
+		<e k="GC_Factory_Animal_Dialogue2" v="Select the number of animals to unload to vehicle."/>
 		<e k="GC_gui_disabled" v="Disabled"/>
 		<e k="GC_gui_add" v="Add"/>
 		<e k="GC_gui_remove" v="Remove"/>
+		<e k="GC_gui_rename" v="Rename"/>
 		<e k="GC_gui_max" v="Maximum"/>
 		<e k="GC_gui_percent" v="Percent"/>
 		<e k="GC_gui_lifeTimeIncome" v="Lifetime Income"/>
 		<e k="GC_gui_changeFactoryTitle" v="Enter new factory reference name below."/>
-
-		<e k="GC_gui_placeableObject" v="Placeable Object"/>
-		<e k="GC_gui_farmlandObject" v="Farmland Object"/>
+		<e k="GC_gui_factories" v="Factories"/>
+		<e k="GC_gui_activeProductLines" v="Active factories:"/>
+		<e k="GC_gui_emptyInputs" v="Raw Materials:"/>
+		<e k="GC_gui_fullOutputs" v="Final Product:"/>
+		<e k="GC_gui_dynamicStorages" v="Dynamic Storages"/>
+		<e k="GC_gui_freeSlots" v="Free Slots:"/>
+		<e k="GC_gui_placeableObject" v="Objeto colocable"/>
+		<e k="GC_gui_farmlandObject" v="Farmland Objetc"/>
+		<e k="GC_gui_changeDynamicStorageTitle" v="Define a name for the Storage"/>
+		<e k="GC_gui_dynamicStorage_titleBackup" v="Dynamic Storage"/>
 		
 		<!-- Formatting required -->
 		<e k="GC_Factory_Sell_Warning" v="This factory still contains products. These will be sold in bulk for the following amount:
-
-Bulk Price:  %s"/>		
-		
+			Bulk Price:  %s"/>		
 		<e k="GC_Factory_Purchase_Warning" v="Please confirm the following product purchase.
-
-Input Product:  %s
-Volume:  %s
-Cost:  %s"/>
-
+			Input Product:  %s
+			Volume:  %s
+			Cost:  %s"/>
 
 		<!-- BaleShreader -->
 		<e k="GC_baleShreader_openSteer" v="Open Steer"/>
@@ -129,8 +129,63 @@ Cost:  %s"/>
 		<e k="GC_dynamicStorage_gui_info_unloading" v="Choose in which box should be unloaded. Note that in each box only one fruit can be unloaded."/>
 		<e k="GC_dynamicStorage_gui_info_loading" v="Choose from which box to load."/>
 		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s Litre"/>
-		<e k="GC_dynamicStorage_gui_empty" v="empty"/>
+		<e k="GC_dynamicStorage_gui_empty" v="Empty"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Confirm unloading position"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Confirm charging box"/>
+
+		<!-- PlaceableDigitalDisplay -->
+		<e k="GC_placeableDigDisplay_openGui" v="Adjust digital display"/>
+		<e k="GC_placeableDigDisplay_header" v="Digitales display"/>
+		<e k="GC_placeableDigDisplay_headerInfo" v="Here you can specify any text you want to appear on the display."/>
+		<e k="GC_placeableDigDisplay_btnSave" v="Save"/>
+		
+		<!-- GlobalMarket -->
+		<e k="GC_globalMarket_openGui" v="Open GlobalMarket"/>
+		<e k="GC_globalMarket_header" v="Global Markt 2020"/>
+		<e k="GC_globalMarket_headerInfo" v="Here you can sell delivered goods or buy goods."/>
+		<e k="GC_globalMarket_btn_buyScreen" v="Purchase overview"/>
+		<e k="GC_globalMarket_btn_storageScreen" v="Stock overview"/>
+		<e k="GC_globalMarket_btn_synch" v="Synchronize"/>
+		
+		<e k="GC_globalMarket_header2" v="Global Markt 2020 - Quantity selection"/>
+		<e k="GC_globalMarket_headerInfo2" v="Select the desired quantity here!"/>
+		<e k="GC_globalMarket_btn_ok" v="Confirm"/>
+		<e k="GC_globalMarket_btn_startLoad" v="Start loading"/>
+		
+		<e k="GC_globalMarket_header3" v="Global Markt 2020 - Outsource"/>
+		<e k="GC_globalMarket_headerInfo3" v="Select what to load"/>
+		<e k="GC_globalMarket_btn_min" v="Minimum"/>
+		<e k="GC_globalMarket_btn_max" v="Maximum"/>
+
+		<e k="GC_globalMarket_txt_amount" v="Quantity"/>
+		<e k="GC_globalMarket_txt_money" v="Value"/>
+
+		<e k="GC_globalMarket_tbl_header_filltype" v="Fruit type"/>
+		<e k="GC_globalMarket_tbl_header_level" v="Litres"/>
+		<e k="GC_globalMarket_tbl_header_pallets" v="Pallets"/>
+		<e k="GC_globalMarket_tbl_header_bales" v="Bales"/>
+		<e k="GC_globalMarket_tbl_header_price" v="Actual Price"/>
+		<e k="GC_globalMarket_tbl_header_price2" v="Actual Price / 1000 Liter"/>
+		<e k="GC_globalMarket_btn_outsource" v="Outsource"/>
+		<e k="GC_globalMarket_btn_outsourceBale1" v="Round bale"/>
+		<e k="GC_globalMarket_btn_outsourceBale2" v="Square bale"/>
+		<e k="GC_globalMarket_btn_sell" v="Sell"/>
+		<e k="GC_globalMarket_btn_buy" v="Buy"/>
+
+		<e k="GC_globalMarket_tbl_header_preview" v="Preview"/>
+		<e k="GC_globalMarket_tbl_header_name" v="Name"/>
+		<e k="GC_globalMarket_tbl_header_age" v="Age"/>
+		<e k="GC_globalMarket_tbl_header_price3" v="Price"/>
+
+		<e k="GC_globalMarket_externIsOffline" v="Start the necessary external software so that you can buy goods or sell your delivered goods."/>
+		<e k="GC_globalMarket_externIsFalseVersion" v="You do not have the latest version of the external software."/>
+		
+		
+		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Square bale grass"/>
+		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Round bale grass"/>
+		<e k="GC_globalMarket_storeItem_cotton" v="Cotton"/>
+	
+		<!-- FarmStarter -->
+		<e k="GC_farmstarter_header" v="Choose your startfarm!"/>
 	</elements>
 </l10n>

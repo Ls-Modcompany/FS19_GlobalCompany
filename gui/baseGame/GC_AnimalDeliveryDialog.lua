@@ -48,20 +48,17 @@ function GC_AnimalDeliveryDialog:new()
 	return self
 end
 
-function GC_AnimalDeliveryDialog:setDialogData(animalsInTrailer, capacity)
+function GC_AnimalDeliveryDialog:setDialogData(animalsInTrailer, capacity, subType, isInput)
 	local animalsTable = {"    0"}
 
-	if #animalsInTrailer > 0 then
-		local animal = animalsInTrailer[1]
-		local subType = animal:getSubType()
-
+	if animalsInTrailer > 0 then
 		self.animalType = subType.type
 		self.animalFillTypeDesc = subType.fillTypeDesc
 
 		self.animalTitle = self.animalFillTypeDesc.title
 		self.iconFilename = self.animalFillTypeDesc.hudOverlayFilenameSmall		
 		
-		local maxToMove = math.min(#animalsInTrailer, capacity)
+		local maxToMove = math.min(animalsInTrailer, capacity)
 		for i = 1, maxToMove do			
 			table.insert(animalsTable, string.format("    %d", i))
 		end

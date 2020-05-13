@@ -77,6 +77,14 @@ function GC_Gui:loadFromXMLRec(xmlFile, key, actGui)
 			guiElement = GC_Gui_table:new(self.classGui);
 		elseif t == "input" then
 			guiElement = GC_Gui_input:new(self.classGui);
+		elseif t == "page" then
+			guiElement = GC_Gui_page:new(self.classGui);
+		elseif t == "pageSelector" then
+			guiElement = GC_Gui_pageSelector:new(self.classGui);
+		elseif t == "ingameMap" then
+			guiElement = GC_Gui_ingameMap:new(self.classGui);
+		elseif t == "tableSort" then
+			guiElement = GC_Gui_tableSort:new(self.classGui);			
 		else
 			guiElement = GC_Gui_element:new(self.classGui, nil, true);
 		end;

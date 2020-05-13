@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<vehicle type="buyableBale">
+    <annotation>Copyright (C) GIANTS Software GmbH, All Rights Reserved.</annotation>
+
+    <storeData>
+        <name>$l10n_GC_globalMarket_storeItem_roundBaleGrass</name>
+        <specs>
+            <capacity unit="$l10n_unit_literShort">4000</capacity>
+        </specs>
+        <image>$data/objects/buyableBales/store_buyableBales_dryGrassRound.png</image>
+        <price>650</price>
+        <lifetime>600</lifetime>
+        <allowLeasing>false</allowLeasing>
+        <canBeSold>false</canBeSold>
+        <showInStore>false</showInStore>
+        <rotation>0</rotation>
+        <brand>LIZARD</brand>
+        <category>bales</category>
+        <vertexBufferMemoryUsage>576</vertexBufferMemoryUsage>
+        <indexBufferMemoryUsage>72</indexBufferMemoryUsage>
+        <textureMemoryUsage>64</textureMemoryUsage>
+        <instanceVertexBufferMemoryUsage>0</instanceVertexBufferMemoryUsage>
+        <instanceIndexBufferMemoryUsage>0</instanceIndexBufferMemoryUsage>
+    </storeData>
+
+    <base>
+        <typeDesc>$l10n_storeItem_roundBaleSilage</typeDesc>
+        <filename>$data/objects/buyableBales/buyableBale.i3d</filename>
+        <size width="4" length="4" />
+        <components>
+            <component centerOfMass="0 0 0" solverIterationCount="10" mass="100"/>
+        </components>
+    </base>
+
+    <buyableBale filename="$data/objects/roundbales/roundbaleGrass_w112_d130.i3d">
+        <offsets>
+            <offset amount="1" offset="0 0 0.67"/>
+            <offset amount="3" offset="0 0 0"/>
+            <offset amount="5" offset="-0.67 0 0"/>
+        </offsets>
+        <balePositions>
+            <balePosition position="0 0.567 -0.67" rotation="-90 0 0"/>
+            <balePosition position="0 1.697 -0.67" rotation="-90 0 0"/>
+
+            <balePosition position="0 0.567 0.67" rotation="-90 0 0"/>
+            <balePosition position="0 1.697 0.67" rotation="-90 0 0"/>
+
+            <balePosition position="1.34 0.567 -0.67" rotation="-90 0 0"/>
+            <balePosition position="1.34 1.697 -0.67" rotation="-90 0 0"/>
+
+            <balePosition position="1.34 0.567 0.67" rotation="-90 0 0"/>
+            <balePosition position="1.34 1.697 0.67" rotation="-90 0 0"/>
+        </balePositions>
+    </buyableBale>
+
+    <buyableBaleAmountConfigurations>
+        <buyableBaleAmountConfiguration name="1" price="0"/>
+        <buyableBaleAmountConfiguration name="2" price="650"/>
+        <buyableBaleAmountConfiguration name="3" price="1300"/>
+        <buyableBaleAmountConfiguration name="4" price="1950"/>
+        <buyableBaleAmountConfiguration name="5" price="2600"/>
+        <buyableBaleAmountConfiguration name="6" price="3250"/>
+        <buyableBaleAmountConfiguration name="7" price="3900"/>
+        <buyableBaleAmountConfiguration name="8" price="4550"/>
+    </buyableBaleAmountConfigurations>
+
+</vehicle>

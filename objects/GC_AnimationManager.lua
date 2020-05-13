@@ -112,8 +112,10 @@ function GC_AnimationManager:loadAnimation(xmlFile, key, animation, allowLooping
 		local looping = false
 		if allowLooping then
 			looping = Utils.getNoNil(getXMLBool(xmlFile, key .. "#looping"), false)
+			stopAfterLoop = Utils.getNoNil(getXMLBool(xmlFile, key .. "#stopAfterLoop"), false)
 		end
 		animation.looping = looping
+		animation.stopAfterLoop = stopAfterLoop
 		animation.resetOnStart = Utils.getNoNil(getXMLBool(xmlFile, key .. "#resetOnStart"), true)
 
 		local partI = 0
@@ -457,10 +459,10 @@ function GC_AnimationManager:setRealAnimationTime(name, animTime, update)
 			
 			self:resetAnimationValues(animation)
 			
-			local dtToUse, _ = self:updateAnimationCurrentTime(animation, 99999999, animTime)			
+			local dtToUse, _ = self:updateAnimationCurrentTime(animation, 99999999, animTime)
 			self:updateAnimation(animation, dtToUse, false)
 			animation.currentSpeed = currentSpeed
-		else
+		else	
 			animation.currentTime = animTime
 		end
 	end
@@ -726,15 +728,16 @@ function GC_AnimationManager:updateAnimation(anim, dtToUse, stopAnim, allowResta
 			self.activeAnimations[anim.name] = nil
 
 			-- Not sure if we should ignore this when looping??
-			GC_AnimationManager.raiseTargetFunction(self, "animationFinishedPlaying", anim.name)
+			GC_AnimationManager.raiseTargetFunction(self, "animationFinishedPlaying", anim.name, true)
 		end
 		
 		if allowRestart == nil or allowRestart then
 			if anim.looping then
-				-- restart animation
 				local factor = 0 -- 1
 				self:setAnimationTime(anim.name, math.abs((anim.duration - anim.currentTime) - factor), true)
-				self:playAnimation(anim.name, anim.currentSpeed, nil, true)
+				if not anim.stopAfterLoop then
+					self:playAnimation(anim.name, anim.currentSpeed, nil, true)
+				end
 			end
 		end
 	end
@@ -929,10 +932,10 @@ function GC_AnimationManager.animPartSorterReverse(a, b)
 	return false
 end
 
-function GC_AnimationManager.raiseTargetFunction(self, functionName, animName)
+function GC_AnimationManager.raiseTargetFunction(self, functionName, animName, ...)
 	local target = self.target	
 	if target[functionName] ~= nil then
-		target[functionName](target, animName)
+		target[functionName](target, animName, ...)
 	end
 end
 

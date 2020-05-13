@@ -24,9 +24,13 @@ Gc_Gui_MainGui = {};
 Gc_Gui_MainGui.xmlFilename = g_company.dir .. "gui/objects/GcMain.xml";
 Gc_Gui_MainGui.debugIndex = g_company.debug:registerScriptName("Gc_Gui_MainGui");
 
-source(g_company.dir .. "gui/objects/GcMain_Errors.lua");
-source(g_company.dir .. "gui/objects/GcMain_Settings.lua");
-source(g_company.dir .. "gui/objects/GcMain_Factories.lua");
+if not g_company.isGreenWeekVersion then
+    source(g_company.dir .. "gui/objects/GcMain_Errors.lua");
+    source(g_company.dir .. "gui/objects/GcMain_Settings.lua");
+    source(g_company.dir .. "gui/objects/GcMain_Factories.lua");
+    source(g_company.dir .. "gui/objects/GcMain_DynamicStorages.lua");
+    --source(g_company.dir .. "gui/objects/GcMain_Market.lua");
+end
 
 local Gc_Gui_MainGui_mt = Class(Gc_Gui_MainGui);
 
@@ -36,12 +40,18 @@ function Gc_Gui_MainGui:new(target, custom_mt)
     end;
     local self = setmetatable({}, Gc_Gui_MainGui_mt);
 
-    g_company.gui:loadGui(Gc_Gui_MainSettings, "gcMainSettings");
-    g_company.gui:loadGui(Gc_Gui_Errors, "gcMainErrors");    
-	g_company.gui:loadGui(Gc_Gui_Factories, "gcMainFactories");
-	
-	local factoryMenu = {imageFilename = "g_gcUi2", imageUVs = "icon_factories", gui = g_company.gui:getGui("gcMainFactories")};    
-	self.backupItems = {factoryMenu}; 
+    if not g_company.isGreenWeekVersion then
+        g_company.gui:loadGui(Gc_Gui_MainSettings, "gcMainSettings");
+        g_company.gui:loadGui(Gc_Gui_Errors, "gcMainErrors");    
+        g_company.gui:loadGui(Gc_Gui_Factories, "gcMainFactories");
+        g_company.gui:loadGui(Gc_Gui_DynamicStorages, "gcMainDynamicStorages");
+        --g_company.gui:loadGui(Gc_Gui_Market, "gcMainMarket");
+        
+        local factoryMenu = {imageFilename = "g_gcUi2", imageUVs = "icon_factories", gui = g_company.gui:getGui("gcMainFactories")};    
+        local dynStorageMenu = {imageFilename = "g_gcUi2", imageUVs = "icon_dynamicStorages", gui = g_company.gui:getGui("gcMainDynamicStorages")};   
+        --local marketMenu = {imageFilename = "g_gcUi2", imageUVs = "icon_market", gui = g_company.gui:getGui("gcMainMarket")};   
+        self.backupItems = {factoryMenu, dynStorageMenu}; 
+    end
 	
 	return self;
 end;
@@ -49,18 +59,33 @@ end;
 function Gc_Gui_MainGui:onCreate() 
     self.gui_menu:removeElement(self.gui_menuItem);
     
-    for _, d in pairs(self.backupItems) do
+    if not g_company.isGreenWeekVersion then
+        for _, d in pairs(self.backupItems) do
+            self:addMenuItem(d.imageFilename, d.imageUVs, d.gui, true);
+        end;
+    end
+    for _, d in pairs(GlobalCompanyGui.gcMenuModSites) do
         self:addMenuItem(d.imageFilename, d.imageUVs, d.gui, true);
     end;
+    
     self.loadSpecial = true;
 end;
 
 function Gc_Gui_MainGui:onOpen() 
     g_depthOfFieldManager:setBlurState(true)
 
+    for _, d in pairs(GlobalCompanyGui.gcMenuModSites) do
+        if d.added == nil or not d.added then
+            self:addMenuItem(d.imageFilename, d.imageUVs, d.gui, true);
+            d.added = true
+        end
+    end;
+
     if self.loadSpecial then
-        self:addMenuItem("g_gcUi2", "icon_errors", g_company.gui:getGui("gcMainErrors"), true);
-        self:addMenuItem("g_gcUi2", "icon_settings", g_company.gui:getGui("gcMainSettings"), true);
+        if not g_company.isGreenWeekVersion then
+            self:addMenuItem("g_gcUi2", "icon_errors", g_company.gui:getGui("gcMainErrors"), true);
+            self:addMenuItem("g_gcUi2", "icon_settings", g_company.gui:getGui("gcMainSettings"), true);
+        end
         self.loadSpecial = false;
     end;
     
@@ -154,3 +179,9 @@ function Gc_Gui_MainGui:onClickMenuNext()
         self.gui_menu.elements[i]:setActive(i == toOpen);      
     end;  
 end;
+
+function Gc_Gui_MainGui:setData(site)
+    site = Utils.getNoNil(site, self.activePage);
+    self:onClickMainMenu(self.gui_menu.elements[site]);
+    self.gui_menu.elements[site]:setActive(true);  
+end

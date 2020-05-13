@@ -93,7 +93,7 @@ function GC_ProductionFactoryPlaceable:load(xmlFilename, x,y,z, rx,ry,rz, initRa
 				if indexName ~= nil and usedIndexNames[indexName] == nil then
 					usedIndexNames[indexName] = key
 					local factory = GC_ProductionFactory:new(self.isServer, g_dedicatedServerInfo == nil, nil, filenameToUse, self.baseDirectory, self.customEnvironment)
-					if factory:load(self.nodeId, xmlFile, key, indexName, true) then
+					if factory:load(self.nodeId, xmlFile, key, indexName, true, self) then
 						factory.owningPlaceable = self
 						factory:setOwnerFarmId(self:getOwnerFarmId(), false)
 						table.insert(self.productionFactories, factory)
@@ -132,6 +132,7 @@ function GC_ProductionFactoryPlaceable:finalizePlacement()
 	GC_ProductionFactoryPlaceable:superClass().finalizePlacement(self)
 
 	for _, factory in ipairs(self.productionFactories) do
+		factory:finalizePlacement()
 		factory:register(true)
 	end
 end
@@ -165,7 +166,7 @@ function GC_ProductionFactoryPlaceable:writeStream(streamId, connection)
 			NetworkUtil.writeNodeObjectId(streamId, NetworkUtil.getObjectId(factory))
 			factory:writeStream(streamId, connection)
 			g_server:registerObjectInStream(connection, factory)
-		end
+		end		
 	end
 end
 

@@ -37,7 +37,7 @@
 --
 
 GC_ObjectInfo = {};
-local GC_ObjectInfo_mt = Class(GC_ObjectInfo);
+GC_ObjectInfo._mt = Class(GC_ObjectInfo, g_company.gc_staticClass);
 InitObjectClass(GC_ObjectInfo, "GC_ObjectInfo");
 
 GC_ObjectInfo.debugIndex = g_company.debug:registerScriptName("Gc_ObjectInfo");
@@ -46,10 +46,8 @@ GC_ObjectInfo.lastFoundBaleNetworkId = nil;
 GC_ObjectInfo.supportedTypes = {"pallet","genetix","attachablePallet","FS19_bresselUndLadeBigBagPack.bigBagRack","FS19_bresselUndLadeBigBagPack.bigBag"};
 
 function GC_ObjectInfo:init()
-	local self = setmetatable({}, GC_ObjectInfo_mt);
+	local self =  GC_ObjectInfo:superClass():new(GC_ObjectInfo._mt, g_server ~= nil, g_dedicatedServerInfo == nil);
 
-	self.isServer = g_server ~= nil;
-	self.isClient = g_dedicatedServerInfo == nil;
 	self.isMultiplayer = g_currentMission.missionDynamicInfo.isMultiplayer;		
 
 	self.debugPrintObjectId = 0;
@@ -57,8 +55,8 @@ function GC_ObjectInfo:init()
 	
 	self.debugData = g_company.debug:getDebugData(GC_ObjectInfo.debugIndex, g_company);
 
-	self.eventId_getFarmId = g_company.eventManager:registerEvent(self, self.getFarmIdEvent);
-	self.eventId_sendFarmId = g_company.eventManager:registerEvent(self, self.sendFarmIdEvent, true);
+    self.eventId_getFarmId = self:registerEvent(self, self.getFarmIdEvent, false, false)
+    self.eventId_sendFarmId = self:registerEvent(self, self.sendFarmIdEvent, false, true)
 
 	if self.isClient then
 		g_company.addUpdateable(self, self.update);	
@@ -118,18 +116,20 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 					for k, v in pairs(GC_ObjectInfo.supportedTypes) do
 						if (object.typeName == v) then
 							if (object.getFillUnits ~= nil) then
-								local fUnit = object:getFillUnits();								
-								if object:getFillUnitExists(fUnit[1].fillUnitIndex) then							
-									local lev = Utils.getNoNil(g_company.mathUtils.round(fUnit[1].fillLevel,0.01),0);
-									local perc = Utils.getNoNil(g_company.mathUtils.round((object:getFillUnitFillLevelPercentage(fUnit[1].fillUnitIndex) * 100),0.01),0);
-									local fill = Utils.getNoNil(g_fillTypeManager.fillTypes[fUnit[1].fillType].title,"unknown");
-									if (string.lower(fill) ~= "unknown") then
-										self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(fill);
-										self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level2'):format(lev, perc);
-										self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object, self, false));
-										self.showInfo = true;
+								local fUnit = object:getFillUnits();	
+								if fUnit[1] ~= nil then							
+									if object:getFillUnitExists(fUnit[1].fillUnitIndex) then							
+										local lev = Utils.getNoNil(g_company.mathUtils.round(fUnit[1].fillLevel,0.01),0);
+										local perc = Utils.getNoNil(g_company.mathUtils.round((object:getFillUnitFillLevelPercentage(fUnit[1].fillUnitIndex) * 100),0.01),0);
+										local fill = Utils.getNoNil(g_fillTypeManager.fillTypes[fUnit[1].fillType].title,"unknown");
+										if (string.lower(fill) ~= "unknown") then
+											self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(fill);
+											self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level2'):format(lev, perc);
+											self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object, self, false));
+											self.showInfo = true;
+										end;
 									end;
-								end;
+								end
 							end;
 						end;
 					end;
@@ -187,8 +187,7 @@ function GC_ObjectInfo:getFarmInfo(object, ref, noEventSend)
 end;
 
 function GC_ObjectInfo:getFarmIdEvent(data, noEventSend)
-	g_company.eventManager:createEvent(self.eventId_getFarmId, data, false, noEventSend);
-	
+    self:raiseEvent(self.eventId_getFarmId, data, noEventSend)
 	if self.isServer then
 		local baleObject = NetworkUtil.getObject(data[1]);
 		local farm = g_farmManager:getFarmById(baleObject.ownerFarmId);
@@ -198,9 +197,9 @@ function GC_ObjectInfo:getFarmIdEvent(data, noEventSend)
 	end;
 end;
 
-function GC_ObjectInfo:sendFarmIdEvent(data, noEventSend)   
+function GC_ObjectInfo:sendFarmIdEvent(data, noEventSend)  
 	if self.isServer then
-		g_company.eventManager:createEvent(self.eventId_sendFarmId, data, false, noEventSend);
+    	self:raiseEvent(self.eventId_sendFarmId, data, noEventSend)
 	else
 		self.mpBaleOwnerId = data[1];
 	end;

@@ -86,10 +86,12 @@ function GC_Gui_overlay:loadTemplate(templateName, xmlFile, key, overlayName)
 	elseif self.imageFilename == "g_baseHUDFilename" then
 		self.imageFilename = g_baseHUDFilename;
 	elseif self.imageFilename == "gc_uiElements1" then
-        self.imageFilename = g_company.dir .. "images/ui_elements_1.dds";
+		self.imageFilename = g_company.dir .. "images/ui_elements_1.dds";
+	elseif self.imageFilename == "pda" then
+		self.imageFilename = g_currentMission.mapImageFilename;
 	elseif uiElement ~= nil then
         self.imageFilename = uiElement;
-    end;
+	end;
 	
 	self.imageOverlay = createImageOverlay(self.imageFilename);
 	self:loadOnCreate();
@@ -157,7 +159,7 @@ end;
 
 function GC_Gui_overlay:draw(index)
 	self.drawPosition[1], self.drawPosition[2] = g_company.gui:calcDrawPos(self, index);
-	if self:getVisible() then
+	--if self:getVisible() then
 		if self.isCamera then
 			setOverlayRotation(self.imageOverlay, self.rotation, self.size[1] * 0.5, self.size[2] * 0.5);
 			renderOverlay(self.imageOverlay, self.drawPosition[1], self.drawPosition[2], self.size[1], self.size[2]);
@@ -170,7 +172,7 @@ function GC_Gui_overlay:draw(index)
 			local sizeY = math.max(self.size[2], 1 / g_screenHeight);			
 			renderOverlay(self.imageOverlay, self.drawPosition[1], self.drawPosition[2], sizeX * self.scaleX, sizeY * self.scaleY);
 		end;
-	end;
+	--end;
 
 	GC_Gui_overlay:superClass().draw(self);
 end;

@@ -28,8 +28,9 @@ local GuiScreen_mt = Class(GuiScreen);
 
 GuiScreen.debugIndex = g_company.debug:registerScriptName("GlobalCompany-GuiScreen");
 
+g_company.gui.guiScreen = GuiScreen;
 
-function GuiScreen:new()	
+function GuiScreen:new(custom_mt)	
 	if custom_mt == nil then
         custom_mt = GuiScreen_mt;
     end;
@@ -46,9 +47,6 @@ end;
 
 function GuiScreen:onClose()
     g_depthOfFieldManager:setBlurState(false);
-end;
-
-function GuiScreen:onOpen()
     
 end;
 
@@ -62,22 +60,32 @@ function GuiScreen:onClickClose()
 end;
 
 
-function GuiScreen:setPage(num, text)
-    local goToPage = num or 1;
-    if goToPage ~= self.currentPage and goToPage > 0 and goToPage < 4 then
-        
-        self["gui_headerLocationText_" .. goToPage]:setText(text);
-        if self.currentPage ~= nil then
-            if goToPage > self.currentPage then
-                self["gui_headerLocationSep_" .. goToPage]:setVisible(true);
-            end;
-            if goToPage < self.currentPage then
-                self["gui_headerLocationSep_" .. (goToPage + 1)]:setVisible(false);
-                self["gui_headerLocationText_" .. (goToPage + 1)]:setText("");
-            end;
-        end;
-        self.currentPage = goToPage;        
-    end;
+-- function GuiScreen:setPage(num, text)
+--     local goToPage = num or 1;
+--     if goToPage ~= self.currentPage and goToPage > 0 and goToPage < 4 then
+--         self["gui_headerLocationText_" .. goToPage]:setText(text);
+--         if self.currentPage ~= nil then
+--             if goToPage > self.currentPage then
+--                 self["gui_headerLocationSep_" .. goToPage]:setVisible(true);
+--             end;
+--             if goToPage < self.currentPage then
+--                 self["gui_headerLocationSep_" .. (goToPage + 1)]:setVisible(false);
+--                 self["gui_headerLocationText_" .. (goToPage + 1)]:setText("");
+--             end;
+--         end;
+--         self.currentPage = goToPage;        
+--     end;
+-- end;
+
+function GuiScreen:setPage(page)
+    if page.parentPage == nil then
+        self.gui_headerLocationText_1:setText(page.pageHeader)
+
+
+
+    else
+
+    end
 end;
 
 

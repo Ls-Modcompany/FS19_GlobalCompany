@@ -1,14 +1,17 @@
 --
 -- GlobalCompany - Objects - GC_PalletCreator
 --
--- @Interface: 1.4.0.0 b5007
+-- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
--- @Date: 04.08.2019
--- @Version: 1.1.1.0
+-- @Date: 21.12.2019
+-- @Version: 1.2.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+--
+-- 	v1.2.0.0 (21.12.2019):
+-- 		- add y offset and overlapsize as xml attributes
 --
 -- 	v1.1.1.0 (04.08.2019):
 -- 		- y offset is not taken from the node unless lower than terrain.
@@ -119,6 +122,9 @@ function GC_PalletCreator:load(nodeId, target, xmlFile, xmlKey, baseDirectory, p
 							local warningInterval = Utils.getNoNil(getXMLInt(xmlFile, palletCreatorsKey .. "#minWarningInterval"), 5) -- Default five minutes between warnings.
 							self.warningInterval = math.max(warningInterval, 1) * 60000
 							self.nextWarningTime = g_currentMission.time
+							
+							self.yOffset = Utils.getNoNil(getXMLFloat(xmlFile, palletCreatorsKey .. "#yOffset"), -5)
+							self.palletSizeHeightExtent = Utils.getNoNil(getXMLFloat(xmlFile, palletCreatorsKey .. "#yExtent"), 10)
 
 							local i = 0
 							while true do
@@ -233,7 +239,7 @@ function GC_PalletCreator:debugDrawUpdate(dt)
 			local x, y, z = getWorldTranslation(spawner)
 			local rx, ry, rz = getWorldRotation(spawner)
 			DebugUtil.drawDebugNode(spawner, nil)
-			DebugUtil.drawOverlapBox(x, y - 5, z, rx, ry, rz, self.palletSizeWidthExtent, 10, self.palletSizeLengthExtent, 0.5, 1.0, 0.5)
+			DebugUtil.drawOverlapBox(x, y + self.yOffset, z, rx, ry, rz, self.palletSizeWidthExtent, self.palletSizeHeightExtent, self.palletSizeLengthExtent, 0.5, 1.0, 0.5)
 			Utils.renderTextAtWorldPosition(x, y + 5.5, z, self.debugDrawData[i].name, getCorrectTextSize(0.018), 0, self.debugDrawData[i].colours)
 			Utils.renderTextAtWorldPosition(x, y + 5, z, self.debugDrawData[i].id, getCorrectTextSize(0.018), 0, self.debugDrawData[i].colours)
 		end
@@ -339,8 +345,15 @@ function GC_PalletCreator:findNextPallet()
 		if nextSpawnerToUse ~= nil then
 			self.spawnerInUse = nextSpawnerToUse.spawner
 			local x, y, z = getWorldTranslation(self.spawnerInUse)
-			local _, ry, _ = getWorldRotation(self.spawnerInUse)
+			local rx, ry, rz = getWorldRotation(self.spawnerInUse)
 			
+			--Thanks to grouminait! https://ls-modcompany.com/forum/thread/5655-gc-palletcreator-optionen/?postID=67874#post67874
+			if g_company.utils.floatEqual(math.abs(math.deg(rx)), 180, 1) and g_company.utils.floatEqual(math.abs(math.deg(rz)), 180, 1) then
+				rx = math.rad(0)
+				ry = math.rad(-math.deg(ry))
+				rz = math.rad(0)
+			end
+
 			local terrainHeight = getTerrainHeightAtWorldPos(g_currentMission.terrainRootNode, x, 300, z) + 0.5
             y = math.max(terrainHeight, y)
 
@@ -367,7 +380,7 @@ function GC_PalletCreator:checkSpawner(spawner)
 	self.spawner = spawner
 	local x, y, z = getWorldTranslation(spawner)
 	local rx, ry, rz = getWorldRotation(spawner)
-	local overlap = overlapBox(x, y - 5, z, rx, ry, rz, self.palletSizeWidthExtent, 10, self.palletSizeLengthExtent, "spawnAreaCallback", self, nil, true, false, true)
+	local overlap = overlapBox(x, y + self.yOffset, z, rx, ry, rz, self.palletSizeWidthExtent, self.palletSizeHeightExtent, self.palletSizeLengthExtent, "spawnAreaCallback", self, nil, true, false, true)
 
 	return x, y, z, rx, ry, rz, overlap
 end
