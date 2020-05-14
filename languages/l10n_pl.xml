@@ -251,12 +251,12 @@ Koszt: %s"/>
 		
 		<!-- CowFeedMixer_Pack -->
 		<e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_FactoryName" v="Mieszalnik TMR"/>
-        	<e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_FactoryDescription" v="Mieszalnik pokarmu dla krów produkuje optymalną paszę z kiszonki, słomy i siana dla Twoich krów."/>
-       	 	<e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_productLine_cowfood" v="Produkcja TMR"/>
-        	<e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_Input1" v="Kiszonka"/>
-        	<e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_Input2" v="Słoma"/>
-        	<e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_Input3" v="Siano"/>
-        	<e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_Output1" v="Pasza"/>
+        <e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_FactoryDescription" v="Mieszalnik pokarmu dla krów produkuje optymalną paszę z kiszonki, słomy i siana dla Twoich krów."/>
+        <e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_productLine_cowfood" v="Produkcja TMR"/>
+        <e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_Input1" v="Kiszonka"/>
+        <e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_Input2" v="Słowa"/>
+        <e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_Input3" v="Siano"/>
+        <e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_Output1" v="Pasza"/>
 		
 		
 		<!-- PlaceableDisplay -->
