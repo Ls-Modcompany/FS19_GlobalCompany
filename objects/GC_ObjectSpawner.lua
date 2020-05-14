@@ -245,4 +245,5 @@ end
 
 function GC_ObjectSpawner:collisionCallback(transformId)
 	self.areaUsed = g_currentMission.nodeToObject[transformId] ~= nil or g_currentMission.players[transformId] ~= nil
+	--print(getName(transformId))
 end
