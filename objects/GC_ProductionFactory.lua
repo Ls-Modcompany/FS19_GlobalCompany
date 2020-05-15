@@ -2898,7 +2898,9 @@ function GC_ProductionFactory:programmFlow_setAnimationNode(parameters)
 	
 	local index = parsedParameters[1]
 	local state = parsedParameters[2]
-	self.programmFlowOperatingParts.operateAnimationNodes:setAnimationNodesStateByNode(index, state)
+	if self.programmFlowOperatingParts ~= nil and self.programmFlowOperatingParts.operateAnimationNodes ~= nil then
+		self.programmFlowOperatingParts.operateAnimationNodes:setAnimationNodesStateByNode(index, state)
+	end
 end
 
 --[[   setParticleEffect
@@ -2910,7 +2912,9 @@ function GC_ProductionFactory:programmFlow_setParticleEffect(parameters)
 	
 	local index = parsedParameters[1]
 	local state = parsedParameters[2]
-	self.programmFlowOperatingParts.operateParticleEffects:setEffectsState(state, true)
+	if self.programmFlowOperatingParts ~= nil and self.programmFlowOperatingParts.operateParticleEffects ~= nil then
+		self.programmFlowOperatingParts.operateParticleEffects:setEffectsState(state, true)
+	end
 end
 
 -----------------------------------------ManureSystem--------------------------------------------------
