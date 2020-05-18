@@ -120,8 +120,9 @@ function GC_ShovelFillTrigger:update(dt)
 							if pickupFillType == FillType.UNKNOWN or pickupFillType == self.fillTypeIndex then
 								pickupFillType = self.fillTypeIndex
 
-								local fillFactor = 0.001
-								if shovelNode.needsMovement then
+								--local fillFactor = 0.001
+								local fillFactor = 1
+								if shovelNode.needsMovement and shovel.spec_forageWagon == nil then
 									local movementSpeed = math.min(math.abs(shovel:getLastSpeed()), 6)
 									fillFactor = movementSpeed * 0.0001
 								end
@@ -163,18 +164,17 @@ end
 
 function GC_ShovelFillTrigger:shovelFillTriggerCallback(triggerId, otherId, onEnter, onLeave, onStay, otherShapeId)
 	if self.isEnabled then
-		if otherShapeId ~= nil and (onEnter or onLeave) then
-			local object = g_currentMission:getNodeObject(otherShapeId)
+		if otherId ~= nil and (onEnter or onLeave) then
+			local object = g_currentMission:getNodeObject(otherId) -- moved from otherShapeId to otherId
 			if object ~= nil and object:isa(Vehicle) and object.spec_shovel ~= nil then
-
 				if onEnter then
-					if self.shovelsInTrigger[otherShapeId] == nil then
-						self.shovelsInTrigger[otherShapeId] = true
+					if self.shovelsInTrigger[otherId] == nil then
+						self.shovelsInTrigger[otherId] = true
 						self.numShovelsInTrigger = self.numShovelsInTrigger + 1
 					end
 				else
-					if self.shovelsInTrigger[otherShapeId] ~= nil then
-						self.shovelsInTrigger[otherShapeId] = nil
+					if self.shovelsInTrigger[otherId] ~= nil then
+						self.shovelsInTrigger[otherId] = nil
 						self.numShovelsInTrigger = math.max(self.numShovelsInTrigger - 1, 0)
 					end
 				end
