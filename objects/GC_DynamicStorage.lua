@@ -155,18 +155,22 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
     end;
 
     local unloadingTriggerKey = string.format("%s.unloadingTrigger", xmlKey);    
-    local unloadingTrigger = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.rootNode, self, xmlFile, unloadingTriggerKey, self.fillTypes);
-    if unloadingTrigger ~= nil then
-        unloadingTrigger.useTargetGetIsFillTypeAllowed = false
-        self.unloadingTrigger = unloadingTrigger;
-    end;
+    if hasXMLProperty(xmlFile, unloadingTriggerKey) then
+        local unloadingTrigger = self.triggerManager:addTrigger(GC_UnloadingTrigger, self.rootNode, self, xmlFile, unloadingTriggerKey, self.fillTypes);
+        if unloadingTrigger ~= nil then
+            unloadingTrigger.useTargetGetIsFillTypeAllowed = false
+            self.unloadingTrigger = unloadingTrigger;
+        end;
+    end
 
     local loadingTriggerKey = string.format("%s.loadingTrigger", xmlKey);
-    local loadingTrigger = self.triggerManager:addTrigger(GC_LoadingTrigger, self.rootNode, self, xmlFile, loadingTriggerKey, {}, false, true);
-    if loadingTrigger ~= nil then        
-        loadingTrigger.onActivateObject = function() self:loadingTriggerOnActivateObject() end;
-        self.loadingTrigger = loadingTrigger;
-    end;
+    if hasXMLProperty(xmlFile, loadingTriggerKey) then
+        local loadingTrigger = self.triggerManager:addTrigger(GC_LoadingTrigger, self.rootNode, self, xmlFile, loadingTriggerKey, {}, false, true);
+        if loadingTrigger ~= nil then        
+            loadingTrigger.onActivateObject = function() self:loadingTriggerOnActivateObject() end;
+            self.loadingTrigger = loadingTrigger;
+        end;
+    end
   
     i = 0;
     while true do
@@ -252,13 +256,15 @@ function GC_DynamicStorage:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
         i = i + 1;
     end;
 
-    local vehicleInteractionNode = getXMLString(xmlFile, string.format("%s.vehicleInteraction#triggerNode", xmlKey));
-    self.vehicleInteractionNode = I3DUtil.indexToObject(self.rootNode, vehicleInteractionNode, self.i3dMappings);
-    addTrigger(self.vehicleInteractionNode, "vehicleInteractionTriggerCallback", self);
-		
-	self.vehicleInteractionActivation = g_company.activableObject:new(self.isServer, self.isClient);
-	self.vehicleInteractionActivation:load(self);
-	self.vehicleInteractionActivation:loadFromXML(xmlFile, string.format("%s.vehicleInteraction", xmlKey));
+    if hasXMLProperty(xmlFile, string.format("%s.vehicleInteraction#triggerNode", xmlKey)) then   
+        local vehicleInteractionNode = getXMLString(xmlFile, string.format("%s.vehicleInteraction#triggerNode", xmlKey));
+        self.vehicleInteractionNode = I3DUtil.indexToObject(self.rootNode, vehicleInteractionNode, self.i3dMappings);
+        addTrigger(self.vehicleInteractionNode, "vehicleInteractionTriggerCallback", self);
+            
+        self.vehicleInteractionActivation = g_company.activableObject:new(self.isServer, self.isClient);
+        self.vehicleInteractionActivation:load(self);
+        self.vehicleInteractionActivation:loadFromXML(xmlFile, string.format("%s.vehicleInteraction", xmlKey));
+    end
 
     self.dynamicStorageDirtyFlag = self:getNextDirtyFlag();
         
@@ -298,7 +304,9 @@ function GC_DynamicStorage:delete()
         end;
     end;
 
-    removeTrigger(self.vehicleInteractionNode);
+    if self.vehicleInteractionNode ~= nil then
+        removeTrigger(self.vehicleInteractionNode);
+    end
 	GC_DynamicStorage:superClass().delete(self);
 end;
 
@@ -415,8 +423,7 @@ function GC_DynamicStorage:loadFromXMLFile(xmlFile, key)
                     --place.unloadingTrigger.fillTypes = nil
                     --place.unloadingTrigger:setAcceptedFillTypeState(activeFillTypeIndex, true);
 
-                    local material = self.materials[g_fillTypeManager:getFillTypeNameByIndex(activeFillTypeIndex):lower()];            
-                    
+                    local material = self.materials[g_fillTypeManager:getFillTypeNameByIndex(activeFillTypeIndex):lower()];           
                     place.fillLevel = fillLevel;
 
                     if place.movers ~= nil then
