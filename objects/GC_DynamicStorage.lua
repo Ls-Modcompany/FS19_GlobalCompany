@@ -411,8 +411,13 @@ function GC_DynamicStorage:loadFromXMLFile(xmlFile, key)
         local num = getXMLInt(xmlFile, placeKey .. "#num");
         local fillLevel = getXMLInt(xmlFile, placeKey .. "#fillLevel");
         local activeFillTypeIndex = getXMLInt(xmlFile, placeKey .. "#activeFillTypeIndex");
+        local activeFillType = getXMLString(xmlFile, placeKey .. "#activeFillType");
 
-        if activeFillTypeIndex ~= -1 then
+        if activeFillType ~= nil then
+            activeFillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(activeFillType)
+        end
+
+        if activeFillTypeIndex ~= nil and activeFillTypeIndex ~= -1 then
             for _,place in pairs(self.places) do
                 if place.number == num then
                     place.activeFillTypeIndex = activeFillTypeIndex;
@@ -423,9 +428,12 @@ function GC_DynamicStorage:loadFromXMLFile(xmlFile, key)
                     --place.unloadingTrigger.fillTypes = nil
                     --place.unloadingTrigger:setAcceptedFillTypeState(activeFillTypeIndex, true);
 
-                    local material = self.materials[g_fillTypeManager:getFillTypeNameByIndex(activeFillTypeIndex):lower()];           
-                    place.fillLevel = fillLevel;
+                    place.fillLevel = fillLevel
 
+                    if self.materials ~= nil then
+                        local material = self.materials[g_fillTypeManager:getFillTypeNameByIndex(activeFillTypeIndex):lower()]      
+                    end  
+                    
                     if place.movers ~= nil then
                         if material ~= nil then
                             for _,mover in pairs(place.movers.movers) do
@@ -472,7 +480,10 @@ function GC_DynamicStorage:saveToXMLFile(xmlFile, key, usedModNames)
         local placeKey = string.format("%s.place(%d)", key, index);
         setXMLInt(xmlFile, placeKey .. "#num", place.number);
         setXMLInt(xmlFile, placeKey .. "#fillLevel", place.fillLevel);
-        setXMLInt(xmlFile, placeKey .. "#activeFillTypeIndex", place.activeFillTypeIndex);
+        local fillTypeName = g_fillTypeManager:getFillTypeNameByIndex(place.activeFillTypeIndex)
+        if fillTypeName ~= nil then
+            setXMLString(xmlFile, placeKey .. "#activeFillType", g_fillTypeManager:getFillTypeNameByIndex(place.activeFillTypeIndex))
+        end
         index = index + 1;
     end;
 end;
@@ -554,14 +565,16 @@ function GC_DynamicStorage:updatePlace(place, fillLevel, fillTypeIndex)
         if place.shovelTrigger ~= nil then
             place.shovelTrigger.fillTypeIndex = fillTypeIndex;
         end
-        local material = self.materials[g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex):lower()];    
-        if place.movers ~= nil then        
-            if material ~= nil then
-                for _,mover in pairs(place.movers.movers) do
-                    setMaterial(mover.node, material, 0);
-                end;
-            end;
-        end;
+        if self.materials ~= nil then
+            local material = self.materials[g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex):lower()]
+            if place.movers ~= nil then        
+                if material ~= nil then
+                    for _,mover in pairs(place.movers.movers) do
+                        setMaterial(mover.node, material, 0)
+                    end
+                end
+            end
+        end
 
         if place.fillVolumes ~= nil then
             place.fillVolumes:setFillType(fillTypeIndex)
