@@ -225,7 +225,6 @@ function GlobalCompany.initialLoad()
 			end;
 		end;
 		g_company.specializations:loadFromXML(modNameCurrent, xmlFileCurrentMod);	
-
 	else
 		getfenv(0)["g_company"] = nil;
 	end;
@@ -433,7 +432,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_Effects.lua");
 	source(GlobalCompany.dir .. "objects/GC_Lighting.lua");
 	source(GlobalCompany.dir .. "objects/GC_Conveyor.lua");
-	-- source(GlobalCompany.dir .. "objects/GC_MovingPart.lua");
+	source(GlobalCompany.dir .. "objects/GC_MovingPart.lua");
 	source(GlobalCompany.dir .. "objects/GC_FillVolume.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicHeap.lua");
 	source(GlobalCompany.dir .. "objects/GC_DirtyObjects.lua");
@@ -455,6 +454,9 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_ProgrammFlow.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProgrammFlow_Globalfunctions.lua");
 	source(GlobalCompany.dir .. "objects/GC_AnimalFeeder.lua");
+	source(GlobalCompany.dir .. "objects/GC_Visibility.lua");
+
+	source(GlobalCompany.dir .. "objects/GC_ProductionFactoryObject.lua");
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
@@ -465,6 +467,8 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "triggers/GC_ShovelFillTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_AnimalLoadingTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_VehicleTrigger.lua");
+	source(GlobalCompany.dir .. "triggers/GC_ExtendedFillTypesTrigger.lua");
+	source(GlobalCompany.dir .. "triggers/GC_ExtendedFilTypesFillTrigger.lua");
 	--source(GlobalCompany.dir .. "triggers/GC_PalletExtendedTrigger.lua");
 
 	--|| Placeables ||--

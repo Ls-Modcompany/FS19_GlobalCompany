@@ -52,18 +52,18 @@ GC_GlobalMarket.baleToFilename["COTTON"] = {nil, g_company.dir .. "shop/buyableB
 
 
 GC_GlobalMarket.fillTypeToFilename = {}
-GC_GlobalMarket.fillTypeToFilename["TREESAPLINGS"] = "$data/objects/pallets/treeSaplingPallet/treeSaplingPallet.xml"
-GC_GlobalMarket.fillTypeToFilename["WOOL"] = "$data/objects/pallets/woolPallet/woolPallet.xml"
-GC_GlobalMarket.fillTypeToFilename["EGG"] = "$data/objects/pallets/eggBox/eggBox.xml"
-GC_GlobalMarket.fillTypeToFilename["POPLAR"] = "$data/objects/pallets/palletPoplar/palletPoplar.xml"
-GC_GlobalMarket.fillTypeToFilename["WOODCHIPS"] = "$data/objects/pallets/fillablePallet/fillablePallet.xml"
-GC_GlobalMarket.fillTypeToFilename["SUGARBEET"] = "$data/objects/pallets/fillablePallet/fillablePallet.xml"
-GC_GlobalMarket.fillTypeToFilename["FORAGE"] = "$data/objects/pallets/fillablePallet/fillablePallet.xml"
-GC_GlobalMarket.fillTypeToFilename["FORAGE_MIXING"] = "$data/objects/pallets/fillablePallet/fillablePallet.xml"
-GC_GlobalMarket.fillTypeToFilename["CHAFF"] = "$data/objects/pallets/fillablePallet/fillablePallet.xml"
---GC_GlobalMarket.fillTypeToFilename["SILAGE"] = "$data/objects/pallets/fillablePallet/fillablePallet.xml"
-GC_GlobalMarket.fillTypeToFilename["MANURE"] = "$data/objects/pallets/fillablePallet/fillablePallet.xml"
-GC_GlobalMarket.fillTypeToFilename["PIGFOOD"] = "$data/objects/bigBagContainer/bigBagContainerPigFood.xml"
+GC_GlobalMarket.fillTypeToFilename["TREESAPLINGS"] = "data/objects/pallets/treeSaplingPallet/treeSaplingPallet.xml"
+GC_GlobalMarket.fillTypeToFilename["WOOL"] = "data/objects/pallets/woolPallet/woolPallet.xml"
+GC_GlobalMarket.fillTypeToFilename["EGG"] = "data/objects/pallets/eggBox/eggBox.xml"
+GC_GlobalMarket.fillTypeToFilename["POPLAR"] = "data/objects/pallets/palletPoplar/palletPoplar.xml"
+GC_GlobalMarket.fillTypeToFilename["WOODCHIPS"] = "data/objects/pallets/fillablePallet/fillablePallet.xml"
+GC_GlobalMarket.fillTypeToFilename["SUGARBEET"] = "data/objects/pallets/fillablePallet/fillablePallet.xml"
+GC_GlobalMarket.fillTypeToFilename["FORAGE"] = "data/objects/pallets/fillablePallet/fillablePallet.xml"
+GC_GlobalMarket.fillTypeToFilename["FORAGE_MIXING"] = "data/objects/pallets/fillablePallet/fillablePallet.xml"
+GC_GlobalMarket.fillTypeToFilename["CHAFF"] = "data/objects/pallets/fillablePallet/fillablePallet.xml"
+--GC_GlobalMarket.fillTypeToFilename["SILAGE"] = "data/objects/pallets/fillablePallet/fillablePallet.xml"
+GC_GlobalMarket.fillTypeToFilename["MANURE"] = "data/objects/pallets/fillablePallet/fillablePallet.xml"
+GC_GlobalMarket.fillTypeToFilename["PIGFOOD"] = "data/objects/bigBagContainer/bigBagContainerPigFood.xml"
 
 GC_GlobalMarket.fillTypeMapping = {}
 GC_GlobalMarket.fillTypeMapping["GRASS"] = "GRASS_WINDROW"

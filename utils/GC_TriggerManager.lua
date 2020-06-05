@@ -174,7 +174,6 @@ end
 function GC_TriggerManager:writeStream(streamId, connection)
     if not connection:getIsServer() then
 		if self:getHasTriggers() then
-			
 			if not self.parent.isPlaceable then
 				g_server.currentWriteStreamConnection = connection
 				g_server.currentWriteStreamConnectionIsInitial = true
@@ -192,7 +191,6 @@ function GC_TriggerManager:writeStream(streamId, connection)
 				g_server.currentWriteStreamConnection = nil
 				g_server.currentWriteStreamConnectionIsInitial = false
 			end
-
 		end
     end
 end

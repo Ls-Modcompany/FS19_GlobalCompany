@@ -1,5 +1,5 @@
 --
--- GlobalCompany - Objects - GC_ObjectSpawner
+-- GlobalCompany - Objects - GC_ExtendedFilltypesSpawner
 --
 -- @Interface: 1.4.0.0 b5007
 -- @Author: LS-Modcompany 
@@ -25,16 +25,16 @@
 --
 
 
-GC_ObjectSpawner = {}
-local GC_ObjectSpawner_mt = Class(GC_ObjectSpawner, Object)
-InitObjectClass(GC_ObjectSpawner, "GC_ObjectSpawner")
+GC_ExtendedFilltypesSpawner = {}
+local GC_ExtendedFilltypesSpawner_mt = Class(GC_ExtendedFilltypesSpawner, Object)
+InitObjectClass(GC_ExtendedFilltypesSpawner, "GC_ExtendedFilltypesSpawner")
 
-GC_ObjectSpawner.debugIndex = g_company.debug:registerScriptName("GC_ObjectSpawner")
+GC_ExtendedFilltypesSpawner.debugIndex = g_company.debug:registerScriptName("GC_ExtendedFilltypesSpawner")
 
-g_company.objectSpawner = GC_ObjectSpawner
+g_company.objectSpawner = GC_ExtendedFilltypesSpawner
 
-function GC_ObjectSpawner:new(isServer, isClient, customMt)
-	local self = Object:new(isServer, isClient, customMt or GC_ObjectSpawner_mt)
+function GC_ExtendedFilltypesSpawner:new(isServer, isClient, customMt)
+	local self = Object:new(isServer, isClient, customMt or GC_ExtendedFilltypesSpawner_mt)
 
 	self.extraParamater = nil
 	self.registerTriggerInStream = false
@@ -44,19 +44,17 @@ function GC_ObjectSpawner:new(isServer, isClient, customMt)
 	return self
 end
 
-function GC_ObjectSpawner:load(nodeId, target, xmlFile, xmlKey, keyName)
+function GC_ExtendedFilltypesSpawner:load(nodeId, target, xmlFile, xmlKey, keyName)
 	if nodeId == nil or target == nil then
 		return false
 	end
 
-	self.debugData = g_company.debug:getDebugData(GC_ObjectSpawner.debugIndex, target)
+	self.debugData = g_company.debug:getDebugData(GC_ExtendedFilltypesSpawner.debugIndex, target)
 
 	self.rootNode = nodeId
 	self.target = target
 
 	local key = xmlKey .. Utils.getNoNil(keyName, ".objectSpawner")
-
-	self.bitMaskDec = Utils.getNoNil(getXMLFloat(xmlFile, key .. "#bitMaskDec"), 528895)
 
 	local i = 0
 	while true do
@@ -89,7 +87,7 @@ function GC_ObjectSpawner:load(nodeId, target, xmlFile, xmlKey, keyName)
 	return false
 end
 
-function GC_ObjectSpawner:getSpaceByObjectInfo(object, maxWanted, ignoreShapesHit)
+function GC_ExtendedFilltypesSpawner:getSpaceByObjectInfo(object, maxWanted, ignoreShapesHit)
 	local totalFreeAreas = 0
 	if object.width ~= nil and object.length ~= nil then
 		local numToCheck = g_company.utils.getLess(255, maxWanted, 255)
@@ -107,7 +105,7 @@ function GC_ObjectSpawner:getSpaceByObjectInfo(object, maxWanted, ignoreShapesHi
 	return totalFreeAreas
 end
 
-function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesHit, object2, numberToSpawn2, ownFillLevel)
+function GC_ExtendedFilltypesSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesHit, object2, numberToSpawn2, ownFillLevel)
 	local numSpawned = 0
 	local owner = self:getOwnerFarmId()
 	if object.farmId ~= nil then
@@ -150,17 +148,13 @@ function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesH
 						local configs = object.configurations
 						local pallet = g_currentMission:loadVehicle(object.filename, x, y, z, 0, ry, true, 0, Vehicle.PROPERTY_STATE_OWNED, owner, configs, nil)
 						if pallet ~= nil then
-							if pallet.isExtendedFillTypeObject ~= nil then
-
-							else
-								if object.fillUnitIndex ~= nil and object.fillTypeIndex ~= nil then
-									local currentFillLevel = pallet:getFillUnitFillLevel(object.fillUnitIndex)
-									local deltaFillLevel = object.fillLevel
-									if currentFillLevel ~= nil then
-										deltaFillLevel = (currentFillLevel * -1) + object.fillLevel
-									end
-									pallet:addFillUnitFillLevel(owner, object.fillUnitIndex, deltaFillLevel, object.fillTypeIndex, ToolType.UNDEFINED)
+							if object.fillUnitIndex ~= nil and object.fillTypeIndex ~= nil then
+								local currentFillLevel = pallet:getFillUnitFillLevel(object.fillUnitIndex)
+								local deltaFillLevel = object.fillLevel
+								if currentFillLevel ~= nil then
+									deltaFillLevel = (currentFillLevel * -1) + object.fillLevel
 								end
+								pallet:addFillUnitFillLevel(owner, object.fillUnitIndex, deltaFillLevel, object.fillTypeIndex, ToolType.UNDEFINED)
 							end
 
 							numSpawned = numSpawned + 1
@@ -200,13 +194,14 @@ function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesH
 	return numSpawned
 end
 
-function GC_ObjectSpawner:getSpawnAreaDataBySize(spawnArea, width, length, customOffset, count, placesToSpawn, ignoreShapesHit)
+function GC_ExtendedFilltypesSpawner:getSpawnAreaDataBySize(spawnArea, width, length, customOffset, count, placesToSpawn, ignoreShapesHit)
 	local halfWidth = width * 0.5
 	local halfLength = length * 0.5
 
 	local offset = width * Utils.getNoNil(customOffset, 0.5)
 
 	local freeSpaces = 0
+	local bitMaskDec = 528895	
 	local usedWidth = 0
 	local spawnerWidth, _, _ = getTranslation(spawnArea.endNode)
 	local areaValue = spawnerWidth - halfWidth
@@ -220,7 +215,7 @@ function GC_ObjectSpawner:getSpawnAreaDataBySize(spawnArea, width, length, custo
 				y = math.max(terrainHeight, y)
 	
 				self.areaUsed = false
-				local shapesHit = overlapBox(x, y, z, rx, ry, rz, halfWidth, 10, halfLength, "collisionCallback", self, self.bitMaskDec, true, false)
+				local shapesHit = overlapBox(x, y, z, rx, ry, rz, halfWidth, 10, halfLength, "collisionCallback", self, bitMaskDec, true, false)
 				if (ignoreShapesHit == true or shapesHit == 0) and self.areaUsed == false then
 					usedWidth = dirX + offset
 					
@@ -248,7 +243,6 @@ function GC_ObjectSpawner:getSpawnAreaDataBySize(spawnArea, width, length, custo
 	return freeSpaces
 end
 
-function GC_ObjectSpawner:collisionCallback(transformId)
+function GC_ExtendedFilltypesSpawner:collisionCallback(transformId)
 	self.areaUsed = g_currentMission.nodeToObject[transformId] ~= nil or g_currentMission.players[transformId] ~= nil
-	--print(getName(transformId))
 end

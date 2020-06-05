@@ -113,6 +113,8 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 			if (object~= nil) then
 				if (object.typeName ~= nil) and self.objectInfoEnabled then
 					GC_ObjectInfo.foundBale = nil;
+
+					local found = false
 					for k, v in pairs(GC_ObjectInfo.supportedTypes) do
 						if (object.typeName == v) then
 							if (object.getFillUnits ~= nil) then
@@ -127,12 +129,35 @@ function GC_ObjectInfo:infoObjectRaycastCallback(hitObjectId, x, y, z, distance)
 											self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level2'):format(lev, perc);
 											self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object, self, false));
 											self.showInfo = true;
+											found = true
 										end;
 									end;
 								end
 							end;
 						end;
 					end;
+					
+					if not found and object.typeName:find("gcProductionItem") and not object.typeName:find("gcProductionItemNone") then
+						local lev = Utils.getNoNil(g_company.mathUtils.round(object:getExtendedFillLevel(),0.01),0);
+						local cap = Utils.getNoNil(object:getExtendedFillLevelCapacity(),0);
+						local perc = Utils.getNoNil(g_company.mathUtils.round((object:getExtendedFillLevelPercentage() * 100),0.01),0);
+						
+						self.displayLine1 = ""
+						self.displayLine2 = ""
+						if lev > 0 then
+							local fillTypeIndex = object:getCurrentExtendedFillType()
+							if fillTypeIndex ~= nil then
+								self.displayLine1 = g_company.languageManager:getText('GC_ObjectInfo_filltype'):format(g_company.fillTypeManager:getExtendedFillTypeByIndex(fillTypeIndex).title)
+							end
+						end
+
+						if cap ~= 1 then
+							self.displayLine2 = g_company.languageManager:getText('GC_ObjectInfo_level2'):format(lev, perc)
+						end
+						
+						self.displayLine3 = g_company.languageManager:getText('GC_ObjectInfo_owner'):format(GC_ObjectInfo:getFarmInfo(object, self, false))
+						self.showInfo = true
+					end
 				elseif (object.typeName == nil) and (object.fillType ~= nil) and (object.fillLevel ~= nil) then
 					if object:isa(Bale) then
 						GC_ObjectInfo.foundBale = object;
