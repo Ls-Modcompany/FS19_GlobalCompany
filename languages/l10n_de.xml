@@ -78,7 +78,7 @@
 		<e k="GC_gui_changeFactoryTitle" v="Geben Sie unten einen neuen Fabriknamen ein."/>
 
 		<e k="GC_gui_factories" v="Produktionen"/>
-		<e k="GC_gui_activeProductLines" v="aktive Produktlinien:"/>
+		<e k="GC_gui_activeProductLines" v="Aktive Produktlinien:"/>
 		<e k="GC_gui_emptyInputs" v="Leere Rohstoffe:"/>
 		<e k="GC_gui_fullOutputs" v="Volle Produkte:"/>
 
@@ -139,7 +139,7 @@ Kosten:  %s"/>
 		<e k="GC_dynamicStorage_gui_info_unloading" v="Wähle aus, in welche Box abgeladen werden soll. Beachte, dass in jede Box nur eine Frucht abgeladen werden kann."/>
 		<e k="GC_dynamicStorage_gui_info_loading" v="Wähle aus, aus welcher Box geladen werden soll."/>
 		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s Liter"/>
-		<e k="GC_dynamicStorage_gui_empty" v="leer"/>
+		<e k="GC_dynamicStorage_gui_empty" v="Leer"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Abladeposition bestätigen"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Aufladebox bestätigen"/>
 

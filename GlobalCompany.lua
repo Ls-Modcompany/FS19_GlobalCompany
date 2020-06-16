@@ -3,12 +3,17 @@
 --
 -- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
--- @Date: 18.05.2020
--- @Version: 1.5.0.4
+-- @Date: 16.06.2020
+-- @Version: 1.6.0.1
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+-- 	v1.6.0.0 (07.08.2020):
+--		- Add features for DynamicStorage
+--		- Add productionfactory for vehicles
+--		- Adaption for Stappenbach19
+--
 -- 	v1.5.0.0 (29.04.2020):
 --		- Fix Baler
 --
@@ -112,9 +117,9 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.5.0.4";
-GlobalCompany.versionDate = "18.05.2020";
-GlobalCompany.currentVersionId = 1504; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.version = "1.6.0.1";
+GlobalCompany.versionDate = "16.06.2020";
+GlobalCompany.currentVersionId = 1601; -- Mod Manager ID. (Version number without periods.)
 GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
 GlobalCompany.isGreenWeekVersion = false;
 

@@ -430,8 +430,9 @@ function GC_DynamicStorage:loadFromXMLFile(xmlFile, key)
 
                     place.fillLevel = fillLevel
 
+                    local material
                     if self.materials ~= nil then
-                        local material = self.materials[g_fillTypeManager:getFillTypeNameByIndex(activeFillTypeIndex):lower()]      
+                        material = self.materials[g_fillTypeManager:getFillTypeNameByIndex(activeFillTypeIndex):lower()]      
                     end  
                     
                     if place.movers ~= nil then
