@@ -296,7 +296,7 @@ function GC_AnimalFeeder:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
     self.feedingLiterPerDrive = 0
 
     local animationClips = GC_AnimationClips:new(self.isServer, self.isClient)
-    if animationClips:load(self.rootNode, self, xmlFile, xmlKey) then
+    if animationClips:load(self.rootNode, self, xmlFile, xmlKey, true) then
         self.animationClips = animationClips
     end
 
@@ -323,7 +323,14 @@ function GC_AnimalFeeder:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
 end;
 function GC_AnimalFeeder:finalizePlacement()
 	GC_AnimalFeeder:superClass().finalizePlacement(self)	
-    --self.eventId_setActiveUnloadingBox = self:registerEvent(self, self.setActiveUnloadingBoxEvent, false, false)
+    self.eventId_updateRoboter = self:registerEvent(self, self.updateRoboterEvent, false, false)
+    self.eventId_resetRoboter = self:registerEvent(self, self.resetRoboterEvent, false, false)
+    self.eventId_setFeedingTimes = self:registerEvent(self, self.setFeedingTimesEvent, false, false)
+    self.eventId_setFeedingDemandPercent = self:registerEvent(self, self.setFeedingDemandPercentEvent, false, false)
+    self.eventId_setFeedingLiterPerDrive = self:registerEvent(self, self.setFeedingLiterPerDriveEvent, false, false)
+    self.eventId_setFeedingMixingRatio = self:registerEvent(self, self.setFeedingMixingRatioEvent, false, false)
+    self.eventId_setRobotorUnloadingEffects = self:registerEvent(self, self.setRobotorUnloadingEffectsEvent, false, false)
+    self.eventId_setRobotorOperationEffects = self:registerEvent(self, self.setRobotorOperationEffectsEvent, false, false)
 end
 
 function GC_AnimalFeeder:delete()
@@ -381,9 +388,36 @@ function GC_AnimalFeeder:readStream(streamId, connection)
         if streamReadBool(streamId) then
 			local customTitle = streamReadString(streamId)
 			self:setCustomTitle(customTitle, true)
-		end
-	end;
-end;
+        end
+        
+        for _,bunker in pairs(self.bunkers) do
+            local fillLevel = streamReadFloat32(streamId)
+            bunker.history = streamReadFloat32(streamId)
+            bunker.historyCurrent = streamReadFloat32(streamId)
+            self:updateBunkerClient(bunker)
+        end
+
+        local fillLevel = streamReadFloat32(streamId)
+        local fillTypeIndex = streamReadInt32(streamId)
+
+        if self.roboter.fillVolumes ~= nil then
+            self.roboter.fillVolumes:setFillType(fillTypeIndex)
+            self.roboter.fillVolumes:addFillLevel(fillLevel)
+        end
+    
+        if self.roboter.digitalDisplays ~= nil then
+            self.roboter.digitalDisplays:updateLevelDisplays(fillLevel, self.roboter.capacity)
+        end
+
+        for _,feedingTime in pairs(self.feedingTimes) do
+            feedingTime.time = streamReadFloat32(streamId)
+            feedingTime.active = streamReadBool(streamId)
+        end
+
+        self.feedingDemandPercent = streamReadInt32(streamId)
+        self.feedingLiterPerDrive = streamReadInt32(streamId)
+	end
+end
 
 function GC_AnimalFeeder:writeStream(streamId, connection)
 	GC_AnimalFeeder:superClass().writeStream(self, streamId, connection);
@@ -391,16 +425,30 @@ function GC_AnimalFeeder:writeStream(streamId, connection)
 	if not connection:getIsServer() then
 		if self.triggerManager ~= nil then
 			self.triggerManager:writeStream(streamId, connection)
-		end
-
-        
+		end        
 
 		local customTitle = self:getCustomTitle()
 		if streamWriteBool(streamId, customTitle ~= GC_AnimalFeeder.BACKUP_TITLE) then
 			streamWriteString(streamId, customTitle)
-		end
-	end;
-end;
+        end
+        
+        for _,bunker in pairs (self.bunkers) do     
+            streamWriteFloat32(streamId, bunker.fillLevel)
+            streamWriteFloat32(streamId, bunker.history)
+            streamWriteFloat32(streamId, bunker.historyCurrent)
+        end
+        streamWriteFloat32(streamId, self.roboter.fillLevel)
+        streamWriteInt32(streamId, self.roboter.fillTypeIndex)    
+
+        for _,feedingTime in pairs(self.feedingTimes) do
+            streamWriteFloat32(streamId, feedingTime.time)
+            streamWriteBool(streamId, feedingTime.active)
+        end
+
+        streamWriteInt32(streamId, self.feedingDemandPercent)    
+        streamWriteInt32(streamId, self.feedingLiterPerDrive)                   
+	end
+end
 
 function GC_AnimalFeeder:readUpdateStream(streamId, timestamp, connection)
 	GC_AnimalFeeder:superClass().readUpdateStream(self, streamId, timestamp, connection);
@@ -411,9 +459,8 @@ function GC_AnimalFeeder:readUpdateStream(streamId, timestamp, connection)
                 local fillLevel = streamReadFloat32(streamId)
                 bunker.history = streamReadFloat32(streamId)
                 bunker.historyCurrent = streamReadFloat32(streamId)
-                self:updateBunker(nunker.id, fillLevel)
-            end
-
+                self:updateBunkerClient(bunker)
+            end                        
         end
 	end
 end
@@ -427,8 +474,7 @@ function GC_AnimalFeeder:writeUpdateStream(streamId, connection, dirtyMask)
                 streamWriteFloat32(streamId, bunker.fillLevel)
                 streamWriteFloat32(streamId, bunker.history)
                 streamWriteFloat32(streamId, bunker.historyCurrent)
-            end
-
+            end               
         end
 	end
 end
@@ -725,18 +771,32 @@ function GC_AnimalFeeder:updateBunker(bunkerId, fillLevelDelta)
     end
 
     if self.isClient then
-        if bunker.fillVolumes ~= nil then
-            bunker.fillVolumes:addFillLevel(bunker.fillLevel)
-        end
-
-        if bunker.digitalDisplays ~= nil then
-            bunker.digitalDisplays:updateLevelDisplays(bunker.fillLevel, bunker.capacity)
-        end
+        self:updateBunkerClient(bunker)
     end
 end
 
-function GC_AnimalFeeder:updateRoboter(fillLevelDelta, fillTypeIndex, bunkerId, resetBunker)
-    --event
+function GC_AnimalFeeder:updateBunkerClient(bunker)
+    if bunker.fillVolumes ~= nil then
+        bunker.fillVolumes:addFillLevel(bunker.fillLevel)
+    end
+
+    if bunker.digitalDisplays ~= nil then
+        bunker.digitalDisplays:updateLevelDisplays(bunker.fillLevel, bunker.capacity)
+    end
+end
+
+function GC_AnimalFeeder:updateRoboter()
+    self:updateRoboterEvent({fillLevelDelta, fillTypeIndex, bunkerId, resetBunker})
+end
+
+function GC_AnimalFeeder:updateRoboterEvent(data, noEventSend)
+    self:raiseEvent(self.eventId_updateRoboter, data, noEventSend)
+
+    local fillLevelDelta = data[1]
+    local fillTypeIndex = data[2] 
+    local bunkerId = data[3]
+    local resetBunker = data[4]
+
     local fillLevel = 0
     if bunkerId ~= nil then
         self.roboter.fillLevels[bunkerId] = self.roboter.fillLevels[bunkerId] + fillLevelDelta
@@ -746,6 +806,8 @@ function GC_AnimalFeeder:updateRoboter(fillLevelDelta, fillTypeIndex, bunkerId, 
         fillLevel = self.roboter.fillLevel
     end
 
+    self.roboter.fillTypeIndex = fillTypeIndex
+
     if resetBunker then
         self.roboter.fillLevels = {}
         for _,bunker in pairs(self.bunkers) do
@@ -753,24 +815,29 @@ function GC_AnimalFeeder:updateRoboter(fillLevelDelta, fillTypeIndex, bunkerId, 
         end
     end
 
-    if self.isServer then
-        self:raiseDirtyFlags(self.animalFeederDirtyFlag)
-    end
+    --if self.isServer then
+    --    self:raiseDirtyFlags(self.animalFeederDirtyFlag)
+    --end
 
     if self.isClient then
         if self.roboter.fillVolumes ~= nil then
             self.roboter.fillVolumes:setFillType(fillTypeIndex)
             self.roboter.fillVolumes:addFillLevel(fillLevel)
         end
-
+    
         if self.roboter.digitalDisplays ~= nil then
             self.roboter.digitalDisplays:updateLevelDisplays(fillLevel, self.roboter.capacity)
         end
     end
 end
 
-function GC_AnimalFeeder:resetRoboter()
-    --event
+function GC_AnimalFeeder:resetRoboter()    
+    self:resetRoboterEvent({})
+end
+
+function GC_AnimalFeeder:resetRoboterEvent(data, noEventSend)
+    self:raiseEvent(self.eventId_resetRoboter, data, noEventSend)
+
     self.roboter.fillLevels = {}
     for _,bunker in pairs(self.bunkers) do
         self.roboter.fillLevels[bunker.id] = 0
@@ -816,8 +883,13 @@ function GC_AnimalFeeder:getFeedingTimes()
 end
 
 function GC_AnimalFeeder:setFeedingTimes(id, time, active)
-    self.feedingTimes[id] = {time=time, active=active}
-    --event
+    self:setFeedingTimesEvent({id, time, active})
+end
+
+function GC_AnimalFeeder:setFeedingTimesEvent(data, noEventSend)
+    self:raiseEvent(self.eventId_setFeedingTimes, data, noEventSend)
+
+    self.feedingTimes[data[1]] = {time=data[2], active=data[3]}
 end
 
 function GC_AnimalFeeder:getFeedingDemandPercent()
@@ -825,8 +897,13 @@ function GC_AnimalFeeder:getFeedingDemandPercent()
 end
 
 function GC_AnimalFeeder:setFeedingDemandPercent(value)
-    self.feedingDemandPercent = value
-    --event
+    self:setFeedingDemandPercentEvent({value})
+end
+
+function GC_AnimalFeeder:setFeedingDemandPercentEvent(data, noEventSend)
+    self:raiseEvent(self.eventId_setFeedingDemandPercent, data, noEventSend)
+
+    self.feedingDemandPercent = data[1]
 end
 
 function GC_AnimalFeeder:getFeedingLiterPerDrive()
@@ -834,8 +911,13 @@ function GC_AnimalFeeder:getFeedingLiterPerDrive()
 end
 
 function GC_AnimalFeeder:setFeedingLiterPerDrive(value)
-    self.feedingLiterPerDrive = value
-    --event
+    self:setFeedingLiterPerDriveEvent({value})
+end
+
+function GC_AnimalFeeder:setFeedingLiterPerDriveEvent(data, noEventSend)
+    self:raiseEvent(self.eventId_setFeedingLiterPerDrive, data, noEventSend)
+
+    self.feedingLiterPerDrive = data[1]
 end
 
 function GC_AnimalFeeder:getFeedingBunker()
@@ -843,14 +925,18 @@ function GC_AnimalFeeder:getFeedingBunker()
 end
 
 function GC_AnimalFeeder:setFeedingMixingRatio(id, value)
-    self.bunkers[id].mixingRatio.value = value
-    --event
+    self:setFeedingMixingRatioEvent({id, value})
+end
+
+function GC_AnimalFeeder:setFeedingMixingRatioEvent(data, noEventSend)
+    self:raiseEvent(self.eventId_setFeedingMixingRatio, data, noEventSend)
+
+    self.bunkers[data[1]].mixingRatio.value = data[2]
 end
 
 function GC_AnimalFeeder:getRoboterCapacity()
     return self.roboter.capacity
 end
-
 
 function GC_AnimalFeeder:getRoboterDriveCapacity()
     return self.roboter.capacity * 2
@@ -863,9 +949,6 @@ function GC_AnimalFeeder:getRoboterFillLevel()
     end  
     return fullLevel 
 end
-
-
-
 
 function GC_AnimalFeeder:hourChanged()
     for _,feedTime in pairs(self.feedingTimes) do
@@ -917,19 +1000,29 @@ function GC_AnimalFeeder:setOperationEffects(bunkerId, state)
 end
 
 function GC_AnimalFeeder:setRobotorUnloadingEffects(state)
-    --event
+    self:setRobotorUnloadingEffectsEvent({state})
+end
+
+function GC_AnimalFeeder:setRobotorUnloadingEffectsEvent(data, noEventSend)
+    self:raiseEvent(self.eventId_setRobotorUnloadingEffects, data, noEventSend)
+    
     if self.isClient then
         if self.roboter.unloading.particleEffects ~= nil then
-            self.roboter.unloading.particleEffects:setEffectsState(state)
+            self.roboter.unloading.particleEffects:setEffectsState(data[1])
         end        
     end
 end
 
 function GC_AnimalFeeder:setRobotorOperationEffects(state)
-    --event
+    self:setRobotorOperationEffectsEvent({state})
+end
+
+function GC_AnimalFeeder:setRobotorOperationEffectsEvent(data, noEventSend)
+    self:raiseEvent(self.eventId_setRobotorOperationEffects, data, noEventSend)
+
     if self.isClient then
         if  self.roboter.operation.animationNodes ~= nil then
-            self.roboter.operation.animationNodes:setAnimationNodesState(state)
+            self.roboter.operation.animationNodes:setAnimationNodesState(data[1])
         end        
     end
 end
