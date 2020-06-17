@@ -179,13 +179,89 @@ Koszt: %s"/>
 
 		<e k="GC_globalMarket_externIsOffline" v="Uruchom dodatkowy program, aby móc kupować lub sprzedawać towary."/>
 		<e k="GC_globalMarket_externIsFalseVersion" v="Nie masz najnowszej wersji programu."/>
-		
-		
+				
 		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Kwadratowe bele trawy"/>
 		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Okrągłe bele trawy"/>
 		<e k="GC_globalMarket_storeItem_cotton" v="Bawełna"/>
 	
 		<!-- FarmStarter -->
 		<e k="GC_farmstarter_header" v="Wybierz swoją farmę startową!"/>
+		
+		<e k="GC_Placeable_PW_FactoryName" v="Myjka ziemniaków"/>
+		<e k="GC_Placeable_PW_FactoryDescription" v="Myjka ziemniaków może być użyta do czyszczenia ziemniaków by je później sprzedać za wyższą cenę."/>
+		<e k="GC_Placeable_PW_productLine_PW" v="Produkcja mytych ziemniaków"/>
+		<e k="GC_Placeable_PW_Input1" v="Ziemniaki"/>
+		<e k="GC_Placeable_PW_Input2" v="Woda"/>
+		<e k="GC_Placeable_PW_Output1" v="Umyte ziemniaki"/>
+		<e k="GC_Placeable_PW_fillType_PotatoWash" v="Umyte ziemniaki"/>
+		
+		<e k="GC_Placeable_Sorter_FactoryName" v="Sorter ziemniaków"/>
+		<e k="GC_Placeable_Sorter_FactoryDescription" v="Sorter ziemniaków sortuje umyte ziemniaki i przetwarza na ziemniaki Premium oraz karmę dla świń"/>
+		<e k="GC_Placeable_Sorter_productLine_Sorter" v="Produkcja ziemniaków Premium"/>
+		<e k="GC_Placeable_Sorter_Input1" v="Umyte ziemniaki"/>
+		<e k="GC_Placeable_Sorter_Output1" v="Ziemniaki Premium"/>
+		<e k="GC_Placeable_Sorter_fillType_PotatoSorted" v="Ziemniaki Premium"/>
+		
+		
+		<!-- FieldLease -->
+		<e k="GlobalCompanyAddOn_FieldLease_gui_leaseheader" v="Dzierżawa terenu"/>	
+		<e k="GlobalCompanyAddOn_FieldLease_gui_buy" v="Kup"/>	
+		<e k="GlobalCompanyAddOn_FieldLease_gui_sell" v="Sprzedaj"/>	
+		<e k="GlobalCompanyAddOn_FieldLease_gui_lease" v="Dzierżawa"/>	
+		<e k="GlobalCompanyAddOn_FieldLease_gui_leaseStop" v="Zakończ dzierżawę"/>	
+		
+		<e k="GlobalCompanyAddOn_FieldLease_field" v="Pole %s"/>	
+		<e k="GlobalCompanyAddOn_FieldLease_state_empty" v="Bezpłatne"/>	
+		<e k="GlobalCompanyAddOn_FieldLease_state_sold" v="Sprzedane"/>	
+		<e k="GlobalCompanyAddOn_FieldLease_state_leased" v="Wydzierżawione"/>	
+		
+		<e k="GlobalCompanyAddOn_FieldLease_dialog_1" v="Kupić pole %s za %s?"/>	
+		<e k="GlobalCompanyAddOn_FieldLease_dialog_2" v="Sprzedać pole %s za %s?"/>	
+		<e k="GlobalCompanyAddOn_FieldLease_dialog_3" v="Dzierżawić pole %s za %s (dzierżawa/dzień: %s)?"/>	
+		<e k="GlobalCompanyAddOn_FieldLease_dialog_4" v="Zakończ dzierżawę pola %s?"/>	
+
+		<e k="GlobalCompanyAddOn_FieldLease_info_1" v="Łączna wartość zakupionych pól: %s"/>	
+		<e k="GlobalCompanyAddOn_FieldLease_info_2" v="Dzierżawa/dzień: %s"/>
+		
+	
+		<!-- FieldCreator -->
+		<e k="GlobalCompanyAddOn_FieldCalculator_gui_header" v="Fieldcalculator - Zużycie nasion i nawozu"/>			
+		<e k="GlobalCompanyAddOn_FieldCalculator_gui_liter" v="%s Litrów"/>	
+		<e k="GlobalCompanyAddOn_FieldCalculator_gui_seeds" v="Zużycie nasion"/>			
+		<e k="GlobalCompanyAddOn_FieldCalculator_gui_seedshead" v="Zużycie nasion na polu %s"/>			
+		<e k="GlobalCompanyAddOn_FieldCalculator_gui_fruit" v="Uprawa"/>			
+		<e k="GlobalCompanyAddOn_FieldCalculator_gui_usage" v="Zużycie"/>		
+		<e k="GlobalCompanyAddOn_FieldCalculator_gui_header_field" v="Pole"/>			
+		<e k="GlobalCompanyAddOn_FieldCalculator_gui_header_fieldSize" v="Wielkość pola"/>			
+		<e k="GlobalCompanyAddOn_FieldCalculator_gui_header_fieldSize2" v="%s HA"/>	
+	
+	
+		<!-- AnimalStableStorage -->
+		<e k="GlobalCompanyPlaceable_AnimalStableStorages_slurryStorage_shoptItem" v="Magazyn gnojownicy"/>
+		<e k="GlobalCompanyPlaceable_AnimalStableStorages_slurryStorage_description" v="Zwiększ pojemność zbiornika gnojownicy w zagrodzie. Musi być umieszczony w pobliżu zagrody."/>
+		<e k="GlobalCompanyPlaceable_AnimalStableStorages_slurryStorage_header_in" v="Proces przechowywania"/>
+		<e k="GlobalCompanyPlaceable_AnimalStableStorages_slurryStorage_header_out" v="Magazyn gnojownicy"/>	
+
+		<e k="GlobalCompanyPlaceable_AnimalStableStorages_waterStorage_shoptItem" v="Magazyn wody"/>
+		<e k="GlobalCompanyPlaceable_AnimalStableStorages_waterStorage_description" v="Zwiększ pojemność zasobnika wody w zagrodzie. Musi być umieszczony w pobliżu zagrody."/>
+		<e k="GlobalCompanyPlaceable_AnimalStableStorages_waterStorage_header_in" v="Magazyn wody"/>
+		<e k="GlobalCompanyPlaceable_AnimalStableStorages_waterStorage_header_out" v="Proces Outsourcingu"/>
+	
+		
+		<!-- CowFeedMixer_Pack -->
+		<e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_FactoryName" v="Mieszalnik TMR"/>
+        <e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_FactoryDescription" v="Mieszalnik pokarmu dla krów produkuje optymalną paszę z kiszonki, słomy i siana dla Twoich krów."/>
+        <e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_productLine_cowfood" v="Produkcja TMR"/>
+        <e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_Input1" v="Kiszonka"/>
+        <e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_Input2" v="Słoma"/>
+        <e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_Input3" v="Siano"/>
+        <e k="GlobalCompanyPlaceable_CowFeedMixer_Pack_Output1" v="Pasza"/>
+		
+		
+		<!-- PlaceableDisplay -->
+		<e k="GlobalCompanyPlaceable_PlaceableDisplay_shopItem_small" v="Mały wyświetlacz cyfrowy"/>
+		<e k="GlobalCompanyPlaceable_PlaceableDisplay_function_small" v="Tekst (dowolnie definiowalny) w jednym wierszu."/>
+		<e k="GlobalCompanyPlaceable_PlaceableDisplay_shopItem_big" v="Duży wyświetlacz cyfrowy"/>
+		<e k="GlobalCompanyPlaceable_PlaceableDisplay_function_big" v="Tekst (dowolnie definiowalny) w kilku wierszach."/>
 	</elements>
 </l10n>
