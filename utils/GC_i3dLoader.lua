@@ -46,6 +46,7 @@ end;
 
 function GC_i3dLoader:loadMaterials(i3dPath, dir, xmlFile, xmlKey, i3dMappings)
 	local materials = {};
+	if not hasXMLProperty(xmlFile, xmlKey) then return end
 	
 	local nodeId = g_i3DManager:loadSharedI3DFile(i3dPath, dir, false, false, false);
 	
@@ -60,7 +61,7 @@ function GC_i3dLoader:loadMaterials(i3dPath, dir, xmlFile, xmlKey, i3dMappings)
 		local index = getXMLString(xmlFile, key .. "#index");
 		local materialIndex = getXMLInt(xmlFile, key .. "#materialIndex");
 		
-		if i3dMappings ~= nil then
+		if i3dMappings ~= nil and i3dMappings[index] ~= nil then
 			index = i3dMappings[index];
 		end;
 				

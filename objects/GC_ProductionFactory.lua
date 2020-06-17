@@ -106,12 +106,13 @@ function GC_ProductionFactory:onCreate(transformId)
 	end
 end
 
-function GC_ProductionFactory:new(isServer, isClient, customMt, xmlFilename, baseDirectory, customEnvironment)
+function GC_ProductionFactory:new(isServer, isClient, customMt, xmlFilename, baseDirectory, customEnvironment, isVehicle)
 	local self = Object:new(isServer, isClient, customMt or GC_ProductionFactory_mt)
 
 	self.xmlFilename = xmlFilename
 	self.baseDirectory = baseDirectory
 	self.customEnvironment = customEnvironment
+	self.isVehicle = isVehicle
 
 	self.triggerIdToInputProductId = {}
 	self.triggerIdToOutputProductId = {}
@@ -134,6 +135,8 @@ function GC_ProductionFactory:new(isServer, isClient, customMt, xmlFilename, bas
 
 	self.productNameToProduct = {}
 
+	self.fillTypeIsExtend = {}
+
 	self.numInputProducts = 0
 	self.numOutputProducts = 0
 
@@ -154,14 +157,19 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 	self.rootNode = nodeId
 	self.indexName = indexName
 	self.isPlaceable = isPlaceable
-	self.placeableClass = placeableClass
+	self.placeableClass = placeableClass --or vehicle class
 
 	self.triggerManager = GC_TriggerManager:new(self)
-	self.i3dMappings = GC_i3dLoader:loadI3dMapping(xmlFile, xmlKey .. ".i3dMappings")
 
-	self.saveId = getXMLString(xmlFile, xmlKey .. "#saveId")
-	if self.saveId == nil then
-		self.saveId = "ProductionFactory_" .. indexName
+	if self.isVehicle then
+		placeableClass:onLoadFactory(self)
+	else
+		self.i3dMappings = GC_i3dLoader:loadI3dMapping(xmlFile, xmlKey .. ".i3dMappings")
+
+		self.saveId = getXMLString(xmlFile, xmlKey .. "#saveId")
+		if self.saveId == nil then
+			self.saveId = "ProductionFactory_" .. indexName
+		end
 	end
 
 	local factoryTitle = getXMLString(xmlFile, xmlKey .. ".guiInformation#title")
@@ -196,6 +204,9 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 	if refPoint ~= nil and refPoint ~= "" then
 		self.refPoint = I3DUtil.indexToObject(self.rootNode, refPoint, self.i3dMappings)
 	else
+		if self.isVehicle then
+			g_company.debug:writeModding(self.debugData, "[FACTORY - %s] 'refPoint' is required for vehicles!", indexName)
+		end		
 		self.refPoint = self.rootNode
 	end
 
@@ -287,6 +298,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				end
 
 				local fillTypeName = getXMLString(xmlFile, fillTypesKey .. "#name")
+				local isExtend = getXMLBool(xmlFile, fillTypesKey .. "#isExtend")
 				if fillTypeName ~= nil then
 					local fillType
 
@@ -333,7 +345,12 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 							g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Unknown animalType ( %s ) found in 'inputProduct' ( %s ) at %s, ignoring!", indexName, fillTypeName, inputProductName, fillTypesKey)
 						end
 					else
-						fillType = g_fillTypeManager:getFillTypeByName(fillTypeName)
+						if isExtend ~= nil and isExtend then
+							fillType = g_company.fillTypeManager:getExtendedFillTypeByName(fillTypeName)
+							self.fillTypeIsExtend[fillType] = true
+						else
+							fillType = g_fillTypeManager:getFillTypeByName(fillTypeName)
+						end
 					end
 
 					if fillType ~= nil and usedFillTypeNames[fillTypeName] == nil then
@@ -343,7 +360,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 							inputProduct.fillTypes = {}
 						end
 
-						inputProduct.fillTypes[fillType.index] = true
+						inputProduct.fillTypes[fillType.index] = {used=true, isExtend=isExtend}
 
 						if inputProduct.lastFillTypeIndex == nil then
 							inputProduct.lastFillTypeIndex = fillType.index
@@ -420,7 +437,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				if not inputProduct.isAlwaysFull and hasXMLProperty(xmlFile, inputProductKey .. ".inputMethods") then
 					if self.isServer then
 						if hasXMLProperty(xmlFile, inputProductKey .. ".inputMethods.rainWaterCollector") then
-							if inputProduct.fillTypes[FillType.WATER] ~= nil then
+							if inputProduct.fillTypes[FillType.WATER] ~= nil and not inputProduct.fillTypes[FillType.WATER].isExtend then
 								local litresPerHour = getXMLString(xmlFile, inputProductKey .. ".inputMethods.rainWaterCollector#litresPerHour")
 								if litresPerHour ~= nil then
 									if self.rainWaterCollector == nil then
@@ -445,7 +462,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 
 					local woodTriggerKey = inputProductKey .. ".inputMethods.woodTrigger"
 					if hasXMLProperty(xmlFile, woodTriggerKey) then
-						if inputProduct.fillTypes[FillType.WOODCHIPS] ~= nil then
+						if inputProduct.fillTypes[FillType.WOODCHIPS] ~= nil and not inputProduct.fillTypes[FillType.WOODCHIPS].isExtend then
 							local trigger = self.triggerManager:addTrigger(GC_WoodTrigger, self.rootNode, self, xmlFile, woodTriggerKey, "WOODCHIPS")
 							if trigger ~= nil then
 								trigger.extraParamater = trigger.managerId
@@ -505,6 +522,22 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 									self.triggerIdToInputProductId[triggerId][index] = inputProductId
 								end
 							end
+						end
+					end
+					
+					local extendedFillTypesTriggerKey = inputProductKey .. ".inputMethods.extendedFillTypesTrigger"
+					if hasXMLProperty(xmlFile, extendedFillTypesTriggerKey) then	
+						local extendedFillTypesTrigger = self.triggerManager:addTrigger(GC_ExtendedFillTypesTrigger, self.rootNode, self, xmlFile, extendedFillTypesTriggerKey, inputProductId)
+						if extendedFillTypesTrigger ~= nil then
+							extendedFillTypesTrigger.extraParamater = extendedFillTypesTrigger.managerId
+
+							self.triggerIdToInputProductId[extendedFillTypesTrigger.managerId] = {}
+							for index, data in pairs (inputProduct.fillTypes) do
+								if data.isExtend then
+									extendedFillTypesTrigger:setAcceptedFillTypeState(index, true)
+									self.triggerIdToInputProductId[extendedFillTypesTrigger.managerId][index] = inputProduct.id
+								end
+							end							
 						end
 					end
 				end
@@ -585,6 +618,7 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				outputProduct.isAnimalTypes = Utils.getNoNil(getXMLBool(xmlFile, outputProductKey .. "#isAnimalTypes"), false)
 
 				local fillTypeName = getXMLString(xmlFile, outputProductKey .. "#fillType")
+				local isExtend = getXMLBool(xmlFile, outputProductKey .. "#isExtend")
 
 				if fillTypeName ~= nil then
 					local fillType, subFillType
@@ -621,8 +655,13 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 						else
 							g_company.debug:writeModding(self.debugData, "[FACTORY - %s] Unknown animalType ( %s ) found in 'outputProduct' ( %s ) at %s, ignoring!", indexName, fillTypeName, outputProductName, fillTypesKey)
 						end
-					else
-						fillType = g_fillTypeManager:getFillTypeByName(fillTypeName)
+					else						
+						if isExtend ~= nil and isExtend then
+							fillType = g_company.fillTypeManager:getExtendedFillTypeByName(fillTypeName)
+							self.fillTypeIsExtend[fillType] = true
+						else
+							fillType = g_fillTypeManager:getFillTypeByName(fillTypeName)
+						end
 					end
 					if fillType ~= nil then
 						local fillTypeIndex = fillType.index
@@ -812,6 +851,18 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 										end
 									end
 									table.insert(triggersLoaded, "livestockTrigger")
+								end
+							end
+
+							local extendedFillTypesFillTriggerKey = outputMethodsKey .. ".extendedFilltypesFillTrigger"
+							if hasXMLProperty(xmlFile, extendedFillTypesFillTriggerKey) then
+								local extendedFillTypesFillTrigger = self.triggerManager:addTrigger(GC_ExtendedFilTypesFillTrigger, self.rootNode, self, xmlFile, extendedFillTypesFillTriggerKey, fillTypeIndex)
+								if extendedFillTypesFillTrigger ~= nil then
+									outputProduct.extendedFillTypesFillTrigger = extendedFillTypesFillTrigger
+									extendedFillTypesFillTrigger.extraParamater = extendedFillTypesFillTrigger.managerId
+									self.triggerIdToOutputProductId[extendedFillTypesFillTrigger.managerId] = {[fillTypeIndex] = outputProductId}
+									extendedFillTypesFillTrigger:setAcceptedFillType(fillTypeIndex)
+									table.insert(triggersLoaded, "extendedFillTypesFillTrigger")
 								end
 							end
 
@@ -1068,6 +1119,14 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 			end
 		end
 
+		local movingPartsKey = xmlKey .. ".movingParts"
+		if hasXMLProperty(xmlFile, movingPartsKey) then
+			local movingParts = GC_MovingPart:new(self.isServer, self.isClient)
+			if movingParts:load(self.rootNode, xmlFile, movingPartsKey, self) then
+				self.movingParts = movingParts
+			end
+		end
+
 		if canLoad then
 			self.globalIndex = g_company.addFactory(self)
 
@@ -1102,8 +1161,8 @@ function GC_ProductionFactory:setUnloadingTrigger(inputProduct, xmlFile, unloadi
 			local canAdd = true
 			local fillTypeNameError = ""
 			if trigger.fillTypes ~= nil then
-				for index, _ in pairs (inputProduct.fillTypes) do
-					if trigger.fillTypes[index] ~= nil then
+				for index, data in pairs (inputProduct.fillTypes) do
+					if not data.isExtend and trigger.fillTypes[index] ~= nil then
 						canAdd = false
 						fillTypeNameError =  g_fillTypeManager:getFillTypeNameByIndex(index)
 						break
@@ -1111,9 +1170,11 @@ function GC_ProductionFactory:setUnloadingTrigger(inputProduct, xmlFile, unloadi
 				end
 			end
 			if canAdd then
-				for index, _ in pairs (inputProduct.fillTypes) do
-					trigger:setAcceptedFillTypeState(index, true)
-					self.triggerIdToInputProductId[triggerId][index] = inputProduct.id
+				for index, data in pairs (inputProduct.fillTypes) do
+					if not data.isExtend then
+						trigger:setAcceptedFillTypeState(index, true)
+						self.triggerIdToInputProductId[triggerId][index] = inputProduct.id
+					end
 				end
 
 				return true
@@ -1211,6 +1272,11 @@ function GC_ProductionFactory:loadOperatingParts(xmlFile, key, parent, isProduct
 			parent.operateAnimationNodes = animationNodes
 		end
 
+		local visibility = GC_Visibility:new(self.isServer, self.isClient)
+		if visibility:load(self.rootNode, self, xmlFile, key, self.baseDirectory) then
+			parent.operateVisibility = visibility
+		end
+
 		local particleEffects = GC_Effects:new(self.isServer, self.isClient)
 		if particleEffects:load(self.rootNode, self, xmlFile, key) then
 			parent.operateParticleEffects = particleEffects
@@ -1254,6 +1320,10 @@ function GC_ProductionFactory:finalizePlacement()
 			inputProduct.animalTrough:finalizePlacement()
 		end
 	end	
+
+	if self.movingParts ~= nil then
+		self.movingParts:finalizePlacement()
+	end
 end
 
 function GC_ProductionFactory:delete()
@@ -1294,6 +1364,10 @@ function GC_ProductionFactory:delete()
 				product.visibilityNodes:delete()
 			end
 		end
+	end
+
+	if self.movingParts ~= nil then
+		self.movingParts:delete()
 	end
 
 	if self.isClient then
@@ -1352,6 +1426,10 @@ function GC_ProductionFactory:deleteOperatingParts(parent)
 		parent.operateAnimationNodes:delete()
 	end
 
+	if parent.operateVisibility ~= nil then
+		parent.operateVisibility:delete()
+	end
+	
 	if parent.operateParticleEffects ~= nil then
 		parent.operateParticleEffects:delete()
 	end
@@ -1367,6 +1445,10 @@ function GC_ProductionFactory:readStream(streamId, connection)
 	if connection:getIsServer() then
 		if self.triggerManager ~= nil then
 			self.triggerManager:readStream(streamId, connection)
+		end
+		
+		if self.animationManager ~= nil then
+			self.animationManager:readStream(streamId, connection)
 		end
 
 		for _, inputProduct in ipairs (self.inputProducts) do
@@ -1416,6 +1498,10 @@ function GC_ProductionFactory:writeStream(streamId, connection)
 	if not connection:getIsServer() then
 		if self.triggerManager ~= nil then
 			self.triggerManager:writeStream(streamId, connection)
+		end
+		
+		if self.animationManager ~= nil then
+			self.animationManager:writeStream(streamId, connection)
 		end
 
 		for _, inputProduct in ipairs (self.inputProducts) do
@@ -1528,7 +1614,7 @@ end
 
 function GC_ProductionFactory:loadFromXMLFile(xmlFile, key)
 	local factoryKey = key
-	if not self.isPlaceable then
+	if not self.isPlaceable and not self.isVehicle then
 		factoryKey = string.format("%s.productionFactory", key)
 	end
 
@@ -1549,9 +1635,14 @@ function GC_ProductionFactory:loadFromXMLFile(xmlFile, key)
 
 			local lastFillTypeIndex
 			local lastFillTypeName = getXMLString(xmlFile, inputProductKey .. "#lastFillTypeName")
-			if lastFillTypeName ~= nil then
-				lastFillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(lastFillTypeName)
-				if lastFillTypeIndex ~= nil and inputProduct.fillTypes[lastFillTypeIndex] ~= true then
+			local lastFillTypeNameIsExtended = getXMLBool(xmlFile, inputProductKey .. "#lastFillTypeNameIsExtended")
+			if lastFillTypeName ~= nil then				
+				if lastFillTypeNameIsExtended then
+					lastFillTypeIndex = g_company.fillTypeManager:getExtendedFillTypeIndexByName(lastFillTypeName)
+				else
+					lastFillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(lastFillTypeName)
+				end				
+				if lastFillTypeIndex ~= nil and inputProduct.fillTypes[lastFillTypeIndex] ~= nil and not inputProduct.fillTypes[lastFillTypeIndex].used and inputProduct.fillTypes[lastFillTypeIndex] == lastFillTypeNameIsExtended then
 					lastFillTypeIndex = nil
 				end
 			end
@@ -1652,7 +1743,7 @@ end
 
 function GC_ProductionFactory:saveToXMLFile(xmlFile, key, usedModNames)
 	local factoryKey = key
-	if not self.isPlaceable then
+	if not self.isPlaceable and not self.isVehicle then
 		factoryKey = string.format("%s.productionFactory", key)
 
 		-- This only saved for 'onCreate'. May not need as farmlandManager seems to have it sorted.
@@ -1684,8 +1775,14 @@ function GC_ProductionFactory:saveToXMLFile(xmlFile, key, usedModNames)
 			if totalDelivered > 0 then
 				setXMLFloat(xmlFile, inputProductKey .. "#totalDelivered", totalDelivered)
 			end
+			
+			local lastFillTypeName 
+			if self.fillTypeIsExtend[inputProduct.lastFillTypeIndex] then
+				lastFillTypeIndex = g_company.fillTypeManager:getExtendedFillTypeNameByIndex(inputProduct.lastFillTypeIndex)
+			else
+				lastFillTypeIndex = g_fillTypeManager:getFillTypeNameByIndex(inputProduct.lastFillTypeIndex)
+			end
 
-			local lastFillTypeName = g_fillTypeManager:getFillTypeNameByIndex(inputProduct.lastFillTypeIndex)
 			if lastFillTypeName ~= nil then
 				setXMLString(xmlFile, inputProductKey .. "#lastFillTypeName", lastFillTypeName)
 			end
@@ -2157,6 +2254,10 @@ function GC_ProductionFactory:setOperatingParts(parent, state)
 		parent.operateAnimationNodes:setAnimationNodesState(state)
 	end
 
+	if parent.operateVisibility ~= nil then
+		parent.operateVisibility:updateNodes(state)
+	end
+
 	if parent.operateParticleEffects ~= nil then
 		parent.operateParticleEffects:setEffectsState(state)
 	end
@@ -2295,7 +2396,6 @@ function GC_ProductionFactory:palletCreatorInteraction(level, blockedLevel, delt
 			end
 		end
 	end
-
 end
 
 function GC_ProductionFactory:vehicleChangedHeapLevel(heapLevel, fillTypeIndex, heapId)
@@ -2898,7 +2998,9 @@ function GC_ProductionFactory:programmFlow_setAnimationNode(parameters)
 	
 	local index = parsedParameters[1]
 	local state = parsedParameters[2]
-	self.programmFlowOperatingParts.operateAnimationNodes:setAnimationNodesStateByNode(index, state)
+	if self.programmFlowOperatingParts ~= nil and self.programmFlowOperatingParts.operateAnimationNodes ~= nil then
+		self.programmFlowOperatingParts.operateAnimationNodes:setAnimationNodesStateByNode(index, state)
+	end
 end
 
 --[[   setParticleEffect
@@ -2910,7 +3012,9 @@ function GC_ProductionFactory:programmFlow_setParticleEffect(parameters)
 	
 	local index = parsedParameters[1]
 	local state = parsedParameters[2]
-	self.programmFlowOperatingParts.operateParticleEffects:setEffectsState(state, true)
+	if self.programmFlowOperatingParts ~= nil and self.programmFlowOperatingParts.operateParticleEffects ~= nil then
+		self.programmFlowOperatingParts.operateParticleEffects:setEffectsState(state, true)
+	end
 end
 
 -----------------------------------------ManureSystem--------------------------------------------------
@@ -2946,8 +3050,3 @@ function GC_ProductionFactory:ms_getFillUnitFreeCapacity(fillUnitIndex, triggerI
 
 	return 0
 end
-
-
-
-
-

@@ -32,9 +32,10 @@ function GC_FillTypeManager:new()
     local self = {};
 	setmetatable(self, GC_FillTypeManager_mt);
 
-    --self.fillTypes = {};
-    --self.fillTypesById = {};
-    --self.fillTypesByName = {};
+    self.extendedFillTypes = {};
+    self.extendedFillTypesById = {};
+    self.extendedFillTypesByName = {};
+    self.extendedFillTypesCategories = {};
 
     self.xmlFiles = {};
     
@@ -88,10 +89,10 @@ function GC_FillTypeManager:load()
             local hudOverlayFilenameSmall = getXMLString(xmlFile, xmlKey .. ".image#hudSmall");
             local palletFilename = getXMLString(xmlFile, xmlKey .. ".pallet#filename");
         
-            local s,_ = palletFilename:find("$data");
-            if s == nil then
+            --local s,_ = palletFilename:find("$data");
+            --if s == nil then
                 --palletFilename = g_company.utils.createModPath(data.modName, palletFilename);
-            end;
+            --end;
             
             title = g_company.languageManager:getText(string.format("%s_%s", string.gsub(data.modName, "FS19_", ""), string.gsub(title, "$l10n_", "")));
 
@@ -132,21 +133,148 @@ function GC_FillTypeManager:load()
 
             i = i + 1;
         end;
-    end;
+
+        i = 0
+        while true do
+            local xmlKey = string.format("map.extendedFillTypes.fillType(%d)", i)
+            if not hasXMLProperty(xmlFile, xmlKey) then
+                break
+            end
+            
+            local name = getXMLString(xmlFile, xmlKey .. "#name")
+            local title = getXMLString(xmlFile, xmlKey .. "#title")
+            local palletFilename = getXMLString(xmlFile, xmlKey .. ".pallet#filename")
+            local colorMat = getXMLString(xmlFile, xmlKey .. ".color#mat")
+            --local s = string.format("%s_%s", string.gsub(data.modName, "FS19_", ""), string.gsub(title, "$l10n_", ""))
+            title = g_company.languageManager:getText(title)
+
+            self:addExtendedFillType(name, title, palletFilename, colorMat)
+            i = i + 1;
+        end
+
+        i = 0
+        while true do
+            local xmlKey = string.format("map.extendedFillTypesCategories.extendedFillTypesCategory(%d)", i);
+            if not hasXMLProperty(xmlFile, xmlKey) then
+                break
+            end
+            
+            local name = getXMLString(xmlFile, xmlKey .. "#name")
+            local fillTypes = getXMLString(xmlFile, xmlKey .. "#fillTypes")
+                                
+            self:addExtendedFillTypeCategory(name, g_company.utils.splitString(fillTypes, " "))
+            i = i + 1
+        end
+
+        if hasXMLProperty(xmlFile, "map.extendedFillTypesMaterials") then
+            self:loadExtendedFilltypeMaterials(xmlFile, "map.extendedFillTypesMaterials", data.modName)
+        end
+        
+    
+
+    end
 
     if newFilltype then
-        g_currentMission.hud.fillLevelsDisplay:refreshFillTypes(g_fillTypeManager);        
-    end;
-end;
+        g_currentMission.hud.fillLevelsDisplay:refreshFillTypes(g_fillTypeManager)       
+    end
+end
 
---[[
 function GC_FillTypeManager:getNextId()
     if self.fillTypeId == nil then
-        self.fillTypeId = -1;
+        self.fillTypeId = 0
     end;
-    self.fillTypeId = self.fillTypeId + 1;
-    return self.fillTypeId;
+    self.fillTypeId = self.fillTypeId + 1
+    return self.fillTypeId
 end
+
+function GC_FillTypeManager:addExtendedFillType(name, title, palletFilename, colorMat)    
+    name = name:upper()
+
+    if self.extendedFillTypesByName[name] ~= nil then
+		g_company.debug:writeError(self.debugData, "Filltype %s already exist.", name)
+        return
+    end
+
+    local newFilltype = {}
+    newFilltype.name = name
+    newFilltype.title = title
+    newFilltype.palletFilename = palletFilename
+
+    if colorMat ~= nil then
+        newFilltype.colorMat = g_company.utils.splitString(colorMat, " ")
+    end
+
+    newFilltype.index = self:getNextId()
+
+    self.extendedFillTypesByName[newFilltype.name] = newFilltype
+    self.extendedFillTypesById[newFilltype.index] = newFilltype
+end
+
+function GC_FillTypeManager:addExtendedFillTypeCategory(name, fillTypes)   
+    name = name:upper()
+    if self.extendedFillTypesCategories[name] == nil then
+        self.extendedFillTypesCategories[name] = {}
+    end
+
+    for _,fillTypeName in pairs(fillTypes) do
+        if self.extendedFillTypesByName[fillTypeName] == nil then
+            g_company.debug:writeError(self.debugData, "Filltype %s not exist.", fillTypeName)
+        end
+        
+        table.insert(self.extendedFillTypesCategories[name], fillType)
+        self.extendedFillTypesByName[fillTypeName].category = name
+    end
+end
+
+function GC_FillTypeManager:getExtendedFillTypeByName(name)   
+    return self.extendedFillTypesByName[name:upper()]
+end
+
+function GC_FillTypeManager:getExtendedFillTypeByIndex(index)   
+    return self.extendedFillTypesById[index]
+end
+
+function GC_FillTypeManager:getExtendedFillTypeIndexByName(name)   
+    if self.extendedFillTypesByName[name:upper()] ~= nil then
+        return self.extendedFillTypesByName[name:upper()].index
+    end
+end
+
+function GC_FillTypeManager:getExtendedFillTypeNameByIndex(index)   
+    if self.extendedFillTypesById[index] ~= nil then
+        return self.extendedFillTypesById[index].name
+    end
+end
+
+
+function GC_FillTypeManager:getExtendedFillTypeById(id)   
+    return self.extendedFillTypesById[id]
+end
+
+function GC_FillTypeManager:getExtendedFillTypeByCategorie(name)   
+    return self.extendedFillTypesCategories[name]
+end
+
+function GC_FillTypeManager:getIsExtendedFillTypeIsInCategorie(filltypename, categorie)   
+    return self.extendedFillTypesByName[filltypename].category == categorie
+end
+
+function GC_FillTypeManager:loadExtendedFilltypeMaterials(xmlFile, xmlKey, modName)    
+    local materialPath = getXMLString(xmlFile, xmlKey .. "#materialHolder");
+    local materials = GC_i3dLoader:loadMaterials(materialPath, g_company.utils.createDirPath(modName), xmlFile, xmlKey)   
+        
+    for name, material in pairs(materials) do
+        if self.extendedFillTypesByName[name:upper()] ~= nil then
+            self.extendedFillTypesByName[name:upper()].material = material
+        else
+            print(string.format("GC_FillTypeManager invalid filltype %s", name))
+        end
+    end
+end
+
+
+
+--[[
     
 function GC_FillTypeManager:registerFillType(name, lang)
     if self.fillTypesByName[name] ~= nil then

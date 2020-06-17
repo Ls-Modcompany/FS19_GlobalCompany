@@ -138,13 +138,45 @@
 		<e k="GC_placeableDigDisplay_headerInfo" v="Aquí puede especificar cualquier texto que desee que aparezca en la pantalla digital."/>
 		<e k="GC_placeableDigDisplay_btnSave" v="Salvar"/>
 		
-		<!-- Market -->
-		<!--e k="GC_market_showDetails" v="Details"/>
-		<e k="GC_market_date" v="Datum"/>
-		<e k="GC_market_name" v="Name"/>
-		<e k="GC_market_type" v="Art"/>
-		<e k="GC_market_liter" v="Liter"/>
-		<e k="GC_market_money" v="Preis"/>
-		<e k="GC_market_designation" v="Bezeichnung"/-->
+		<!-- GlobalMarket -->
+		<e k="GC_globalMarket_openGui" v="Abrir GlobalMarket"/>
+		<e k="GC_globalMarket_header" v="Global Market 2020"/>
+		<e k="GC_globalMarket_headerInfo" v="Aqui puedes comprar y vender tus productos"/>
+		<e k="GC_globalMarket_btn_buyScreen" v="Ver Mercado"/>
+		<e k="GC_globalMarket_btn_storageScreen" v="Ver Almacen"/>
+		<e k="GC_globalMarket_btn_synch" v="Sincronizar"/>
+		
+		<e k="GC_globalMarket_header2" v="Global Market 2020 - Definir cantidad"/>
+		<e k="GC_globalMarket_headerInfo2" v="Defina la cantidad deseada aquí!"/>
+		<e k="GC_globalMarket_btn_ok" v="Confirmar"/>
+		<e k="GC_globalMarket_btn_startLoad" v="Comenzar carga"/>
+		
+		<e k="GC_globalMarket_header3" v="Global Market 2020 - Salidas"/>
+		<e k="GC_globalMarket_headerInfo3" v="Elija que quiere cargar"/>
+		<e k="GC_globalMarket_btn_min" v="Minimo"/>
+		<e k="GC_globalMarket_btn_max" v="Maximo"/>
+
+		<e k="GC_globalMarket_txt_amount" v="Cantidad"/>
+		<e k="GC_globalMarket_txt_money" v="Valor"/>
+
+		<e k="GC_globalMarket_tbl_header_filltype" v="Tipo Fruta"/>
+		<e k="GC_globalMarket_tbl_header_level" v="Litros"/>
+		<e k="GC_globalMarket_tbl_header_pallets" v="Pallets"/>
+		<e k="GC_globalMarket_tbl_header_bales" v="Pacas"/>
+		<e k="GC_globalMarket_tbl_header_price" v="precio actual"/>
+		<e k="GC_globalMarket_tbl_header_price2" v="precio actual / 1000 Litros"/>
+		<e k="GC_globalMarket_btn_outsource" v="Sacar"/>
+		<e k="GC_globalMarket_btn_outsourceBale1" v="Paca redonda"/>
+		<e k="GC_globalMarket_btn_outsourceBale2" v="Paca cuadrada"/>
+		<e k="GC_globalMarket_btn_sell" v="Vender"/>
+		<e k="GC_globalMarket_btn_buy" v="Comprar"/>
+
+		<e k="GC_globalMarket_externIsOffline" v="Arranque el software obligatorio EXE externo y podrá vender y comprar productos en el mercado."/>
+		<e k="GC_globalMarket_externIsFalseVersion" v="No tienes la última versión del software EXE externo"/>
+		
+		
+		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Paca cuadrada hierba"/>
+		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Paca redonda hierba"/>
+		<e k="GC_globalMarket_storeItem_cotton" v="Algodón"/>
 	</elements>
 </l10n>

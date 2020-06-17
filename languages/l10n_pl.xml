@@ -179,8 +179,7 @@ Koszt: %s"/>
 
 		<e k="GC_globalMarket_externIsOffline" v="Uruchom dodatkowy program, aby móc kupować lub sprzedawać towary."/>
 		<e k="GC_globalMarket_externIsFalseVersion" v="Nie masz najnowszej wersji programu."/>
-		
-		
+				
 		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Kwadratowe bele trawy"/>
 		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Okrągłe bele trawy"/>
 		<e k="GC_globalMarket_storeItem_cotton" v="Bawełna"/>

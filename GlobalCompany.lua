@@ -3,15 +3,23 @@
 --
 -- @Interface: 1.5.1.0 b6730
 -- @Author: LS-Modcompany
--- @Date: 29.04.2020
--- @Version: 1.4.5.1
+-- @Date: 16.06.2020
+-- @Version: 1.6.0.1
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+-- 	v1.6.0.0 (07.08.2020):
+--		- Add features for DynamicStorage
+--		- Add productionfactory for vehicles
+--		- Adaption for Stappenbach19
+--
+-- 	v1.5.0.0 (29.04.2020):
+--		- Fix Baler
+--
 -- 	v1.4.4.0 (18.04.2020):
 --		- Some Bugfixes
-
+--
 -- 	v1.4.3.0 (02.04.2020):
 --		- FarmStart: Add 'boughtWithFarmland' attribute for items
 --
@@ -109,9 +117,9 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.4.5.1";
-GlobalCompany.versionDate = "29.04.2020";
-GlobalCompany.currentVersionId = 1451; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.version = "1.6.0.1";
+GlobalCompany.versionDate = "16.06.2020";
+GlobalCompany.currentVersionId = 1601; -- Mod Manager ID. (Version number without periods.)
 GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
 GlobalCompany.isGreenWeekVersion = false;
 
@@ -131,6 +139,7 @@ function GlobalCompany.initialLoad()
 		source(GlobalCompany.dir .. "utils/GC_DataTypeConverter.lua");
 		source(GlobalCompany.dir .. "class/GC_Class.lua");
 		source(GlobalCompany.dir .. "class/GC_StaticClass.lua");
+		source(GlobalCompany.dir .. "utils/GC_NetworkManager.lua");
 
 		source(GlobalCompany.dir .. "utils/GC_DebugUtils.lua");
 		source(GlobalCompany.dir .. "utils/GC_DebugManager.lua");
@@ -181,6 +190,7 @@ function GlobalCompany.initialLoad()
 		GlobalCompany.objects = {}
 		GlobalCompany.objectId = 1
 		GlobalCompany.staticObjects = {}
+		g_company.networkManager = GC_NetworkManager:new();
 
 		g_company.modManager:initDevelopmentWarning(GlobalCompany.isDevelopmentVersion);
 
@@ -220,7 +230,6 @@ function GlobalCompany.initialLoad()
 			end;
 		end;
 		g_company.specializations:loadFromXML(modNameCurrent, xmlFileCurrentMod);	
-
 	else
 		getfenv(0)["g_company"] = nil;
 	end;
@@ -428,7 +437,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_Effects.lua");
 	source(GlobalCompany.dir .. "objects/GC_Lighting.lua");
 	source(GlobalCompany.dir .. "objects/GC_Conveyor.lua");
-	-- source(GlobalCompany.dir .. "objects/GC_MovingPart.lua");
+	source(GlobalCompany.dir .. "objects/GC_MovingPart.lua");
 	source(GlobalCompany.dir .. "objects/GC_FillVolume.lua");
 	source(GlobalCompany.dir .. "objects/GC_DynamicHeap.lua");
 	source(GlobalCompany.dir .. "objects/GC_DirtyObjects.lua");
@@ -450,6 +459,9 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_ProgrammFlow.lua");
 	source(GlobalCompany.dir .. "objects/GC_ProgrammFlow_Globalfunctions.lua");
 	source(GlobalCompany.dir .. "objects/GC_AnimalFeeder.lua");
+	source(GlobalCompany.dir .. "objects/GC_Visibility.lua");
+
+	source(GlobalCompany.dir .. "objects/GC_ProductionFactoryObject.lua");
 
 	--|| Triggers ||--
 	source(GlobalCompany.dir .. "triggers/GC_WoodTrigger.lua");
@@ -460,6 +472,8 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "triggers/GC_ShovelFillTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_AnimalLoadingTrigger.lua");
 	source(GlobalCompany.dir .. "triggers/GC_VehicleTrigger.lua");
+	source(GlobalCompany.dir .. "triggers/GC_ExtendedFillTypesTrigger.lua");
+	source(GlobalCompany.dir .. "triggers/GC_ExtendedFilTypesFillTrigger.lua");
 	--source(GlobalCompany.dir .. "triggers/GC_PalletExtendedTrigger.lua");
 
 	--|| Placeables ||--
@@ -490,6 +504,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "events/GC_ProductionFactoryProductPurchaseEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_ProductionDynamicStorageCustomTitleEvent.lua");
 	source(GlobalCompany.dir .. "events/GC_GmSendMoneyEvent.lua");
+	source(GlobalCompany.dir .. "events/GC_NetworkManagerInitEvent.lua");
 	
 
 	--|| Specializations ||--
@@ -569,6 +584,7 @@ end;
 
 function GlobalCompany:loadMap()
 	g_company.debug:loadConsoleCommands();
+	--g_company.networkManager:register(true)
 	
 	g_company.gui:load()
 

@@ -320,8 +320,6 @@ function GC_AnimalLoadingTrigger:deliverAnimals(animalTrailer, numberToDeliver)
 						table.insert(animalsToRemove, animals[i])
 					end
 
-					print(litresPerAnimal)
-					print(numberToRemove)
 					animalTrailer:removeAnimals(animalsToRemove)
 					self.target:addFillLevel(farmId, litresPerAnimal * numberToRemove, fillTypeIndex, ToolType.UNDEFINED, nil, self.extraParamater)
 				end
@@ -345,8 +343,7 @@ function GC_AnimalLoadingTrigger:deliverAnimals(animalTrailer, numberToDeliver)
 				newAnimal:register()
 				animalTrailer:addAnimal(newAnimal)
 			end
-			print(litresPerAnimal)
-			print(numberToAdd)
+			
 			self.target:removeFillLevel(farmId, litresPerAnimal * numberToAdd, fillTypeIndex, self.extraParamater)
 		end
 	end
