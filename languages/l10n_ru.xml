@@ -3,15 +3,15 @@
 	<elements>
 
 		<!-- Warnings / Errors -->
-		<e k="GC_mapVersionWarning" v="Карта '%s' от %s нуждается GlobalCompany - Нужна версия %s или выше. Скачай последнюю версию с модхаба или посети '%s' для поддержки."/>	
-		<e k="GC_modVersionWarning" v="Мод '%s' от %s нуждается GlobalCompany - Нужна версия %s или выше. Скачай последнюю версию с модхаба или посети '%s' для поддержки."/>	
-		<e k="GC_loadingError" v="Во время загрузки GlobalCompany что то пошло не так! Скачай последнюю версию с модхаба или посети '%s' для поддержки."/>	
-		<e k="GC_duplicateError" v="обнаружены дубликат GlobalCompany ! Удали '%s' из папки с модами и перезапусти игру."/>
-		<e k="GC_combinedError" v="GlobalCompany загружается как часть карты '%s'! Это запрещено и приводит к ошибкам. Скачай последнюю версию с модхаба или посети '%s' для поддержки."/>
+		<e k="GC_mapVersionWarning" v="Карта '%s' от %s нуждается в GlobalCompany - Нужна версия %s или выше. Скачай последнюю версию с ModHub или посети '%s' для поддержки."/>	
+		<e k="GC_modVersionWarning" v="Мод '%s' от %s нуждается в GlobalCompany - Нужна версия %s или выше. Скачай последнюю версию с ModHub или посети '%s' для поддержки."/>	
+		<e k="GC_loadingError" v="Во время загрузки GlobalCompany что то пошло не так! Скачай последнюю версию с ModHub или посети '%s' для поддержки."/>	
+		<e k="GC_duplicateError" v="Обнаружен дубликат GlobalCompany! Удали '%s' из папки с модами и перезапусти игру."/>
+		<e k="GC_combinedError" v="GlobalCompany загружается как часть карты '%s'! Это запрещено и приводит к ошибкам. Скачай последнюю версию с ModHub или посети '%s' для поддержки."/>
 		<e k="GC_invalidModWarning" v="Мод %s от %s не поддерживается! Во избежании ошибок удали его из папки с модами!"/>
 		<e k="GC_quitToMainMenu" v="Действительно вернуться в главное меню?"/>
-		<e k="GC_betaVersionWarning" v="Загружена разрабатываемая версия. Пожалуйста все найденные предупреждения и ошибки сообщайте %s . Используй ссылку на модхаб для загрузки последней официальной версии или посети '%s' для поддержки."/>
-		<e k="GC_namingError" v="Обнаружено правильное название 'Datei / Zip' Name '%s' для разрабатываемой версии! Используй название 'FS19_GlobalCompany'. Используй ссылку на модхаб для загрузки последней официальной версии или посети '%s' для поддержки."/>
+		<e k="GC_betaVersionWarning" v="Загружена версия для разработчиков. Пожалуйста все найденные предупреждения и ошибки сообщайте %s . Используй ссылку на ModHub для загрузки последней официальной версии или посети '%s' для поддержки."/>
+		<e k="GC_namingError" v="Обнаружено правильное название 'Datei / Zip' Name '%s' в версии для разработчиков! Используй название 'FS19_GlobalCompany'. Используй ссылку на ModHub для загрузки последней официальной версии или посети '%s' для поддержки."/>
 
 		<!-- GUI -->
 		<e k="GC_gui_buttons_ok" v="OK"/>
@@ -29,7 +29,7 @@
 		<!-- Settings -->
 		<e k="GC_settings_header" v="GlobalCompany - Установки"/>
 		<e k="GC_settings1_title" v="Активировать повсеместное размещение"/>
-		<e k="GC_settings2_title" v="Покозать онформацию по объекту"/>
+		<e k="GC_settings2_title" v="Показать онформацию по объекту"/>
 		<e k="GC_settings3_title" v="Нанять помощника (300€ / Лошадь / День)"/>
 		<e k="GC_settings4_title" v="Активировать посадку большего количества деревьев"/>
 		<e k="GC_settings5_title" v="Активировать резку тюков"/>
@@ -47,7 +47,7 @@
 		<e k="GC_gui_activate" v="Включить"/>
 		<e k="GC_gui_deactivate" v="Выключить"/>
 		<e k="GC_gui_state" v="Статус:"/>
-		<e k="GC_gui_automatic" v="Автоматик:"/>
+		<e k="GC_gui_automatic" v="Автоматически:"/>
 		<e k="GC_gui_state_on" v="Запущено"/>
 		<e k="GC_gui_state_off" v="Остановлено"/>
 		<e k="GC_gui_pallet1" v="%s Поддон"/>
@@ -102,8 +102,8 @@
 Цена:  %s"/>
 
 		<!-- BaleShreader -->
-		<e k="GC_baleShreader_openSteer" v="Открыть управление"/>
-		<e k="GC_baleShreader_closeSteer" v="Закрыть управление"/>
+		<e k="GC_baleShreader_openSteer" v="Открыть меню управления"/>
+		<e k="GC_baleShreader_closeSteer" v="Закрыть меню управления"/>
 		<e k="GC_baleShreader_startWork" v="Запустить дробилку"/>
 		<e k="GC_baleShreader_endWork" v="Остановить дробилку"/>
 		<e k="GC_baleShreader_toggleOnWorkLight" v="Включить рабочее освещение"/>
@@ -113,8 +113,8 @@
 		<e k="GC_baler_title" v="Тюковщик"/>
 		<e k="GC_baler_title_witStack" v="Тюковщик с погрузчиком"/>
 		<e k="GC_baler_cleaner" v="Очистить место выгрузки"/>
-		<e k="GC_baler_openGui" v="Открыть управление"/>
-		<e k="GC_baler_closeGui" v="Закрыть управление"/>
+		<e k="GC_baler_openGui" v="Открыть меню управления"/>
+		<e k="GC_baler_closeGui" v="Закрыть меню управления"/>
 		<e k="GC_baler_makeEmpty" v="Выгрузить"/>
 		<e k="GC_baler_turnOn" v="Включить"/>
 		<e k="GC_baler_turnOff" v="Выключить"/>
@@ -136,12 +136,12 @@
 		<e k="GC_dynamicStorage_unloadSettings" v="Настройки выгрузки"/>
 		<e k="GC_dynamicStorage_gui_header_unloading" v="Выбрать позицию выгрузки"/>
 		<e k="GC_dynamicStorage_gui_header_loading" v="Выбрать бокс загрузки"/>
-		<e k="GC_dynamicStorage_gui_info_unloading" v="Выбери в какой боки должно выгружаться. Учти, только один продукт выгружается в каждый бокс."/>
+		<e k="GC_dynamicStorage_gui_info_unloading" v="Выбери в какой бокс должно выгружаться. Учти, только один продукт выгружается в каждый бокс."/>
 		<e k="GC_dynamicStorage_gui_info_loading" v="Выбери в какой бокс должно загружаться."/>
 		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s Литров"/>
 		<e k="GC_dynamicStorage_gui_empty" v="Пусто"/>
-		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Бокс выгрузки подтвердить."/>
-		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Бокс загрузки подтвердить"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Подтвердить бокс выгрузки."/>
+		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Подтвердить бокс загрузки."/>
 
 		<!-- PlaceableDigitalDisplay -->
 		<e k="GC_placeableDigDisplay_openGui" v="Настроить монитор"/>
@@ -150,25 +150,25 @@
 		<e k="GC_placeableDigDisplay_btnSave" v="Сохранить"/>
 		
 		<!-- GlobalMarket -->
-		<e k="GC_globalMarket_openGui" v="GlobalerMarkt открыть"/>
-		<e k="GC_globalMarket_header" v="Globaler Markt 2020"/>
+		<e k="GC_globalMarket_openGui" v="Открыть меню Global Market"/>
+		<e k="GC_globalMarket_header" v="Global Market 2020"/>
 		<e k="GC_globalMarket_headerInfo" v="Здесть ты можешь продавать или покупать продукцию."/>
 		<e k="GC_globalMarket_btn_buyScreen" v="Обзор покупки"/>
 		<e k="GC_globalMarket_btn_storageScreen" v="Обзор хранилища"/>
-		<e k="GC_globalMarket_btn_synch" v="SСинхронизировать"/>
+		<e k="GC_globalMarket_btn_synch" v="Синхронизировать"/>
 		
-		<e k="GC_globalMarket_header2" v="Globaler Markt 2020 - выбор количества"/>
+		<e k="GC_globalMarket_header2" v="Global Market 2020 - выбор количества"/>
 		<e k="GC_globalMarket_headerInfo2" v="Выбери желаемое количество!"/>
 		<e k="GC_globalMarket_btn_ok" v="Подтвердить"/>
 		<e k="GC_globalMarket_btn_startLoad" v="Старт загрузки"/>
 		
-		<e k="GC_globalMarket_header3" v="Globaler Markt 2020 - Выгрузка"/>
+		<e k="GC_globalMarket_header3" v="Global Market 2020 - Выгрузка"/>
 		<e k="GC_globalMarket_headerInfo3" v="Выбери желаемый продукт"/>
 		<e k="GC_globalMarket_btn_min" v="Минимум"/>
 		<e k="GC_globalMarket_btn_max" v="Максимум"/>
 
-		<e k="GC_globalMarket_header4" v="Globaler Markt 2020 - Перемещение техники"/>
-		<e k="GC_globalMarket_headerInfo4" v="Онформация о покупке техники"/>
+		<e k="GC_globalMarket_header4" v="Global Market 2020 - Перемещение техники"/>
+		<e k="GC_globalMarket_headerInfo4" v="Информация о покупке техники"/>
 
 		<e k="GC_globalMarket_txt_amount" v="Количество"/>
 		<e k="GC_globalMarket_txt_money" v="Цена"/>
@@ -193,8 +193,8 @@
 		<e k="GC_globalMarket_txt_hours" v="%s Часов"/>
 		<e k="GC_globalMarket_txt_days" v="%s Дней"/>
 
-		<e k="GC_globalMarket_externIsOffline" v="Для продажи или покупки желаемой продукции, необходимо запустить сторонний софт."/>
-		<e k="GC_globalMarket_externIsFalseVersion" v="У тебя не актуальная версия стороннего софта."/>
+		<e k="GC_globalMarket_externIsOffline" v="Для продажи или покупки желаемой продукции, необходимо запустить GlobalMarket.exe."/>
+		<e k="GC_globalMarket_externIsFalseVersion" v="У тебя не актуальная версия GlobalMarket.exe."/>
 		
 		
 		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Квадратные тюки травы"/>
@@ -206,7 +206,7 @@
 		<e k="GC_animalFeeder_backupTitie" v="Системы кормления"/>
 		<e k="GC_animalFeeder_openGui" v="Открыть панель"/>
 		<e k="GC_animalFeeder_gui_info" v="Обслуживание Системы кормления!"/>
-		<e k="GC_animalFeeder_gui_startManual" v="ручной запуск"/>
+		<e k="GC_animalFeeder_gui_startManual" v="Ручной запуск"/>
 		<e k="GC_animalFeeder_gui_hist_header" v="Статистика"/>
 		<e k="GC_animalFeeder_gui_hist_text1" v="Общий расход за прошедший день:"/>
 		<e k="GC_animalFeeder_gui_hist_text2" v="Расход бункера за прошедший день %s:"/>
@@ -228,12 +228,12 @@
 
 
 		<!-- Market -->
-		<!--e k="GC_market_showDetails" v="Details"/>
-		<e k="GC_market_date" v="Datum"/>
-		<e k="GC_market_name" v="Name"/>
-		<e k="GC_market_type" v="Art"/>
-		<e k="GC_market_liter" v="Liter"/>
-		<e k="GC_market_money" v="Preis"/>
-		<e k="GC_market_designation" v="Bezeichnung"/-->
+		<!--e k="GC_market_showDetails" v="Детали"/>
+		<e k="GC_market_date" v="Дата"/>
+		<e k="GC_market_name" v="Имя"/>
+		<e k="GC_market_type" v="Тип"/>
+		<e k="GC_market_liter" v="Литр"/>
+		<e k="GC_market_money" v="Цена"/>
+		<e k="GC_market_designation" v="Наименование"/-->
 	</elements>
 </l10n>
