@@ -173,6 +173,7 @@ Kosten: %s"/>
 		<e k="GC_globalMarket_tbl_header_level" v="Liter"/>
 		<e k="GC_globalMarket_tbl_header_pallets" v="Pallets"/>
 		<e k="GC_globalMarket_tbl_header_bales" v="Balen"/>
+    
 		<e k="GC_globalMarket_tbl_header_price" v="Werkelijke prijs"/>
 		<e k="GC_globalMarket_tbl_header_price2" v="Werkelijke prijs / 1000 Liter"/>
 		<e k="GC_globalMarket_btn_outsource" v="Uitgaand"/>
@@ -195,7 +196,23 @@ Kosten: %s"/>
 		<e k="GC_globalMarket_storeItem_cotton" v="Katoen"/>
 	
 		<!-- FarmStarter -->
-		<e k="GC_farmstarter_header" v="Kies je startboerderij!"/>		
+		<e k="GC_farmstarter_header" v="Kies je startboerderij!"/>	
 
+		<e k="GC_globalMarket_tbl_header_preview" v="Voorbeeld"/>
+		<e k="GC_globalMarket_tbl_header_name" v="Naam"/>
+		<e k="GC_globalMarket_tbl_header_age" v="Leeftijd"/>
+		<e k="GC_globalMarket_tbl_header_price3" v="Prijs"/>
+
+		<e k="GC_globalMarket_externIsOffline" v="Start de nodige externe software zodat u goederen kunt kopen of uw geleverde goederen kunt verkopen."/>
+		<e k="GC_globalMarket_externIsFalseVersion" v="U beschikt niet over de nieuwste versie van de externe software."/>
+		
+		
+		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Vierkante baal gras"/>
+		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Ronde baal gras"/>
+		<e k="GC_globalMarket_storeItem_cotton" v="Katoen"/>
+	
+		<!-- FarmStarter -->
+		<e k="GC_farmstarter_header" v="Kies je startboerderij!"/>
+	
 	</elements>
 </l10n>
