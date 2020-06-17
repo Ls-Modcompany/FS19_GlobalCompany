@@ -89,6 +89,8 @@ function GC_AnimationManager:load(nodeId, target, xmlFile, xmlKey, allowLooping,
 	end
 
 	if self.numLoadedAnimations > 0 then
+		g_company.addRaisedUpdateable(self)
+
 		for name, animation in pairs(self.animations) do
 			if animation.resetOnStart then
 				self:playAnimation(name, -1, nil, true)
@@ -112,9 +114,13 @@ function GC_AnimationManager:loadAnimation(xmlFile, key, animation, allowLooping
 		local looping = false
 		if allowLooping then
 			looping = Utils.getNoNil(getXMLBool(xmlFile, key .. "#looping"), false)
+			stopAfterLoop = Utils.getNoNil(getXMLBool(xmlFile, key .. "#stopAfterLoop"), false)
 		end
 		animation.looping = looping
+		animation.stopAfterLoop = stopAfterLoop
 		animation.resetOnStart = Utils.getNoNil(getXMLBool(xmlFile, key .. "#resetOnStart"), true)
+
+		animation.doSynch = Utils.getNoNil(getXMLBool(xmlFile, key .. "#doSynch"), false)
 
 		local partI = 0
 		while true do
@@ -301,13 +307,14 @@ function GC_AnimationManager:delete()
 		end
 	end
 
+	g_company.removeRaisedUpdateable(self)
 	GC_AnimationManager:superClass().delete(self)
 end
 
 function GC_AnimationManager:update(dt)
 	self:updateAnimations(dt)
 	if self.numActiveAnimations > 0 then
-		self:raiseActive()
+		self:raiseUpdate()
 	end
 end
 
@@ -361,7 +368,7 @@ function GC_AnimationManager:playAnimation(name, speed, animTime, noEventSend)
 			g_soundManager:playSample(animation.sample)
 		end
 
-		self:raiseActive()
+		self:raiseUpdate()
 	end
 end
 
@@ -408,6 +415,10 @@ function GC_AnimationManager:setAnimationByState(name, state, noEventSend)
 			end
 		end
 	end
+end
+
+function GC_AnimationManager:getAnimation(name)
+	return self.animations[name]
 end
 
 function GC_AnimationManager:getAnimationExists(name)
@@ -457,10 +468,10 @@ function GC_AnimationManager:setRealAnimationTime(name, animTime, update)
 			
 			self:resetAnimationValues(animation)
 			
-			local dtToUse, _ = self:updateAnimationCurrentTime(animation, 99999999, animTime)			
+			local dtToUse, _ = self:updateAnimationCurrentTime(animation, 99999999, animTime)
 			self:updateAnimation(animation, dtToUse, false)
 			animation.currentSpeed = currentSpeed
-		else
+		else	
 			animation.currentTime = animTime
 		end
 	end
@@ -726,15 +737,16 @@ function GC_AnimationManager:updateAnimation(anim, dtToUse, stopAnim, allowResta
 			self.activeAnimations[anim.name] = nil
 
 			-- Not sure if we should ignore this when looping??
-			GC_AnimationManager.raiseTargetFunction(self, "animationFinishedPlaying", anim.name)
+			GC_AnimationManager.raiseTargetFunction(self, "animationFinishedPlaying", anim.name, true)
 		end
 		
 		if allowRestart == nil or allowRestart then
 			if anim.looping then
-				-- restart animation
 				local factor = 0 -- 1
 				self:setAnimationTime(anim.name, math.abs((anim.duration - anim.currentTime) - factor), true)
-				self:playAnimation(anim.name, anim.currentSpeed, nil, true)
+				if not anim.stopAfterLoop then
+					self:playAnimation(anim.name, anim.currentSpeed, nil, true)
+				end
 			end
 		end
 	end
@@ -929,10 +941,10 @@ function GC_AnimationManager.animPartSorterReverse(a, b)
 	return false
 end
 
-function GC_AnimationManager.raiseTargetFunction(self, functionName, animName)
+function GC_AnimationManager.raiseTargetFunction(self, functionName, animName, ...)
 	local target = self.target	
 	if target[functionName] ~= nil then
-		target[functionName](target, animName)
+		target[functionName](target, animName, ...)
 	end
 end
 
@@ -994,4 +1006,37 @@ end
 
 function GC_AnimationManager:getPartsOfAnimation(name)
 	return self.animations[name].parts
+end
+
+function GC_AnimationManager:writeStream(streamId, connection)	
+	streamWriteInt16(streamId, self.numActiveAnimations)
+	for name, _ in pairs(self.activeAnimations) do
+		streamWriteString(streamId, name)
+	end
+	
+	for _, animation in pairs(self.animations) do
+		if animation.doSynch then
+			streamWriteFloat32(streamId, animation.currentSpeed)
+			streamWriteFloat32(streamId, animation.currentTime)
+		end
+	end
+end
+
+function GC_AnimationManager:readStream(streamId, connection)
+	self.numActiveAnimations = streamReadInt16(streamId)
+	local names = {}
+	for i=1, self.numActiveAnimations do
+		names[streamReadString(streamId)] = true
+	end
+
+	for name, animation in pairs(self.animations) do
+		if animation.doSynch then
+			if names[name] then
+				self.activeAnimations[name] = animation
+			end
+			animation.currentSpeed = streamReadFloat32(streamId)
+			local animTime = streamReadFloat32(streamId)
+			self:setRealAnimationTime(name, animTime, true)
+		end
+	end	
 end

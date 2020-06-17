@@ -117,7 +117,10 @@ function GlobalCompanyGui:getIsDev()
 	return g_company.debug:getIsDev() and GlobalCompanyGui.devVersion;
 end;
 
-function GlobalCompanyGui:loadMap()
+function GlobalCompanyGui:loadMap()	
+	Gui.mouseEvent = GlobalCompanyGui_stored_gui_mouseEvent
+	Gui.keyEvent = GlobalCompanyGui_stored_gui_keyEvent
+
 	if g_company.debug:getIsDev() then
 		addConsoleCommand("gcGuiReload", "Reload all templates.", "consoleCommandReloadTemplates", g_company.gui);
 		addConsoleCommand("gcGuiDevMode", "Set the state GUI Development Mode. [state]", "consoleCommandEnableDevVersion", g_company.gui);
@@ -1057,5 +1060,9 @@ BaseMission.draw = Utils.appendedFunction(BaseMission.draw, GlobalCompanyGui.dra
 Gui.draw = Utils.appendedFunction(Gui.draw, GlobalCompanyGui.drawM);
 
 Gui.update = Utils.appendedFunction(Gui.update, GlobalCompanyGui.update);
-Gui.mouseEvent  = Utils.appendedFunction(Gui.mouseEvent, GlobalCompanyGui.mouseEvent );
-Gui.keyEvent  = Utils.appendedFunction(Gui.keyEvent, GlobalCompanyGui.keyEvent );
+
+GlobalCompanyGui_stored_gui_mouseEvent = Gui.mouseEvent
+GlobalCompanyGui_stored_gui_keyEvent = Gui.keyEvent
+Gui.mouseEvent  = Utils.appendedFunction(Gui.mouseEvent, GlobalCompanyGui.mouseEvent);
+Gui.keyEvent  = Utils.appendedFunction(Gui.keyEvent, GlobalCompanyGui.keyEvent);
+

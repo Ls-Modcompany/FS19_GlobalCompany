@@ -42,9 +42,9 @@ function GC_SynchEvent:new(gcId, targetEventId, data, targetClassType)
 end
 
 function GC_SynchEvent:readStream(streamId, connection)
-	self.gcId = streamReadUInt8(streamId)
-    self.targetEventId = streamReadUInt8(streamId)
-    self.targetClassType = streamReadUInt8(streamId)
+	self.gcId = streamReadUInt16(streamId)
+    self.targetEventId = streamReadUInt16(streamId)
+    self.targetClassType = streamReadUInt16(streamId)
 
     if self.targetClassType == 1 then
         self.gcObject = g_company:getObject(self.gcId)
@@ -81,9 +81,9 @@ function GC_SynchEvent:readStream(streamId, connection)
 end
 
 function GC_SynchEvent:writeStream(streamId, connection)
-	streamWriteUInt8(streamId, self.gcId)
-    streamWriteUInt8(streamId, self.targetEventId)
-    streamWriteUInt8(streamId, self.targetClassType)
+	streamWriteUInt16(streamId, self.gcId)
+    streamWriteUInt16(streamId, self.targetEventId)
+    streamWriteUInt16(streamId, self.targetClassType)
     
     streamWriteUInt16(streamId, g_company.utils.getTableLength(self.data));
 

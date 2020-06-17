@@ -340,7 +340,7 @@ function GC_GlobalMarket:getIsFillTypeFromType(fillTypeIndex, types)
     return false
 end
 
-function GC_GlobalMarket:getPalletFilenameFromFillTypeIndex(fillTypeIndex) 
+function GC_GlobalMarket:getPalletFilenameFromFillTypeIndex(fillTypeIndex)    
     local path = g_fillTypeManager:getFillTypeByIndex(fillTypeIndex).palletFilename
     local name = string.upper(g_fillTypeManager:getFillTypeNameByIndex(fillTypeIndex))
     if path == nil then

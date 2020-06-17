@@ -47,8 +47,8 @@
 		<e k="GC_gui_deactivate" v="Uitschakelen"/>
 		<e k="GC_gui_state" v="Status:"/>
 		<e k="GC_gui_automatic" v="Automatisch:"/>
-		<e k="GC_gui_state_on" v="lopend"/>
-		<e k="GC_gui_state_off" v="gestopt"/>
+		<e k="GC_gui_state_on" v="Lopend"/>
+		<e k="GC_gui_state_off" v="Gestopt"/>
 		<e k="GC_gui_pallet1" v="%s Pallet"/>
 		<e k="GC_gui_pallet2" v="%s Palletten"/>
 		<e k="GC_gui_spawnText1" v="%s Pallet Generen"/>
@@ -77,9 +77,9 @@
 		<e k="GC_gui_changeFactoryTitle" v="Voer hieronder een nieuwe Fabrieksnaam in."/>
 
 		<e k="GC_gui_factories" v="Producties"/>
-		<e k="GC_gui_activeProductLines" v="actieve Productlijnen:"/>
-		<e k="GC_gui_emptyInputs" v="lege grondstoffen:"/>
-		<e k="GC_gui_fullOutputs" v="volledige Producten:"/>
+		<e k="GC_gui_activeProductLines" v="Actieve Productlijnen:"/>
+		<e k="GC_gui_emptyInputs" v="Lege grondstoffen:"/>
+		<e k="GC_gui_fullOutputs" v="Volledige Producten:"/>
 
 		<e k="GC_gui_dynamicStorages" v="Dynamische Lagers"/>
 		<e k="GC_gui_freeSlots" v="Vrije Vakken:"/>
@@ -146,7 +146,7 @@ Kosten: %s"/>
 		<e k="GC_placeableDigDisplay_openGui" v="Aanpassing van de digitale weergave"/>
 		<e k="GC_placeableDigDisplay_header" v="Digitaal Display"/>
 		<e k="GC_placeableDigDisplay_headerInfo" v="Hier kunt u elke tekst definiëren die op het scherm moet verschijnen."/>
-		<e k="GC_placeableDigDisplay_btnSave" v="Bewaar"/>
+		<e k="GC_placeableDigDisplay_btnSave" v="Bewaar"/>Purchase overview		
 		
 		<!-- GlobalMarket -->
 		<e k="GC_globalMarket_openGui" v="Open GlobalMarket"/>
@@ -173,13 +173,30 @@ Kosten: %s"/>
 		<e k="GC_globalMarket_tbl_header_level" v="Liter"/>
 		<e k="GC_globalMarket_tbl_header_pallets" v="Pallets"/>
 		<e k="GC_globalMarket_tbl_header_bales" v="Balen"/>
-		<e k="GC_globalMarket_tbl_header_price" v="werkelijke prijs"/>
-		<e k="GC_globalMarket_tbl_header_price2" v="werkelijke prijs / 1000 Liter"/>
+    
+		<e k="GC_globalMarket_tbl_header_price" v="Werkelijke prijs"/>
+		<e k="GC_globalMarket_tbl_header_price2" v="Werkelijke prijs / 1000 Liter"/>
 		<e k="GC_globalMarket_btn_outsource" v="Uitgaand"/>
 		<e k="GC_globalMarket_btn_outsourceBale1" v="Ronde baal"/>
 		<e k="GC_globalMarket_btn_outsourceBale2" v="Vierkante baal"/>
-		<e k="GC_globalMarket_btn_sell" v="verkopen"/>
-		<e k="GC_globalMarket_btn_buy" v="kopen"/>
+		<e k="GC_globalMarket_btn_sell" v="Verkopen"/>
+		<e k="GC_globalMarket_btn_buy" v="Kopen"/>
+
+		<e k="GC_globalMarket_tbl_header_preview" v="Voorbeeld"/>
+		<e k="GC_globalMarket_tbl_header_name" v="Naam"/>
+		<e k="GC_globalMarket_tbl_header_age" v="Leeftijd"/>
+		<e k="GC_globalMarket_tbl_header_price3" v="Prijs"/>
+
+		<e k="GC_globalMarket_externIsOffline" v="Start de nodige externe software zodat u goederen kunt kopen of uw geleverde goederen kunt verkopen."/>
+		<e k="GC_globalMarket_externIsFalseVersion" v="U beschikt niet over de nieuwste versie van de externe software."/>
+		
+		
+		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Vierkante baal gras"/>
+		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Ronde baal gras"/>
+		<e k="GC_globalMarket_storeItem_cotton" v="Katoen"/>
+	
+		<!-- FarmStarter -->
+		<e k="GC_farmstarter_header" v="Kies je startboerderij!"/>	
 
 		<e k="GC_globalMarket_tbl_header_preview" v="Voorbeeld"/>
 		<e k="GC_globalMarket_tbl_header_name" v="Naam"/>

@@ -157,4 +157,9 @@ function GC_FarmStarter:loadFromXMLFile(xmlFile, key, resetVehicles)
     end
 end
 
+function GC_FarmStarter:saveToXMLFile(xmlFile, key, usedModNames)   
+    setXMLBool(xmlFile, key.."#boughtWithFarmland", self.boughtWithFarmland)
+end 
+
 Placeable.loadFromXMLFile = g_company.utils.appendedFunction2(Placeable.loadFromXMLFile, GC_FarmStarter.loadFromXMLFile)
+Placeable.saveToXMLFile = g_company.utils.appendedFunction2(Placeable.saveToXMLFile, GC_FarmStarter.saveToXMLFile)

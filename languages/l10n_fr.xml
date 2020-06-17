@@ -138,7 +138,7 @@ Coût : %s"/>
 		<e k="GC_dynamicStorage_gui_info_unloading" v="Sélectionner la boîte de déchargement. Notez que chaque boîte ne peut contenir qu'un seul type de produit."/>
 		<e k="GC_dynamicStorage_gui_info_loading" v="Sélectionnez la boîte à charger."/>
 		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s litre"/>
-		<e k="GC_dynamicStorage_gui_empty" v="vide"/>
+		<e k="GC_dynamicStorage_gui_empty" v="Vide"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Confirmer la position de déchargement"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Confirmer le chargement"/>
 

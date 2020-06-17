@@ -85,7 +85,7 @@ function GC_VehicleTrigger:triggerCallback(triggerId, otherId, onEnter, onLeave,
     if onEnter or onLeave then
         local vehicle = g_currentMission.nodeToObject[otherId]
         if vehicle ~= nil then
-            print(string.format("GC_VehicleTrigger triggerCallback %s %s %s %s", onEnter, onLeave, otherId, otherShapeId))
+            --print(string.format("GC_VehicleTrigger triggerCallback %s %s %s %s", onEnter, onLeave, otherId, otherShapeId))
             self.triggerVehicles[vehicle] = onEnter
         end
     end

@@ -74,7 +74,7 @@ function DirtObjects:load(nodeId, isOnCreate)
 	self.dirtNodes = {};
 	I3DUtil.getNodesByShaderParam(self.nodeId, "RDT", self.dirtNodes);
 	for i,dirtNode in pairs (self.dirtNodes) do	
-		print(getName(dirtNode))
+		--print(getName(dirtNode))
 	end;
 
 	self.factorPerHour = Utils.getNoNil(getUserAttribute(nodeId, "factorPerHour"), 0.01);

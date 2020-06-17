@@ -5,13 +5,13 @@
 		<!-- Warnings / Errors -->
 		<e k="GC_mapVersionWarning" v="Map '%s' von %s benötigt GlobalCompany - Version %s oder höher wird benötigt. Lade dir die aktuellste Version aus dem Modhub oder besuche '%s' für Support."/>	
 		<e k="GC_modVersionWarning" v="Mod '%s' von %s benötigt GlobalCompany - Version %s oder höher wird benötigt. Lade dir die aktuellste Version aus dem Modhub oder besuche '%s' für Support."/>	
-		<e k="GC_loadingError" v="Beim Laden von GlobalCompany ist etwas schief gelaufen! Lade dir die aktuellste Version aus dem Modhub oder besuche '%s' für support"/>	
+		<e k="GC_loadingError" v="Beim Laden von GlobalCompany ist etwas schief gelaufen! Lade dir die aktuellste Version aus dem Modhub oder besuche '%s' für Support."/>	
 		<e k="GC_duplicateError" v="Es wurde versucht, GlobalCompany doppelt zu laden! Entferne '%s' aus dem Modordner und lade das Spiel neu."/>
-		<e k="GC_combinedError" v="Es wurde versucht, GlobalCompany als Teil der Modmap '%s' zu laden! Das ist nicht erlaubt und bringt Fehler. Lade dir die aktuellste Version aus dem Modhub oder besuche '%s' für support."/>
+		<e k="GC_combinedError" v="Es wurde versucht, GlobalCompany als Teil der Modmap '%s' zu laden! Das ist nicht erlaubt und bringt Fehler. Lade dir die aktuellste Version aus dem Modhub oder besuche '%s' für Support."/>
 		<e k="GC_invalidModWarning" v="Mod %s von %s wird nicht unterstützt! Um Fehler zu vermeiden, muss dieser Mod entfernt werden!"/>
 		<e k="GC_quitToMainMenu" v="Wirklich zum Haupmenü zurückkehren?"/>
-		<e k="GC_betaVersionWarning" v="Entwicklerversion wurde geladen. Bitte Warnungen und Fehler bei %s melden. Folge dem Modhub Downloadlink für die letzte offizielle Version oder Besuche '%s' für Support."/>
-		<e k="GC_namingError" v="Fehlerhafte 'Datei / Zip' Name '%s' gefunden für Entwicklerversion! Benütze 'FS19_GlobalCompany' als Dateinamen. Folge dem Modhub Downloadlink für die letzte offizielle Version oder Besuche '%s' für Support."/>
+		<e k="GC_betaVersionWarning" v="Entwicklerversion wurde geladen. Bitte Warnungen und Fehler bei %s melden. Folge dem Modhub Downloadlink für die letzte offizielle Version oder besuche '%s' für Support."/>
+		<e k="GC_namingError" v="Fehlerhafte 'Datei / Zip' Name '%s' gefunden für Entwicklerversion! Benutze 'FS19_GlobalCompany' als Dateinamen. Folge dem Modhub Downloadlink für die letzte offizielle Version oder besuche '%s' für Support."/>
 
 		<!-- GUI -->
 		<e k="GC_gui_buttons_ok" v="OK"/>
@@ -48,8 +48,8 @@
 		<e k="GC_gui_deactivate" v="Ausschalten"/>
 		<e k="GC_gui_state" v="Status:"/>
 		<e k="GC_gui_automatic" v="Automatik:"/>
-		<e k="GC_gui_state_on" v="läuft"/>
-		<e k="GC_gui_state_off" v="gestoppt"/>
+		<e k="GC_gui_state_on" v="Läuft"/>
+		<e k="GC_gui_state_off" v="Gestoppt"/>
 		<e k="GC_gui_pallet1" v="%s Palette"/>
 		<e k="GC_gui_pallet2" v="%s Paletten"/>
 		<e k="GC_gui_spawnText1" v="%s Palette erzeugen"/>
@@ -78,12 +78,12 @@
 		<e k="GC_gui_changeFactoryTitle" v="Geben Sie unten einen neuen Fabriknamen ein."/>
 
 		<e k="GC_gui_factories" v="Produktionen"/>
-		<e k="GC_gui_activeProductLines" v="aktive Produktlinien:"/>
-		<e k="GC_gui_emptyInputs" v="leere Rohstoffe:"/>
-		<e k="GC_gui_fullOutputs" v="volle Produkte:"/>
+		<e k="GC_gui_activeProductLines" v="Aktive Produktlinien:"/>
+		<e k="GC_gui_emptyInputs" v="Leere Rohstoffe:"/>
+		<e k="GC_gui_fullOutputs" v="Volle Produkte:"/>
 
 		<e k="GC_gui_dynamicStorages" v="Dynamische Lager"/>
-		<e k="GC_gui_freeSlots" v="freie Boxen:"/>
+		<e k="GC_gui_freeSlots" v="Freie Boxen:"/>
 		
 		<e k="GC_gui_placeableObject" v="Platzierbare Objekt"/>
 		<e k="GC_gui_farmlandObject" v="Farmland Objekt"/>
@@ -139,7 +139,7 @@ Kosten:  %s"/>
 		<e k="GC_dynamicStorage_gui_info_unloading" v="Wähle aus, in welche Box abgeladen werden soll. Beachte, dass in jede Box nur eine Frucht abgeladen werden kann."/>
 		<e k="GC_dynamicStorage_gui_info_loading" v="Wähle aus, aus welcher Box geladen werden soll."/>
 		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s Liter"/>
-		<e k="GC_dynamicStorage_gui_empty" v="leer"/>
+		<e k="GC_dynamicStorage_gui_empty" v="Leer"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Abladeposition bestätigen"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Aufladebox bestätigen"/>
 
@@ -152,7 +152,7 @@ Kosten:  %s"/>
 		<!-- GlobalMarket -->
 		<e k="GC_globalMarket_openGui" v="GlobalerMarkt öffnen"/>
 		<e k="GC_globalMarket_header" v="Globaler Markt 2020"/>
-		<e k="GC_globalMarket_headerInfo" v="Hier kannst du abgelieferte Ware verkaufen oder Ware ankaufen. Auch kannst du Fahrzeuge verkaufen und kaufen."/>
+		<e k="GC_globalMarket_headerInfo" v="Hier kannst du abgelieferte Ware verkaufen oder Ware ankaufen."/>
 		<e k="GC_globalMarket_btn_buyScreen" v="Kaufübersicht"/>
 		<e k="GC_globalMarket_btn_storageScreen" v="Lagerübersicht"/>
 		<e k="GC_globalMarket_btn_synch" v="Synchronisieren"/>
@@ -177,8 +177,8 @@ Kosten:  %s"/>
 		<e k="GC_globalMarket_tbl_header_level" v="Liter"/>
 		<e k="GC_globalMarket_tbl_header_pallets" v="Paletten"/>
 		<e k="GC_globalMarket_tbl_header_bales" v="Ballen"/>
-		<e k="GC_globalMarket_tbl_header_price" v="aktueller Preis"/>
-		<e k="GC_globalMarket_tbl_header_price2" v="aktueller Preis / 1000 Liter"/>
+		<e k="GC_globalMarket_tbl_header_price" v="Aktueller Preis"/>
+		<e k="GC_globalMarket_tbl_header_price2" v="Aktueller Preis / 1000 Liter"/>
 		<e k="GC_globalMarket_btn_outsource" v="Auslagern"/>
 		<e k="GC_globalMarket_btn_outsourceBale1" v="Rundballen"/>
 		<e k="GC_globalMarket_btn_outsourceBale2" v="Quaderballen"/>

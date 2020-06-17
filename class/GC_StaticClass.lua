@@ -23,6 +23,7 @@ end
 
 GC_StaticClass = {}
 GC_StaticClass._mt = Class(GC_StaticClass)
+InitObjectClass(GC_StaticClass, "GC_StaticClass")
 g_company.gc_staticClass = GC_StaticClass
 
 function GC_StaticClass:new(mt, isServer, isClient, scriptDebugInfo, target)

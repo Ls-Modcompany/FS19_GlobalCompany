@@ -56,6 +56,8 @@ function GC_ObjectSpawner:load(nodeId, target, xmlFile, xmlKey, keyName)
 
 	local key = xmlKey .. Utils.getNoNil(keyName, ".objectSpawner")
 
+	self.bitMaskDec = Utils.getNoNil(getXMLFloat(xmlFile, key .. "#bitMaskDec"), 528895)
+
 	local i = 0
 	while true do
 		local areaKey = string.format("%s.area(%d)", key, i)
@@ -148,13 +150,17 @@ function GC_ObjectSpawner:spawnByObjectInfo(object, numberToSpawn, ignoreShapesH
 						local configs = object.configurations
 						local pallet = g_currentMission:loadVehicle(object.filename, x, y, z, 0, ry, true, 0, Vehicle.PROPERTY_STATE_OWNED, owner, configs, nil)
 						if pallet ~= nil then
-							if object.fillUnitIndex ~= nil and object.fillTypeIndex ~= nil then
-								local currentFillLevel = pallet:getFillUnitFillLevel(object.fillUnitIndex)
-								local deltaFillLevel = object.fillLevel
-								if currentFillLevel ~= nil then
-									deltaFillLevel = (currentFillLevel * -1) + object.fillLevel
+							if pallet.isExtendedFillTypeObject ~= nil then
+
+							else
+								if object.fillUnitIndex ~= nil and object.fillTypeIndex ~= nil then
+									local currentFillLevel = pallet:getFillUnitFillLevel(object.fillUnitIndex)
+									local deltaFillLevel = object.fillLevel
+									if currentFillLevel ~= nil then
+										deltaFillLevel = (currentFillLevel * -1) + object.fillLevel
+									end
+									pallet:addFillUnitFillLevel(owner, object.fillUnitIndex, deltaFillLevel, object.fillTypeIndex, ToolType.UNDEFINED)
 								end
-								pallet:addFillUnitFillLevel(owner, object.fillUnitIndex, deltaFillLevel, object.fillTypeIndex, ToolType.UNDEFINED)
 							end
 
 							numSpawned = numSpawned + 1
@@ -201,7 +207,6 @@ function GC_ObjectSpawner:getSpawnAreaDataBySize(spawnArea, width, length, custo
 	local offset = width * Utils.getNoNil(customOffset, 0.5)
 
 	local freeSpaces = 0
-	local bitMaskDec = 528895	
 	local usedWidth = 0
 	local spawnerWidth, _, _ = getTranslation(spawnArea.endNode)
 	local areaValue = spawnerWidth - halfWidth
@@ -215,7 +220,7 @@ function GC_ObjectSpawner:getSpawnAreaDataBySize(spawnArea, width, length, custo
 				y = math.max(terrainHeight, y)
 	
 				self.areaUsed = false
-				local shapesHit = overlapBox(x, y, z, rx, ry, rz, halfWidth, 10, halfLength, "collisionCallback", self, bitMaskDec, true, false)
+				local shapesHit = overlapBox(x, y, z, rx, ry, rz, halfWidth, 10, halfLength, "collisionCallback", self, self.bitMaskDec, true, false)
 				if (ignoreShapesHit == true or shapesHit == 0) and self.areaUsed == false then
 					usedWidth = dirX + offset
 					
@@ -245,4 +250,5 @@ end
 
 function GC_ObjectSpawner:collisionCallback(transformId)
 	self.areaUsed = g_currentMission.nodeToObject[transformId] ~= nil or g_currentMission.players[transformId] ~= nil
+	--print(getName(transformId))
 end

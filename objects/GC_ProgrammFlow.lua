@@ -282,17 +282,17 @@ function GC_ProgrammFlow:checkIf(action)
         return false
     end
 
-    if action.compare == "<" then
+    if action.compare == "<" or action.compare == "lt" then
         return value < compareValue
-    elseif action.compare == "<=" then
+    elseif action.compare == "<=" or action.compare == "lte" then
         return value <= compareValue    
-    elseif action.compare == ">" then
+    elseif action.compare == ">" or action.compare == "gt" then
         return value > compareValue
-    elseif action.compare == ">=" then
+    elseif action.compare == ">=" or action.compare == "gte" then
         return value >= compareValue
-    elseif action.compare == "==" then
+    elseif action.compare == "==" or action.compare == "e" then
         return value == compareValue
-    elseif action.compare == "~=" then
+    elseif action.compare == "~=" or action.compare == "ne" then
         return value ~= compareValue
     elseif action.compare == nil then
         return value

@@ -127,7 +127,7 @@ function GC_PhysicManager:update()
 
     for _,sphere in pairs(self.overlapSpheres) do
         if sphere.targetObject:getIsActiveOverlapSphere(sphere.id) then		
-            print("is active")	
+            --print("is active")	
 			local x,y,z = getWorldTranslation(sphere.node);
             local run = false;
             if sphere.onServer and self.isServer then
@@ -153,7 +153,7 @@ function GC_PhysicManager:hitRaycast(hitObjectId, x, y, z, distance)
 end;
 
 function GC_PhysicManager:hitOverlap(hitObjectId, x, y, z, distance)
-    print("hit")
+    --print("hit")
     if self.currentOverlapSphere > -1 and hitObjectId ~= nil and hitObjectId ~= g_currentMission.terrainDetailId then
         local overlapSphere = self.overlapSpheres[self.currentOverlapSphere];
         overlapSphere.targetObject[overlapSphere.overlapFunctionCallback](overlapSphere.targetObject, hitObjectId, x, y, z, distance);
