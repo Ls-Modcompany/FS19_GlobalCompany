@@ -50,7 +50,7 @@ function GC_AnimationClips:new(isServer, isClient, customMt)
 	return self
 end
 
-function GC_AnimationClips:load(nodeId, target, xmlFile, xmlKey)
+function GC_AnimationClips:load(nodeId, target, xmlFile, xmlKey, runOnServer)
 	if nodeId == nil or target == nil then
 		return false
 	end
@@ -58,10 +58,12 @@ function GC_AnimationClips:load(nodeId, target, xmlFile, xmlKey)
 	self.rootNode = nodeId
 	self.target = target
 
+	self.runOnServer = runOnServer or false
+
 	self.debugData = g_company.debug:getDebugData(GC_AnimationClips.debugIndex, target)
 
 	local returnValue = false
-	if self.isClient then
+	if self.isClient or runOnServer then
 		local i = 0
 		while true do
 			local key = string.format("%s.animationClips.animationClip(%d)", xmlKey, i)
@@ -163,7 +165,7 @@ function GC_AnimationClips:load(nodeId, target, xmlFile, xmlKey)
 end
 
 function GC_AnimationClips:delete()
-	if self.isClient then
+	if self.isClient or runOnServer then
 		if self.intervalAnimationClips ~= nil then
 			g_company.removeRaisedUpdateable(self)
 		end
@@ -171,7 +173,7 @@ function GC_AnimationClips:delete()
 end
 
 function GC_AnimationClips:update(dt)
-	if self.isClient then
+	if self.isClient or runOnServer then
 		if self.intervalAnimationClips ~= nil then
 			if self.animationClipsActive then
 				for i = 1, #self.intervalAnimationClips do
@@ -219,7 +221,7 @@ function GC_AnimationClips:update(dt)
 end
 
 function GC_AnimationClips:setAnimationClipsState(state, forceState)
-	if self.isClient then
+	if self.isClient or runOnServer then
 		local setState = Utils.getNoNil(state, not self.animationClipsActive)
 
 		if self.animationClipsActive ~= setState or forceState == true then
