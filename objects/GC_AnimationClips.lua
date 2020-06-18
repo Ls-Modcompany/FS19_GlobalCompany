@@ -165,7 +165,7 @@ function GC_AnimationClips:load(nodeId, target, xmlFile, xmlKey, runOnServer)
 end
 
 function GC_AnimationClips:delete()
-	if self.isClient or runOnServer then
+	if self.isClient or self.runOnServer then
 		if self.intervalAnimationClips ~= nil then
 			g_company.removeRaisedUpdateable(self)
 		end
@@ -173,7 +173,7 @@ function GC_AnimationClips:delete()
 end
 
 function GC_AnimationClips:update(dt)
-	if self.isClient or runOnServer then
+	if self.isClient or self.runOnServer then
 		if self.intervalAnimationClips ~= nil then
 			if self.animationClipsActive then
 				for i = 1, #self.intervalAnimationClips do
@@ -221,7 +221,7 @@ function GC_AnimationClips:update(dt)
 end
 
 function GC_AnimationClips:setAnimationClipsState(state, forceState)
-	if self.isClient or runOnServer then
+	if self.isClient or self.runOnServer then
 		local setState = Utils.getNoNil(state, not self.animationClipsActive)
 
 		if self.animationClipsActive ~= setState or forceState == true then
