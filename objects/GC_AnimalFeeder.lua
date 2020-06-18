@@ -785,7 +785,7 @@ function GC_AnimalFeeder:updateBunkerClient(bunker)
     end
 end
 
-function GC_AnimalFeeder:updateRoboter()
+function GC_AnimalFeeder:updateRoboter(fillLevelDelta, fillTypeIndex, bunkerId, resetBunker)
     self:updateRoboterEvent({fillLevelDelta, fillTypeIndex, bunkerId, resetBunker})
 end
 
