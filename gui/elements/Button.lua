@@ -205,7 +205,7 @@ function GC_Gui_button:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
 						self.doubleClickTime = 0;
 					end;
 					
-					if self.callback_onClick ~= nil then
+					if self.callback_onClick ~= nil and self.gui[self.callback_onClick] ~= nil then
 						self.gui[self.callback_onClick](self.gui, self, self.parameter);
 					end;
 					
