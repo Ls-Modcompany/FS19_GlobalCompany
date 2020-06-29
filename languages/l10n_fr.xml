@@ -21,6 +21,7 @@
 		<e k="GC_gui_modHubLink" v="Lien de téléchargement du ModHub"/>
 		<e k="GC_gui_buttons_nextWarning" v="Avertissement suivant"/>
 		<e k="GC_gui_buttons_nextConflict" v="Conflit suivant"/>
+		<e k="GC_gui_buttons_accept" v="Confirmer"/>
 
 		<!-- General -->
 		<e k="GC_category_globalCompanyPlaceable" v="GlobalCompany"/>
@@ -45,8 +46,8 @@
 		<e k="GC_gui_buyText" v="Acheter (%s)"/>
 		<e k="GC_gui_activate" v="Activer"/>
 		<e k="GC_gui_deactivate" v="Désactiver"/>
-		<e k="GC_gui_state" v="Statut:"/>
-		<e k="GC_gui_automatic" v="Automatique:"/>
+		<e k="GC_gui_state" v="Statut :"/>
+		<e k="GC_gui_automatic" v="Automatique :"/>
 		<e k="GC_gui_state_on" v="En fonctionnement"/>
 		<e k="GC_gui_state_off" v="Arrêté"/>
 		<e k="GC_gui_pallet1" v="%s palette"/>
@@ -65,7 +66,7 @@
 		<e k="GC_Open_Overview_Menu" v="Aperçu"/>
 		
 		<e k="GC_Factory_Animal_Dialogue1" v="Sélectionnez le nombre d'animaux à décharger."/>
-		<e k="GC_Factory_Animal_Dialogue2" v="Select the number of animals to unload to vehicle."/>
+		<e k="GC_Factory_Animal_Dialogue2" v="Sélectionnez le nombre d'animaux à décharger dans le véhicule."/>
 
 		<e k="GC_gui_disabled" v="Désactivé"/>
 		<e k="GC_gui_add" v="Ajouter"/>
@@ -82,7 +83,7 @@
 		<e k="GC_gui_fullOutputs" v="Sortie(s) pleine(s) :"/>
 
 		<e k="GC_gui_dynamicStorages" v="Stockages dynamiques"/>
-		<e k="GC_gui_freeSlots" v="emplacements libres :"/>
+		<e k="GC_gui_freeSlots" v="Emplacements libres :"/>
 		
 		<e k="GC_gui_placeableObject" v="Objet plaçable"/>
 		<e k="GC_gui_farmlandObject" v="Objet de la carte"/>
@@ -114,10 +115,10 @@ Coût : %s"/>
 		<e k="GC_baler_cleaner" v="Nettoyer la presse à balles"/>
 		<e k="GC_baler_openGui" v="Ouvrir le capot"/>
 		<e k="GC_baler_closeGui" v="Refermer le capot"/>
-		<e k="GC_baler_makeEmpty" v="Vide"/>
+		<e k="GC_baler_makeEmpty" v="Décharger"/>
 		<e k="GC_baler_turnOn" v="Allumer"/>
 		<e k="GC_baler_turnOff" v="Éteindre"/>
-		<e k="GC_baler_info_machineData" v="Données"/>
+		<e k="GC_baler_info_machineData" v="Données d'usine"/>
 		<e k="GC_baler_info_fillLevel" v="Quantité"/>
 		<e k="GC_baler_info_fillLevelBunker" v="Niveau de remplissage du bunker"/>
 		<e k="GC_baler_info_counter" v="Compteur de balles"/>
@@ -133,13 +134,13 @@ Coût : %s"/>
 
 		<!-- DynamicStorage -->
 		<e k="GC_dynamicStorage_unloadSettings" v="Paramètres de déchargement"/>
-		<e k="GC_dynamicStorage_gui_header_unloading" v="Sélectionner la position de déchargement"/>
-		<e k="GC_dynamicStorage_gui_header_loading" v="Sélectionner la boîte de chargement"/>
-		<e k="GC_dynamicStorage_gui_info_unloading" v="Sélectionner la boîte de déchargement. Notez que chaque boîte ne peut contenir qu'un seul type de produit."/>
-		<e k="GC_dynamicStorage_gui_info_loading" v="Sélectionnez la boîte à charger."/>
+		<e k="GC_dynamicStorage_gui_header_unloading" v="Sélectionner l'emplacement de déchargement"/>
+		<e k="GC_dynamicStorage_gui_header_loading" v="Sélectionner l'emplacement de chargement"/>
+		<e k="GC_dynamicStorage_gui_info_unloading" v="Sélectionner l'emplacement de déchargement. Notez que chaque emplacement ne peut contenir qu'un seul type de produit."/>
+		<e k="GC_dynamicStorage_gui_info_loading" v="Sélectionnez l'emplacement à charger."/>
 		<e k="GC_dynamicStorage_gui_fillLevel" v="%s / %s litre"/>
 		<e k="GC_dynamicStorage_gui_empty" v="Vide"/>
-		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Confirmer la position de déchargement"/>
+		<e k="GC_dynamicStorage_gui_confirmBoxUnloading" v="Confirmer l'emplacement de déchargement"/>
 		<e k="GC_dynamicStorage_gui_confirmBoxLoading" v="Confirmer le chargement"/>
 
 		<!-- PlaceableDigitalDisplay -->
@@ -147,5 +148,83 @@ Coût : %s"/>
 		<e k="GC_placeableDigDisplay_header" v="Affichage numérique"/>
 		<e k="GC_placeableDigDisplay_headerInfo" v="Vous pouvez spécifier ici n'importe quel texte qui apparaîtra à l'écran."/>
 		<e k="GC_placeableDigDisplay_btnSave" v="Sauver"/>
+
+		<!-- GlobalMarket -->
+		<e k="GC_globalMarket_openGui" v="Ouvrir Global Market"/>
+		<e k="GC_globalMarket_header" v="Global Markt 2020"/>
+		<e k="GC_globalMarket_headerInfo" v="Ici, vous pouvez vendre des marchandises livrées ou acheter des marchandises."/>
+		<e k="GC_globalMarket_btn_buyScreen" v="Aperçu des achats"/>
+		<e k="GC_globalMarket_btn_storageScreen" v="Aperçu des stocks"/>
+		<e k="GC_globalMarket_btn_synch" v="Synchroniser"/>
+		
+		<e k="GC_globalMarket_header2" v="Global Market 2020 - Sélection de quantité"/>
+		<e k="GC_globalMarket_headerInfo2" v="Choisissez ici le montant souhaité !"/>
+		<e k="GC_globalMarket_btn_ok" v="Confirmer"/>
+		<e k="GC_globalMarket_btn_startLoad" v="Commencer le chargement"/>
+		
+		<e k="GC_globalMarket_header3" v="Global Market 2020 - Externaliser"/>
+		<e k="GC_globalMarket_headerInfo3" v="Choisissez le produit à charger"/>
+		<e k="GC_globalMarket_btn_min" v="Minimum"/>
+		<e k="GC_globalMarket_btn_max" v="Maximum"/>
+
+		<e k="GC_globalMarket_header4" v="Global Market 2020 - Transfert de véhicule"/>
+		<e k="GC_globalMarket_headerInfo4" v="Informations sur l'achat d'un véhicule"/>
+
+		<e k="GC_globalMarket_txt_amount" v="Montant"/>
+		<e k="GC_globalMarket_txt_money" v="Valeur"/>
+
+		<e k="GC_globalMarket_tbl_header_filltype" v="Type de produit"/>
+		<e k="GC_globalMarket_tbl_header_level" v="Litres"/>
+		<e k="GC_globalMarket_tbl_header_pallets" v="Palettes"/>
+		<e k="GC_globalMarket_tbl_header_bales" v="Balles"/>
+		<e k="GC_globalMarket_tbl_header_price" v="Prix ​​actuel"/>
+		<e k="GC_globalMarket_tbl_header_price2" v="Prix ​​actuel / 1000 litres"/>
+		<e k="GC_globalMarket_btn_outsource" v="Externaliser"/>
+		<e k="GC_globalMarket_btn_outsourceBale1" v="Balles rondes"/>
+		<e k="GC_globalMarket_btn_outsourceBale2" v="Balles carrées"/>
+		<e k="GC_globalMarket_btn_sell" v="Vendre"/>
+		<e k="GC_globalMarket_btn_buy" v="Acheter"/>
+
+		<e k="GC_globalMarket_tbl_header_preview" v="Aperçu"/>
+		<e k="GC_globalMarket_tbl_header_name" v="Désignation"/>
+		<e k="GC_globalMarket_tbl_header_age" v="Âge"/>
+		<e k="GC_globalMarket_tbl_header_operationTime" v="Temps de fonctionnement"/>
+		<e k="GC_globalMarket_tbl_header_price3" v="Prix"/>
+		<e k="GC_globalMarket_txt_hours" v="%s heure(s)"/>
+		<e k="GC_globalMarket_txt_days" v="%s jour(s)"/>
+
+		<e k="GC_globalMarket_externIsOffline" v="Démarrez le logiciel externe requis pour pouvoir acheter ou vendre vos marchandises."/>
+		<e k="GC_globalMarket_externIsFalseVersion" v="Vous ne disposez pas de la dernière version du logiciel externe."/>
+		
+		
+		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Balles carrées d'herbe"/>
+		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Balles rondes d'herbe"/>
+		<e k="GC_globalMarket_storeItem_cotton" v="Coton"/>
+
+		
+		<!-- AnimalFeeder -->
+		<e k="GC_animalFeeder_backupTitie" v="Système d'alimentation"/>
+		<e k="GC_animalFeeder_openGui" v="Ouvrir l'interface"/>
+		<e k="GC_animalFeeder_gui_info" v="Gérez le système d'alimentation ici !"/>
+		<e k="GC_animalFeeder_gui_startManual" v="Démarrer le système manuellement"/>
+		<e k="GC_animalFeeder_gui_hist_header" v="Statistiques"/>
+		<e k="GC_animalFeeder_gui_hist_text1" v="Consommation totale pour hier :"/>
+		<e k="GC_animalFeeder_gui_hist_text2" v="Consommation du bunker %s pour hier :"/>
+		<e k="GC_animalFeeder_gui_hist_val" v="%s litres"/>
+		<e k="GC_animalFeeder_gui_hist_time" v="%s:00 heures"/>
+		<e k="GC_animalFeeder_gui_demandPercent" v="Besoins suppl. / Aliment :"/>
+		<e k="GC_animalFeeder_gui_bunker_title" v="Aperçu du bunker"/>
+		<e k="GC_animalFeeder_gui_bunker_name" v="Bunker %s"/>
+		<e k="GC_animalFeeder_gui_mixingRatio_title" v="Taux de mélange"/>
+		<e k="GC_animalFeeder_gui_mixingRatio_warnung" v="Le rapport de mélange doit être de 100% !"/>
+		<e k="GC_animalFeeder_gui_literPerDrive" v="Quantité / Voyage :"/>
+		<e k="GC_animalFeeder_gui_warningHeader" v="Systèmes d'alimentation - Avertissements (%s)"/>
+		<e k="GC_animalFeeder_gui_warningText_bunkerEmpty" v="%s : %s vide !"/>
+		<e k="GC_animalFeeder_gui_warningText_noConnectedAnimalTrough" v="Aucune mangeoire trouvée !"/>
+		<e k="GC_animalFeeder_gui_warningText_toHighDeltaForTroug" v="Quantité de remplissage trop importante !"/>
+	
+		<!-- FarmStarter -->
+		<e k="GC_farmstarter_header" v="Choisissez votre ferme de départ !"/>
+	
 	</elements>
 </l10n>
