@@ -126,6 +126,7 @@ function GC_AnimalFeederPlaceable:finalizePlacement()
 	GC_AnimalFeederPlaceable:superClass().finalizePlacement(self)
 
 	for _, object in ipairs(self.list) do
+		object:finalizePlacement();
 		object:register(true)
 	end
 end
