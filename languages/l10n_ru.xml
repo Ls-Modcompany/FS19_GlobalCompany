@@ -5,7 +5,7 @@
 		<!-- Warnings / Errors -->
 		<e k="GC_mapVersionWarning" v="Карта '%s' от %s нуждается в GlobalCompany - Нужна версия %s или выше. Скачай последнюю версию с ModHub или посети '%s' для поддержки."/>	
 		<e k="GC_modVersionWarning" v="Мод '%s' от %s нуждается в GlobalCompany - Нужна версия %s или выше. Скачай последнюю версию с ModHub или посети '%s' для поддержки."/>	
-		<e k="GC_loadingError" v="Во время загрузки GlobalCompany что то пошло не так! Скачай последнюю версию с ModHub или посети '%s' для поддержки."/>	
+		<e k="GC_loadingError" v="Во время загрузки GlobalCompany что-то пошло не так! Скачай последнюю версию с ModHub или посети '%s' для поддержки."/>	
 		<e k="GC_duplicateError" v="Обнаружен дубликат GlobalCompany! Удали '%s' из папки с модами и перезапусти игру."/>
 		<e k="GC_combinedError" v="GlobalCompany загружается как часть карты '%s'! Это запрещено и приводит к ошибкам. Скачай последнюю версию с ModHub или посети '%s' для поддержки."/>
 		<e k="GC_invalidModWarning" v="Мод %s от %s не поддерживается! Во избежании ошибок удали его из папки с модами!"/>
@@ -29,9 +29,9 @@
 		<!-- Settings -->
 		<e k="GC_settings_header" v="GlobalCompany - Установки"/>
 		<e k="GC_settings1_title" v="Активировать повсеместное размещение"/>
-		<e k="GC_settings2_title" v="Показать онформацию по объекту"/>
-		<e k="GC_settings3_title" v="Нанять помощника (300€ / Лошадь / День)"/>
-		<e k="GC_settings4_title" v="Активировать посадку большего количества деревьев"/>
+		<e k="GC_settings2_title" v="Показать информацию по объекту"/>
+		<e k="GC_settings3_title" v="Нанять помощника (300€ за лошадь в день)"/>
+		<e k="GC_settings4_title" v="Активировать большее количество деревьев"/>
 		<e k="GC_settings5_title" v="Активировать резку тюков"/>
 		
 		<!-- Factory -->
@@ -62,7 +62,7 @@
 		<e k="GC_Input_Header_Backup" v="Ресурсы"/>
 		<e k="GC_Output_Header_Backup" v="Продукты"/>
 		
-		<e k="GC_Open_Product_Menu" v="Открыть меню прозводства"/>
+		<e k="GC_Open_Product_Menu" v="Открыть меню производства"/>
 		<e k="GC_Open_Overview_Menu" v="Открыть меню обзора"/>
 		
 		<e k="GC_Factory_Animal_Dialogue1" v="Выбери количество животных, которые должны быть выгружены на производство."/>
@@ -121,7 +121,7 @@
 		<e k="GC_baler_info_machineData" v="Данные установки"/>
 		<e k="GC_baler_info_fillLevel" v="Заполнение"/>
 		<e k="GC_baler_info_fillLevelBunker" v="Заполнение бункера"/>
-		<e k="GC_baler_info_counter" v="Запресованные тюки"/>
+		<e k="GC_baler_info_counter" v="Запрессованные тюки"/>
 		<e k="GC_baler_info_automatic" v="Автоматически"/>
 		<e k="GC_baler_actualTyp" v="Актуальный тип тюков:"/>
 		<e k="GC_baler_canStack" v="Число сложенных тюков:"/>
@@ -152,7 +152,7 @@
 		<!-- GlobalMarket -->
 		<e k="GC_globalMarket_openGui" v="Открыть меню Global Market"/>
 		<e k="GC_globalMarket_header" v="Global Market 2020"/>
-		<e k="GC_globalMarket_headerInfo" v="Здесть ты можешь продавать или покупать продукцию."/>
+		<e k="GC_globalMarket_headerInfo" v="Здесь ты можешь продавать или покупать продукцию."/>
 		<e k="GC_globalMarket_btn_buyScreen" v="Обзор покупки"/>
 		<e k="GC_globalMarket_btn_storageScreen" v="Обзор хранилища"/>
 		<e k="GC_globalMarket_btn_synch" v="Синхронизировать"/>
