@@ -274,6 +274,20 @@ function GC_AnimalFeeder:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
             end
         end
         
+        if hasXMLProperty(xmlFile, roboterKey .. ".sounds") then 
+            local operateSounds = GC_Sounds:new(self.isServer, self.isClient)
+            if operateSounds:load(self.rootNode, self, xmlFile, roboterKey) then
+                self.roboter.operationSound = operateSounds
+            end
+        end
+
+        if hasXMLProperty(xmlFile, roboterKey .. ".unloading.sounds") then 
+            local operateSounds = GC_Sounds:new(self.isServer, self.isClient)
+            if operateSounds:load(self.rootNode, self, xmlFile, roboterKey .. ".unloading") then
+                self.roboter.unloadingSound = operateSounds
+            end
+        end
+        
         local animationNodes = GC_AnimationNodes:new(self.isServer, self.isClient)
         if animationNodes:load(self.rootNode, self, xmlFile, operationKey) then
             self.roboter.operation.animationNodes = animationNodes
@@ -680,11 +694,17 @@ function GC_AnimalFeeder:update(dt)
             local currentAnimTime = self:getCurrentAnimTime()
             if self.anim.state == GC_AnimalFeeder.ANIMSTATE.DEFAULT then
                 self.animationClips:setAnimationClipsState(true)
-                self.anim.state = GC_AnimalFeeder.ANIMSTATE.RUNNING
+                self.anim.state = GC_AnimalFeeder.ANIMSTATE.RUNNING                
+                if self.roboter.operationSound ~= nil then
+                    self.roboter.operationSound:setEffectsState(true)
+                end
             elseif self.anim.state == GC_AnimalFeeder.ANIMSTATE.RUNNING then
                 for _,bunker in pairs(self.bunkers) do                    
                     if self.anim.raisedTimes[bunker.operation.startTime] == nil and currentAnimTime >= bunker.operation.startTime then
-                        self.anim.state = GC_AnimalFeeder.ANIMSTATE.LOADING
+                        self.anim.state = GC_AnimalFeeder.ANIMSTATE.LOADING        
+                        if self.roboter.operationSound ~= nil then
+                            self.roboter.operationSound:setEffectsState(false)
+                        end
                         self.anim.loadingBunkerId = bunker.id
                         self.anim.raisedTimes[bunker.operation.startTime] = true
                         self:setOperationEffects(bunker.id, true)
@@ -728,7 +748,10 @@ function GC_AnimalFeeder:update(dt)
                             end
                         end
                         if self.anim.raisedTimes[bunker.operation.endTime] == nil and currentAnimTime >= bunker.operation.endTime then
-                            self.anim.state = GC_AnimalFeeder.ANIMSTATE.RUNNING
+                            self.anim.state = GC_AnimalFeeder.ANIMSTATE.RUNNING 
+                            if self.roboter.operationSound ~= nil then
+                                self.roboter.operationSound:setEffectsState(true)
+                            end
                             self.anim.raisedTimes[bunker.operation.endTime] = true
                             self:setOperationEffects(bunker.id, false)
                         end
@@ -767,7 +790,10 @@ function GC_AnimalFeeder:update(dt)
                 self.anim.isRunning = false
                 self.anim.raisedTimes = {}
                 self.animationClips:setAnimationClipsState(false)
-                self.anim.state = GC_AnimalFeeder.ANIMSTATE.DEFAULT
+                self.anim.state = GC_AnimalFeeder.ANIMSTATE.DEFAULT 
+                if self.roboter.operationSound ~= nil then
+                    self.roboter.operationSound:setEffectsState(false)
+                end
                 self:resetRoboter()
             end
             self:raiseUpdate()
@@ -1065,6 +1091,9 @@ function GC_AnimalFeeder:setRobotorUnloadingEffectsEvent(data, noEventSend)
         if self.roboter.unloading.particleEffects ~= nil then
             self.roboter.unloading.particleEffects:setEffectsState(data[1])
         end        
+        if self.roboter.unloadingSound ~= nil then
+            self.roboter.unloadingSound:setSoundsState(data[1])
+        end                
     end
 end
 
