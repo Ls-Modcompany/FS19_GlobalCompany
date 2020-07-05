@@ -866,28 +866,14 @@ function GC_AnimalFeeder:updateBunkerClient(bunker)
 end
 
 function GC_AnimalFeeder:updateRoboter(fillLevelDelta, fillTypeIndex, bunkerId, resetBunker)
-    self:updateRoboterEvent({fillLevelDelta, fillTypeIndex, bunkerId, resetBunker, bunkerId ~= nil})
-end
-
-function GC_AnimalFeeder:updateRoboterEvent(data, noEventSend)
-    self:raiseEvent(self.eventId_updateRoboter, data, noEventSend)
-
-    local fillLevelDelta = data[1]
-    local fillTypeIndex = data[2] 
-    local bunkerId = data[3]
-    local resetBunker = data[4]
-    local useBunker = data[5]
-
     local fillLevel = 0
-    if useBunker and bunkerId ~= nil then
+
+    if bunkerId ~= nil then
         self.roboter.fillLevels[bunkerId] = self.roboter.fillLevels[bunkerId] + fillLevelDelta
         fillLevel = self:getRoboterFillLevel()
     else
-        self.roboter.fillLevel = self.roboter.fillLevel + fillLevelDelta
-        fillLevel = self.roboter.fillLevel
+        fillLevel = self.roboter.fillLevel + fillLevelDelta
     end
-
-    self.roboter.fillTypeIndex = fillTypeIndex
 
     if resetBunker then
         self.roboter.fillLevels = {}
@@ -896,9 +882,17 @@ function GC_AnimalFeeder:updateRoboterEvent(data, noEventSend)
         end
     end
 
-    --if self.isServer then
-    --    self:raiseDirtyFlags(self.animalFeederDirtyFlag)
-    --end
+    self:updateRoboterEvent({fillLevel, fillTypeIndex})
+end
+
+function GC_AnimalFeeder:updateRoboterEvent(data, noEventSend)
+    self:raiseEvent(self.eventId_updateRoboter, data, noEventSend)
+
+    local fillLevel = data[1]
+    local fillTypeIndex = data[2] 
+
+    self.roboter.fillLevel = fillLevel   
+    self.roboter.fillTypeIndex = fillTypeIndex
 
     if self.isClient then
         if self.roboter.fillVolumes ~= nil then
@@ -912,17 +906,18 @@ function GC_AnimalFeeder:updateRoboterEvent(data, noEventSend)
     end
 end
 
-function GC_AnimalFeeder:resetRoboter()    
-    self:resetRoboterEvent({})
-end
-
-function GC_AnimalFeeder:resetRoboterEvent(data, noEventSend)
-    self:raiseEvent(self.eventId_resetRoboter, data, noEventSend)
-
+function GC_AnimalFeeder:resetRoboter()        
     self.roboter.fillLevels = {}
     for _,bunker in pairs(self.bunkers) do
         self.roboter.fillLevels[bunker.id] = 0
     end
+
+    self:resetRoboterEvent({})
+end
+
+function GC_AnimalFeeder:resetRoboterEvent(data, noEventSend)
+    --self:raiseEvent(self.eventId_resetRoboter, data, noEventSend)
+
     self.roboter.fillLevel = 0
 
     if self.isClient then
