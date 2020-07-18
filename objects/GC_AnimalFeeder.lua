@@ -274,16 +274,16 @@ function GC_AnimalFeeder:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
             end
         end
         
-        if hasXMLProperty(xmlFile, roboterKey .. ".sounds") then 
+        if hasXMLProperty(xmlFile, operationKey .. ".sounds") then 
             local operateSounds = GC_Sounds:new(self.isServer, self.isClient)
-            if operateSounds:load(self.rootNode, self, xmlFile, roboterKey) then
+            if operateSounds:load(self.rootNode, self, xmlFile, operationKey) then
                 self.roboter.operationSound = operateSounds
             end
         end
 
-        if hasXMLProperty(xmlFile, roboterKey .. ".unloading.sounds") then 
+        if hasXMLProperty(xmlFile, operationKey .. ".unloading.sounds") then 
             local operateSounds = GC_Sounds:new(self.isServer, self.isClient)
-            if operateSounds:load(self.rootNode, self, xmlFile, roboterKey .. ".unloading") then
+            if operateSounds:load(self.rootNode, self, xmlFile, operationKey .. ".unloading") then
                 self.roboter.unloadingSound = operateSounds
             end
         end
@@ -696,14 +696,14 @@ function GC_AnimalFeeder:update(dt)
                 self.animationClips:setAnimationClipsState(true)
                 self.anim.state = GC_AnimalFeeder.ANIMSTATE.RUNNING                
                 if self.roboter.operationSound ~= nil then
-                    self.roboter.operationSound:setEffectsState(true)
+                    self.roboter.operationSound:setSoundsState(true)
                 end
             elseif self.anim.state == GC_AnimalFeeder.ANIMSTATE.RUNNING then
                 for _,bunker in pairs(self.bunkers) do                    
                     if self.anim.raisedTimes[bunker.operation.startTime] == nil and currentAnimTime >= bunker.operation.startTime then
                         self.anim.state = GC_AnimalFeeder.ANIMSTATE.LOADING        
                         if self.roboter.operationSound ~= nil then
-                            self.roboter.operationSound:setEffectsState(false)
+                            self.roboter.operationSound:setSoundsState(false)
                         end
                         self.anim.loadingBunkerId = bunker.id
                         self.anim.raisedTimes[bunker.operation.startTime] = true
@@ -750,7 +750,7 @@ function GC_AnimalFeeder:update(dt)
                         if self.anim.raisedTimes[bunker.operation.endTime] == nil and currentAnimTime >= bunker.operation.endTime then
                             self.anim.state = GC_AnimalFeeder.ANIMSTATE.RUNNING 
                             if self.roboter.operationSound ~= nil then
-                                self.roboter.operationSound:setEffectsState(true)
+                                self.roboter.operationSound:setSoundsState(true)
                             end
                             self.anim.raisedTimes[bunker.operation.endTime] = true
                             self:setOperationEffects(bunker.id, false)
@@ -792,7 +792,7 @@ function GC_AnimalFeeder:update(dt)
                 self.animationClips:setAnimationClipsState(false)
                 self.anim.state = GC_AnimalFeeder.ANIMSTATE.DEFAULT 
                 if self.roboter.operationSound ~= nil then
-                    self.roboter.operationSound:setEffectsState(false)
+                    self.roboter.operationSound:setSoundsState(false)
                 end
                 self:resetRoboter()
             end
@@ -803,6 +803,7 @@ function GC_AnimalFeeder:update(dt)
             self:raiseUpdate()
         elseif self.anim.needNewStarts > 0 then
             local canRun, deltaToFeed, numberRuns = self:checkRun()
+            self.anim.needNewStarts = self.anim.needNewStarts - 1
             if canRun then
                 self.anim.needNewStarts = self.anim.needNewStarts - 1
                 self.anim.isRunning = true    
