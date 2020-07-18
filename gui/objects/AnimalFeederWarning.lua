@@ -98,7 +98,7 @@ function Gc_Gui_AnimalFeederWarning:setOnGui()
     for i=num, num -2, -1 do
         if self.warnings[i] ~= nil then
             self["gui_text" .. tostring(index)]:setVisible(true)
-            self["gui_header" .. tostring(i)]:setVisible(true)
+            self["gui_header" .. tostring(index)]:setVisible(true)
             self["gui_text" .. tostring(index)]:setText(self.warnings[i].warningText)
             self["gui_header" .. tostring(index)]:setText(self.warnings[i].header)
             index = index + 1
