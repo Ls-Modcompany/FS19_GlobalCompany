@@ -63,7 +63,7 @@ function GC_Gui_tableSort:delete()
 end;
 
 function GC_Gui_tableSort:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
-	GC_Gui_slider:superClass().mouseEvent(self, posX, posY, isDown, isUp, button, eventUsed)
+	GC_Gui_tableSort:superClass().mouseEvent(self, posX, posY, isDown, isUp, button, eventUsed)
 end;
 
 function GC_Gui_tableSort:keyEvent(unicode, sym, modifier, isDown, eventUsed)   

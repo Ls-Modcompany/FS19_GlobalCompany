@@ -61,7 +61,7 @@ function GC_Gui_input:delete()
 end;
 
 function GC_Gui_input:mouseEvent(posX, posY, isDown, isUp, button, eventUsed)
-	GC_Gui_slider:superClass().mouseEvent(self, posX, posY, isDown, isUp, button, eventUsed)
+	GC_Gui_input:superClass().mouseEvent(self, posX, posY, isDown, isUp, button, eventUsed)
 end;
 
 function GC_Gui_input:keyEvent(unicode, sym, modifier, isDown, eventUsed)

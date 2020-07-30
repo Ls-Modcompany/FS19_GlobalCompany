@@ -137,7 +137,7 @@ function GlobalCompanyGui:preLoad()
 
 	g_company.gui:registerGui("gc_farmStarter", nil, Gc_Gui_FarmStarter, false, false, true);	
 	self.activeGuiDialogs = {};
-	self.registeredActonEvents = false;
+	self.registeredActionEvents = false;
 end
 
 function GlobalCompanyGui:load()	

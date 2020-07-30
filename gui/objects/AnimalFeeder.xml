@@ -115,8 +115,8 @@
     <GuiElement type="flowLayout" template="gcAnimalFeederButtonsLayout">
         <GuiElement type="button" template="gcBaseGuiButton" inputAction="MENU_BACK" onClick="onClickClose" />
         <GuiElement type="text" template="gcBaseGuiButtonText" text="$l10n_GC_gui_buttons_back" />     
-        <GuiElement type="button" position="50px 0px" template="gcBaseGuiButtonNext" inputAction="JUMP" onClick="onClickStartManual" id="gui_btn_startManual" />
-        <GuiElement type="text" template="gcBaseGuiButtonText" id="gui_btn_startManualText" text="$l10n_GC_animalFeeder_gui_startManual" />     
+        <!--GuiElement type="button" position="50px 0px" template="gcBaseGuiButtonNext" inputAction="JUMP" onClick="onClickStartManual" id="gui_btn_startManual" /-->
+        <!--GuiElement type="text" template="gcBaseGuiButtonText" id="gui_btn_startManualText" text="$l10n_GC_animalFeeder_gui_startManual" /-->     
     
     </GuiElement>
   </GuiElement>  

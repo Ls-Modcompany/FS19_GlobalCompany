@@ -733,10 +733,11 @@ function GC_AnimalFeeder:update(dt)
                         if self.anim.raisedTimes[bunker.operation.endTime] == nil then 
                             if self.isServer then                                                   
                                 local fillDeltaFullTime = self.anim.deltaToFeed * (bunker.mixingRatio.value / 100) * self:getCurrentAnimSpeed()
+                                --print(string.format("mixVal %s speed %s", bunker.mixingRatio.value, self:getCurrentAnimSpeed()))
                                 local fillDeltaTime = bunker.operation.endTime - bunker.operation.startTime
                                 --print(string.format("loading 1: fillDeltaTime: %s dt: %s", fillDeltaTime, dt))
                                 local fillDelta = fillDeltaFullTime / fillDeltaTime * dt
-                                fillDelta = math.min(fillDelta, bunker.capacity - bunker.fillLevel)
+                                fillDelta = math.min(fillDelta, bunker.fillLevel)
                                 --print(string.format("loading 2: capacity: %s fillLevel: %s fillDelta: %s", bunker.capacity, bunker.fillLevel, fillDelta))
                                 local oldFillDelta = self.roboter.fillLevels[bunker.id]                    
                                 if self.roboter.fillLevels[bunker.id] + fillDelta > fillDeltaFullTime then
@@ -744,7 +745,7 @@ function GC_AnimalFeeder:update(dt)
                                 end
                                 --print(string.format("loading %s %s %s", self.anim.deltaToFeed, fillDelta, fillDeltaFullTime))
                                 self:updateRoboter(fillDelta, bunker.mainFillType, bunker.id)
-                                self:updateBunker(bunker.id, fillDelta * -1)
+                                self:updateBunker(bunker.id, fillDelta * -1)                                
                             end
                         end
                         if self.anim.raisedTimes[bunker.operation.endTime] == nil and currentAnimTime >= bunker.operation.endTime then

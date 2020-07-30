@@ -184,6 +184,28 @@
 		<e k="GC_globalMarket_storeItem_squareBaleGrass" v="Square bale grass"/>
 		<e k="GC_globalMarket_storeItem_roundBaleGrass" v="Round bale grass"/>
 		<e k="GC_globalMarket_storeItem_cotton" v="Cotton"/>
+
+		
+		<!-- AnimalFeeder -->
+		<e k="GC_animalFeeder_backupTitie" v="Feedingsystem"/>
+		<e k="GC_animalFeeder_openGui" v="Open panel"/>
+		<e k="GC_animalFeeder_gui_info" v="Manage the feeding system here!"/>
+		<e k="GC_animalFeeder_gui_startManual" v="Starting the system manually"/>
+		<e k="GC_animalFeeder_gui_hist_header" v="Statistic"/>
+		<e k="GC_animalFeeder_gui_hist_text1" v="Total consumption yesterday:"/>
+		<e k="GC_animalFeeder_gui_hist_text2" v="Bunker %s consumption yesterday:"/>
+		<e k="GC_animalFeeder_gui_hist_val" v="%s Litres"/>
+		<e k="GC_animalFeeder_gui_hist_time" v="Time %s:00"/>
+		<e k="GC_animalFeeder_gui_demandPercent" v="More need/feeding:"/>
+		<e k="GC_animalFeeder_gui_bunker_title" v="Bunker overview"/>
+		<e k="GC_animalFeeder_gui_bunker_name" v="Bunker %s"/>
+		<e k="GC_animalFeeder_gui_mixingRatio_title" v="Mixing ratio"/>
+		<e k="GC_animalFeeder_gui_mixingRatio_warnung" v="Mixing ratio must be 100%!"/>
+		<e k="GC_animalFeeder_gui_literPerDrive" v="Quantity/trip:"/>
+		<e k="GC_animalFeeder_gui_warningHeader" v="Feeding systems - warnings (%s)"/>
+		<e k="GC_animalFeeder_gui_warningText_bunkerEmpty" v="%s: %s empty!"/>
+		<e k="GC_animalFeeder_gui_warningText_noConnectedAnimalTrough" v="No trough found!"/>
+		<e k="GC_animalFeeder_gui_warningText_toHighDeltaForTroug" v="Capacity too large!"/>
 	
 		<!-- FarmStarter -->
 		<e k="GC_farmstarter_header" v="Choose your startfarm!"/>

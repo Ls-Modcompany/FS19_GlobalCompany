@@ -1,15 +1,18 @@
 --
 -- GlobalCompany
 --
--- @Interface: 1.5.1.0 b6730
+-- @Interface: 1.6.0.0 b9166
 -- @Author: LS-Modcompany
--- @Date: 16.06.2020
--- @Version: 1.6.0.1
+-- @Date: 19.07.2020
+-- @Version: 1.7.0.0
 --
 -- @Support: LS-Modcompany
 --
 -- Changelog:
--- 	v1.6.0.0 (07.08.2020):
+-- 	v1.7.0.0 (19.07.2020):
+--		- Add AnimalFeeder
+--
+-- 	v1.6.0.0 (07.06.2020):
 --		- Add features for DynamicStorage
 --		- Add productionfactory for vehicles
 --		- Adaption for Stappenbach19
@@ -117,9 +120,9 @@
 GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
-GlobalCompany.version = "1.6.0.1";
-GlobalCompany.versionDate = "16.06.2020";
-GlobalCompany.currentVersionId = 1601; -- Mod Manager ID. (Version number without periods.)
+GlobalCompany.version = "1.7.0.0";
+GlobalCompany.versionDate = "19.07.2020";
+GlobalCompany.currentVersionId = 1700; -- Mod Manager ID. (Version number without periods.)
 GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
 GlobalCompany.isGreenWeekVersion = false;
 

@@ -907,8 +907,8 @@ function GC_ProductionFactory:load(nodeId, xmlFile, xmlKey, indexName, isPlaceab
 				g_company.debug:writeModding(self.debugData, "[FACTORY - %s] loadingTrigger '%s' found at '%s.loadingTrigger' is not in use! This should be removed from XML.", indexName, regName, item.key)
 			end
 		end
-	else
-		self.outputProducts = nil
+	--else
+		--self.outputProducts = nil
 	end
 
 	if self.numInputProducts > 0 then
@@ -1980,7 +1980,7 @@ function GC_ProductionFactory:minuteChanged()
 							local productionFactor = (productPerHour / 60) * self.updateDelay
 							local hasSpace, factor = self:getHasOutputSpace(productLine, productionFactor)
 							local hasProduct, producedFactor = self:getHasInputProducts(productLine, factor)
-
+							
 							if hasSpace and hasProduct then
 								raiseFlags = true
 
