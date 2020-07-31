@@ -158,7 +158,7 @@ function GC_AnimalFeeder:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
         bunker.mixingRatio = {}
         bunker.mixingRatio.min = Utils.getNoNil(getXMLInt(xmlFile, bunkerKey .. ".mixingRatio#min"), 0)
         bunker.mixingRatio.max = Utils.getNoNil(getXMLInt(xmlFile, bunkerKey .. ".mixingRatio#max"), 100)
-        bunker.mixingRatio.value = bunker.mixingRatio.min
+        bunker.mixingRatio.value = bunker.mixingRatio.min + (bunker.mixingRatio.max - bunker.mixingRatio.min) / 2
         ratioCount = ratioCount + bunker.mixingRatio.value
 
         local unloadingTriggerKey = string.format("%s.unloadingTrigger", bunkerKey)
@@ -236,8 +236,17 @@ function GC_AnimalFeeder:load(nodeId, xmlFile, xmlKey, indexName, isPlaceable)
     self.roboter = {}
     self.roboter.capacity = Utils.getNoNil(getXMLInt(xmlFile, roboterKey .. "#capacity"), 50000)
     self.roboter.animalModul = Utils.getNoNil(getXMLString(xmlFile, roboterKey .. "#animalModul"), "food")
-    self.roboter.animalFillType = g_fillTypeManager:getFillTypeIndexByName(Utils.getNoNil(getXMLString(xmlFile, roboterKey .. "#animalFillType"), "GRASS_WINDROW"))
-    
+
+    local animalFillType = getXMLString(xmlFile, roboterKey .. "#animalFillType")
+    local foodMixture = getXMLString(xmlFile, roboterKey .. "#foodMixture")
+
+    if animalFillType ~= nil then
+        self.roboter.animalFillType = g_fillTypeManager:getFillTypeIndexByName(animalFillType)
+    elseif foodMixture ~= nil then
+        self.roboter.foodMixture = g_fillTypeManager:getFillTypeIndexByName(foodMixture)
+        self.roboter.animalFillType = self.roboter.foodMixture
+    end
+
     self.roboter.fillLevel = 0
     self.roboter.fillTypeIndex = -1;
     self.roboter.currentFillLevelDelta = 0
@@ -765,15 +774,44 @@ function GC_AnimalFeeder:update(dt)
                     self.anim.raisedTimes[self.roboter.unloading.endTime] = true                    
                     self:setRobotorUnloadingEffects(false)
                     if self.isServer and self.roboter.fillLevel > 0 then
-                        local delta = self:getConnectedHusbandry():changeFillLevels(self.roboter.fillLevel, self.roboter.animalFillType)                
-                        self:updateRoboter(delta * -1, self.roboter.animalFillType)
+                        if self.roboter.foodMixture == nil then
+                            self:getConnectedHusbandry():changeFillLevels(self.roboter.fillLevel, self.roboter.animalFillType)                
+                            self:updateRoboter(self.roboter.fillLevel * -1, self.roboter.animalFillType)
+                        else
+                            for _, ingredient in ipairs(g_animalFoodManager.foodMixtures[self.roboter.foodMixture].ingredients) do                                
+                                for _,bunker in pairs(self.bunkers) do
+                                    for _, fillTypeInt in pairs(ingredient.fillTypes) do
+                                        if bunker.fillTypes[fillTypeInt] ~= nil then
+                                            self:getConnectedHusbandry():changeFillLevels(self.roboter.fillLevel * (bunker.mixingRatio.value / 100), fillTypeInt)                
+                                            self:updateRoboter(self.roboter.fillLevel * (bunker.mixingRatio.value / 100) * -1, self.roboter.animalFillType)
+                                            break
+                                        end
+                                    end
+                                end                                
+                            end
+                        end
                     end
                 end
                 if currentAnimTime > self.roboter.unloading.startTime and currentAnimTime < self.roboter.unloading.endTime then  
-                    if self.isServer then                                              
-                        local delta = self:getConnectedHusbandry():changeFillLevels(math.min(self.roboter.currentFillLevelDelta * dt * self:getCurrentAnimSpeed(), self.roboter.fillLevel), self.roboter.animalFillType)                
-                        --print(string.format("unloading %s %s", math.min(self.roboter.currentFillLevelDelta * dt * self:getCurrentAnimSpeed(), self.roboter.fillLevel), delta))
-                        self:updateRoboter(delta * -1, self.roboter.animalFillType)
+                    if self.isServer then              
+                        if self.roboter.foodMixture == nil then
+                            local delta = self:getConnectedHusbandry():changeFillLevels(math.min(self.roboter.currentFillLevelDelta * dt * self:getCurrentAnimSpeed(), self.roboter.fillLevel), self.roboter.animalFillType)                
+                            --print(string.format("unloading %s %s", math.min(self.roboter.currentFillLevelDelta * dt * self:getCurrentAnimSpeed(), self.roboter.fillLevel), delta))
+                            self:updateRoboter(delta * -1, self.roboter.animalFillType)
+                        else        
+                            for _, ingredient in ipairs(g_animalFoodManager.foodMixtures[self.roboter.foodMixture].ingredients) do                                
+                                for _,bunker in pairs(self.bunkers) do
+                                    for _, fillTypeInt in pairs(ingredient.fillTypes) do
+                                        if bunker.fillTypes[fillTypeInt] ~= nil then
+                                            print(g_fillTypeManager:getFillTypeNameByIndex(fillTypeInt))
+                                            local delta = self:getConnectedHusbandry():changeFillLevels(math.min(self.roboter.currentFillLevelDelta * dt * self:getCurrentAnimSpeed() * (bunker.mixingRatio.value / 100), self.roboter.fillLevel * (bunker.mixingRatio.value / 100)), fillTypeInt)                
+                                            self:updateRoboter(delta * -1, self.roboter.animalFillType)
+                                            break
+                                        end
+                                    end
+                                end                                
+                            end
+                        end
                     end
                 end
             end
@@ -1117,7 +1155,7 @@ function GC_AnimalFeeder:checkRun()
         self:addWarning(g_company.languageManager:getText("GC_animalFeeder_gui_warningText_noConnectedAnimalTrough"))
         return false, 0, 0
     end
-
+        
     local freeCapacity = self:getConnectedHusbandry():getFreeCapacity(self.roboter.animalFillType)
 
     if freeCapacity < self.feedingLiterPerDrive then
