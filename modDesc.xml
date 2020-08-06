@@ -2,7 +2,7 @@
 <modDesc descVersion="51">
 	<author>LS-Modcompany / kevink98, aPuehri, Eribus</author>
 	
-    <version>1.7.0.0</version>
+    <version>1.7.1.0</version>
     
 	<title>
         <en>GlobalCompany</en>
@@ -12,6 +12,9 @@
         <en><![CDATA[Global Company - A large script extension for Farming Simulator!
 
 GlobalCompany is the base for many scripts. No matter if production, warehouse or whatever - with this it is easy to implement.
+
+Changelog 1.7.1.0:
+- NEW: Animalfeeder supports foodmixtures
 
 Changelog 1.7.0.0:
 - NEW: Animalfeeder
@@ -81,6 +84,9 @@ Changelog 1.1.0.0:
 
 GlobalCompany ist die Grundlage für viele Scripte. Egal ob Produktionen, Lager oder was auch immer - hiermit lässt es sich einfach umsetzen.
 
+Changelog 1.7.1.0:
+- NEU: Animalfeeder unterstützt nun Mischfutter
+
 Changelog 1.7.0.0:
 - NEU: Animalfeeder
 
@@ -149,6 +155,9 @@ Changelog 1.1.0.0:
 
 GlobalCompany основа для множества скриптов. Будь то производства, хранилища или что то еще - с ним возможно многое.
 
+Блог изменений 1.7.1.0:
+- НОВИНКА: Животновод поддерживает пищевые смеси
+
 Блог изменений 1.7.0.0:
 - НОВИНКА: Животновод
 
@@ -216,6 +225,9 @@ GlobalCompany основа для множества скриптов. Будь 
         <fr><![CDATA[Global Company - Une grande extension de script pour Farming Simulator !
 
 GlobalCompany est la base de nombreux scripts. Que ce soit pour la production, l'entreposage ou autre - avec ce mod, il est facile de tout implémenter.
+
+Changelog 1.7.1.0 :
+- NOUVEAU : L'alimentation animale soutient les mélanges alimentaires
 
 Changelog 1.7.0.0 :
 - NOUVEAU : Nourriture pour animaux

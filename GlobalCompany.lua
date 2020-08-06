@@ -9,6 +9,9 @@
 -- @Support: LS-Modcompany
 --
 -- Changelog:
+-- 	v1.7.1.0 (01.08.2020):
+--		- AnimalFeeder: Support now foodmixtures
+--
 -- 	v1.7.0.0 (19.07.2020):
 --		- Add AnimalFeeder
 --
@@ -121,9 +124,9 @@ GlobalCompany = {};
 GlobalCompany.dir = g_currentModDirectory;
 
 GlobalCompany.version = "1.7.1.0";
-GlobalCompany.versionDate = "30.07.2020";
+GlobalCompany.versionDate = "01.08.2020";
 GlobalCompany.currentVersionId = 1710; -- Mod Manager ID. (Version number without periods.)
-GlobalCompany.isDevelopmentVersion = true; -- This is for versions loaded from GIT.
+GlobalCompany.isDevelopmentVersion = false; -- This is for versions loaded from GIT.
 GlobalCompany.isGreenWeekVersion = false;
 
 function GlobalCompany.initialLoad()
@@ -463,6 +466,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "objects/GC_ProgrammFlow_Globalfunctions.lua");
 	source(GlobalCompany.dir .. "objects/GC_AnimalFeeder.lua");
 	source(GlobalCompany.dir .. "objects/GC_Visibility.lua");
+	--source(GlobalCompany.dir .. "objects/GC_ObjectStorage.lua");
 
 	source(GlobalCompany.dir .. "objects/GC_ProductionFactoryObject.lua");
 
@@ -486,6 +490,7 @@ function GlobalCompany.loadSourceFiles()
 	source(GlobalCompany.dir .. "placeables/GC_PlaceableDigitalDisplayPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_GlobalMarketPlaceable.lua");
 	source(GlobalCompany.dir .. "placeables/GC_AnimalFeederPlaceable.lua");
+	--source(GlobalCompany.dir .. "placeables/GC_ObjectStoragePlaceable.lua");
 
 	--|| Additionals ||--
 	source(GlobalCompany.dir .. "additionals/GC_BaleAddon.lua");
@@ -529,6 +534,7 @@ function GlobalCompany.loadPlaceables()
 	GlobalCompany:addPlaceableType("GC_PlaceableDigitalDisplayPlaceable", "GC_PlaceableDigitalDisplayPlaceable", placeablesDir .. "GC_PlaceableDigitalDisplayPlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_GlobalMarketPlaceable", "GC_GlobalMarketPlaceable", placeablesDir .. "GC_GlobalMarketPlaceable.lua");
 	GlobalCompany:addPlaceableType("GC_AnimalFeederPlaceable", "GC_AnimalFeederPlaceable", placeablesDir .. "GC_AnimalFeederPlaceable.lua");
+	--GlobalCompany:addPlaceableType("GC_ObjectStoragePlaceable", "GC_ObjectStoragePlaceable", placeablesDir .. "GC_ObjectStoragePlaceable.lua");
 end;
 
 function GlobalCompany:registerObject(object)

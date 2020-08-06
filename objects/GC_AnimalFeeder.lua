@@ -803,7 +803,6 @@ function GC_AnimalFeeder:update(dt)
                                 for _,bunker in pairs(self.bunkers) do
                                     for _, fillTypeInt in pairs(ingredient.fillTypes) do
                                         if bunker.fillTypes[fillTypeInt] ~= nil then
-                                            print(g_fillTypeManager:getFillTypeNameByIndex(fillTypeInt))
                                             local delta = self:getConnectedHusbandry():changeFillLevels(math.min(self.roboter.currentFillLevelDelta * dt * self:getCurrentAnimSpeed() * (bunker.mixingRatio.value / 100), self.roboter.fillLevel * (bunker.mixingRatio.value / 100)), fillTypeInt)                
                                             self:updateRoboter(delta * -1, self.roboter.animalFillType)
                                             break
@@ -1181,7 +1180,6 @@ function GC_AnimalFeeder:checkRun()
         deltaToFeed = deltaToFeed / 2
     end
 
-    --print(string.format("checkRun %s %s %s", canRun, deltaToFeed, numberRuns))
     return canRun, deltaToFeed, numberRuns
 end
 
